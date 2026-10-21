@@ -99,7 +99,7 @@ function bottomMenu(){
 const e=$('#bottom');e.innerHTML='<div id="bottomNav" class="bottom-nav"></div><div class="bottom-shortcuts">단축키 <kbd>I</kbd> 소지품 <kbd>C</kbd> 캐릭터 <kbd>M</kbd> 지도 <kbd>F5</kbd> 저장 <kbd>F9</kbd> 불러오기</div>';
 for(const name of ['생활','세계 지도','제작','인벤토리','캐릭터','숙련','도감','신앙','설정',...(s.dungeon?['던전']:[])]){const b=make('button',{class:'bottom-button'+((s.page===name||overlayPage===name)?' current':''),type:'button','aria-label':name},$('#bottomNav'));b.innerHTML=svgIcon(ICON_MAP[name]||'map')+'<span>'+name+'</span>';b.onclick=()=>openPage(name)}
 }
-function closeOverlay(){overlayPage=null;if(overlayReturnTab!==null){s.tab=overlayReturnTab;overlayReturnTab=null;}const dialog=$('#largeDialog');if(dialog?.open)dialog.close();dialog?.remove();const prior=overlayReturn;overlayReturn=null;if(prior?.isConnected)prior.focus();render()}
+function closeOverlay(){const previousOverlay=overlayPage;overlayPage=null;if(overlayReturnTab!==null){s.tab=overlayReturnTab;overlayReturnTab=null;}const dialog=$('#largeDialog');if(dialog?.open)dialog.close();dialog?.remove();const prior=overlayReturn;overlayReturn=null;render();const restored=prior?.isConnected?prior:[...document.querySelectorAll('.bottom-button')].find(b=>b.getAttribute('aria-label')===previousOverlay);restored?.focus()}
 function drawOverlay(){
 const old=$('#largeDialog');old?.remove();if(!overlayPage)return;
 const dialog=make('dialog',{id:'largeDialog','aria-label':overlayPage,class:'large-dialog'},document.body);
