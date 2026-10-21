@@ -37,16 +37,7 @@ function iconify(){if(window.lucide?.createIcons){window.lucide.createIcons()}el
 function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:0,pos:[2,2],dungeon:false,hp:100,mp:80,hunger:85,day:1,hour:8,items:safeCopy(baseItems),logs:[],filter:'전체',search:'',sort:'name',selectedItem:null,selectedIds:[],logFilter:'전체',logSearch:'',pinnedIds:[],expandedLogs:[],collapsed:true,viewFont:100,theme:'aurora',auto:{hp:{on:true,pct:35},mp:{on:false,pct:20},hunger:{on:true,pct:25}}}}
 let s=fresh(),autoTimer=null,previousPage='생활';const LOG_LIMIT=500;
 
-const THEMES=[
-{id:'aurora',name:'오로라',mode:'light',colors:['#9667d9','#75b4f4','#f4a2d1'],source:'기본 게임 테마'},
-{id:'cat-latte',name:'Catppuccin Latte',mode:'light',colors:['#8839ef','#1e66f5','#ea76cb'],source:'Catppuccin'},
-{id:'rose-dawn',name:'Rosé Pine Dawn',mode:'light',colors:['#907aa9','#286983','#b4637a'],source:'Rosé Pine'},
-{id:'nord',name:'Nord Aurora',mode:'light',colors:['#b48ead','#5e81ac','#bf616a'],source:'Nord'},
-{id:'rose-moon',name:'Rosé Pine Moon',mode:'dark',colors:['#c4a7e7','#9ccfd8','#eb6f92'],source:'Rosé Pine'},
-{id:'cat-mocha',name:'Catppuccin Mocha',mode:'dark',colors:['#cba6f7','#89b4fa','#f5c2e7'],source:'Catppuccin'},
-{id:'dracula',name:'Dracula',mode:'dark',colors:['#bd93f9','#8be9fd','#ff79c6'],source:'Dracula'},
-{id:'tokyo',name:'Tokyo Night',mode:'dark',colors:['#bb9af7','#7aa2f7','#f7768e'],source:'Tokyo Night'}
-];
+const THEMES=[{"id":"aurora","name":"오로라","mode":"light","colors":["#9667d9","#75b4f4","#f4a2d1"],"source":"기본 게임 테마"},{"id":"rose-dawn","name":"장미빛 새벽","mode":"light","colors":["#907aa9","#286983","#b4637a"],"source":"로즈 파인"},{"id":"rose-moon","name":"장미빛 달","mode":"dark","colors":["#c4a7e7","#9ccfd8","#eb6f92"],"source":"로즈 파인"},{"id":"tokyo","name":"도쿄의 밤","mode":"dark","colors":["#bb9af7","#7aa2f7","#f7768e"],"source":"도쿄 나이트"},{"id":"solarized","name":"솔라라이즈드","mode":"light","colors":["#268bd2","#2aa198","#b58900"],"source":"솔라라이즈드"},{"id":"gruvbox","name":"그루브박스","mode":"dark","colors":["#fe8019","#b8bb26","#83a598"],"source":"그루브박스"},{"id":"everforest","name":"상록의 숲","mode":"dark","colors":["#a7c080","#dbbc7f","#7fbbb3"],"source":"에버포레스트"},{"id":"citrus","name":"시트러스","mode":"light","colors":["#65a30d","#f59e0b","#0d9488"],"source":"테일윈드 색상군 조합"}];
 function useTheme(id,persist=true){if(!THEMES.some(t=>t.id===id))id='aurora';s.theme=id;document.documentElement.dataset.theme=id;document.documentElement.style.colorScheme=THEMES.find(t=>t.id===id).mode;if(persist){try{localStorage.setItem('fantasy-ui-theme',id)}catch{}}}
 try{const stored=localStorage.getItem('fantasy-ui-theme');if(THEMES.some(t=>t.id===stored))s.theme=stored}catch{}
 
