@@ -1,0 +1,8 @@
+{
+  "name": "fantasy-life-sim-ui-prototype",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "check": "node --check src/app.js && node --check src/data.js"
+  }
+}
