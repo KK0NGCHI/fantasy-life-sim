@@ -75,3 +75,22 @@ py -m http.server 8000
 원본 자료: [Catppuccin](https://catppuccin.com/palette/), [Rosé Pine](https://rosepinetheme.com/ko/palette/), [Nord](https://www.nordtheme.com/docs/colors-and-palettes/), [Dracula](https://draculatheme.com/contribute), [Tokyo Night](https://github.com/tokyo-night/tokyo-night-vscode-theme).
 
 CSS 테마 토큰은 `src/v5.css`에 있습니다. 기존 스타일은 `src/v4.css`에 보존됩니다.
+
+## v0.6 팔레트 다양화 및 다크모드 개선 (2026-10-22)
+
+- 테마 선택 목록을 8종으로 다시 구성. 이름은 전부 한국어로 표시.
+- 유지: 오로라, 장미빛 새벽, 장미빛 달, 도쿄의 밤.
+- 추가: 솔라라이즈드(밝은 파랑·청록·황토), 그루브박스(어두운 주황·연두·청록), 상록의 숲(어두운 녹색·황금·청록), 시트러스(밝은 라임·호박·청록).
+- 제거: Catppuccin Latte/Mocha, Nord Aurora, Dracula.
+- 다크 테마에서는 **하단 단축키 키캡**, 하단 탭 hover·선택 상태, 설정 입력창, 제작/인벤토리 목록, 로그와 세부 정보 패널의 배경/테두리/텍스트를 공통 테마 변수로 정리.
+- 지역 그라데이션은 보존하되 어두운 테마에서 얇은 반투명 오버레이로 배경만 어둡게 처리. 텍스트와 아이콘은 함께 흐려지지 않도록 분리.
+- 세계 지도 아이콘과 제목은 중앙 기준 아래로 3px 이동.
+- 기존 이용자의 제거된 테마 설정은 유효하지 않으므로 오로라로 안전하게 대체.
+
+### 팔레트 레퍼런스
+- [Solarized 공식 컬러](https://ethanschoonover.com/solarized/)
+- [Gruvbox 공식 색상 소스](https://github.com/morhetz/gruvbox/blob/master/colors/gruvbox.vim)
+- [Everforest 공식 컬러 표](https://github.com/sainnhe/everforest/blob/master/palette.md)
+- [Tailwind 컬러 팔레트](https://tailwindcss.com/docs/customizing-colors)
+
+현재 게임 전용 CSS 테마는 원본 팔레트 전체를 재현하는 대신 대표적인 3색과 분위기를 반영한 파생 UI입니다. CSS는 `src/v6.css`에 있고, 이전 버전은 보존되어 있습니다.
