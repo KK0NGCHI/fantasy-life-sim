@@ -30,7 +30,7 @@ const baseItems=[...START_ITEMS.map(i=>({...i,weight:.5,quality:'보통',materia
 const ICON_MAP={"생활":"house","세계 지도":"map","인벤토리":"backpack","캐릭터":"user-round","숙련":"chart-no-axes-column","제작":"hammer","도감":"book-open","신앙":"sparkles","설정":"settings","던전":"footprints"};
 const ACTION_ICONS={'밭을 돌본다':'sprout','작물을 수확한다':'wheat','작업대를 사용한다':'hammer','휴식한다':'bed-double','약초를 채집한다':'leaf','풀을 벤다':'scissors','농지를 살핀다':'scan-eye','나무를 조사한다':'trees','나뭇가지를 줍는다':'logs','버섯을 채집한다':'sprout','낚시한다':'fish','강변을 조사한다':'waves','광석을 채굴한다':'pickaxe','지층을 조사한다':'mountain','던전에 진입한다':'footprints','주변을 살핀다':'scan-eye'};
 const STATUS_MOCK=[{name:'출혈',icon:'droplets',turns:4,desc:'매 턴 피해를 받는 상태. 실제 피해량은 미정입니다.'},{name:'중독',icon:'flask-conical',turns:12,desc:'독의 영향을 받는 상태. 실제 효과는 미정입니다.'},{name:'혼란',icon:'brain',turns:7,desc:'행동에 영향을 주는 상태. 실제 판정은 미정입니다.'},{name:'저주',icon:'shield-alert',turns:null,desc:'해제 조건이 정해지지 않은 지속 상태입니다.'},{name:'화상',icon:'flame',turns:3,desc:'화염 관련 지속 피해 후보. 효과 미정입니다.'},{name:'마력 과부하',icon:'zap',turns:9,desc:'마법 관련 상태 이상 예시입니다.'},{name:'쇠약',icon:'activity',turns:5,desc:'능력 저하 효과 후보입니다.'},{name:'빙결',icon:'snowflake',turns:2,desc:'냉기 관련 상태 이상 예시입니다.'},{name:'공포',icon:'eye',turns:8,desc:'정신 관련 상태 이상 예시입니다.'}];
-let overlayPage=null,overlayReturn=null,conditionExpanded=false;
+let overlayPage=null,overlayReturn=null,overlayReturnTab=null,conditionExpanded=false;
 function svgIcon(name){return '<i data-lucide="'+esc(name)+'" aria-hidden="true"></i>'}
 function iconify(){if(window.lucide?.createIcons){window.lucide.createIcons()}else if(!document.querySelector('#lucide-load-warning')){const note=document.createElement('span');note.id='lucide-load-warning';note.className='sr';note.textContent='아이콘 라이브러리를 불러오지 못했습니다.';document.body.append(note)}}
 
@@ -41,11 +41,11 @@ const make=(tag,props={},parent)=>{const e=document.createElement(tag);for(const
 function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',text,class:classes},parent);b.addEventListener('click',fn);return b}
 function top(){ $('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+s.day+'일</span><span>'+svgIcon('clock')+' '+String(s.hour).padStart(2,'0')+':00</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span></div>'}
 function side(){ /* v0.3: persistent left navigation removed in favor of bottom controls */ }
-function head(name,description){const main=$('#main');main.innerHTML='<h1>'+esc(name)+'</h1>'+(description?'<p class="subhead">'+esc(description)+'</p>':'')+'<div id="view"></div>';return $('#view')}
+function head(name,description){const main=$('#main');main.innerHTML='<h1>'+esc(name)+'</h1>'+(description?'<p class="subhead">'+esc(description)+'</p>':'')+'<div id="view"></div>';return main.querySelector('#view')}
 function tabs(target,names,handler){const e=make('div',{class:'tabs'},target);for(const name of names){const b=btn(name,()=>handler(name),s.tab===name?'active':'',e);b.setAttribute('aria-selected',String(s.tab===name))}return e}
 function section(el,title){const sec=make('section',{class:'section'},el);make('h2',{text:title},sec);return sec}
 function changeTab(t){s.tab=t;if(overlayPage)drawOverlay();else drawMain();iconify()}
-function openPage(name){if(autoTimer)stopAuto();if(['인벤토리','캐릭터','숙련','도감','신앙'].includes(name)){overlayReturn=document.activeElement;overlayPage=name;s.tab=name==='인벤토리'?'전체':name==='캐릭터'?'기본 정보':name==='숙련'?'생활':name==='도감'?'발견 목록':'개요';render();return;}overlayPage=null;if(s.page!==name)previousPage=s.page;s.page=name;s.tab=name==='생활'?'개요':name==='제작'?'제작법':'기본';render()}
+function openPage(name){if(autoTimer)stopAuto();if(['인벤토리','캐릭터','숙련','도감','신앙'].includes(name)){if(!overlayPage)overlayReturnTab=s.tab;overlayReturn=document.activeElement;overlayPage=name;s.tab=name==='인벤토리'?'전체':name==='캐릭터'?'기본 정보':name==='숙련'?'생활':name==='도감'?'발견 목록':'개요';render();return;}overlayPage=null;if(s.page!==name)previousPage=s.page;s.page=name;s.tab=name==='생활'?'개요':name==='제작'?'제작법':'기본';render()}
 function act(name){if(name==='던전에 진입한다'){s.dungeon=true;s.page='던전';s.tab='탐색';s.turn++;nextLog('탐험','지하미궁에 들어섰습니다.','고정 예시 지도이며 실제 절차적 생성은 아직 없습니다.');return render()}if(name==='작업대를 사용한다')return openPage('제작');s.turn++;nextLog('생활',actionLabel(name)+'을(를) 실행했습니다.','실제 생산·성장·시간 계산 없이 UI 로그만 생성했습니다.');render()}
 function regionActions(){return ACTIONS[s.region]||['주변을 살핀다','휴식한다']}
 function lifestyle(){
@@ -99,7 +99,7 @@ function bottomMenu(){
 const e=$('#bottom');e.innerHTML='<div id="bottomNav" class="bottom-nav"></div><div class="bottom-shortcuts">단축키 <kbd>I</kbd> 소지품 <kbd>C</kbd> 캐릭터 <kbd>M</kbd> 지도 <kbd>F5</kbd> 저장 <kbd>F9</kbd> 불러오기</div>';
 for(const name of ['생활','세계 지도','제작','인벤토리','캐릭터','숙련','도감','신앙','설정',...(s.dungeon?['던전']:[])]){const b=make('button',{class:'bottom-button'+((s.page===name||overlayPage===name)?' current':''),type:'button','aria-label':name},$('#bottomNav'));b.innerHTML=svgIcon(ICON_MAP[name]||'map')+'<span>'+name+'</span>';b.onclick=()=>openPage(name)}
 }
-function closeOverlay(){overlayPage=null;const dialog=$('#largeDialog');if(dialog?.open)dialog.close();dialog?.remove();const prior=overlayReturn;overlayReturn=null;if(prior?.isConnected)prior.focus();render()}
+function closeOverlay(){overlayPage=null;if(overlayReturnTab!==null){s.tab=overlayReturnTab;overlayReturnTab=null;}const dialog=$('#largeDialog');if(dialog?.open)dialog.close();dialog?.remove();const prior=overlayReturn;overlayReturn=null;if(prior?.isConnected)prior.focus();render()}
 function drawOverlay(){
 const old=$('#largeDialog');old?.remove();if(!overlayPage)return;
 const dialog=make('dialog',{id:'largeDialog','aria-label':overlayPage,class:'large-dialog'},document.body);
