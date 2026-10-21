@@ -1,0 +1,131 @@
+@import url("./v6.css");
+/* Light-only theme design tokens; overrides legacy dark selectors. */
+:root,
+:root[data-theme="aurora"]{
+color-scheme:light;
+--theme-bg:#fcfaff;--theme-surface:#fff;--theme-side:#f7f3ff;--theme-panel:#f5f0fc;
+--theme-text:#34304f;--theme-muted:#65617e;--theme-line:#e6ddf2;
+--theme-primary:#8655cb;--theme-secondary:#619de8;--theme-tertiary:#eb82b9;
+--theme-select:#ece2ff;--theme-hover:#f2e8fa;--theme-focus:#6756bd;
+--theme-kbd-bg:#fff;--theme-kbd-text:#4f4768;--theme-kbd-border:#d3cae9;
+--theme-table-head:#f2eefa;--theme-hero-dim:transparent;
+}
+:root[data-theme="rose-dawn"]{
+color-scheme:light;--theme-bg:#faf4ed;--theme-surface:#fffaf3;--theme-side:#f6eee9;
+--theme-panel:#f2e8e5;--theme-text:#464261;--theme-muted:#70697f;--theme-line:#e3d6d1;
+--theme-primary:#907aa9;--theme-secondary:#286983;--theme-tertiary:#b4637a;
+--theme-select:#ece2ec;--theme-hover:#f1e7e8;--theme-focus:#846b9e;
+--theme-kbd-bg:#fff8f3;--theme-kbd-text:#595067;--theme-kbd-border:#d7c9cb;--theme-table-head:#f0e5e0;--theme-hero-dim:transparent;
+}
+:root[data-theme="solarized"]{
+color-scheme:light;--theme-bg:#fdf6e3;--theme-surface:#fffdf5;--theme-side:#f7f1df;
+--theme-panel:#f3efdd;--theme-text:#344c51;--theme-muted:#526a70;--theme-line:#ded7c4;
+--theme-primary:#267ba8;--theme-secondary:#2aa198;--theme-tertiary:#b58900;
+--theme-select:#d7e9e4;--theme-hover:#e3eee6;--theme-focus:#267ba8;
+--theme-kbd-bg:#fffdf5;--theme-kbd-text:#41535a;--theme-kbd-border:#bcb6a6;--theme-table-head:#e9e4d2;--theme-hero-dim:transparent;
+}
+:root[data-theme="citrus"]{
+color-scheme:light;--theme-bg:#fffef4;--theme-surface:#fffefa;--theme-side:#f1f6e8;
+--theme-panel:#f4f6e4;--theme-text:#38443b;--theme-muted:#58685d;--theme-line:#dce5d0;
+--theme-primary:#4f8124;--theme-secondary:#0f887c;--theme-tertiary:#b87612;
+--theme-select:#ddedc8;--theme-hover:#e6f1d5;--theme-focus:#447a27;
+--theme-kbd-bg:#fff;--theme-kbd-text:#475341;--theme-kbd-border:#c8d5ba;--theme-table-head:#e9f1dd;--theme-hero-dim:transparent;
+}
+:root[data-theme="red"]{
+color-scheme:light;--theme-bg:#fff8f6;--theme-surface:#fffefd;--theme-side:#fff0ee;
+--theme-panel:#fff0ec;--theme-text:#56363c;--theme-muted:#7e6264;--theme-line:#f0d9d5;
+--theme-primary:#ba384d;--theme-secondary:#c97843;--theme-tertiary:#7195bd;
+--theme-select:#ffe0df;--theme-hover:#ffebea;--theme-focus:#ac3649;
+--theme-kbd-bg:#fffafa;--theme-kbd-text:#6e464c;--theme-kbd-border:#e9c9c9;--theme-table-head:#fff0ed;--theme-hero-dim:transparent;
+}
+:root[data-theme="blue"]{
+color-scheme:light;--theme-bg:#f5faff;--theme-surface:#fff;--theme-side:#ebf5ff;
+--theme-panel:#edf5ff;--theme-text:#2c4667;--theme-muted:#5a7292;--theme-line:#d4e4f4;
+--theme-primary:#236cb7;--theme-secondary:#2f9bbd;--theme-tertiary:#c69039;
+--theme-select:#d8eafb;--theme-hover:#e5f1fd;--theme-focus:#276faf;
+--theme-kbd-bg:#fff;--theme-kbd-text:#415d7c;--theme-kbd-border:#c8dbea;--theme-table-head:#edf4fd;--theme-hero-dim:transparent;
+}
+:root[data-theme="lavender"]{
+color-scheme:light;--theme-bg:#fbf9ff;--theme-surface:#fff;--theme-side:#f3effb;
+--theme-panel:#f4f0fb;--theme-text:#4e4162;--theme-muted:#77688b;--theme-line:#e4dcec;
+--theme-primary:#7d59b7;--theme-secondary:#8d65c8;--theme-tertiary:#589c77;
+--theme-select:#eaddf8;--theme-hover:#f1eafa;--theme-focus:#835fc0;
+--theme-kbd-bg:#fff;--theme-kbd-text:#605174;--theme-kbd-border:#dccdeb;--theme-table-head:#f2edfa;--theme-hero-dim:transparent;
+}
+:root[data-theme="cocoa"]{
+color-scheme:light;--theme-bg:#fff9f2;--theme-surface:#fffefb;--theme-side:#f9eee4;
+--theme-panel:#fbf0e6;--theme-text:#554338;--theme-muted:#816b5b;--theme-line:#ead9c8;
+--theme-primary:#986346;--theme-secondary:#7f9f93;--theme-tertiary:#d19752;
+--theme-select:#f1dfcf;--theme-hover:#f7e7d9;--theme-focus:#986346;
+--theme-kbd-bg:#fff;--theme-kbd-text:#675446;--theme-kbd-border:#e1cbb9;--theme-table-head:#f9ecdd;--theme-hero-dim:transparent;
+}
+/* Every interactive hover references its active theme, including old hardcoded rules. */
+.v3-shell .bottom-button:hover,.v3-shell .bottom-button:focus-visible,
+.v3-shell .top-settings:hover,.v3-shell .iconbutton:hover,
+.v3-shell .v3-action:hover,.v3-shell .craft-choice:hover,
+.v3-shell .inventory-choice:hover,.v3-shell .region:hover:not(.active),
+.v3-shell .btn:hover,.v3-shell .linklike:hover,.v3-shell .eventtools button:hover,
+.dialog-body .btn:hover,.dialog-body .craft-choice:hover,.dialog-body .inventory-choice:hover,
+.dialog-body .theme-choice:hover,.v3-shell .theme-choice:hover{
+background:var(--theme-hover)!important;color:var(--theme-text)!important;
+}
+.v3-shell .bottom-button.current:hover,.v3-shell .bottom-button.current:focus-visible,
+.v3-shell .region.active:hover,.v3-shell .inventory-choice.selected:hover,
+.v3-shell .craft-choice.selected:hover{background:var(--theme-select)!important;color:var(--theme-text)!important}
+.v3-shell .logtools button:hover,.v3-shell .rightpanel .logtools button:hover{background:var(--theme-hover)!important;color:var(--theme-text)!important}
+.v3-shell .bottom-button.current{color:var(--theme-primary)!important;background:var(--theme-select)!important}
+.v3-shell .bottom-button.current:hover{color:var(--theme-primary)!important}
+.v3-shell .scene-spot:hover{background:rgba(255,255,255,.76)!important}
+.theme-choice:hover{background:var(--theme-hover)!important}
+.inventory-choice:hover,.craft-choice:hover{background:var(--theme-hover)!important}
+button:hover{transform:none!important;translate:none!important}
+button:focus-visible{transform:none!important}
+.region:hover,.v3-action:hover,.bottom-button:hover,.scene-spot:hover,
+.inventory-item-button:hover,.craft-choice:hover,.theme-choice:hover{transform:none!important;translate:none!important}
+*{scroll-behavior:auto}
+body .world-v4 .region:hover{transform:none!important;filter:none;box-shadow:0 3px 13px #514b8420}
+/* Preserve region identity on map hover; use subtle inset emphasis rather than a different hue. */
+.v3-shell .world-v4 .region:hover:not(.active){box-shadow:inset 0 0 0 2px var(--theme-primary),0 3px 13px #514b8420}
+.v3-shell .world-v4 .region.active:hover{box-shadow:inset 0 0 0 3px var(--theme-primary)}
+/* Dungeon: efficient horizontal split, centered map, generous control width. */
+.v3-shell .center:has(.dungeon-v7){padding:19px 21px 21px}
+.dungeon-screen~*{margin-top:0}
+.v3-shell .center:has(.dungeon-v7) h1{font-size:23px;margin:0 0 4px}
+.v3-shell .center:has(.dungeon-v7) .subhead{font-size:12px;line-height:1.5;margin:0 0 14px;max-width:none}
+.dungeon-v7{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(280px,38%);gap:18px;align-items:start;margin:0 auto;width:100%;max-width:1250px}
+.dungeon-v7>.dungeon-map-pane{min-width:0;display:flex;align-items:center;justify-content:center;padding:5px}
+.dungeon-v7>.dungeon-controls{min-width:0;background:var(--theme-panel)!important;border-radius:15px;padding:20px 22px}
+.dungeon-v7 .tilemap{grid-template-columns:repeat(16,min(2.6vw,36px));gap:2px;margin:0 auto;width:max-content;max-width:100%}
+.dungeon-v7 .tile{width:min(2.6vw,36px);height:min(2.6vw,36px)}
+.dungeon-v7 .dungeon-controls h2{margin-bottom:10px}
+.dungeon-v7 .dungeon-controls .section{margin-top:13px;padding-top:13px}
+.dungeon-pad{display:grid;grid-template-columns:repeat(3,44px);grid-template-rows:repeat(2,39px);gap:4px;justify-content:center;margin:11px auto 17px}
+.dungeon-pad .dungeon-arrow{min-height:38px;padding:7px;text-align:center;display:grid;place-items:center}
+.dungeon-pad .up{grid-column:2;grid-row:1}.dungeon-pad .left{grid-column:1;grid-row:2}.dungeon-pad .down{grid-column:2;grid-row:2}.dungeon-pad .right{grid-column:3;grid-row:2}
+.dungeon-main-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:center}
+.dungeon-main-actions .btn{padding:10px 13px}
+.dungeon-threshold{gap:9px;white-space:nowrap}
+.dungeon-threshold input[type=number]{width:69px}
+.dungeon-quick{display:flex;flex-wrap:wrap;gap:9px}
+.dungeon-note{margin:15px 0 0;text-align:center}
+@media(max-width:1250px){
+.dungeon-v7{grid-template-columns:1fr;gap:13px}
+.dungeon-v7 .tilemap{grid-template-columns:repeat(16,clamp(20px,4vw,36px))}
+.dungeon-v7 .tile{width:clamp(20px,4vw,36px);height:clamp(20px,4vw,36px)}
+.dungeon-v7>.dungeon-controls{width:100%;max-width:580px;justify-self:center}
+}
+@media(max-width:800px){
+.dungeon-v7{display:block!important}
+.dungeon-v7 .tilemap{grid-template-columns:repeat(16,clamp(15px,4.6vw,28px));gap:1px}
+.dungeon-v7 .tile{width:clamp(15px,4.6vw,28px);height:clamp(15px,4.6vw,28px)}
+.dungeon-v7>.dungeon-controls{margin-top:15px;padding:16px}
+}
+/* Draggable player/log divider. Separate scroll areas, fixed footer. */
+.v3-shell .rightpanel{--log-pane-height:274px}
+.v3-shell .rightpanel .playerpanel{flex:1 1 0;min-height:0;overflow-y:auto}
+.v3-shell .rightpanel .log{flex:0 0 var(--log-pane-height)!important;height:var(--log-pane-height)!important;min-height:0!important;max-height:none!important;overflow:hidden}
+.v3-shell .rightpanel .logbody{min-height:0;max-height:none;overflow-y:auto;flex:1}
+.panel-splitter{flex:0 0 9px;height:9px;min-height:9px;position:relative;background:var(--theme-side);border-top:1px solid var(--theme-line);border-bottom:1px solid var(--theme-line);cursor:row-resize;touch-action:none;z-index:2}
+.panel-splitter:before{content:"";width:40px;height:3px;position:absolute;top:2px;left:50%;transform:translateX(-50%);border-radius:5px;background:var(--theme-muted);opacity:.65}
+.panel-splitter:hover,.panel-splitter.dragging,.panel-splitter:focus-visible{background:var(--theme-select);outline-offset:-2px}
+@media(max-width:800px){.v3-shell .rightpanel .playerpanel{flex:auto;overflow:visible}.v3-shell .rightpanel .log{height:var(--log-pane-height)!important;max-height:none!important}.panel-splitter{display:none}}
