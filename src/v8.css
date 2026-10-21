@@ -38,3 +38,31 @@ border-radius:8px;
 .dungeon-v7 .dungeon-main-actions{margin-top:13px}
 .dungeon-v7>.dungeon-controls{padding-top:21px}
 @media(max-width:700px){.inventory-toolbar input[placeholder]{width:155px}.inventory-toolbar select,.craft-toolbar select{min-width:90px}}
+
+
+/* Compact after removing helper copy: no empty subtitle space. */
+.v3-shell .center{padding-top:21px}
+.v3-shell .center h1{margin-bottom:10px}
+.v3-shell .center:has(.region-scene)>h1{display:none}
+.v3-shell .center:has(.world-v4)>h1{margin-bottom:13px}
+.dialog-body{padding-top:18px}
+.dialog-body .modal-main>h1{display:none}
+.modal-main .tabs,.dialog-body .tabs{margin-top:0;margin-bottom:15px}
+.v3-shell .center .tabs{margin-top:0;margin-bottom:15px}
+.dialog-body .toolbar,.v3-shell .center .toolbar{margin-top:5px;margin-bottom:12px}
+.dialog-body .panegrid{margin-top:0}
+.region-scene{padding-top:18px;padding-bottom:18px;margin-top:0;margin-bottom:13px}
+.region-scene .scene-heading h2{margin:0}
+.region-scene .scene-spots{margin-top:13px}
+.v3-actions{margin-top:11px;gap:11px}
+.v3-shell .rightpanel .logbody{padding-bottom:6px}
+.v3-shell .rightpanel .loghead{padding-bottom:10px}
+.v3-shell .rightpanel .loghead .sectiontitle{margin-bottom:8px}
+.v3-shell .center .section{margin-top:17px;padding-top:15px}
+.v3-shell .center .section:first-child{margin-top:0;padding-top:0}
+.craft-toolbar+.craft-layout,.inventory-toolbar+.inventory-layout{margin-top:0}
+@media(max-width:800px){
+.v3-shell .center{padding-top:15px}
+.dialog-body{padding-top:13px}
+.region-scene{padding:17px;margin-bottom:10px}
+}
