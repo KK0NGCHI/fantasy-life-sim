@@ -60,3 +60,18 @@ py -m http.server 8000
 ### 컬러 관련 참고
 - [Learn UI Design: Mesh Gradients](https://www.learnui.design/blog/mesh-gradients.html) — 다중 색원으로 자연스러운 그라데이션 구성
 - [MDN: Using CSS Gradients](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Images/Using_gradients) — 기울기 각도, 다중 배경, 색 전환
+
+## v0.5 · 팔레트 선택 및 상태 이상 UI (2026-10-22)
+
+- 상태 이상 설명은 스크롤 가능한 플레이어 패널 밖, 브라우저 화면 최상위에 고정 위치로 표시해 중앙 패널에 가려지지 않도록 개선했습니다. 호버 및 키보드 포커스를 지원하며 화면 경계 안에 배치합니다.
+- 세계지도 지역 이름은 12px, 아이콘은 35px로 확대, 둘 사이 간격은 4px로 축소했습니다.
+- 거점은 밝은 노랑·녹색으로 조정하고, 고대 유적과 지하미궁은 명도를 소폭 낮췄습니다.
+- 기본 UI 색상을 보라/파랑/분홍으로 구성하고, 설정의 팔레트 미리보기에서 즉시 변경할 수 있습니다.
+- 라이트: 오로라(자체 시안), Catppuccin Latte, Rosé Pine Dawn, Nord Aurora 기반.
+- 다크: Rosé Pine Moon, Catppuccin Mocha, Dracula, Tokyo Night 기반.
+- 팔레트 선택은 `localStorage`의 `fantasy-ui-theme`에 별도로 보존됩니다. 기존 목업 저장과 무관하게 유지됩니다.
+- 유명 테마는 원본 색상의 **게임 UI용 재해석**이지 원본의 모든 토큰을 그대로 이식한 것은 아닙니다.
+
+원본 자료: [Catppuccin](https://catppuccin.com/palette/), [Rosé Pine](https://rosepinetheme.com/ko/palette/), [Nord](https://www.nordtheme.com/docs/colors-and-palettes/), [Dracula](https://draculatheme.com/contribute), [Tokyo Night](https://github.com/tokyo-night/tokyo-night-vscode-theme).
+
+CSS 테마 토큰은 `src/v5.css`에 있습니다. 기존 스타일은 `src/v4.css`에 보존됩니다.
