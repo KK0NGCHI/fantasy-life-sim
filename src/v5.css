@@ -1,0 +1,88 @@
+@import url("./v4.css");
+/* UI palette presets: design adaptations of cited source palettes. */
+:root{
+--theme-bg:#fcfaff;--theme-surface:#ffffff;--theme-side:#f5f1fd;--theme-panel:#f5f0fc;
+--theme-text:#34304f;--theme-muted:#65617e;--theme-line:#e6ddf2;
+--theme-primary:#8655cb;--theme-secondary:#619de8;--theme-tertiary:#eb82b9;
+--theme-select:#ece2ff;--theme-hover:#f4eaff;--theme-focus:#6756bd;
+--theme-hero-text:#354358;
+}
+:root[data-theme="cat-latte"]{--theme-bg:#eff1f5;--theme-surface:#ffffff;--theme-side:#e6e9ef;--theme-panel:#f2ecfc;--theme-text:#4c4f69;--theme-muted:#626880;--theme-line:#dce0e8;--theme-primary:#8839ef;--theme-secondary:#1e66f5;--theme-tertiary:#ea76cb;--theme-select:#e9dafa;--theme-hover:#f2e8ff;--theme-focus:#8839ef}
+:root[data-theme="rose-dawn"]{--theme-bg:#faf4ed;--theme-surface:#fffaf3;--theme-side:#f2e9e1;--theme-panel:#f4ede8;--theme-text:#464261;--theme-muted:#6e687e;--theme-line:#dfdad9;--theme-primary:#907aa9;--theme-secondary:#286983;--theme-tertiary:#b4637a;--theme-select:#ebe1ef;--theme-hover:#f4e8ee;--theme-focus:#806499}
+:root[data-theme="nord"]{--theme-bg:#eceff4;--theme-surface:#ffffff;--theme-side:#e5e9f0;--theme-panel:#e9eaf4;--theme-text:#2e3440;--theme-muted:#4c566a;--theme-line:#d8dee9;--theme-primary:#9d6d9a;--theme-secondary:#5e81ac;--theme-tertiary:#bf616a;--theme-select:#e9e0eb;--theme-hover:#f0e7f4;--theme-focus:#5e81ac}
+:root[data-theme="rose-moon"]{--theme-bg:#232136;--theme-surface:#2a273f;--theme-side:#302b48;--theme-panel:#393552;--theme-text:#e0def4;--theme-muted:#b1aac9;--theme-line:#514b69;--theme-primary:#c4a7e7;--theme-secondary:#9ccfd8;--theme-tertiary:#eb6f92;--theme-select:#494165;--theme-hover:#443957;--theme-focus:#d2b4f2;--theme-hero-text:#33314c}
+:root[data-theme="cat-mocha"]{--theme-bg:#1e1e2e;--theme-surface:#313244;--theme-side:#242536;--theme-panel:#45475a;--theme-text:#cdd6f4;--theme-muted:#bac2de;--theme-line:#585b70;--theme-primary:#cba6f7;--theme-secondary:#89b4fa;--theme-tertiary:#f5c2e7;--theme-select:#45405d;--theme-hover:#4a425e;--theme-focus:#b4befe;--theme-hero-text:#33314c}
+:root[data-theme="dracula"]{--theme-bg:#282a36;--theme-surface:#343746;--theme-side:#303240;--theme-panel:#44475a;--theme-text:#f8f8f2;--theme-muted:#c6c7d3;--theme-line:#55596c;--theme-primary:#bd93f9;--theme-secondary:#8be9fd;--theme-tertiary:#ff79c6;--theme-select:#514867;--theme-hover:#514563;--theme-focus:#bd93f9;--theme-hero-text:#33314c}
+:root[data-theme="tokyo"]{--theme-bg:#1a1b26;--theme-surface:#24283b;--theme-side:#202335;--theme-panel:#31354c;--theme-text:#c0caf5;--theme-muted:#a9b1d6;--theme-line:#414967;--theme-primary:#bb9af7;--theme-secondary:#7aa2f7;--theme-tertiary:#f7768e;--theme-select:#414164;--theme-hover:#383754;--theme-focus:#bb9af7;--theme-hero-text:#33314c}
+/* Shared semantic surfaces. These selectors supersede earlier hardcoded colors. */
+html,body{background:var(--theme-bg);color:var(--theme-text)}
+.v3-shell .top,.v3-shell .center,.v3-shell .rightpanel .log,.large-dialog{background:var(--theme-surface);color:var(--theme-text)}
+.v3-shell .top{border-bottom-color:var(--theme-line)}
+.v3-shell .center h1,.scene-heading h2,.sectiontitle,.player-title strong,.region-facts strong,.craft-choice,.inventory-item-button,.v3-shell .v3-action{color:var(--theme-text)}
+.v3-shell .rightpanel{background:var(--theme-side);border-left-color:var(--theme-line)}
+.playerpanel{background:var(--theme-side);border-bottom-color:var(--theme-line);color:var(--theme-text)}
+.v3-shell .rightpanel .loghead,.v3-shell .event{border-color:var(--theme-line)}
+.top-meta,.top-meta svg,.top-title,.player-title span,.v3-meter>div:first-child span,.v3-shell .rightpanel .logfoot,.subhead,.tiny.muted,.muted{color:var(--theme-muted)}
+.v3-shell .rightpanel .logfoot,.bottom,.v3-shell .bottom,.dialog-heading{background:var(--theme-side);border-color:var(--theme-line);color:var(--theme-text)}
+.bottom-button,.top-settings,.dialog-close,.iconbutton{color:var(--theme-text)}
+.bottom-button:hover,.top-settings:hover,.iconbutton:hover{background:var(--theme-hover)}
+.v3-shell .bottom-button.current{background:var(--theme-select);color:var(--theme-primary)}
+.v3-shell .rightpanel .logtools button,.tag,.pill{background:var(--theme-panel);color:var(--theme-text)}
+.v3-shell .rightpanel .logtools button.active{background:var(--theme-select);color:var(--theme-primary)}
+.v3-shell .v3-action,.craft-choice,.inventory-choice,.inventory-item-button,.input,.btn,.craft-materials>div{background:var(--theme-surface);border-color:var(--theme-line);color:var(--theme-text)}
+.v3-shell .v3-action svg,.craft-choice svg,.inventory-item-button svg,.top-settings svg,.bottom-button svg{color:currentColor}
+.v3-shell .v3-action:hover,.craft-choice:hover,.inventory-choice:hover,.bottom-button:hover{background:var(--theme-hover)}
+.craft-choice.selected,.inventory-choice.selected{background:var(--theme-select)}
+.craft-detail,.inventory-detail,.dungeonlayout>div:nth-child(2),.detail,.info{background:var(--theme-panel);color:var(--theme-text)}
+.craft-materials>div{background:var(--theme-surface)}
+.v3-shell .btn.primary{background:var(--theme-primary);border-color:var(--theme-primary);color:var(--theme-bg)}
+.v3-shell .center .tabs button.active,.modal-main .tabs button.active{border-color:var(--theme-primary);color:var(--theme-primary)}
+.v3-shell .center .tabs{border-color:var(--theme-line)}
+.v3-shell .center .tabs button{color:var(--theme-muted)}
+.v3-shell .center .tabs button.active{color:var(--theme-primary)}
+.v3-shell .region-facts{border-color:var(--theme-line)}
+.region-facts>div{border-color:var(--theme-line)}
+.v3-track{background:var(--theme-line)}
+.v3-track .hit{background:#df747f}.v3-track .mana{background:var(--theme-secondary)}.v3-track .experience{background:var(--theme-tertiary)}
+.effect-icon{background:var(--theme-surface);color:var(--theme-text);border-color:var(--theme-line)}
+.effect-icon:hover,.effect-icon:focus-visible{background:var(--theme-select)}
+.top-meta .gold-data{color:var(--theme-primary)}
+.v3-shell .loghead .sectiontitle{color:var(--theme-text)}
+.v3-shell .rightpanel .logtools button.active{color:var(--theme-primary)}
+a,button.link,.linklike{color:var(--theme-primary)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline-color:var(--theme-focus)}
+dialog::backdrop{background:rgba(13,12,30,.63)}
+:root[data-theme="rose-moon"] .world-v4 .region,:root[data-theme="cat-mocha"] .world-v4 .region,:root[data-theme="dracula"] .world-v4 .region,:root[data-theme="tokyo"] .world-v4 .region{filter:saturate(.72) brightness(.86)}
+/* World map refinement */
+.world-v4{gap:12px}
+.world-v4 .region,.world-v4 .region span{font-size:12px;font-weight:400;line-height:1.2}
+.world-v4 .region svg{width:35px;height:35px}
+.world-v4 .region{gap:4px}
+/* Green and yellow, not coral, for the home village. */
+.scene-town{background:radial-gradient(ellipse at 17% 15%,#fff39a 0,transparent 52%),radial-gradient(ellipse at 85% 86%,#b4f4a7 0,transparent 64%),linear-gradient(130deg,#f5e990,#b8efbb)!important}
+/* Bring the ruins and dungeon down slightly in luminance. */
+.scene-ruins{background:radial-gradient(ellipse at 17% 20%,#b48aec 0,transparent 57%),radial-gradient(ellipse at 86% 87%,#d992c5 0,transparent 66%),linear-gradient(130deg,#ab97df,#a5c2e5)!important}
+.scene-dungeon{background:radial-gradient(ellipse at 17% 20%,#aa88e9 0,transparent 55%),radial-gradient(ellipse at 86% 87%,#d998cc 0,transparent 68%),linear-gradient(130deg,#af9be9,#9bbfe7)!important}
+.scene-town .scene-heading h2,.scene-ruins .scene-heading h2,.scene-dungeon .scene-heading h2{color:var(--theme-hero-text)!important}
+.world-v4 .region-town{background:linear-gradient(130deg,#ffe792,#b9f0b8)}
+.world-v4 .region-ruin{background:linear-gradient(133deg,#b99ce8,#d7acca)}
+.world-v4 .region-dungeon{background:linear-gradient(133deg,#a98ee2,#cd9acb)}
+/* Status tooltip lives at document root; viewport-fixed, so no clipping by
+   player panel scrolling or the main panel stacking context. */
+.floating-effect-tooltip{position:fixed;z-index:2147483647;width:240px;max-width:calc(100vw - 24px);padding:13px 15px;border-radius:11px;background:#28283f;color:#fff;box-shadow:0 9px 30px #15142955;font-size:12px;line-height:1.55;pointer-events:none}
+.floating-effect-tooltip[hidden]{display:none!important}
+.floating-effect-tooltip strong{font-size:13px}
+.floating-effect-tooltip p{margin:5px 0 7px}
+.floating-effect-tooltip em{color:#ead0ff;font-style:normal}
+.effect-tip{display:none!important}
+/* Settings theme selector */
+.theme-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;margin-top:14px}
+.theme-choice{display:flex;flex-direction:column;align-items:stretch;text-align:left;gap:6px;padding:13px;background:var(--theme-surface);border:1px solid var(--theme-line);border-radius:14px;color:var(--theme-text);min-height:117px}
+.theme-choice:hover{background:var(--theme-hover)}
+.theme-choice.chosen{outline:2px solid var(--theme-primary);outline-offset:-2px}
+.theme-swatch{height:38px;border-radius:9px;display:flex;overflow:hidden;margin-bottom:3px}
+.theme-swatch span{flex:1}
+.theme-name{font-size:13px;font-weight:700}
+.theme-choice small{font-size:11px;color:var(--theme-muted)}
+:root[data-theme="rose-moon"] .region-scene,:root[data-theme="cat-mocha"] .region-scene,:root[data-theme="dracula"] .region-scene,:root[data-theme="tokyo"] .region-scene{box-shadow:0 6px 20px #0003}
+@media(max-width:800px){.world-v4 .region svg{width:27px;height:27px}.theme-gallery{grid-template-columns:repeat(2,minmax(0,1fr))}}
