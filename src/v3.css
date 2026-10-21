@@ -83,3 +83,96 @@ kbd{font:11px ui-monospace,Consolas,monospace;border:1px solid #c7cbd0;backgroun
 @media(max-width:1150px){.v3-shell{grid-template-columns:minmax(0,1fr) 300px}.v3-shell .center{padding:24px}.bottom-shortcuts{width:100%;border-top:1px solid #e5e7eb}}
 @media(max-width:800px){.v3-shell{display:block}.v3-shell .center{min-height:0;padding:20px 15px}.rightpanel{min-height:0;border-left:0;border-top:1px solid #e1e1dd}.playerpanel{padding:19px}.rightpanel .log{min-height:240px}.rightpanel .logbody{max-height:260px}.scene-spots{gap:5px}.region-scene{padding:18px}.v3-actions{grid-template-columns:repeat(2,minmax(0,1fr))}.modal-main .panegrid{grid-template-columns:1fr}.large-dialog{width:98vw;max-width:98vw;height:92vh;max-height:92vh}.dialog-body{padding:17px}.bottom-button{min-width:66px;padding:9px}}
 @media(max-width:450px){.scene-spots{grid-template-columns:1fr}.scene-spot{min-height:46px}.region-facts{grid-template-columns:1fr}.region-facts>div{border-right:0;border-bottom:1px solid #e4e6e8}.v3-actions{grid-template-columns:1fr}.bottom-nav{justify-content:center}.scene-heading h2{font-size:20px}}
+
+
+/* v0.4: stable viewport shell, independent log scroll */
+@media (min-width:801px){
+  html,body{height:100%;overflow:hidden}
+  .v3-shell{height:100dvh;min-height:0;grid-template-rows:auto minmax(0,1fr) auto;overflow:hidden}
+  .v3-shell .center{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+  .v3-shell .rightpanel{height:100%;min-height:0;overflow:hidden;display:flex;flex-direction:column}
+  .v3-shell .playerpanel{min-height:0;flex:1 1 auto;overflow-y:auto}
+  .v3-shell .rightpanel .log{height:274px;min-height:274px;max-height:274px;flex:0 0 274px;overflow:hidden}
+  .v3-shell .rightpanel .loghead,.v3-shell .rightpanel .logfoot{flex:0 0 auto}
+  .v3-shell .rightpanel .logbody{min-height:0;max-height:none;overflow-y:auto;overscroll-behavior:contain}
+  .v3-shell .bottom{min-height:65px;max-height:145px;overflow-y:auto}
+}
+.top-settings{display:inline-flex;align-items:center;justify-content:center;min-width:36px;min-height:36px;background:transparent;color:#394252;border:0;padding:7px;margin-left:2px}
+.top-settings:hover{background:#f0f0f2}
+.top-settings svg{width:21px;height:21px}
+.v3-shell .scene-town,.v3-shell .scene-forest,.v3-shell .scene-river,.v3-shell .scene-mine,.v3-shell .scene-ruins,.v3-shell .scene-volcano,.v3-shell .scene-snow,.v3-shell .scene-desert,.v3-shell .scene-pasture{background:#f0efed}
+.v3-shell .scene-kicker{color:#65667a}
+.v3-shell .scene-heading h2{color:#343744}
+.v3-shell .scene-heading p{color:#6b707b}
+.v3-shell .scene-heading>svg{color:#5b596a}
+.v3-shell .scene-spot{color:#424651}
+.v3-shell .scene-spot.growing{background:#e2e3de}
+.v3-shell .scene-spot.workshop{background:#e4e1df}
+.v3-shell .scene-spot.water{background:#e1e4e9}
+.v3-shell .scene-spot svg{color:#454958}
+.v3-shell .region-scene{border-bottom:1px solid #d9d8dc}
+.v3-shell .v3-action:hover{border-color:#868799}
+.v3-shell .v3-action svg{color:#343744}
+/* World map: four rows × four columns, compact squares, centered content */
+.world-v4{display:grid;grid-template-columns:repeat(4,clamp(78px,11dvh,112px));gap:10px;width:max-content;max-width:100%;margin:10px auto 0}
+.world-v4 .region{width:100%;aspect-ratio:1/1;min-height:0;min-width:0;border:1px solid #d9d9df;text-align:center;padding:10px 6px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:7px;font-size:12px;line-height:1.4;color:#353b48;transition:background .12s}
+.world-v4 .region svg{width:24px;height:24px;display:block;flex-shrink:0}
+.world-v4 .region span{display:block;line-height:1.3}
+.world-v4 .region:hover{filter:brightness(.96);border-color:#8c8798}
+.world-v4 .region.active{outline:2px solid #545267;outline-offset:-3px;font-weight:800}
+.world-v4 .region-town,.world-v4 .region-field{background:#eee8dc}
+.world-v4 .region-forest{background:#dfe5db}
+.world-v4 .region-water{background:#dce4eb}
+.world-v4 .region-mountain,.world-v4 .region-ore{background:#e1e0df}
+.world-v4 .region-snow{background:#e7ebf0}
+.world-v4 .region-desert{background:#ece3d6}
+.world-v4 .region-volcano{background:#eadcda}
+.world-v4 .region-mystic,.world-v4 .region-dungeon{background:#e5dfed}
+.world-v4 .region-ruin{background:#e4e1e5}
+body:has(.world-v4) .v3-shell .center h1{font-size:21px;margin-bottom:8px}
+body:has(.world-v4) .v3-shell .center .subhead{margin:0 0 12px}
+/* Crafting: list 40%, detailed selection 60% */
+.craft-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:22px;align-items:stretch}
+.craft-toolbar{display:flex;gap:9px;align-items:center}
+.craft-list{min-width:0;max-height:500px;overflow-y:auto;padding-right:3px}
+.craft-choice{min-height:62px;width:100%;display:flex;align-items:center;text-align:left;gap:12px;padding:11px 13px;border-bottom:1px solid #e5e4e7;background:#fff;color:#363944}
+.craft-choice:hover{background:#f3f2f4}
+.craft-choice.selected{background:#eceaf1}
+.craft-choice svg{width:21px;height:21px}
+.craft-choice span{display:flex;flex-direction:column;gap:3px}
+.craft-choice strong{font-size:13px}
+.craft-choice small{font-size:11px;color:#777982}
+.craft-detail{padding:21px 24px;min-height:345px;border-top:3px solid #737188;background:#f3f1f4}
+.craft-detail-title{display:flex;align-items:center;gap:13px;padding-bottom:20px;border-bottom:1px solid #dedbe2;margin-bottom:17px}
+.craft-detail-title>svg{width:29px;height:29px}
+.craft-detail-title h2{margin:3px 0 0}
+.craft-detail-row{display:flex;justify-content:space-between;gap:12px;padding:0 0 19px;font-size:13px}
+.craft-detail h3{margin:15px 0 10px}
+.craft-materials{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.craft-materials>div{display:flex;align-items:center;gap:8px;border:1px solid #dedde3;background:#fff;padding:11px;font-size:12px}
+.craft-materials svg{width:16px;height:16px}
+.modal-main .craft-layout{grid-template-columns:minmax(0,2fr) minmax(0,3fr)}
+/* Dungeon tiles readable, with priority over v0.2 definitions */
+.tilemap{grid-template-columns:repeat(16,36px);gap:2px}
+.tilemap .tile{height:36px;width:36px;font-size:18px}
+.tilemap .tile svg{width:19px;height:19px}
+@media (max-width:1370px) and (min-width:801px){
+ .tilemap{grid-template-columns:repeat(16,30px)}
+ .tilemap .tile{height:30px;width:30px}
+ .dungeonlayout{gap:16px}
+}
+@media (max-width:1100px){
+ .craft-layout{grid-template-columns:minmax(0,2fr) minmax(0,3fr);gap:12px}
+ .craft-detail{padding:17px}
+}
+@media (max-width:800px){
+ .world-v4{grid-template-columns:repeat(4,clamp(66px,19vw,98px));gap:7px}
+ .world-v4 .region{padding:5px;font-size:11px}
+ .world-v4 .region svg{height:21px;width:21px}
+ .craft-layout{grid-template-columns:1fr}
+ .craft-list{max-height:280px}
+ .tilemap{grid-template-columns:repeat(16,clamp(16px,4.4vw,28px));gap:1px}
+ .tilemap .tile{height:clamp(16px,4.4vw,28px);width:clamp(16px,4.4vw,28px)}
+ .v3-shell .rightpanel .log{height:274px;max-height:274px;min-height:274px;flex:0 0 274px}
+ .v3-shell .rightpanel .logbody{max-height:none;min-height:0;overflow-y:auto}
+}
