@@ -88,6 +88,31 @@ const pane=make('div',{class:'panegrid inventory-layout'},el);
 const list=make('div',{class:'inventory-list'},pane);
 const detail=make('aside',{class:'inventory-detail','aria-label':'선택한 아이템 상세'},pane);
 const selected=new Set(s.selectedIds);
+function redraw(){
+let items=s.items.filter(i=>(s.tab==='전체'||i.group===s.tab)&&(s.filter==='전체'||!s.filter||i.group===s.filter)&&[i.name,i.material,i.id,...i.tags].join(' ').toLowerCase().includes(s.search.toLowerCase()));
+items.sort((a,b)=>['qty','weight'].includes(s.sort)?b[s.sort]-a[s.sort]:String(a[s.sort]).localeCompare(String(b[s.sort]),'ko'));
+total.textContent=items.length+'종 · 선택 '+selected.size+'종';
+list.innerHTML='<label class="inventory-select-all"><input type="checkbox" id="selectAllItems"> 전체 선택 <span class="muted tiny">(보이는 아이템)</span></label>';
+for(const item of items){
+const row=make('div',{class:'inventory-choice'+(s.selectedItem===item.id?' selected':'')},list);
+const checkbox=make('input',{type:'checkbox','aria-label':item.name+' 선택'},row);checkbox.checked=selected.has(item.id);
+checkbox.onchange=()=>{checkbox.checked?selected.add(item.id):selected.delete(item.id);s.selectedIds=[...selected];redraw()};
+const button=make('button',{class:'inventory-item-button',type:'button','aria-label':item.name+' 상세 보기'},row);
+button.innerHTML=svgIcon(item.group==='장비'?'sword':item.group==='식재료'?'wheat':item.group==='광석'?'gem':item.group==='약초'?'leaf':item.group==='도구'?'hammer':'package')+'<span class="inventory-item-name"><strong>'+esc(item.name)+'</strong><small>'+esc(item.group)+' · '+esc(item.material)+' · '+esc(item.quality)+'</small></span><span class="inventory-quantity">×'+item.qty+'</span>';
+button.onclick=()=>{s.selectedItem=item.id;redraw();iconify()};
+}
+if(!items.length)make('p',{class:'empty',text:'선택한 조건에 해당하는 아이템이 없습니다.'},list);
+const all=list.querySelector('#selectAllItems');all.checked=items.length>0&&items.every(i=>selected.has(i.id));all.indeterminate=items.some(i=>selected.has(i.id))&&!all.checked;all.onchange=()=>{items.forEach(i=>all.checked?selected.add(i.id):selected.delete(i.id));s.selectedIds=[...selected];redraw()};
+let item=s.items.find(i=>i.id===s.selectedItem);
+detail.innerHTML=item?'<div class="inventory-detail-head">'+svgIcon(item.group==='장비'?'sword':item.group==='식재료'?'wheat':item.group==='광석'?'gem':item.group==='약초'?'leaf':'package')+'<div><small>'+esc(item.group)+'</small><h2>'+esc(item.name)+'</h2></div></div>'+mockDetail(item):'<h2>아이템 정보</h2><p class="muted">아이템을 선택하면 이곳에 상세 정보가 나타납니다.</p>';
+iconify();
+}
+search.oninput=()=>{s.search=search.value;redraw()};
+sort.onchange=()=>{s.sort=sort.value;redraw()};
+filter.onchange=()=>{s.filter=filter.value;redraw()};
+redraw();
+}
+
 function character(){const el=head('캐릭터','캐릭터 정보를 한곳에 모으는 화면입니다. EXP 총량, 레벨 공식, 능력치 수치는 기획 확정 전까지 표시하지 않습니다.');tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('div',{class:'detail'},pane);if(s.tab==='기본 정보')left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong><span>모의 캐릭터 · 캐릭터 생성 미구현</span></div><div class="textrow"><strong>직업 및 종족</strong><span>선택 시스템 미구현</span></div><div class="textrow"><strong>EXP / 현재 레벨</strong><span>성장 공식 미정</span></div>';else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">현재 상태 이상 없음 <span class="mark">표시 예시</span></p><p class="muted small">추후 상태 이상 발생 시 이름, 남은 시간, 효과를 표시합니다.</p>';else left.innerHTML='<h2>'+esc(s.tab)+'</h2><p class="small muted">'+(s.tab==='장비'?'장착 부위 및 효과는 목업 상세 구성 예정입니다.':'능력치 종류와 성장 공식의 최종 확정을 기다리는 영역입니다.')+'</p>';right.innerHTML='<h3>상시 표시 위치</h3><p class="small">HP / MP / 허기: 상단</p><p class="small">골드: 상단 우측</p><p class="small">게임 날짜와 시간: 상단 우측</p><p class="small">EXP: 상단 요약 + 캐릭터 상세</p><p class="small">상태 이상: 상단 경고 + 상세 탭</p><span class="mark">레이아웃만 확정 후보</span>'}
 function skills(){const el=head('숙련','카테고리별 숙련 및 진행 정보. 표시 레벨은 목업이고 EXP 계산은 미정입니다.');tabs(el,['생활','전투','마법','기타'],changeTab);const rows=s.tab==='생활'?SKILLS.filter(([n])=>!['학문'].includes(n)):s.tab==='기타'?SKILLS.filter(([n])=>n==='학문'):[];const skillTable=make('div',{class:'tablewrap'},el);skillTable.innerHTML='<table><thead><tr><th>숙련</th><th class="right">임시 레벨</th><th>성장 EXP</th><th>사용 분야</th></tr></thead><tbody>'+rows.map(([n,l])=>'<tr><td>'+esc(n)+'</td><td class="right">'+l+'</td><td>공식 미정</td><td>레퍼런스 조사 및 설계 대상</td></tr>').join('')+'</tbody></table></div>';if(!rows.length)make('p',{class:'empty',text:'세부 숙련 분류는 아직 확정하지 않았습니다.'},el)}
 function crafts(){
