@@ -46,7 +46,7 @@ function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===
 const make=(tag,props={},parent)=>{const e=document.createElement(tag);for(const [k,v]of Object.entries(props)){if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k==='class')e.className=v;else e.setAttribute(k,v)}if(parent)parent.append(e);return e};
 function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',text,class:classes},parent);b.addEventListener('click',fn);return b}
 function top(){
-$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+s.day+'일</span><span>'+svgIcon('clock')+' '+String(s.hour).padStart(2,'0')+':00</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><button type="button" class="top-settings" id="settingsControl" aria-label="설정" title="설정">'+svgIcon('settings')+'</button></div>';
+$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+s.day+'일</span><span>'+svgIcon('clock')+' '+String(s.hour).padStart(2,'0')+':00</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span><button type="button" class="top-settings" id="settingsControl" aria-label="설정" title="설정">'+svgIcon('settings')+'</button></div>';
 $('#settingsControl').onclick=()=>openPage('설정');
 }
 
@@ -60,16 +60,16 @@ function act(name){if(name==='던전에 진입한다'){s.dungeon=true;s.page='�
 function regionActions(){return ACTIONS[s.region]||['주변을 살핀다','휴식한다']}
 function lifestyle(){
 const el=head(s.region,'');const hue={'거점 마을':'town','초원·농경지':'pasture','숲':'forest','강·호수':'river','습지':'marsh','산맥':'mountain','광산':'mine','설원':'snow','사막':'desert','해안·항구':'coast','바다':'ocean','화산지대':'volcano','고대 유적':'ruins','폐허·묘지':'grave','만신전':'temple','지하미궁':'dungeon'}[s.region]||'pasture';
-const hero=make('section',{class:'region-scene scene-'+hue},el);hero.innerHTML='<div class="scene-heading"><div><span class="scene-kicker">현재 머무는 지역</span><h2>'+esc(s.region)+'</h2><p>생활과 탐험의 출발점</p></div>'+svgIcon(hue==='forest'?'trees':hue==='river'?'waves':hue==='mine'?'mountain':hue==='volcano'?'flame':hue==='snow'?'snowflake':hue==='desert'?'sun':hue==='ocean'||hue==='coast'?'waves':hue==='temple'?'sparkles':hue==='dungeon'?'footprints':'sun')+'</div>';
+const hero=make('section',{class:'region-scene scene-'+hue},el);hero.innerHTML='<div class="scene-heading"><div><h2>'+esc(s.region)+'</h2></div>'+svgIcon(hue==='forest'?'trees':hue==='river'?'waves':hue==='mine'?'mountain':hue==='volcano'?'flame':hue==='snow'?'snowflake':hue==='desert'?'sun':hue==='ocean'||hue==='coast'?'waves':hue==='temple'?'sparkles':hue==='dungeon'?'footprints':'sun')+'</div>';
 const places=make('div',{class:'scene-spots'},hero);
 const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업장','workshop'],['waves','강변','water']]:hue==='forest'?[['trees','숲길','growing'],['leaf','채집지','workshop'],['tent-tree','야영지','water']]:hue==='river'?[['fish','어장','water'],['waves','강변','growing'],['leaf','수풀','workshop']]:[['compass','탐색지','growing'],['pickaxe','자원지','workshop'],['map-pin','지형','water']];
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
-const workspace=section(el,'이곳에서 할 수 있는 일');const actions=make('div',{class:'v3-actions'},workspace);
+const actions=make('div',{class:'v3-actions'},el);
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
-const summary=section(el,'지역 현황');summary.innerHTML+='<div class="region-facts"><div><span>지역 자원</span><strong>조사 전</strong></div><div><span>현재 날씨</span><strong>맑음 · 예시</strong></div><div><span>탐사 진행</span><strong>규칙 미구현</strong></div></div>';
+
 }
 function world(){
-const el=head('세계 지도','지역을 선택해 이동합니다. 이동 시간과 조건은 미구현입니다.');el.classList.add('world-screen');
+const el=head('세계 지도','');el.classList.add('world-screen');
 const grid=make('div',{class:'mapgrid world-v4'},el);
 const icons=['house','sprout','trees','waves','leaf','mountain','pickaxe','snowflake','sun','anchor','sailboat','flame','landmark','church','sparkles','footprints'];
 const hues=['town','field','forest','water','forest','mountain','ore','snow','desert','water','water','volcano','mystic','ruin','mystic','dungeon'];
@@ -79,7 +79,7 @@ b.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';b.onclick=()=>{s.re
 
 function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>무게</dt><dd>'+esc(i.weight||0)+' (목업)</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·무게·전투 공식이 아닙니다.</p>'}
 function inventory(){
-const el=head('인벤토리','소지품의 소재·품질·무게·태그를 확인합니다. 실제 게임 효과는 아직 연결되지 않았습니다.');
+const el=head('인벤토리','');
 tabs(el,['전체','장비','식재료','재료','광석','약초','도구','기타'],changeTab);
 const toolbar=make('div',{class:'toolbar inventory-toolbar'},el);
 const search=make('input',{class:'input',placeholder:'이름·소재·태그 검색','aria-label':'소지품 검색'},toolbar);search.value=s.search;
@@ -98,7 +98,7 @@ function redraw(){
 let items=s.items.filter(i=>(s.tab==='전체'||i.group===s.tab)&&(s.filter==='전체'||!s.filter||i.group===s.filter)&&[i.name,i.material,i.id,...i.tags].join(' ').toLowerCase().includes(s.search.toLowerCase()));
 items.sort((a,b)=>['qty','weight'].includes(s.sort)?b[s.sort]-a[s.sort]:String(a[s.sort]).localeCompare(String(b[s.sort]),'ko'));
 total.textContent=items.length+'종 · 선택 '+selected.size+'종';
-list.innerHTML='<label class="inventory-select-all"><input type="checkbox" id="selectAllItems"> 전체 선택 <span class="muted tiny">(보이는 아이템)</span></label>';
+list.innerHTML='<label class="inventory-select-all"><input type="checkbox" id="selectAllItems"> 전체 선택 </label>';
 for(const item of items){
 const row=make('div',{class:'inventory-choice'+(s.selectedItem===item.id?' selected':'')},list);
 const checkbox=make('input',{type:'checkbox','aria-label':item.name+' 선택'},row);checkbox.checked=selected.has(item.id);
@@ -119,15 +119,14 @@ filter.onchange=()=>{s.filter=filter.value;redraw()};
 redraw();
 }
 
-function character(){const el=head('캐릭터','캐릭터 정보를 한곳에 모으는 화면입니다. EXP 총량, 레벨 공식, 능력치 수치는 기획 확정 전까지 표시하지 않습니다.');tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('div',{class:'detail'},pane);if(s.tab==='기본 정보')left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong><span>모의 캐릭터 · 캐릭터 생성 미구현</span></div><div class="textrow"><strong>직업 및 종족</strong><span>선택 시스템 미구현</span></div><div class="textrow"><strong>EXP / 현재 레벨</strong><span>성장 공식 미정</span></div>';else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">현재 상태 이상 없음 <span class="mark">표시 예시</span></p><p class="muted small">추후 상태 이상 발생 시 이름, 남은 시간, 효과를 표시합니다.</p>';else left.innerHTML='<h2>'+esc(s.tab)+'</h2><p class="small muted">'+(s.tab==='장비'?'장착 부위 및 효과는 목업 상세 구성 예정입니다.':'능력치 종류와 성장 공식의 최종 확정을 기다리는 영역입니다.')+'</p>';right.innerHTML='<h3>상시 표시 위치</h3><p class="small">HP / MP / 허기: 상단</p><p class="small">골드: 상단 우측</p><p class="small">게임 날짜와 시간: 상단 우측</p><p class="small">EXP: 상단 요약 + 캐릭터 상세</p><p class="small">상태 이상: 상단 경고 + 상세 탭</p><span class="mark">레이아웃만 확정 후보</span>'}
-function skills(){const el=head('숙련','카테고리별 숙련 및 진행 정보. 표시 레벨은 목업이고 EXP 계산은 미정입니다.');tabs(el,['생활','전투','마법','기타'],changeTab);const rows=s.tab==='생활'?SKILLS.filter(([n])=>!['학문'].includes(n)):s.tab==='기타'?SKILLS.filter(([n])=>n==='학문'):[];const skillTable=make('div',{class:'tablewrap'},el);skillTable.innerHTML='<table><thead><tr><th>숙련</th><th class="right">임시 레벨</th><th>성장 EXP</th><th>사용 분야</th></tr></thead><tbody>'+rows.map(([n,l])=>'<tr><td>'+esc(n)+'</td><td class="right">'+l+'</td><td>공식 미정</td><td>레퍼런스 조사 및 설계 대상</td></tr>').join('')+'</tbody></table></div>';if(!rows.length)make('p',{class:'empty',text:'세부 숙련 분류는 아직 확정하지 않았습니다.'},el)}
+function character(){const el=head('캐릭터','');tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('div',{class:'detail'},pane);if(s.tab==='기본 정보')left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong><span>모의 캐릭터 · 캐릭터 생성 미구현</span></div><div class="textrow"><strong>직업 및 종족</strong><span>선택 시스템 미구현</span></div><div class="textrow"><strong>EXP / 현재 레벨</strong><span>성장 공식 미정</span></div>';else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">현재 상태 이상 없음 <span class="mark">표시 예시</span></p><p class="muted small">추후 상태 이상 발생 시 이름, 남은 시간, 효과를 표시합니다.</p>';else left.innerHTML='<h2>'+esc(s.tab)+'</h2><p class="small muted">'+(s.tab==='장비'?'장착 부위 및 효과는 목업 상세 구성 예정입니다.':'능력치 종류와 성장 공식의 최종 확정을 기다리는 영역입니다.')+'</p>';right.innerHTML='<h3>상시 표시 위치</h3><p class="small">HP / MP / 허기: 상단</p><p class="small">골드: 상단 우측</p><p class="small">게임 날짜와 시간: 상단 우측</p><p class="small">EXP: 상단 요약 + 캐릭터 상세</p><p class="small">상태 이상: 상단 경고 + 상세 탭</p><span class="mark">레이아웃만 확정 후보</span>'}
+function skills(){const el=head('숙련','');tabs(el,['생활','전투','마법','기타'],changeTab);const rows=s.tab==='생활'?SKILLS.filter(([n])=>!['학문'].includes(n)):s.tab==='기타'?SKILLS.filter(([n])=>n==='학문'):[];const skillTable=make('div',{class:'tablewrap'},el);skillTable.innerHTML='<table><thead><tr><th>숙련</th><th class="right">임시 레벨</th><th>성장 EXP</th><th>사용 분야</th></tr></thead><tbody>'+rows.map(([n,l])=>'<tr><td>'+esc(n)+'</td><td class="right">'+l+'</td><td>공식 미정</td><td>레퍼런스 조사 및 설계 대상</td></tr>').join('')+'</tbody></table></div>';if(!rows.length)make('p',{class:'empty',text:'세부 숙련 분류는 아직 확정하지 않았습니다.'},el)}
 function crafts(){
-const el=head('제작 · 가공','재료 조건과 예상 결과를 상세 영역에서 검토합니다. 제작 계산은 미구현입니다.');
-const groups=['제작법','작업대','재료 태그'];if(!groups.includes(s.tab))s.tab='제작법';tabs(el,groups,changeTab);
+const el=head('제작 · 가공','');
+const groups=['제작법','작업대'];if(!groups.includes(s.tab))s.tab='제작법';tabs(el,groups,changeTab);
 const sets={
 '제작법':[{name:'밀빵',type:'요리',icon:'cooking-pot',resources:['밀가루','물'],result:'음식',station:'조리대'},{name:'구운 생선',type:'요리',icon:'fish',resources:['생선','소금'],result:'음식',station:'조리대'},{name:'목제 손잡이',type:'목공',icon:'axe',resources:['목재'],result:'부품',station:'작업대'},{name:'철제 못',type:'대장장이',icon:'anvil',resources:['철괴'],result:'부품',station:'모루'},{name:'간이 붕대',type:'재료',icon:'bandage',resources:['섬유'],result:'소모품',station:'작업대'},{name:'기초 연금 시약',type:'연금술',icon:'flask-conical',resources:['약초','용매'],result:'시약',station:'연금술대'}],
-'작업대':[{name:'조리대',type:'생활',icon:'cooking-pot'},{name:'재봉대',type:'생활',icon:'scissors'},{name:'목공 작업대',type:'생활',icon:'hammer'},{name:'모루',type:'대장장이',icon:'anvil'},{name:'연금술 설비',type:'연금술',icon:'flask-conical'}],
-'재료 태그':[{name:'material:wood',type:'재료',icon:'trees'},{name:'material:metal',type:'재료',icon:'pickaxe'},{name:'food:edible',type:'음식',icon:'wheat'},{name:'craft:alchemical',type:'연금술',icon:'flask-conical'}]
+'작업대':[{name:'조리대',type:'생활',icon:'cooking-pot'},{name:'재봉대',type:'생활',icon:'scissors'},{name:'목공 작업대',type:'생활',icon:'hammer'},{name:'모루',type:'대장장이',icon:'anvil'},{name:'연금술 설비',type:'연금술',icon:'flask-conical'}]
 };
 const items=sets[s.tab];if(!window.__craftUI)window.__craftUI={sort:'default',filter:'전체',selected:'밀빵'};
 const state=window.__craftUI;
@@ -142,20 +141,20 @@ const pane=make('div',{class:'panegrid craft-layout'},el),list=make('div',{class
 function repaint(){
 let shown=items.filter(x=>state.filter==='전체'||x.type===state.filter);
 if(state.sort==='name')shown.sort((a,b)=>a.name.localeCompare(b.name,'ko'));else if(state.sort==='type')shown.sort((a,b)=>a.type.localeCompare(b.type,'ko'));
-list.innerHTML='<div class="small muted" style="margin-bottom:12px">'+shown.length+'개 항목</div>';
+list.innerHTML='';
 for(const item of shown){const b=make('button',{class:'craft-choice'+(state.selected===item.name?' selected':''),type:'button'},list);b.innerHTML=svgIcon(item.icon)+'<span><strong>'+esc(item.name)+'</strong><small>'+esc(item.type)+'</small></span>';b.onclick=()=>{state.selected=item.name;repaint();iconify()}}
 const selected=shown.find(x=>x.name===state.selected)||shown[0];if(selected)state.selected=selected.name;
-detail.innerHTML=selected?'<div class="craft-detail-title">'+svgIcon(selected.icon)+'<div><span class="tiny muted">'+esc(selected.type)+'</span><h2>'+esc(selected.name)+'</h2></div></div><div class="craft-detail-row"><span>필요 설비</span><strong>'+esc(selected.station||'정보 미정')+'</strong></div><h3>필요한 재료</h3><div class="craft-materials">'+(selected.resources||['상세 재료 미정']).map(r=>'<div>'+svgIcon('package')+' '+esc(r)+'</div>').join('')+'</div><h3>예상 결과</h3><p>'+esc(selected.result||'설정 전')+'</p><p class="tiny muted">제작법과 소재 계승, 결과 품질은 아직 실제로 계산되지 않습니다.</p>':'<p class="muted">필터에 해당하는 항목이 없습니다.</p>';
+detail.innerHTML=selected?'<div class="craft-detail-title">'+svgIcon(selected.icon)+'<div><span class="tiny muted">'+esc(selected.type)+'</span><h2>'+esc(selected.name)+'</h2></div></div><div class="craft-detail-row"><span>필요 설비: <strong>'+esc(selected.station||'미정')+'</strong></span></div><h3>필요한 재료</h3><div class="craft-materials">'+(selected.resources||['상세 재료 미정']).map(r=>'<div>'+svgIcon('package')+' '+esc(r)+'</div>').join('')+'</div><h3>예상 결과</h3><p>'+esc(selected.result||'설정 전')+'</p>':'<p class="muted">필터에 해당하는 항목이 없습니다.</p>';
 }
 sort.onchange=()=>{state.sort=sort.value;repaint();iconify()};filter.onchange=()=>{state.filter=filter.value;repaint();iconify()};repaint();
 }
 
-function other(){const el=head(s.page,s.page==='도감'?'발견한 정보를 종류별로 축적하는 목록 구조입니다.':'신앙, 제단, 축복과 금기를 확인하는 화면입니다.');const sets=s.page==='도감'?['발견 목록','생물','자연물','제작 지식']:['개요','신 목록','금기','축복'];if(!sets.includes(s.tab))s.tab=sets[0];tabs(el,sets,changeTab);const x=make('div',{class:'panegrid'},el);make('div',{html:'<h2>'+esc(s.tab)+'</h2><div class="textrow"><strong>자료 없음</strong><span>목업: 상세 콘텐츠와 발견 기록은 구현 전</span></div>'},x);make('aside',{class:'detail',html:'<h3>상세 정보</h3><p class="muted small">선택 항목의 설명과 관련 정보를 표시합니다.</p>'},x)}
+function other(){const el=head(s.page,'');const sets=s.page==='도감'?['발견 목록','생물','자연물','제작 지식']:['개요','신 목록','금기','축복'];if(!sets.includes(s.tab))s.tab=sets[0];tabs(el,sets,changeTab);const x=make('div',{class:'panegrid'},el);make('div',{html:'<h2>'+esc(s.tab)+'</h2><div class="textrow"><strong>자료 없음</strong><span>목업: 상세 콘텐츠와 발견 기록은 구현 전</span></div>'},x);make('aside',{class:'detail',html:'<h3>상세 정보</h3><p class="muted small">선택 항목의 설명과 관련 정보를 표시합니다.</p>'},x)}
 function dungeonMove(dx,dy){if(s.page!=='던전'||!s.dungeon)return;const [x,y]=s.pos,nx=x+dx,ny=y+dy,t=TILES[ny]?.[nx];if(!t||t==='#')return;s.pos=[nx,ny];s.turn++;if(t==='!'){nextLog('위험','위험한 지형을 발견했습니다.','자동 이동은 위험 타일에서 정지합니다.');stopAuto()}else if(t==='>')nextLog('탐험','계단 발견','다음 층 생성은 미구현입니다.');else if(t==='o'||t==='*')nextLog('탐험','광맥 발견','채광은 미구현입니다.');else nextLog('탐험','한 칸 이동','던전 이동은 실제 동작하지만 경로 생성은 고정입니다.');render()}
 function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}}
 function autoStep(){if(!s.dungeon||s.page!=='던전'){stopAuto();return}for(const [key,value]of [['hp',s.hp],['mp',s.mp],['hunger',s.hunger]])if(s.auto[key].on&&value<=s.auto[key].pct){stopAuto();nextLog('위험','자동 탐색 중단','설정된 '+key+' 임계값에 도달했습니다.');return render()}const [x,y]=s.pos,options=[[1,0],[0,1],[-1,0],[0,-1]].filter(([dx,dy])=>TILES[y+dy]?.[x+dx]&&TILES[y+dy][x+dx]!=='#');if(!options.length){stopAuto();return}const [dx,dy]=options[s.turn%options.length];dungeonMove(dx,dy)}
 function dungeon(){
-const el=head('지하미궁','방향키 / WASD로 이동 · 자동 탐색은 위험 지형에서 중단');
+const el=head('지하미궁','');
 el.classList.add('dungeon-screen');
 const layout=make('div',{class:'dungeonlayout dungeon-v7'},el);
 const left=make('div',{class:'dungeon-map-pane'},layout);
@@ -168,11 +167,6 @@ for(let y=0;y<TILES.length;y++)for(let x=0;x<TILES[y].length;x++){
  tile.title=player?'플레이어':v==='#'?'벽':v==='!'?'위험':v==='>'?'계단':v==='o'?'광맥':'바닥';
 }
 make('h2',{text:'탐색 제어'},right);
-const pad=make('div',{class:'dungeon-pad'},right);
-for(const [text,dx,dy,slot]of [['↑',0,-1,'up'],['←',-1,0,'left'],['↓',0,1,'down'],['→',1,0,'right']]){
- const b=btn(text,()=>dungeonMove(dx,dy),'btn dungeon-arrow '+slot,pad);
- b.setAttribute('aria-label',text+' 방향 이동');
-}
 const actions=make('div',{class:'dungeon-main-actions'},right);
 btn(autoTimer?'자동 탐색 중지':'자동 탐색 시작',()=>{
  if(autoTimer){stopAuto();nextLog('시스템','자동 이동 중지');render()}
@@ -192,15 +186,15 @@ const quick=section(right,'빠른 메뉴');const opts=make('div',{class:'dungeon
 for(const [label,name]of [['소지품','인벤토리'],['캐릭터','캐릭터']]){
  const b=btn(label,()=>openPage(name),'btn',opts);b.innerHTML=svgIcon(ICON_MAP[name])+' '+label;
 }
-make('p',{class:'muted tiny dungeon-note',text:'지도는 고정 목업입니다. 전투와 보상은 아직 구현되지 않았습니다.'},el);
+
 }
 function settings(){
-const el=head('설정','색상 테마와 화면 설정을 변경할 수 있습니다.');
-const sec=section(el,'색상 팔레트');make('p',{class:'muted small',text:'미리보기를 선택하면 바로 적용됩니다. 선택한 테마는 브라우저에 기억됩니다.'},sec);
+const el=head('설정','');
+const sec=section(el,'색상 팔레트');
 const gallery=make('div',{class:'theme-gallery'},sec);
 for(const t of THEMES){const b=make('button',{type:'button',class:'theme-choice'+(s.theme===t.id?' chosen':''),'aria-label':t.name+' 테마','aria-pressed':String(s.theme===t.id)},gallery);
 const swatches=t.colors.map(color=>'<span style="background:'+color+'"></span>').join('');
-b.innerHTML='<div class="theme-swatch">'+swatches+'</div><span class="theme-name">'+esc(t.name)+'</span><small>'+esc(t.mode==='dark'?'다크':'라이트')+' · '+esc(t.source)+'</small>';
+b.innerHTML='<div class="theme-swatch">'+swatches+'</div><span class="theme-name">'+esc(t.name)+'</span>';
 b.onclick=()=>{useTheme(t.id);settings();iconify()}}
 const font=section(el,'화면 가독성');const label=make('label',{class:'formrow'},font);label.append(document.createTextNode('글자 크기 '));const select=make('select',{class:'input'},label);
 select.innerHTML=[90,100,110,120,130,140].map(n=>'<option value="'+n+'">'+n+'%</option>').join('');select.value=s.viewFont;select.onchange=()=>{s.viewFont=Number(select.value);document.documentElement.style.fontSize=s.viewFont*.15+'px'};
@@ -211,7 +205,7 @@ btn('초기화',()=>{if(!confirm('목업 상태를 초기화할까요?'))return;
 function quickSave(){try{localStorage.setItem('fantasy-v2-demo',JSON.stringify(s));nextLog('시스템','목업 상태를 로컬에 저장했습니다.');render()}catch{nextLog('위험','브라우저 저장소에 기록할 수 없습니다.');render()}}
 function quickLoad(){try{const raw=localStorage.getItem('fantasy-v2-demo');if(!raw)throw Error('empty');const o=JSON.parse(raw);if(!Array.isArray(o.items)||!Array.isArray(o.logs)||!o.auto)throw Error('invalid');stopAuto();s=o;try{const savedTheme=localStorage.getItem('fantasy-ui-theme');if(THEMES.some(t=>t.id===savedTheme))s.theme=savedTheme}catch{}nextLog('시스템','목업 상태를 불러왔습니다.');render()}catch{nextLog('위험','저장된 목업 데이터를 읽을 수 없습니다.');render()}}
 function logs(){
-const e=$('#log');e.innerHTML='<div class="loghead"><div class="sectiontitle">사건 기록</div><div class="logtools" id="logFilters"></div></div><div class="logbody" id="logBody" aria-live="polite"></div><div class="logfoot">연속 기록 압축 · 주요 사건 고정 · 상세 보기</div>';
+const e=$('#log');e.innerHTML='<div class="loghead"><div class="sectiontitle">사건 기록</div><div class="logtools" id="logFilters"></div></div><div class="logbody" id="logBody" aria-live="polite"></div>';
 const filter=()=>{const target=$('#logBody');const sorted=s.logs.filter(x=>s.logFilter==='전체'||x.kind===s.logFilter);sorted.sort((a,b)=>Number(s.pinnedIds.includes(b.id))-Number(s.pinnedIds.includes(a.id)));
 target.innerHTML=sorted.map(x=>{const pin=s.pinnedIds.includes(x.id),expand=s.expandedLogs.includes(x.id);return '<div class="event"><span class="etype '+(x.kind==='위험'?'danger':x.kind==='탐험'?'blue':x.kind==='시스템'?'purple':'accent')+'">['+esc(x.kind)+']</span>'+esc(x.text)+(x.count>1?'<span class="count">× '+x.count+'</span>':'')+(pin?'<span class="pin">★</span>':'')+'<div class="eventtools"><button type="button" data-detail="'+esc(x.id)+'" aria-label="사건 상세 보기">'+svgIcon('info')+' 상세</button><button type="button" data-pin="'+esc(x.id)+'" aria-label="사건 '+(pin?'고정 해제':'고정')+'">'+svgIcon(pin?'pin-off':'pin')+'</button></div>'+(expand?'<p class="muted tiny">'+esc(x.detail||'추가 상세 정보가 없습니다.')+' · 기록: '+x.turn+'턴</p>':'')+'</div>'}).join('')||'<div class="empty">기록이 없습니다.</div>';
 target.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{const id=b.dataset.detail;s.expandedLogs=s.expandedLogs.includes(id)?s.expandedLogs.filter(x=>x!==id):[...s.expandedLogs,id];filter();iconify()});
