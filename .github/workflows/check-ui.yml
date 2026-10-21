@@ -13,10 +13,11 @@ jobs:
           node-version: '22'
       - name: JavaScript syntax
         run: |
+          node --check src/v3.js
           node --check src/v2.js
           node --check src/app.js
           node --check src/data.js
       - name: Validate map fixtures and source contracts
         run: |
           node --input-type=module -e "import('./src/data.js').then(m => { if (m.REGIONS.length !== 16 || m.TILES.length !== 10 || m.TILES.some(x=>x.length!==16)) process.exit(1); console.log('Fixtures OK'); })"
-          node --input-type=module -e "import('node:fs').then(fs=>{ const html=fs.readFileSync('index.html','utf8'); if(!html.includes('src/v2.js')||!html.includes('src/v2.css'))process.exit(1); const ui=fs.readFileSync('src/v2.js','utf8'); for(const feature of ['selectedIds','pinnedIds','logSearch','viewFont','status','dungeonMove','quickSave']){ if(!ui.includes(feature))process.exit(1) } console.log('UI module contracts OK')})"
+          node --input-type=module -e "import('node:fs').then(fs=>{ const html=fs.readFileSync('index.html','utf8'); if(!html.includes('src/v3.js')||!html.includes('src/v3.css'))process.exit(1); const ui=fs.readFileSync('src/v2.js','utf8'); for(const feature of ['function playerPanel','function drawOverlay','function bottomMenu','STATUS_MOCK','svgIcon','function dungeonMove','quickSave']){ if(!ui.includes(feature))process.exit(1) } console.log('UI module contracts OK')})"
