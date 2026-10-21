@@ -1,0 +1,20 @@
+name: Prototype checks
+on:
+  push:
+    branches: [feat/interactive-ui-prototype]
+  pull_request:
+jobs:
+  syntax:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: JavaScript syntax
+        run: |
+          node --check src/app.js
+          node --check src/data.js
+      - name: Validate tile dimensions and region count
+        run: |
+          node --input-type=module -e "import('./src/data.js').then(m => { if (m.REGIONS.length !== 16 || m.TILES.length !== 10 || m.TILES.some(x=>x.length!==16)) process.exit(1); console.log('Fixtures OK'); })"
