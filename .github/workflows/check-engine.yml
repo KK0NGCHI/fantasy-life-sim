@@ -1,0 +1,21 @@
+name: Engine 01-A
+on:
+  push:
+    branches: [feat/interactive-ui-prototype]
+  pull_request:
+jobs:
+  engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned compiler
+        run: npm install --no-audit --no-fund
+      - name: Typecheck, compile, smoke tests and old UI syntax
+        run: npm run check
+      - name: Ensure engine build does not alter tracked UI
+        run: |
+          git diff --exit-code -- index.html src/v3.js src/v8.css
+          test -f dist/engine/index.js
