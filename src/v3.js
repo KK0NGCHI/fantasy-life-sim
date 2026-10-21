@@ -119,8 +119,15 @@ filter.onchange=()=>{s.filter=filter.value;redraw()};
 redraw();
 }
 
-function character(){const el=head('캐릭터','');tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('div',{class:'detail'},pane);if(s.tab==='기본 정보')left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong><span>모의 캐릭터 · 캐릭터 생성 미구현</span></div><div class="textrow"><strong>직업 및 종족</strong><span>선택 시스템 미구현</span></div><div class="textrow"><strong>EXP / 현재 레벨</strong><span>성장 공식 미정</span></div>';else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">현재 상태 이상 없음 <span class="mark">표시 예시</span></p><p class="muted small">추후 상태 이상 발생 시 이름, 남은 시간, 효과를 표시합니다.</p>';else left.innerHTML='<h2>'+esc(s.tab)+'</h2><p class="small muted">'+(s.tab==='장비'?'장착 부위 및 효과는 목업 상세 구성 예정입니다.':'능력치 종류와 성장 공식의 최종 확정을 기다리는 영역입니다.')+'</p>';right.innerHTML='<h3>상시 표시 위치</h3><p class="small">HP / MP / 허기: 상단</p><p class="small">골드: 상단 우측</p><p class="small">게임 날짜와 시간: 상단 우측</p><p class="small">EXP: 상단 요약 + 캐릭터 상세</p><p class="small">상태 이상: 상단 경고 + 상세 탭</p><span class="mark">레이아웃만 확정 후보</span>'}
-function skills(){const el=head('숙련','');tabs(el,['생활','전투','마법','기타'],changeTab);const rows=s.tab==='생활'?SKILLS.filter(([n])=>!['학문'].includes(n)):s.tab==='기타'?SKILLS.filter(([n])=>n==='학문'):[];const skillTable=make('div',{class:'tablewrap'},el);skillTable.innerHTML='<table><thead><tr><th>숙련</th><th class="right">임시 레벨</th><th>성장 EXP</th><th>사용 분야</th></tr></thead><tbody>'+rows.map(([n,l])=>'<tr><td>'+esc(n)+'</td><td class="right">'+l+'</td><td>공식 미정</td><td>레퍼런스 조사 및 설계 대상</td></tr>').join('')+'</tbody></table></div>';if(!rows.length)make('p',{class:'empty',text:'세부 숙련 분류는 아직 확정하지 않았습니다.'},el)}
+function character(){
+const el=head('캐릭터','');tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);
+const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('aside',{class:'detail'},pane);
+if(s.tab==='기본 정보')left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong></div><div class="textrow"><strong>종족 · 직업</strong><span>미정</span></div><div class="textrow"><strong>레벨 · EXP</strong><span>미정</span></div>';
+else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">없음</p>';
+else left.innerHTML='<h2>'+esc(s.tab)+'</h2>';
+right.innerHTML='<h3>'+esc(s.tab)+'</h3>';
+}
+function skills(){const el=head('숙련','');tabs(el,['생활','전투','마법','기타'],changeTab);const rows=s.tab==='생활'?SKILLS.filter(([n])=>!['학문'].includes(n)):s.tab==='기타'?SKILLS.filter(([n])=>n==='학문'):[];const skillTable=make('div',{class:'tablewrap'},el);skillTable.innerHTML='<table><thead><tr><th>숙련</th><th class="right">레벨</th><th>EXP</th></tr></thead><tbody>'+rows.map(([n,l])=>'<tr><td>'+esc(n)+'</td><td class="right">'+l+'</td><td>—</td></tr>').join('')+'</tbody></table>';if(!rows.length)make('p',{class:'empty',text:'항목 없음'},el)}
 function crafts(){
 const el=head('제작 · 가공','');
 const groups=['제작법','작업대'];if(!groups.includes(s.tab))s.tab='제작법';tabs(el,groups,changeTab);
@@ -149,7 +156,13 @@ detail.innerHTML=selected?'<div class="craft-detail-title">'+svgIcon(selected.ic
 sort.onchange=()=>{state.sort=sort.value;repaint();iconify()};filter.onchange=()=>{state.filter=filter.value;repaint();iconify()};repaint();
 }
 
-function other(){const el=head(s.page,'');const sets=s.page==='도감'?['발견 목록','생물','자연물','제작 지식']:['개요','신 목록','금기','축복'];if(!sets.includes(s.tab))s.tab=sets[0];tabs(el,sets,changeTab);const x=make('div',{class:'panegrid'},el);make('div',{html:'<h2>'+esc(s.tab)+'</h2><div class="textrow"><strong>자료 없음</strong><span>목업: 상세 콘텐츠와 발견 기록은 구현 전</span></div>'},x);make('aside',{class:'detail',html:'<h3>상세 정보</h3><p class="muted small">선택 항목의 설명과 관련 정보를 표시합니다.</p>'},x)}
+function other(){
+const el=head(s.page,'');const sets=s.page==='도감'?['발견 목록','생물','자연물','제작 지식']:['개요','신 목록','금기','축복'];
+if(!sets.includes(s.tab))s.tab=sets[0];tabs(el,sets,changeTab);
+const x=make('div',{class:'panegrid'},el);
+make('div',{html:'<div class="empty">항목 없음</div>'},x);
+make('aside',{class:'detail',html:'<h3>상세</h3>'},x);
+}
 function dungeonMove(dx,dy){if(s.page!=='던전'||!s.dungeon)return;const [x,y]=s.pos,nx=x+dx,ny=y+dy,t=TILES[ny]?.[nx];if(!t||t==='#')return;s.pos=[nx,ny];s.turn++;if(t==='!'){nextLog('위험','위험한 지형을 발견했습니다.','자동 이동은 위험 타일에서 정지합니다.');stopAuto()}else if(t==='>')nextLog('탐험','계단 발견','다음 층 생성은 미구현입니다.');else if(t==='o'||t==='*')nextLog('탐험','광맥 발견','채광은 미구현입니다.');else nextLog('탐험','한 칸 이동','던전 이동은 실제 동작하지만 경로 생성은 고정입니다.');render()}
 function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}}
 function autoStep(){if(!s.dungeon||s.page!=='던전'){stopAuto();return}for(const [key,value]of [['hp',s.hp],['mp',s.mp],['hunger',s.hunger]])if(s.auto[key].on&&value<=s.auto[key].pct){stopAuto();nextLog('위험','자동 탐색 중단','설정된 '+key+' 임계값에 도달했습니다.');return render()}const [x,y]=s.pos,options=[[1,0],[0,1],[-1,0],[0,-1]].filter(([dx,dy])=>TILES[y+dy]?.[x+dx]&&TILES[y+dy][x+dx]!=='#');if(!options.length){stopAuto();return}const [dx,dy]=options[s.turn%options.length];dungeonMove(dx,dy)}
