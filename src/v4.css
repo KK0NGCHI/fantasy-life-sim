@@ -1,0 +1,116 @@
+@import url("./v3.css");
+/* Playful yet legible: 2026-10-22 visual refresh. */
+:root{--ink:#30324b;--line:#e4e3ed;--green:#47776c;--surface:#fbfafd}
+.v3-shell .center{background:#fffefe}
+.v3-shell .center h1{font-size:24px}
+.region-scene{border:0!important;border-radius:18px;overflow:hidden;box-shadow:0 7px 21px #564b8a13;isolation:isolate}
+.region-scene .scene-heading h2{color:#29304b!important;font-size:26px}
+.region-scene .scene-kicker,.region-scene .scene-heading p{color:#4b526d!important}
+.region-scene .scene-heading>svg{color:#53638f!important;width:39px;height:39px}
+.scene-town{background:radial-gradient(ellipse at 16% 18%,#ffe16c 0,transparent 52%),radial-gradient(ellipse at 92% 84%,#feacbe 0,transparent 63%),linear-gradient(123deg,#ffdb98 0%,#b9ddff 100%)!important}
+.scene-forest{background:radial-gradient(ellipse at 18% 20%,#a0f6a3 0,transparent 53%),radial-gradient(ellipse at 86% 83%,#ffe084 0,transparent 62%),linear-gradient(132deg,#86d6ba,#b7d7ff)!important}
+.scene-river{background:radial-gradient(ellipse at 20% 15%,#82e8fb 0,transparent 55%),radial-gradient(ellipse at 85% 85%,#c0b2ff 0,transparent 65%),linear-gradient(131deg,#8bc6f9,#ffe1c7)!important}
+.scene-mine{background:radial-gradient(ellipse at 15% 18%,#e9c2ff 0,transparent 52%),radial-gradient(ellipse at 90% 80%,#ffd490 0,transparent 66%),linear-gradient(126deg,#c5b0ea,#a6d4ff)!important}
+.scene-ruins{background:radial-gradient(ellipse at 17% 20%,#cc9eff 0,transparent 56%),radial-gradient(ellipse at 84% 88%,#f4acd7 0,transparent 64%),linear-gradient(133deg,#b49dea,#a1d7f5)!important}
+.scene-volcano{background:radial-gradient(ellipse at 15% 20%,#ffb26a 0,transparent 56%),radial-gradient(ellipse at 86% 83%,#ff91c6 0,transparent 63%),linear-gradient(128deg,#f7b58b,#e2a3e9)!important}
+.scene-snow{background:radial-gradient(ellipse at 15% 19%,#a1e7ff 0,transparent 54%),radial-gradient(ellipse at 85% 80%,#f9d6ff 0,transparent 68%),linear-gradient(129deg,#bfd7ff,#d2faff)!important}
+.scene-desert{background:radial-gradient(ellipse at 16% 19%,#ffe17d 0,transparent 55%),radial-gradient(ellipse at 88% 84%,#ffa7b8 0,transparent 65%),linear-gradient(131deg,#ffd18f,#f6bece)!important}
+.scene-pasture{background:radial-gradient(ellipse at 14% 15%,#b6f5a9 0,transparent 53%),radial-gradient(ellipse at 89% 87%,#ffd693 0,transparent 64%),linear-gradient(130deg,#b2dcff,#ffc3d4)!important}
+.v3-shell .scene-spot{border-radius:11px;background:rgb(255 255 255 / .60)!important;backdrop-filter:blur(5px);color:#394158;min-height:67px}
+.v3-shell .scene-spot svg{color:#434d77}
+.v3-actions{grid-template-columns:repeat(auto-fit,minmax(135px,1fr));gap:14px}
+.v3-action{border:1px solid #e6e4ed;border-radius:13px;box-shadow:0 3px 12px #34365b0b;min-height:83px;padding:12px;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:8px}
+.v3-action:hover{background:#f6f2ff;border-color:#ddd0f0;transform:translateY(-1px);box-shadow:0 5px 14px #7665af24}
+.v3-action svg{width:25px;height:25px;color:#52577a}
+.v3-shell .bottom-button:hover{background:#f0ecfc}
+.bottom-button{border-radius:10px}
+.bottom-nav{gap:3px;padding:3px}
+.v3-shell .bottom-button.current{background:#f0ebff;color:#6752a4}
+.craft-choice{border-radius:10px;border-bottom:0;margin:3px 0}
+.craft-choice.selected{background:#f0e8ff}
+.craft-detail{border-top:0;border-radius:14px;background:#f9f6ff}
+.craft-materials>div{border-radius:9px}
+.large-dialog{border-radius:17px}
+.dialog-heading{background:#f8f5ff}
+.modal-main .panegrid{grid-template-columns:minmax(0,1fr) 280px}
+.inventory-layout{display:grid!important;grid-template-columns:minmax(0,1fr) minmax(230px, 0.86fr)!important;gap:22px;align-items:start}
+.inventory-list{max-height:min(61vh,590px);overflow-y:auto;padding-right:5px;min-width:0}
+.inventory-select-all{display:flex;align-items:center;gap:8px;padding:10px 12px;font-size:12px;color:#5f6175}
+.inventory-choice{display:flex;align-items:center;gap:11px;padding:4px 10px;margin:3px 0;min-height:61px;border-radius:11px}
+.inventory-choice:hover{background:#f7f3ff}
+.inventory-choice.selected{background:#f0ebff}
+.inventory-choice>input{flex-shrink:0}
+.inventory-item-button{width:100%;min-width:0;display:flex;align-items:center;gap:12px;padding:10px 5px;text-align:left;border:0;background:transparent}
+.inventory-item-button:hover{background:transparent;color:#33354f}
+.inventory-item-button svg{width:24px;height:24px;color:#606082}
+.inventory-item-name{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}
+.inventory-item-name strong{font-size:14px;font-weight:650}
+.inventory-item-name small{color:#76788c;font-size:11px;white-space:normal}
+.inventory-quantity{font-size:13px;font-variant-numeric:tabular-nums;white-space:nowrap;color:#595d7a}
+.inventory-detail{background:#f8f6fe;border-radius:14px;padding:19px 21px;min-height:280px}
+.inventory-detail-head{display:flex;gap:13px;align-items:center;padding-bottom:13px;border-bottom:1px solid #e3dff1;margin-bottom:14px}
+.inventory-detail-head>svg{width:31px;height:31px;color:#5c568c}
+.inventory-detail-head h2{font-size:17px;margin:3px 0}
+.inventory-detail-head small{color:#77748c}
+.inventory-detail .detail{min-height:0;background:transparent;border:0;padding:0}
+.inventory-detail .detail h3:first-child,.inventory-detail .detail>.tiny.muted:first-of-type{display:none}
+.world-v4{grid-template-columns:repeat(4,clamp(84px,calc(11dvh + 10px),122px));gap:12px}
+.world-v4 .region{font-size:16px;font-weight:400;border:0;border-radius:13px;padding:9px 4px;gap:8px;box-shadow:0 3px 13px #514b8420;line-height:1.22;color:#35344e}
+.world-v4 .region svg{width:28px;height:28px;color:#47425f}
+.world-v4 .region span{font-weight:400}
+.world-v4 .region.active{outline:3px solid #7369a1;outline-offset:-3px;font-weight:400}
+.world-v4 .region:hover{transform:translateY(-2px);filter:saturate(1.08) brightness(1.01);box-shadow:0 7px 16px #62569f29}
+.world-v4 .region-town{background:linear-gradient(128deg,#ffe18e,#ffb9cf)}
+.world-v4 .region-field{background:linear-gradient(130deg,#d0f48e,#ffe69b)}
+.world-v4 .region-forest{background:linear-gradient(133deg,#a6f2c0,#c9c4ff)}
+.world-v4 .region-water{background:linear-gradient(133deg,#94e9f6,#b9c7ff)}
+.world-v4 .region-mountain{background:linear-gradient(130deg,#c3ccff,#ecc5f8)}
+.world-v4 .region-ore{background:linear-gradient(133deg,#c6baff,#ffcc99)}
+.world-v4 .region-snow{background:linear-gradient(133deg,#c5eeff,#e5d2ff)}
+.world-v4 .region-desert{background:linear-gradient(133deg,#ffe38e,#ffb9ab)}
+.world-v4 .region-volcano{background:linear-gradient(133deg,#ffba92,#f1a9cf)}
+.world-v4 .region-mystic{background:linear-gradient(133deg,#d1aaff,#f2c7f8)}
+.world-v4 .region-dungeon{background:linear-gradient(133deg,#bca7fa,#e4b6ef)}
+.world-v4 .region-ruin{background:linear-gradient(133deg,#d7baff,#ebc6c3)}
+.dungeonlayout{display:grid;grid-template-columns:minmax(0,1fr) 205px;gap:20px;align-items:start}
+.dungeonlayout>div:first-child{display:flex;flex-direction:column;align-items:center;min-width:0}
+.dungeonlayout>div:nth-child(2){min-width:0;background:#f8f6fd;border-radius:14px;padding:17px}
+.dungeonlayout .tilemap{margin:8px auto 21px}
+.dungeon-direction-controls{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;margin-bottom:13px}
+.dungeon-direction-controls .btn{padding:8px 3px;text-align:center;min-width:0;border-radius:7px}
+.dungeonlayout .tile{border-radius:3px}
+.dungeonlayout .rows:not(.dungeon-direction-controls){gap:8px}
+@media(max-width:1550px) and (min-width:801px){
+.dungeonlayout{grid-template-columns:1fr;gap:13px}
+.dungeonlayout>div:nth-child(2){max-width:600px;width:100%;justify-self:center}
+.dungeon-direction-controls{max-width:260px}
+}
+@media(max-width:800px){
+.world-v4{grid-template-columns:repeat(4,clamp(67px,19vw,102px));gap:8px}
+.world-v4 .region{font-size:13px}
+.dungeonlayout{display:block}
+.dungeonlayout>div:nth-child(2){margin-top:18px}
+.inventory-layout{grid-template-columns:1fr!important}
+.inventory-list{max-height:42vh}
+}
+@media(max-height:760px) and (min-width:801px){
+.world-v4{grid-template-columns:repeat(4,clamp(75px,calc(11dvh + 10px),104px));gap:8px}
+.world-v4 .region{font-size:14px}
+}
+
+
+.scene-marsh{background:radial-gradient(ellipse at 18% 19%,#7be5c4 0,transparent 55%),radial-gradient(ellipse at 85% 87%,#bda2f6 0,transparent 66%),linear-gradient(127deg,#8acbc5,#e1ccfa)!important}
+.scene-mountain{background:radial-gradient(ellipse at 17% 17%,#9ac8fc 0,transparent 56%),radial-gradient(ellipse at 87% 86%,#e4b8fa 0,transparent 65%),linear-gradient(132deg,#b9e4ff,#a6b3f6)!important}
+.scene-coast{background:radial-gradient(ellipse at 17% 17%,#83ecf4 0,transparent 55%),radial-gradient(ellipse at 87% 83%,#ffe2a2 0,transparent 65%),linear-gradient(130deg,#91dfff,#f2d1b8)!important}
+.scene-ocean{background:radial-gradient(ellipse at 18% 18%,#7de2fc 0,transparent 55%),radial-gradient(ellipse at 85% 86%,#b7b6ff 0,transparent 62%),linear-gradient(130deg,#8fc4fa,#a6e8fb)!important}
+.scene-grave{background:radial-gradient(ellipse at 15% 18%,#d8b2f5 0,transparent 54%),radial-gradient(ellipse at 87% 88%,#f6aeca 0,transparent 64%),linear-gradient(132deg,#c4c6ff,#f1c9db)!important}
+.scene-temple{background:radial-gradient(ellipse at 16% 17%,#ffe29e 0,transparent 54%),radial-gradient(ellipse at 88% 83%,#c9adff 0,transparent 64%),linear-gradient(129deg,#ffd8da,#b8d6ff)!important}
+.scene-dungeon{background:radial-gradient(ellipse at 17% 18%,#b8a0fa 0,transparent 55%),radial-gradient(ellipse at 87% 85%,#f6b0de 0,transparent 67%),linear-gradient(130deg,#c0b2fb,#b5defe)!important}
+@media(max-width:1100px) and (min-width:801px){
+.dungeonlayout{grid-template-columns:1fr}
+.dungeonlayout>div:nth-child(2){width:100%}
+}
+@media(min-width:1101px) and (max-width:1550px){
+.dungeonlayout{grid-template-columns:minmax(0,1fr) 205px}
+.dungeonlayout>div:nth-child(2){width:auto;max-width:none;justify-self:stretch}
+}
