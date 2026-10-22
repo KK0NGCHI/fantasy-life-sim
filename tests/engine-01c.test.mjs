@@ -93,3 +93,15 @@ test('auto tick runs only one action then pauses on panel without implicit resta
   assert.equal(auto.status.reason,'threshold');
   assert.equal(calls,1);
 });
+
+test('auto stops immediately after an accepted action when post-action sensor reports danger',()=>{
+ const auto=new AutoController(); auto.start();
+ const st=state(), before={hpPercent:100,mpPercent:100,hungerPercent:0,dangerVisible:false,incapacitated:false};
+ const limits={hpPercent:30,mpPercent:20,hungerPercent:80};
+ let calls=0;
+ const result=auto.tick(st,before,limits,()=>action,(s,a)=>{calls++;return dispatchTimedAction(s,a,handlers,defaultTiming);},
+   ()=>({...before,hpPercent:29}));
+ assert.equal(result.accepted,true);
+ assert.equal(calls,1);
+ assert.deepEqual(auto.status,{running:false,reason:'threshold'});
+});
