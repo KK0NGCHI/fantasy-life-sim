@@ -80,9 +80,9 @@ export function buildItemRegistry(catalog: ItemCatalog): { registry: ItemRegistr
       req.anyOf.forEach((matcher,j)=>{
         const q=`${p}.anyOf[${j}]`;
         if(!record(matcher)) { issue(issues,q,'INVALID_MATCHER');return; }
-        if(matcher.kind==='item'&&!id(matcher.definitionId) || !items.has(matcher.definitionId)) issue(issues,q,'UNKNOWN_ITEM');
-        else if(matcher.kind==='material'&&!id(matcher.materialId) || !materials.has(matcher.materialId)) issue(issues,q,'UNKNOWN_MATERIAL');
-        else if(matcher.kind==='category'&&!id(matcher.categoryId) || !categories.has(matcher.categoryId)) issue(issues,q,'UNKNOWN_CATEGORY');
+        if(matcher.kind==='item' && (!id(matcher.definitionId) || !items.has(matcher.definitionId))) issue(issues,q,'UNKNOWN_ITEM');
+        else if(matcher.kind==='material' && (!id(matcher.materialId) || !materials.has(matcher.materialId))) issue(issues,q,'UNKNOWN_MATERIAL');
+        else if(matcher.kind==='category' && (!id(matcher.categoryId) || !categories.has(matcher.categoryId))) issue(issues,q,'UNKNOWN_CATEGORY');
         else if(matcher.kind==='tag'&&!id(matcher.tag)) issue(issues,q,'INVALID_TAG');
         else if(!['item','material','category','tag'].includes(String(matcher.kind))) issue(issues,q,'INVALID_MATCHER');
       });
@@ -107,12 +107,12 @@ export function validateItemInstances(instances: readonly ItemInstanceDraft[], r
     }
     if(item.quality!==undefined&&!finite(item.quality)) issue(issues,p+'.quality','INVALID_QUALITY');
     if(item.enhancementLevel!==undefined&&!integer(item.enhancementLevel)) issue(issues,p+'.enhancementLevel','INVALID_ENHANCEMENT');
-    if(item.rarityId!==undefined&&!id(item.rarityId) || !registry.rarities.has(item.rarityId)) issue(issues,p+'.rarityId','UNKNOWN_RARITY');
+    if(item.rarityId!==undefined && (!id(item.rarityId) || !registry.rarities.has(item.rarityId))) issue(issues,p+'.rarityId','UNKNOWN_RARITY');
     if(item.effects!==undefined){
       if(!Array.isArray(item.effects)) issue(issues,p+'.effects','INVALID_EFFECTS');
       else item.effects.forEach((e,j)=>{
         const q=`${p}.effects[${j}]`;
-        if(!record(e)||!id(e.definitionId) || !registry.effects.has(e.definitionId)) issue(issues,q,'UNKNOWN_EFFECT');
+        if(!record(e) || !id(e.definitionId) || !registry.effects.has(e.definitionId)) issue(issues,q,'UNKNOWN_EFFECT');
         else if(e.level!==undefined&&!finite(e.level)) issue(issues,q+'.level','INVALID_EFFECT_LEVEL');
       });
     }
