@@ -98,3 +98,55 @@ border-radius:8px;
 .inventory-discard-actionbar button[hidden]{display:none!important}
 .inventory-list:not(.inventory-discard-mode) .inventory-check-label{display:none!important}
 .inventory-discard-mode .inventory-check-label input[type=checkbox]{display:grid}
+
+
+/* 02-C polish: inset action, consistent destructive hover and unified row hover. */
+.inventory-discard-actionbar .inventory-discard-trigger{
+  background:color-mix(in srgb,var(--theme-accent,#785bb6) 7%,var(--theme-surface,#fff));
+  border:1px solid color-mix(in srgb,var(--theme-accent,#785bb6) 46%,var(--theme-border,#aaa));
+  box-shadow:inset 0 2px 4px #0000001c,inset 0 1px 2px #00000012;
+  transform:none;
+}
+.inventory-discard-actionbar .inventory-discard-trigger:hover,
+.inventory-discard-actionbar .inventory-discard-trigger:focus-visible{
+  background:color-mix(in srgb,var(--theme-accent,#785bb6) 13%,var(--theme-surface,#fff));
+  color:var(--theme-accent,#785bb6);
+  box-shadow:inset 0 2px 5px #00000025;
+  transform:none;
+}
+.inventory-discard-dialog .inventory-discard-danger,
+.inventory-discard-dialog .inventory-discard-danger:hover,
+.inventory-discard-dialog .inventory-discard-danger:focus-visible,
+.inventory-discard-dialog .inventory-discard-danger:active{
+  background:#a83245;
+  border-color:#a83245;
+  color:#fff;
+  background-image:none;
+  transform:none;
+}
+.inventory-discard-dialog .inventory-discard-danger:hover{
+  background:#952b3e;
+  border-color:#952b3e;
+  box-shadow:inset 0 2px 4px #00000026;
+}
+.inventory-discard-mode .inventory-choice:hover,
+.inventory-discard-mode .inventory-choice:focus-within{
+  background:color-mix(in srgb,var(--theme-accent,#785bb6) 10%,var(--theme-surface,#fff));
+}
+.inventory-discard-mode .inventory-choice:hover .inventory-item-button,
+.inventory-discard-mode .inventory-choice:focus-within .inventory-item-button,
+.inventory-discard-mode .inventory-choice:hover .inventory-check-label,
+.inventory-discard-mode .inventory-choice:focus-within .inventory-check-label{
+  background:transparent;
+  box-shadow:none;
+  color:inherit;
+}
+.inventory-discard-mode .inventory-choice:hover .inventory-check-label input[type=checkbox],
+.inventory-discard-mode .inventory-choice:focus-within .inventory-check-label input[type=checkbox]{
+  border-color:var(--theme-accent,#785bb6);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--theme-accent,#785bb6) 14%,transparent);
+}
+.inventory-discard-mode .inventory-choice:hover .inventory-check-label input[type=checkbox]:checked,
+.inventory-discard-mode .inventory-choice:focus-within .inventory-check-label input[type=checkbox]:checked{
+  background:var(--theme-accent,#785bb6);
+}
