@@ -12,7 +12,7 @@ test('03-B excludes unvisited and expired destinations, and respects directional
  const denied=planTravel(reg,'core:site/town','core:site/forest','fast',{knownSites:new Set(['core:site/town'])});
  assert.equal(denied.reason,'UNDISCOVERED');
  assert.equal(planTravel(reg,'core:site/town','core:site/forest','fast',{...access,expiredSites:new Set(['core:site/forest'])}).ok,false);
- assert.equal(planTravel(reg,'core:site/town','core:site/plains','fast',{...access,blockedEdges:new Set(['core:route/town-plains'])}).reason,'UNREACHABLE');
+ assert.equal(planTravel(reg,'core:site/town','core:site/plains','fast',{...access,blockedEdges:new Set(['core:route/town-plains','core:route/plains-forest'])}).reason,'UNREACHABLE');
 });
 test('03-B pause/resume ticks charge once and restore travel progress',()=>{
  const p=planTravel(reg,'core:site/town','core:site/forest','fast',access).plan;
