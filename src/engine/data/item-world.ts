@@ -30,7 +30,7 @@ export function validateItemWorld(world: ItemWorldSnapshot, registry: ItemRegist
        l.kind==='container'&&!id(l.containerId) ||
        l.kind==='world'&&(!id(l.regionId)||!id(l.locationId)) ||
        !['inventory','equipped','container','world'].includes(String(l.kind))) issues.push(bad(p+'.location','INVALID_LOCATION'));
-    placed.set(entry.itemId,entry.location);
+    placed.set(entry.itemId,entry.location as unknown as ItemLocation);
   });
   for(const item of items.keys()) if(!placed.has(item)) issues.push(bad('items.'+item,'MISSING_PLACEMENT'));
   const containers=new Map<string,readonly string[]>();
