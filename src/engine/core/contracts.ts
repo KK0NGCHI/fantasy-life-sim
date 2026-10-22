@@ -1,4 +1,4 @@
-/** 01-A type contracts only: no gameplay logic. Keep state JSON-serializable. */
+/** Core serializable state contracts. Keep state JSON-serializable. */
 export type EntityId = string;
 export type DefinitionId = string;
 export type RegionId = string;
@@ -62,5 +62,5 @@ export interface GameEvent {
   readonly payload: Readonly<Record<string, unknown>>;
 }
 export type DispatchResult =
-  | { readonly accepted: true; readonly outcome: 'success' | 'failed'; readonly turnsSpent: 1; readonly nextState: GameState; readonly events: readonly GameEvent[] }
+  | { readonly accepted: true; readonly outcome: 'success' | 'failed'; readonly turnsSpent: number; readonly nextState: GameState; readonly events: readonly GameEvent[] }
   | { readonly accepted: false; readonly reason: 'INVALID_COMMAND' | 'BUSY' | 'EXECUTION_ERROR'; readonly turnsSpent: 0 };
