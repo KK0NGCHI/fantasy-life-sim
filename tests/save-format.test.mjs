@@ -36,3 +36,10 @@ test('autosave combines configurable actions and event triggers',()=>{
  assert.equal(shouldAutoSave(0,[{type:'region.entered',payload:{}}],policy),true);
  assert.throws(()=>shouldAutoSave(0,[],{...policy,everyActions:0}));
 });
+
+test('legacy save v1 refuses detailed 02-A item fields until explicit migration',()=>{
+ const save=createSave(state(),slot(),'prototype');
+ const enriched={...save,state:{...save.state,inventory:{items:[{...save.state.inventory.items[0],quality:3,materialId:'core:iron'}]}}};
+ assert.equal(decodeSave(enriched).ok,false);
+ assert.equal(prepareLoad(enriched,state()).ok,false);
+});
