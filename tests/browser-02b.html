@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><title>Somnium 02-B IndexedDB 실브라우저 검증</title>
+<style>body{font:15px system-ui,sans-serif;max-width:850px;margin:3rem auto;padding:0 1rem}pre{white-space:pre-wrap;line-height:1.6;padding:1rem;background:#f4f4f4}button{padding:.6rem 1rem}</style></head>
+<body><h1>02-B IndexedDB 브라우저 검증</h1>
+<p>실제 게임 저장소를 건드리지 않습니다. 이 페이지는 이름이 다른 임시 데이터베이스를 생성·검사·삭제합니다. 먼저 <code>npm run build:engine</code>를 실행하세요.</p>
+<button id="run">검증 실행</button><pre id="log" role="status" aria-live="polite">아직 실행하지 않았습니다.</pre>
+<script type="module">
+import { IndexedDbSaves, SaveConflictError, createSave, createRandomState, prepareLoad } from '../dist/engine/index.js';
+const log=document.querySelector('#log'), run=document.querySelector('#run');
+const assert=(ok,msg)=>{if(!ok)throw Error(msg)};
+const state=()=>({schemaVersion:1,turn:3,clock:{elapsedUnits:4},rng:createRandomState('browser-seed'),
+  player:{id:'p',regionId:'camp',currentHp:8,currentMp:3,hunger:1,statusEffects:[]},
+  inventory:{items:[{id:'ore',definitionId:'core:ore',quantity:2}]},
+  world:{activeRegionId:'camp'},progression:{skillExperience:{}},flags:{}});
+const slot={slotId:'manual-test',worldId:'world-test',kind:'manual',label:'테스트',savedAt:new Date().toISOString(),revision:0};
+const request=(r)=>new Promise((resolve,reject)=>{r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error)});
+async function corruptSnapshot(name,key) {
+ const db=await request(indexedDB.open(name));
+ try {await new Promise((resolve,reject)=>{
+  const tx=db.transaction('snapshots','readwrite'),store=tx.objectStore('snapshots');
+  const req=store.get(key);
+  req.onsuccess=()=>{ const value=req.result;value.save.state.inventory.items[0].quantity=-1;store.put(value); };
+  tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error);
+ });}finally{db.close();}
+}
+async function deleteDb(name){await new Promise((resolve,reject)=>{const r=indexedDB.deleteDatabase(name);r.onsuccess=resolve;r.onerror=()=>reject(r.error);r.onblocked=()=>reject(Error('delete blocked'));});}
+run.addEventListener('click',async()=>{
+ run.disabled=true;log.textContent='';
+ const name='somnium-02b-browser-check-'+crypto.randomUUID();let passed=0;
+ const record=(message)=>{passed++;log.textContent+='✔ '+message+'\n';};
+ try{
+  const store=new IndexedDbSaves(name),base=state();
+  const first=await store.commit(createSave(base,slot,'prototype'),null);
+  assert(first.slot.revision===1,'첫 revision');record('IndexedDB 첫 저장');
+  const loaded=await store.loadLatest(slot.slotId);
+  assert(JSON.stringify(loaded.state)===JSON.stringify(base),'동일 상태 복원');
+  record('DB 재열기 후 RNG·아이템·턴 완전 복원');
+  let conflict=false;
+  try{await store.commit(createSave({...base,turn:10},slot,'prototype'),null);}catch(e){conflict=e instanceof SaveConflictError;}
+  assert(conflict,'동시 탭 revision 충돌 거부');record('오래된 revision 충돌 거부');
+  const next=await store.commit(createSave({...base,turn:5},slot,'prototype'),1);
+  assert(next.slot.revision===2,'두 번째 revision');record('새 스냅샷 생성 및 최신 참조 갱신');
+  assert((await store.listRevisions(slot.slotId)).length===2,'이전 스냅샷 유지');
+  record('이전 정상 스냅샷 보존');
+  await corruptSnapshot(name,slot.slotId+'@2');
+  let damaged=false;
+  try{await store.loadLatest(slot.slotId);}catch{damaged=true;}
+  assert(damaged,'손상된 최신 저장은 불러오기 실패해야 함');
+  record('손상된 최신 저장 거부');
+  const candidates=await store.listRevisions(slot.slotId);
+  assert(candidates.length===1&&candidates[0].save.slot.revision===1,'이전 정상 후보 조회');
+  record('정상 복구 후보만 표시');
+  const current={...base,turn:999};
+  assert(current.turn===999,'승인 전 상태 유지');
+  const preview=prepareLoad(candidates[0].save,current);
+  assert(preview.ok&&current.turn===999&&preview.nextState.turn===3,'승인 전 상태 교체 금지');
+  record('사용자 승인 전 상태 불변');
+  log.textContent+='\n완료: '+passed+'개 검사 통과\n';
+ }catch(e){log.textContent+='\n✖ 실패: '+(e?.stack??e)+'\n';}
+ finally{try{await deleteDb(name);log.textContent+='임시 DB 삭제 완료\n';}catch(e){log.textContent+='임시 DB 삭제 주의: '+e+'\n';}run.disabled=false;}
+});
+</script></body></html>
