@@ -24,3 +24,16 @@
 
 ## 테스트
 `npm run check` — v1 호환성 테스트 + v2 속성 및 아이템 컨테이너 왕복 + 손상 데이터 거부 + 비파괴 변환.
+
+## v2 브라우저 통합 검사
+
+```bash
+git fetch origin
+git switch feat/02-item-schema-v2-persistence
+npm run check
+python3 -m http.server 8000
+```
+
+`http://localhost:8000/tests/browser-items-v2.html`에서 **검증 실행**을 클릭한다. 사용자 DB와 완전히 분리된 임시 IndexedDB로 v2의 상세 아이템 상태·컨테이너·RNG 재열기 복원, 두 번째 revision, 이전 버전 보존, 미등록 소재 거부, 오래된 revision 충돌 방지를 검사한다.
+
+이 파일은 수동 실브라우저 검증이며 CI가 자동 실행하지 않는다. 완료되었다고 주장하려면 브라우저 결과를 확인해야 한다.
