@@ -17,7 +17,7 @@ li{margin:.5rem 0}.row{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
 <dialog id="confirm" aria-labelledby="confirmTitle"><h2 id="confirmTitle">선택한 아이템을 영구 삭제하시겠습니까?</h2><p>버린 아이템은 지면에 남지 않으며 되돌릴 수 없습니다.</p><ul id="preview"></ul><div class="actions"><button id="cancel">취소</button><button id="confirmDiscard">영구 삭제</button></div></dialog>
 <dialog id="loadConfirm" aria-labelledby="loadTitle"><h2 id="loadTitle">현재 진행 상태를 교체할까요?</h2><p id="loadExplanation"></p><div class="actions"><button id="loadCancel">취소</button><button id="loadApprove">불러오기 승인</button></div></dialog>
 <script type="module">
-import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,exportBackupV2,parseBackupV2} from '../dist/engine/index.js';
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,exportBackupV2,parseBackupV2} from '../dist/engine/v2.js';
 const $=q=>document.querySelector(q);
 const catalog={categories:['food','resource','storage'],rarities:[],materials:[],effects:[],items:[
 {id:'core:berry',nameKey:'berry',categoryId:'food',tags:['food'],capabilities:['eat']},
