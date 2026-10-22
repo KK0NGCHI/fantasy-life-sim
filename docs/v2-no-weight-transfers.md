@@ -9,7 +9,7 @@
 
 ## 구현
 - `src/engine/core/item-transfers-v2.ts`: previewDiscard, discardSelected, pickUpItem (무게 필드/검사 없음).
-- `tests/item-transfers-v2.test.mjs`: 일괄 버리기·부분 수량·승인 필수·원자성·줍기 테스트.
+- `tests/item-transfer-v2.test.mjs`: 일괄 버리기·부분 수량·승인 필수·원자성·줍기 테스트.
 - `tests/browser-bulk-discard.html`: 기본 UI 변경 없이 브라우저 네이티브 `<dialog>`를 사용한 확인 팝업 체험/검증.
 - 주의: 이 모달은 **독립 테스트 페이지**이며 게임 기본 인벤토리 UI에 연결된 것이 아니다. 실제 UI 연결 시 팝업 확인 이벤트에서만 삭제 API를 호출해야 한다.
 - `GameStateV2`의 일반 행동 통일과 실제 UI 연동도 후속 단계. 기존 저장/브라우저 UI 건드리지 않음.
