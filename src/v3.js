@@ -312,6 +312,19 @@ async function openSaveManager(){
  const dialog=make('dialog',{id:'saveManagerDialog',class:'inventory-discard-dialog save-manager-dialog','aria-label':'저장 관리자'},document.body);
  make('h2',{text:'저장 관리자'},dialog);
  make('p',{class:'muted',text:'수동 슬롯은 개수 제한이 없습니다. 불러오기와 복구에는 별도 승인이 필요합니다.'},dialog);
+ const policyBox=make('div',{class:'save-manager-autosave'},dialog);
+ make('label',{text:'자동 저장 간격 (행동 수)'},policyBox);
+ const frequency=make('input',{type:'number',min:'1',max:'100000',value:String(mainV2.getAutosavePolicy().everyActions),'aria-label':'자동 저장 간격'},policyBox);
+ const eventToggle=make('label',{},policyBox);
+ const eventInput=make('input',{type:'checkbox'},eventToggle);
+ eventInput.checked=mainV2.getAutosavePolicy().eventTypes.length>0;
+ make('span',{text:'지역 이동·던전 진입/퇴장에서도 저장'},eventToggle);
+ btn('자동 저장 설정 적용',()=>{
+   const everyActions=Number(frequency.value);
+   if(!Number.isSafeInteger(everyActions)||everyActions<1){window.alert('자동 저장 간격은 1 이상의 정수여야 합니다.');return}
+   mainV2.configureAutosave({everyActions,eventTypes:eventInput.checked?['world.travelled','dungeon.entered','dungeon.left']:[]});
+   window.alert('자동 저장 설정을 적용했습니다.');
+ },'btn',policyBox);
  const actions=make('div',{class:'save-manager-actions'},dialog);
  const list=make('div',{class:'save-manager-list'},dialog);
  const close=()=>{dialog.close();dialog.remove()};
