@@ -89,3 +89,12 @@ border-radius:8px;
 .inventory-discard-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
 .inventory-discard-danger{background:#a83245;color:white;border-color:#a83245}
 @media(max-width:650px){.inventory-discard-controls{margin-inline-start:0}.inventory-toolbar{flex-wrap:wrap}}
+
+
+/* Visible inventory action row, independent of crowded filter toolbar. */
+.inventory-discard-actionbar{display:flex;justify-content:flex-end;align-items:center;min-height:42px;margin:8px 0 12px}
+.inventory-discard-actionbar .inventory-discard-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto;visibility:visible;opacity:1}
+.inventory-discard-actionbar .inventory-discard-trigger{display:inline-flex;align-items:center;justify-content:center;min-width:94px;padding:8px 17px;font-weight:700;border:1px solid var(--theme-accent,#785bb6);color:var(--theme-accent,#785bb6);background:var(--theme-surface,#fff)}
+.inventory-discard-actionbar button[hidden]{display:none!important}
+.inventory-list:not(.inventory-discard-mode) .inventory-check-label{display:none!important}
+.inventory-discard-mode .inventory-check-label input[type=checkbox]{display:grid}
