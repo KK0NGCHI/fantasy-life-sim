@@ -1,0 +1,40 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><title>Somnium v2 item-save browser check</title>
+<style>body{font:15px system-ui;margin:3rem auto;max-width:840px;padding:1rem}button{padding:.6rem 1rem}pre{white-space:pre-wrap;line-height:1.6}</style></head>
+<body><h1>아이템·저장 v2 브라우저 검사</h1><p>독립적인 임시 데이터베이스로만 검사합니다. 실행 전 <code>npm run build:engine</code>를 수행하세요.</p>
+<button id="go">검증 실행</button><pre id="result">준비됨</pre>
+<script type="module">
+import {buildItemRegistry,createRandomState,createSaveV2,IndexedDbSavesV2,decodeSaveV2} from '../dist/engine/index.js';
+const registry=buildItemRegistry({items:[
+{id:'core:box',nameKey:'box',categoryId:'box',tags:[],capabilities:['storage']},
+{id:'core:sword',nameKey:'sword',categoryId:'weapon',tags:[],capabilities:['equip'],allowsMaterial:true}],
+materials:[{id:'core:iron',nameKey:'iron',tags:[],properties:{hardness:1}}],
+effects:[{id:'core:glow',nameKey:'glow',tags:[]}],categories:['box','weapon'],rarities:['core:rare']}).registry;
+const state=()=>({schemaVersion:2,turn:8,clock:{elapsedUnits:30},rng:createRandomState('v2-browser'),
+player:{id:'p',regionId:'camp',currentHp:9,currentMp:8,hunger:2,statusEffects:[]},
+world:{activeRegionId:'camp'},progression:{skillExperience:{}},flags:{},
+itemWorld:{items:[{id:'box',definitionId:'core:box',quantity:1},{id:'sword',definitionId:'core:sword',quantity:1,materialId:'core:iron',
+quality:4,rarityId:'core:rare',enhancementLevel:3,effects:[{definitionId:'core:glow',level:2}],condition:{durability:16}}],
+placements:[{itemId:'box',location:{kind:'inventory',ownerId:'p'}},{itemId:'sword',location:{kind:'container',containerId:'box'}}],
+containers:[{containerId:'box',itemIds:['sword']}] }});
+const slot={slotId:'manual',worldId:'world',kind:'manual',label:'test',savedAt:new Date().toISOString(),revision:0};
+const name='somnium-v2-browser-'+crypto.randomUUID();
+const go=document.querySelector('#go'),result=document.querySelector('#result');
+const check=(condition,message)=>{if(!condition)throw Error(message);result.textContent+='✔ '+message+'\n';};
+go.onclick=async()=>{
+ go.disabled=true;result.textContent='';const store=new IndexedDbSavesV2(registry,name);
+ try{
+  const expected=state();const save=createSaveV2(expected,slot,'test-content',registry);
+  const first=await store.commit(save,null);check(first.slot.revision===1,'v2 새 스냅샷 기록');
+  const read=await store.loadLatest('manual');check(JSON.stringify(read.state)===JSON.stringify(expected),'소재·품질·효과·컨테이너·RNG 왕복');
+  const updated=await store.commit(createSaveV2({...state(),turn:9},slot,'test-content',registry),1);
+  check(updated.slot.revision===2,'두 번째 스냅샷 기록');
+  const candidates=await store.listRevisions('manual');check(candidates.length===2,'이전 정상 버전 보존');
+  const malformed=structuredClone(save);malformed.state.itemWorld.items[1].materialId='missing';
+  check(!decodeSaveV2(malformed,registry).ok,'미등록 소재 유효성 거부');
+  let conflict=false;try{await store.commit(save,1);}catch{conflict=true;}
+  check(conflict,'오래된 revision 충돌 거부');
+  result.textContent+='검증 완료\n';
+ }catch(e){result.textContent+='✖ 실패: '+(e?.stack??e)+'\n';}
+ finally{await new Promise(resolve=>{const req=indexedDB.deleteDatabase(name);req.onsuccess=resolve;req.onerror=resolve;req.onblocked=resolve;});result.textContent+='임시 DB 삭제 요청 완료\n';go.disabled=false;}
+};
+</script></body></html>
