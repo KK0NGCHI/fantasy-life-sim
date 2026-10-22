@@ -36,3 +36,7 @@ python3 -m http.server 8000
 - 현재는 JSON 백업에 MAC/암호학적 무결성 검증이 없고 콘텐츠 버전 변환표도 없으므로 외부 임의 JSON은 검증 후에만 수락한다.
 
 레퍼런스: [MDN IndexedDB 트랜잭션](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB), [MDN dialog 모달](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/dialog). 브라우저의 `showModal()` 확인·취소 흐름을 따르고, 저장 트랜잭션의 `complete` 이벤트를 기준으로 성공을 보고한다. 그러나 물리적인 기록 영속성까지 보장하지 않는다.
+
+## 정식 v2 진입점
+
+새 코드의 기본 임포트는 `src/engine/v2.ts` (빌드 후 `dist/engine/v2.js`)이다. `ENGINE_STAGE_V2='02-C'`, `ACTIVE_GAME_STATE_SCHEMA_VERSION=2`를 명시한다. 기존 `index.ts`에 남아 있는 v1 stage/schema 상수는 과거 테스트 및 명시적 마이그레이션 호환을 위해 유지한다. 새 게임의 저장 스키마는 항상 v2.
