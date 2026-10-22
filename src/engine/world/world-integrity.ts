@@ -31,7 +31,7 @@ export function validateWorldTopology(w:WorldDefinition):WorldValidationIssue[]{
    if(!map.entrances.length)errors.push(issue('FLOOR_ENTRY','maps/'+map.id,'Floor needs an entrance'));
    for(const e of map.entrances){
     const target=entrances.get(e.destinationSiteId+'/'+e.destinationFloor+'/'+e.destinationEntryId);
-    if(!target)continue; // Basic validator owns dangling references.
+    if(!target){errors.push(issue('ENTRY_TARGET','maps/'+map.id,'Destination portal does not exist'));continue;}
     if(target.destinationSiteId!==map.siteId||target.destinationFloor!==map.floor||target.destinationEntryId!==e.id)
      errors.push(issue('ONE_WAY_ENTRY','maps/'+map.id,'Entrance must have a reciprocal return link'));
     const walk=reachable(w,map.siteId,map.floor,e.x,e.y);
