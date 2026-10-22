@@ -1,5 +1,5 @@
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
-import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState} from '../dist/engine/v2.js';
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom} from '../dist/engine/v2.js';
 
 /** Bridge for the existing main UI fixture. Game item identity, quantity and ownership live in v2.
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
@@ -64,6 +64,28 @@ export function createMainV2Inventory(uiItems,options={}) {
    await saveInto('auto','main-auto','자동 저장');
   }).catch(error=>{autosaveError=String(error?.message??error);console.warn('Somnium autosave failed:',error)});
  }
+ // Travel is simulated in memory and committed in a single v2 action. Encounters
+ // interrupt after a completed travel turn. Never advance real time or RNG in UI.
+ function simulateJourney(snapshot){
+  let travel=snapshot.world.runtime.travel03B;
+  if(!travel?.progress||travel.progress.status!=='moving')throw Error('Travel not active');
+  let rng=snapshot.rng,turns=0,units=0,encounter=false,arrival=false;
+  const access=routeAccess();
+  const total=travel.progress.plan.totalTurns;
+  for(let guard=0;guard<total;guard++){
+   const step=advanceTravel(travel,worldRegistry,access);
+   if(!step.ok)throw Error(step.reason);
+   travel=step.state;turns+=step.turns;units+=step.worldUnits;arrival=step.arrived;
+   if(travel.position.kind==='site'||arrival){
+    const draw=drawRandom(rng,'world');rng=draw.rng;
+    // Encounter roll per actual road segment; no item weight effects.
+    if(!arrival&&draw.value<0.12){encounter=true;travel=pauseTravel(travel);break}
+   }
+   if(arrival)break;
+  }
+  if(!turns)throw Error('No travel progress');
+  return {travel,rng,turns,units,encounter,arrival};
+ }
  const handlers=new Map([
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
  ['world.travel',(snapshot,command)=>{
@@ -71,17 +93,15 @@ export function createMainV2Inventory(uiItems,options={}) {
    if(typeof region!=='string'||!region.trim())throw Error('Invalid region');
    return {outcome:'success',nextState:{...snapshot,player:{...snapshot.player,regionId:region},world:{...snapshot.world,activeRegionId:region,runtime:{...snapshot.world.runtime,region}}},events:[{type:'world.travelled',payload:{region}}]};
  }],
- ['travel.tick',(snapshot)=>{
-   const current=snapshot.world.runtime.travel03B;
-   if(!current||!validateTravelState(current,worldRegistry))throw Error('Invalid travel state');
-   const step=advanceTravel(current,worldRegistry,routeAccess());
-   if(!step.ok)throw Error(step.reason);
-   const region=step.state.position.kind==='site'?siteToRegion.get(step.state.position.siteId):null;
-   const runtime={...snapshot.world.runtime,travel03B:step.state,...(region?{region}:{})};
-   return {outcome:'success',nextState:{...snapshot,
+ ['travel.skip',(snapshot)=>{
+   const result=simulateJourney(snapshot);
+   const region=result.travel.position.kind==='site'?siteToRegion.get(result.travel.position.siteId):null;
+   const runtime={...snapshot.world.runtime,travel03B:result.travel,...(region?{region}:{})};
+   return {outcome:'success',nextState:{...snapshot,rng:result.rng,
     world:{...snapshot.world,runtime,activeRegionId:region??snapshot.world.activeRegionId},
     player:{...snapshot.player,regionId:region??snapshot.player.regionId}},
-    events:[{type:step.arrived?'world.travelled':'world.travel_tick',payload:{arrived:step.arrived}}]};
+    events:[{type:result.encounter?'world.travel_encounter':result.arrival?'world.travelled':'world.travel_progress',
+       payload:{encounter:result.encounter,arrived:result.arrival}}]};
  }],
  ['dungeon.enter',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,pos:[2,2]}}},events:[{type:'dungeon.entered',payload:{}}]})],
  ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false}}},events:[{type:'dungeon.left',payload:{}}]})],
@@ -92,12 +112,11 @@ export function createMainV2Inventory(uiItems,options={}) {
  }]
  ]);
  const dispatcher=new V2ActionDispatcher(registry,handlers,(current,action)=>{
-  if(action.type==='travel.tick'){
-   const step=advanceTravel(current.world.runtime.travel03B,worldRegistry,routeAccess());
-   if(!step.ok)throw Error(step.reason);
-   return {turns:1,worldUnits:step.worldUnits};
+  if(action.type==='travel.skip'){
+   const result=simulateJourney(current);
+   return {turns:result.turns,worldUnits:result.units};
   }
-  return {turns:1,worldUnits:1};
+    return {turns:1,worldUnits:1};
  });
  const projected=()=>state.itemWorld.items
   .filter(item=>state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
@@ -143,7 +162,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:resumeTravel(current)}}};return true},
   travelCancel(){const current=state.world.runtime.travel03B;if(!current?.progress)return false;
    try{const next=cancelTravel(current);state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:next}}};return true}catch{return false}},
-  travelTick(){return this.dispatch('travel.tick')},
+  travelSkip(){return this.dispatch('travel.skip')},
   prepareDiscard(selections){return prepareBulkDiscard(state,selections,registry)},
   confirmDiscard(preview){
    const outcome=confirmBulkDiscard(state,preview,registry);
