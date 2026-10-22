@@ -85,7 +85,7 @@ export function dispatchItemAction(state:GameStateV2,command:ItemCommand,registr
       if(command.to.kind==='equipped' && !registry.items.get(items[index]!.definitionId)?.capabilities.includes('equip'))outcome='failed';
     }else outcome='failed'; // Moving to the world requires a world-placement action in a later stage.
     if(outcome==='success'&&current){
-      if(current.kind==='container'){const c=containers.find(c=>c.containerId===current.containerId);const at=c?.itemIds.indexOf(command.itemId)??-1;if(at>=0)c!.itemIds.splice(at,1);}
+      if(current.kind==='container'){const containerId=current.containerId;const c=containers.find(c=>c.containerId===containerId);const at=c?.itemIds.indexOf(command.itemId)??-1;if(at>=0)c!.itemIds.splice(at,1);}
       const p=placements.findIndex(p=>p.itemId===command.itemId);
       placements[p]={itemId:command.itemId,location:clone(command.to)};
       if(command.to.kind==='container') {
