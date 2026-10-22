@@ -35,7 +35,7 @@ function svgIcon(name){return '<i data-lucide="'+esc(name)+'" aria-hidden="true"
 function iconify(){if(window.lucide?.createIcons){window.lucide.createIcons()}else if(!document.querySelector('#lucide-load-warning')){const note=document.createElement('span');note.id='lucide-load-warning';note.className='sr';note.textContent='아이콘 라이브러리를 불러오지 못했습니다.';document.body.append(note)}}
 
 function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:0,pos:[2,2],dungeon:false,hp:100,mp:80,hunger:85,day:1,hour:8,items:safeCopy(baseItems),logs:[],filter:'전체',search:'',sort:'name',selectedItem:null,selectedIds:[],logFilter:'전체',logSearch:'',pinnedIds:[],expandedLogs:[],collapsed:true,viewFont:100,theme:'aurora',auto:{hp:{on:true,pct:35},mp:{on:false,pct:20},hunger:{on:true,pct:25}}}}
-let s=fresh(),autoTimer=null,previousPage='생활';const LOG_LIMIT=500;
+let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
 
 const THEMES=[{"id":"aurora","name":"오로라","mode":"light","colors":["#9667d9","#75b4f4","#f4a2d1"],"source":"게임 기본"},{"id":"rose-dawn","name":"장미빛 새벽","mode":"light","colors":["#907aa9","#286983","#b4637a"],"source":"로즈 파인"},{"id":"solarized","name":"솔라라이즈드","mode":"light","colors":["#268bd2","#2aa198","#b58900"],"source":"솔라라이즈드"},{"id":"citrus","name":"시트러스","mode":"light","colors":["#65a30d","#f59e0b","#0d9488"],"source":"라임·호박·청록"},{"id":"red","name":"석류빛","mode":"light","colors":["#d94358","#f5a65b","#7697c7"],"source":"붉은색 중심"},{"id":"blue","name":"푸른 항해","mode":"light","colors":["#267bcc","#70c8e5","#f1c17d"],"source":"파란색 중심"},{"id":"lavender","name":"라벤더 들판","mode":"light","colors":["#9273ce","#c09bea","#97c9a7"],"source":"라벤더·세이지"},{"id":"cocoa","name":"살구 코코아","mode":"light","colors":["#b97a58","#f4b98c","#93b1a6"],"source":"따뜻한 브라운"}];
@@ -77,7 +77,7 @@ for(let i=0;i<REGIONS.length;i++){const region=REGIONS[i],b=make('button',{class
 b.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';b.onclick=()=>{s.region=region;s.page='생활';s.tab='개요';s.dungeon=false;s.turn++;nextLog('이동',region+'에 도착했습니다.','이동 시간은 미구현입니다.');render()}}
 }
 
-function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>무게</dt><dd>'+esc(i.weight||0)+' (목업)</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·무게·전투 공식이 아닙니다.</p>'}
+function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>무게</dt><dd>'+esc(i.weight||0)+' (목업)</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·전투 공식이 아닙니다.</p>'}
 function inventory(){
 const el=head('인벤토리','');
 tabs(el,['전체','장비','식재료','재료','광석','약초','도구','기타'],changeTab);
@@ -85,7 +85,7 @@ const toolbar=make('div',{class:'toolbar inventory-toolbar'},el);
 const search=make('input',{class:'input',placeholder:'이름·소재·태그 검색','aria-label':'소지품 검색'},toolbar);search.value=s.search;
 make('label',{class:'tiny muted',text:'정렬'},toolbar);
 const sort=make('select',{class:'input','aria-label':'인벤토리 정렬'},toolbar);
-sort.innerHTML='<option value="name">이름순</option><option value="group">분류순</option><option value="qty">수량순</option><option value="weight">무게순</option><option value="quality">품질순</option>';sort.value=s.sort;
+sort.innerHTML='<option value="name">이름순</option><option value="group">분류순</option><option value="qty">수량순</option><option value="quality">품질순</option>';sort.value=s.sort;
 make('label',{class:'tiny muted',text:'필터'},toolbar);
 const filter=make('select',{class:'input','aria-label':'인벤토리 분류 필터'},toolbar);
 filter.innerHTML='<option value="전체">전체 분류</option>'+categories.filter(c=>c!=='전체').map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');filter.value=s.filter||'전체';
@@ -93,23 +93,75 @@ const total=make('span',{class:'tiny muted'},toolbar);
 const pane=make('div',{class:'panegrid inventory-layout'},el);
 const list=make('div',{class:'inventory-list'},pane);
 const detail=make('aside',{class:'inventory-detail','aria-label':'선택한 아이템 상세'},pane);
-const selected=new Set(s.selectedIds);
+const selected=new Set(inventoryDiscardMode?s.selectedIds:[]);
+const discardControls=make('div',{class:'inventory-discard-controls'},toolbar);
+const discardButton=btn('버리기',()=>{
+ if(inventoryDiscardMode)return;
+ inventoryDiscardMode=true;selected.clear();s.selectedIds=[];redraw();
+},'btn inventory-discard-trigger',discardControls);
+const confirmButton=btn('확인',()=>requestDiscardConfirmation(),'btn inventory-discard-confirm',discardControls);
+const cancelButton=btn('취소',()=>{inventoryDiscardMode=false;selected.clear();s.selectedIds=[];redraw()},'btn inventory-discard-cancel',discardControls);
+const hint=make('p',{class:'tiny muted inventory-discard-hint',text:'버리기를 누르면 아이템을 여러 개 선택할 수 있습니다.'},el);
+function requestDiscardConfirmation(){
+ const selections=[...selected].map(id=>s.items.find(i=>i.id===id)).filter(Boolean);
+ if(!selections.length)return;
+ const dialog=make('dialog',{class:'inventory-discard-dialog','aria-label':'아이템 버리기 최종 확인'},document.body);
+ const title=make('h2',{text:'선택한 아이템을 영구 삭제할까요?'},dialog);title.id='discard-dialog-title';
+ dialog.setAttribute('aria-labelledby',title.id);
+ make('p',{class:'muted',text:'선택한 아이템은 지면에 떨어지지 않고 소멸합니다. 취소하면 변경되지 않습니다.'},dialog);
+ const ul=make('ul',{},dialog);
+ for(const item of selections)make('li',{text:item.name+' ×'+item.qty},ul);
+ const actions=make('div',{class:'inventory-discard-dialog-actions'},dialog);
+ const snapshot=selections.map(i=>({id:i.id,qty:i.qty}));
+ const remove=()=>{dialog.close();dialog.remove()};
+ const abort=btn('취소',remove,'btn',actions);abort.autofocus=true;
+ btn('영구 삭제',()=>{
+   if(!inventoryDiscardMode||snapshot.some(x=>!s.items.some(i=>i.id===x.id&&i.qty===x.qty))){remove();return}
+   const ids=new Set(snapshot.map(x=>x.id));
+   s.items=s.items.filter(i=>!ids.has(i.id));
+   s.selectedIds=[];s.selectedItem=ids.has(s.selectedItem)?null:s.selectedItem;
+   inventoryDiscardMode=false;selected.clear();remove();
+   nextLog('시스템',snapshot.length+'종의 아이템을 버렸습니다. 아이템은 소멸했습니다.');
+   render();
+ },'btn inventory-discard-danger',actions);
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+ dialog.showModal();
+}
 function redraw(){
 let items=s.items.filter(i=>(s.tab==='전체'||i.group===s.tab)&&(s.filter==='전체'||!s.filter||i.group===s.filter)&&[i.name,i.material,i.id,...i.tags].join(' ').toLowerCase().includes(s.search.toLowerCase()));
-items.sort((a,b)=>['qty','weight'].includes(s.sort)?b[s.sort]-a[s.sort]:String(a[s.sort]).localeCompare(String(b[s.sort]),'ko'));
-total.textContent=items.length+'종 · 선택 '+selected.size+'종';
-list.innerHTML='<label class="inventory-select-all"><input type="checkbox" id="selectAllItems"> 전체 선택 </label>';
+items.sort((a,b)=>s.sort==='qty'?b.qty-a.qty:String(a[s.sort]).localeCompare(String(b[s.sort]),'ko'));
+total.textContent=items.length+'종'+(inventoryDiscardMode?' · 버리기 '+selected.size+'종 선택':'');
+discardButton.hidden=inventoryDiscardMode;confirmButton.hidden=!inventoryDiscardMode;cancelButton.hidden=!inventoryDiscardMode;
+confirmButton.disabled=selected.size===0;
+hint.hidden=!inventoryDiscardMode;hint.textContent=inventoryDiscardMode?'버릴 아이템을 선택하세요. 확인을 누르면 최종 삭제 팝업이 열립니다.':'';
+list.classList.toggle('inventory-discard-mode',inventoryDiscardMode);
+list.replaceChildren();
+if(inventoryDiscardMode){
+ const selectAll=make('label',{class:'inventory-select-all inventory-check-label'},list);
+ const all=make('input',{type:'checkbox',id:'selectAllItems','aria-label':'현재 필터의 아이템 전체 선택'},selectAll);
+ make('span',{text:'현재 목록 전체 선택'},selectAll);
+ all.checked=items.length>0&&items.every(i=>selected.has(i.id));
+ all.indeterminate=items.some(i=>selected.has(i.id))&&!all.checked;
+ all.onchange=()=>{items.forEach(i=>all.checked?selected.add(i.id):selected.delete(i.id));s.selectedIds=[...selected];redraw()};
+}
 for(const item of items){
-const row=make('div',{class:'inventory-choice'+(s.selectedItem===item.id?' selected':'')},list);
-const checkbox=make('input',{type:'checkbox','aria-label':item.name+' 선택'},row);checkbox.checked=selected.has(item.id);
-checkbox.onchange=()=>{checkbox.checked?selected.add(item.id):selected.delete(item.id);s.selectedIds=[...selected];redraw()};
-const button=make('button',{class:'inventory-item-button',type:'button','aria-label':item.name+' 상세 보기'},row);
-button.innerHTML=svgIcon(item.group==='장비'?'sword':item.group==='식재료'?'wheat':item.group==='광석'?'gem':item.group==='약초'?'leaf':item.group==='도구'?'hammer':'package')+'<span class="inventory-item-name"><strong>'+esc(item.name)+'</strong><small>'+esc(item.group)+' · '+esc(item.material)+' · '+esc(item.quality)+'</small></span><span class="inventory-quantity">×'+item.qty+'</span>';
-button.onclick=()=>{s.selectedItem=item.id;redraw();iconify()};
+ const row=make('div',{class:'inventory-choice'+(s.selectedItem===item.id?' selected':'')+(selected.has(item.id)&&inventoryDiscardMode?' discard-marked':'')},list);
+ if(inventoryDiscardMode){
+  const label=make('label',{class:'inventory-check-label','aria-label':item.name+' 버리기 선택'},row);
+  const checkbox=make('input',{type:'checkbox','aria-label':item.name+' 버리기 선택'},label);
+  checkbox.checked=selected.has(item.id);
+  checkbox.onchange=()=>{checkbox.checked?selected.add(item.id):selected.delete(item.id);s.selectedIds=[...selected];redraw()};
+ }
+ const button=make('button',{class:'inventory-item-button',type:'button','aria-label':item.name+(inventoryDiscardMode?' 버리기 선택':' 상세 보기')},row);
+ button.innerHTML=svgIcon(item.group==='장비'?'sword':item.group==='식재료'?'wheat':item.group==='광석'?'gem':item.group==='약초'?'leaf':item.group==='도구'?'hammer':'package')+'<span class="inventory-item-name"><strong>'+esc(item.name)+'</strong><small>'+esc(item.group)+' · '+esc(item.material)+' · '+esc(item.quality)+'</small></span><span class="inventory-quantity">×'+item.qty+'</span>';
+ button.onclick=()=>{
+ if(inventoryDiscardMode){selected.has(item.id)?selected.delete(item.id):selected.add(item.id);s.selectedIds=[...selected]}
+ else s.selectedItem=item.id;
+ redraw();iconify()
+ };
 }
 if(!items.length)make('p',{class:'empty',text:'선택한 조건에 해당하는 아이템이 없습니다.'},list);
-const all=list.querySelector('#selectAllItems');all.checked=items.length>0&&items.every(i=>selected.has(i.id));all.indeterminate=items.some(i=>selected.has(i.id))&&!all.checked;all.onchange=()=>{items.forEach(i=>all.checked?selected.add(i.id):selected.delete(i.id));s.selectedIds=[...selected];redraw()};
-let item=s.items.find(i=>i.id===s.selectedItem);
+const item=s.items.find(i=>i.id===s.selectedItem);
 detail.innerHTML=item?'<div class="inventory-detail-head">'+svgIcon(item.group==='장비'?'sword':item.group==='식재료'?'wheat':item.group==='광석'?'gem':item.group==='약초'?'leaf':'package')+'<div><small>'+esc(item.group)+'</small><h2>'+esc(item.name)+'</h2></div></div>'+mockDetail(item):'<h2>아이템 정보</h2><p class="muted">아이템을 선택하면 이곳에 상세 정보가 나타납니다.</p>';
 iconify();
 }
@@ -216,7 +268,7 @@ btn('F5 · 퀵세이브',quickSave,'btn primary',actions);btn('F9 · 퀵로드',
 btn('초기화',()=>{if(!confirm('목업 상태를 초기화할까요?'))return;stopAuto();const selectedTheme=s.theme;s=fresh();useTheme(selectedTheme);nextLog('시스템','목업 초기화');render()},'btn',actions)
 }
 function quickSave(){try{localStorage.setItem('fantasy-v2-demo',JSON.stringify(s));nextLog('시스템','목업 상태를 로컬에 저장했습니다.');render()}catch{nextLog('위험','브라우저 저장소에 기록할 수 없습니다.');render()}}
-function quickLoad(){try{const raw=localStorage.getItem('fantasy-v2-demo');if(!raw)throw Error('empty');const o=JSON.parse(raw);if(!Array.isArray(o.items)||!Array.isArray(o.logs)||!o.auto)throw Error('invalid');stopAuto();s=o;try{const savedTheme=localStorage.getItem('fantasy-ui-theme');if(THEMES.some(t=>t.id===savedTheme))s.theme=savedTheme}catch{}nextLog('시스템','목업 상태를 불러왔습니다.');render()}catch{nextLog('위험','저장된 목업 데이터를 읽을 수 없습니다.');render()}}
+function quickLoad(){inventoryDiscardMode=false;try{const raw=localStorage.getItem('fantasy-v2-demo');if(!raw)throw Error('empty');const o=JSON.parse(raw);if(!Array.isArray(o.items)||!Array.isArray(o.logs)||!o.auto)throw Error('invalid');stopAuto();s=o;try{const savedTheme=localStorage.getItem('fantasy-ui-theme');if(THEMES.some(t=>t.id===savedTheme))s.theme=savedTheme}catch{}nextLog('시스템','목업 상태를 불러왔습니다.');render()}catch{nextLog('위험','저장된 목업 데이터를 읽을 수 없습니다.');render()}}
 function logs(){
 const e=$('#log');e.innerHTML='<div class="loghead"><div class="sectiontitle">사건 기록</div><div class="logtools" id="logFilters"></div></div><div class="logbody" id="logBody" aria-live="polite"></div>';
 const filter=()=>{const target=$('#logBody');const sorted=s.logs.filter(x=>s.logFilter==='전체'||x.kind===s.logFilter);sorted.sort((a,b)=>Number(s.pinnedIds.includes(b.id))-Number(s.pinnedIds.includes(a.id)));
