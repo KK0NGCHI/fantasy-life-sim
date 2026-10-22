@@ -17,3 +17,6 @@ export type { AutoTile, AutoSensors, AutoThresholds, AutoPauseReason } from './c
 export { buildItemRegistry, validateItemInstances, canStackItems, mergeItemStacks } from './data/item-registry.js';
 export type { ItemCatalog, ItemRegistry, ValidationIssue } from './data/item-registry.js';
 export type { ItemDefinition, MaterialDefinition, EffectDefinition, ItemInstanceDraft, ItemEffect, ItemLocation, ContainerContents, RecipeDefinition, IngredientMatcher, IngredientRequirement } from './data/item-model.js';
+
+export { validateItemWorld, prepareInventoryMigration } from './data/item-world.js';
+export type { ItemWorldSnapshot, ItemPlacement } from './data/item-world.js';
