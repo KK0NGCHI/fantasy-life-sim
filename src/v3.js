@@ -52,6 +52,8 @@ function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',
 function top(){
 $('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+s.day+'일</span><span>'+svgIcon('clock')+' '+String(s.hour).padStart(2,'0')+':00</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span><button type="button" class="top-settings" id="settingsControl" aria-label="설정" title="설정">'+svgIcon('settings')+'</button></div>';
 $('#settingsControl').onclick=()=>openPage('설정');
+const saveButton=make('button',{type:'button',class:'top-settings',title:'저장 관리자','aria-label':'저장 관리자'},$('#top .top-meta'));
+saveButton.innerHTML=svgIcon('save');saveButton.onclick=()=>openSaveManager();
 }
 
 function side(){ /* v0.3: persistent left navigation removed in favor of bottom controls */ }
@@ -269,7 +271,7 @@ const save=section(el,'목업 퀵세이브');const actions=make('div',{class:'ro
 btn('F5 · 퀵세이브',quickSave,'btn primary',actions);btn('F9 · 퀵로드',quickLoad,'btn',actions);
 btn('초기화',()=>{if(!confirm('목업 상태를 초기화할까요?'))return;stopAuto();const selectedTheme=s.theme;s=fresh();useTheme(selectedTheme);nextLog('시스템','목업 초기화');render()},'btn',actions)
 }
-async function quickSave(){try{mainV2.syncVitals(s);const saved=await mainV2.save();nextLog('시스템','v2 인벤토리와 진행 상태를 IndexedDB에 저장했습니다 (revision '+saved.slot.revision+').');render()}catch(e){nextLog('위험','v2 저장 실패: '+e.message);render()}}
+async function quickSave(){try{mainV2.syncVitals(s);const saved=await mainV2.save('quick');nextLog('시스템','v2 인벤토리와 진행 상태를 IndexedDB에 저장했습니다 (revision '+saved.slot.revision+').');render()}catch(e){nextLog('위험','v2 저장 실패: '+e.message);render()}}
 async function quickLoad(){
  inventoryDiscardMode=false;
  try{
@@ -290,6 +292,83 @@ async function quickLoad(){
  }
 }
 
+function requestLoadApproval(saved,origin='저장 슬롯'){
+ const dialog=make('dialog',{class:'inventory-discard-dialog save-manager-confirm','aria-label':'게임 불러오기 확인'},document.body);
+ make('h2',{text:origin+'을(를) 불러올까요?'},dialog);
+ make('p',{text:'현재 진행 상태를 교체합니다. 취소하면 기존 상태는 유지됩니다.'},dialog);
+ const buttons=make('div',{class:'inventory-discard-dialog-actions'},dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ btn('취소',close,'btn',buttons);
+ btn('불러오기 승인',()=>{try{
+  stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();s.page=s.dungeon?'던전':'생활';
+  s.selectedIds=[];s.selectedItem=null;inventoryDiscardMode=false;close();
+  nextLog('시스템','승인한 저장 상태를 복구했습니다.');render();
+ }catch(error){close();nextLog('위험','복구 실패: '+error.message);render()}},'btn inventory-discard-confirm',buttons);
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+async function openSaveManager(){
+ stopAuto();
+ const old=document.querySelector('#saveManagerDialog');old?.close();old?.remove();
+ const dialog=make('dialog',{id:'saveManagerDialog',class:'inventory-discard-dialog save-manager-dialog','aria-label':'저장 관리자'},document.body);
+ make('h2',{text:'저장 관리자'},dialog);
+ make('p',{class:'muted',text:'수동 슬롯은 개수 제한이 없습니다. 불러오기와 복구에는 별도 승인이 필요합니다.'},dialog);
+ const actions=make('div',{class:'save-manager-actions'},dialog);
+ const list=make('div',{class:'save-manager-list'},dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ btn('닫기',close,'btn',actions);
+ btn('새 수동 저장',async()=>{try{
+  mainV2.syncVitals(s);
+  const label=window.prompt('저장 이름을 입력하세요.','수동 저장')??'';
+  if(!label.trim())return;
+  const saved=await mainV2.save('manual','manual-'+crypto.randomUUID(),label.trim());
+  nextLog('시스템','수동 저장 완료: '+saved.slot.label);await refresh();
+ }catch(e){window.alert('저장 실패: '+e.message)}},'btn',actions);
+ btn('퀵세이브',async()=>{try{await quickSave();await refresh()}catch(e){window.alert(e.message)}},'btn',actions);
+ btn('JSON 가져오기',()=>{
+  const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
+  input.onchange=async()=>{const file=input.files?.[0];if(!file)return;
+   if(file.size>8000000){window.alert('백업 파일 크기 초과');return}
+   try{
+    const raw=JSON.parse(await file.text());
+    const {prepareV2Load}=await import('../dist/engine/v2.js');
+    const checked=prepareV2Load(raw,mainV2.registry);
+    if(!checked.ok)throw Error(checked.reason);
+    close();
+    requestLoadApproval({...raw,state:checked.state,slot:raw.slot??{slotId:'import'}},'JSON 백업');
+   }catch(e){window.alert('가져오기 실패: '+e.message)}
+  };input.click();
+ },'btn',actions);
+ async function refresh(){
+  list.replaceChildren();
+  const slots=await mainV2.listSlots();
+  if(!slots.length)make('p',{class:'muted',text:'저장 슬롯이 없습니다.'},list);
+  for(const entry of slots){
+   const row=make('div',{class:'save-manager-slot'},list);
+   const kind=entry.save?.slot.kind??'unknown';
+   const info=make('div',{},row);
+   make('strong',{text:(entry.save?.slot.label??entry.slotId)+' · '+(entry.status==='damaged'?'손상됨':kind)},info);
+   make('div',{class:'muted',text:'Revision '+entry.revision+' · '+(entry.save?.slot.savedAt??'최신 저장을 읽을 수 없음')},info);
+   const buttons=make('div',{class:'save-manager-slot-actions'},row);
+   if(entry.status==='valid'){
+    btn('불러오기',()=>{close();requestLoadApproval(entry.save,entry.slotId)},'btn',buttons);
+    btn('백업',()=>{const blob=new Blob([JSON.stringify(entry.save,null,2)],{type:'application/json'});
+     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
+     a.download='somnium-'+entry.slotId+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    },'btn',buttons);
+   }
+   btn('이전 기록',async()=>{
+    const revisions=await mainV2.recoveryCandidates(entry.slotId);
+    const area=make('div',{class:'save-manager-revisions'},row);
+    if(!revisions.length)make('span',{text:'정상 복구 후보가 없습니다.'},area);
+    for(const r of revisions){
+     btn('Revision '+r.save.slot.revision+' · '+r.save.slot.savedAt,()=>{close();requestLoadApproval(r.save,'복구 후보')},'btn',area);
+    }
+   },'btn',buttons);
+  }
+ }
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+ dialog.showModal();try{await refresh()}catch(e){make('p',{text:'슬롯 조회 실패: '+e.message},list)}
+}
 function logs(){
 const e=$('#log');e.innerHTML='<div class="loghead"><div class="sectiontitle">사건 기록</div><div class="logtools" id="logFilters"></div></div><div class="logbody" id="logBody" aria-live="polite"></div>';
 const filter=()=>{const target=$('#logBody');const sorted=s.logs.filter(x=>s.logFilter==='전체'||x.kind===s.logFilter);sorted.sort((a,b)=>Number(s.pinnedIds.includes(b.id))-Number(s.pinnedIds.includes(a.id)));
