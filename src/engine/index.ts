@@ -36,3 +36,6 @@ export type { ItemCommand, ItemOutcome } from './core/item-actions-v2.js';
 
 export { prepareBulkDiscard, confirmBulkDiscard, pickupWorldItem } from './core/item-transfer-v2.js';
 export type { ItemSelection, DiscardPreview, DiscardResult, PickupResult } from './core/item-transfer-v2.js';
+
+export { previewDiscard, discardSelected, pickUpItem } from './core/item-transfers-v2.js';
+export type { ItemSelection, TransferResult } from './core/item-transfers-v2.js';
