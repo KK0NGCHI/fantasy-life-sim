@@ -56,7 +56,8 @@ export class AutoController {
   get status(): { running: boolean; reason: AutoPauseReason | null } { return { running:this.running, reason:this.reason }; }
   tick(state: GameState, sensors: AutoSensors, limits: AutoThresholds,
        select: (state: GameState) => GameAction | null,
-       execute: (state: GameState, action: GameAction) => DispatchResult): DispatchResult | null {
+       execute: (state: GameState, action: GameAction) => DispatchResult,
+       observeAfter?: (state: GameState) => AutoSensors): DispatchResult | null {
     if (!this.running) return null;
     const before = shouldStopAuto(sensors, limits);
     if (before) { this.pause(before); return null; }
@@ -64,6 +65,10 @@ export class AutoController {
     if (!action) { this.pause('no-safe-route'); return null; }
     const result = execute(state, action);
     if (!result.accepted) this.pause('invalid-command');
+    else if (observeAfter) {
+      const after = shouldStopAuto(observeAfter(result.nextState), limits);
+      if (after) this.pause(after);
+    }
     return result;
   }
 }
