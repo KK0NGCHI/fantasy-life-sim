@@ -74,11 +74,28 @@ export function cancelTravel(state:TravelState):TravelState{
  return {...state,progress:null};
 }
 /** Static compatibility preflight for resumable travel; never mutate the saved snapshot. */
-export function validateTravelState(raw:TravelState,registry:WorldRegistry):boolean{
- if(!raw||!raw.position||!raw.progress)return !!raw&&raw.position?.kind==='site'&&registry.sites.has(raw.position.siteId);
- const p=raw.progress;
- if(!['moving','paused','interrupted'].includes(p.status)||!p.plan?.routeEdgeIds?.length||p.plan.siteIds.length!==p.plan.routeEdgeIds.length+1||
- !Number.isSafeInteger(p.edgeIndex)||p.edgeIndex<0||p.edgeIndex>=p.plan.routeEdgeIds.length)return false;
+export function validateTravelState(raw:unknown,registry:WorldRegistry):boolean{
+ if(!raw||typeof raw!=='object')return false;
+ const state=raw as Partial<TravelState>,position=state.position;
+ if(!position||typeof position!=='object')return false;
+ if(state.progress===null||state.progress===undefined)
+  return position.kind==='site'&&registry.sites.has(position.siteId);
+ const p=state.progress;
+ if(!p||!['moving','paused','interrupted'].includes(p.status)||
+  !p.plan||!Array.isArray(p.plan.routeEdgeIds)||!Array.isArray(p.plan.siteIds)||
+  !p.plan.routeEdgeIds.length||p.plan.siteIds.length!==p.plan.routeEdgeIds.length+1||
+  !Number.isSafeInteger(p.edgeIndex)||p.edgeIndex<0||p.edgeIndex>=p.plan.routeEdgeIds.length||
+  !Number.isSafeInteger(p.completedEdgeTurns)||p.completedEdgeTurns<0)return false;
+ if(!registry.sites.has(p.plan.originSiteId)||!registry.sites.has(p.plan.destinationSiteId))return false;
  const edge=registry.routes.get(p.plan.routeEdgeIds[p.edgeIndex]??'');
- return !!edge&&Number.isSafeInteger(p.completedEdgeTurns)&&p.completedEdgeTurns>=0&&p.completedEdgeTurns<edge.turns;
+ if(!edge||p.completedEdgeTurns>=edge.turns)return false;
+ for(let i=0;i<p.plan.routeEdgeIds.length;i++){
+  const e=registry.routes.get(p.plan.routeEdgeIds[i]??''),from=p.plan.siteIds[i],to=p.plan.siteIds[i+1];
+  if(!e||!from||!to||!(e.fromSiteId===from&&e.toSiteId===to||e.bidirectional&&e.toSiteId===from&&e.fromSiteId===to))return false;
+ }
+ if(p.plan.originSiteId!==p.plan.siteIds[0]||p.plan.destinationSiteId!==p.plan.siteIds[p.plan.siteIds.length-1])return false;
+ if(position.kind==='travel')return position.edgeId===edge.id&&
+  position.fromSiteId===p.plan.siteIds[p.edgeIndex]&&position.toSiteId===p.plan.siteIds[p.edgeIndex+1]&&
+  position.completedTurns===p.completedEdgeTurns&&p.completedEdgeTurns>0;
+ return position.kind==='site'&&position.siteId===p.plan.siteIds[p.edgeIndex]&&p.completedEdgeTurns===0;
 }
