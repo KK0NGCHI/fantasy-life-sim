@@ -1,4 +1,4 @@
-import {buildItemRegistry,createRandomState,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2} from '../dist/engine/v2.js';
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2} from '../dist/engine/v2.js';
 
 /** Bridge for the existing main UI fixture. Game item identity, quantity and ownership live in v2.
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
@@ -16,8 +16,8 @@ export function createMainV2Inventory(uiItems) {
  const store=new IndexedDbSavesV2(registry,'somnium-main-v2');
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
-  player:{id:'main-player',regionId:'main-region',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'main-region'},progression:{skillExperience:{}},flags:{},
+  player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,day:1,hour:8}},progression:{skillExperience:{}},flags:{},
   itemWorld:{
    items:uiItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:uiItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -25,6 +25,22 @@ export function createMainV2Inventory(uiItems) {
   }
  };
  let revision=null;
+ const handlers=new Map([
+ ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
+ ['world.travel',(snapshot,command)=>{
+   const region=command.payload.region;
+   if(typeof region!=='string'||!region.trim())throw Error('Invalid region');
+   return {outcome:'success',nextState:{...snapshot,player:{...snapshot.player,regionId:region},world:{...snapshot.world,activeRegionId:region,runtime:{...snapshot.world.runtime,region}}},events:[{type:'world.travelled',payload:{region}}]};
+ }],
+ ['dungeon.enter',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,pos:[2,2]}}},events:[{type:'dungeon.entered',payload:{}}]})],
+ ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false}}},events:[{type:'dungeon.left',payload:{}}]})],
+ ['dungeon.move',(snapshot,command)=>{
+   const to=command.payload.to;
+   if(!Array.isArray(to)||to.length!==2||!to.every(Number.isSafeInteger))throw Error('Invalid tile');
+   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,pos:[...to]}}},events:[{type:'dungeon.moved',payload:{to}}]};
+ }]
+ ]);
+ const dispatcher=new V2ActionDispatcher(registry,handlers);
  const projected=()=>state.itemWorld.items
   .filter(item=>state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
   .map(item=>({...templates.get(item.definitionId),id:item.id,qty:item.quantity}));
@@ -36,15 +52,20 @@ export function createMainV2Inventory(uiItems) {
  };
  return {
   registry,projected,current,
+  dispatch(type,payload={}){
+    const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
+    if(result.accepted)state=result.nextState;
+    return result;
+  },
   prepareDiscard(selections){return prepareBulkDiscard(state,selections,registry)},
   confirmDiscard(preview){
    const outcome=confirmBulkDiscard(state,preview,registry);
    if(!outcome.accepted)throw new Error(outcome.reason);
    state=outcome.nextState;return outcome;
   },
-  syncVitals({turn,hp,mp,hunger}){
-   if(!Number.isSafeInteger(turn)||turn<0)return;
-   state={...state,turn,player:{...state.player,currentHp:hp,currentMp:mp,hunger}};
+  syncVitals({hp,mp,hunger}){
+   if(![hp,mp,hunger].every(Number.isFinite))return;
+   state={...state,player:{...state.player,currentHp:hp,currentMp:mp,hunger}};
   },
   async save(){
    const envelope=createSaveV2(state,{...slot,savedAt:new Date().toISOString()},'main-prototype',registry);
