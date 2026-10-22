@@ -1,5 +1,5 @@
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
-import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave} from '../dist/engine/v2.js';
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState} from '../dist/engine/v2.js';
 
 /** Bridge for the existing main UI fixture. Game item identity, quantity and ownership live in v2.
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
@@ -14,12 +14,18 @@ export function createMainV2Inventory(uiItems,options={}) {
  const built=buildItemRegistry(catalog);
  if(!built.registry)throw new Error('Main inventory registry invalid: '+JSON.stringify(built.issues));
  const registry=built.registry;
+ const worldBuilt=buildWorldRegistry(SOMNIUM_WORLD_03A);
+ if(!worldBuilt.ok)throw Error('Invalid 03-A world graph');
+ const worldRegistry=worldBuilt.registry;
+ const regionToSite=new Map(worldRegistry.regions.values().map(r=>[r.name,r.siteIds[0]]));
+ const siteToRegion=new Map(worldRegistry.sites.values().map(site=>[site.id,worldRegistry.regions.get(site.regionId)?.name]));
+ const routeAccess=()=>({knownSites:new Set(worldRegistry.sites.keys()),knownHazards:new Set(),allowedRequirements:new Set()});
  const slot={slotId:'main-manual',worldId:'main-world',kind:'manual',label:'메인 UI 저장',savedAt:'2000-01-01T00:00:00Z',revision:0};
  const store=new IndexedDbSavesV2(registry,'somnium-main-v2');
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,day:1,hour:8}},progression:{skillExperience:{}},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,day:1,hour:8,travel03B:null}},progression:{skillExperience:{}},flags:{},
   itemWorld:{
    items:uiItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:uiItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -65,6 +71,18 @@ export function createMainV2Inventory(uiItems,options={}) {
    if(typeof region!=='string'||!region.trim())throw Error('Invalid region');
    return {outcome:'success',nextState:{...snapshot,player:{...snapshot.player,regionId:region},world:{...snapshot.world,activeRegionId:region,runtime:{...snapshot.world.runtime,region}}},events:[{type:'world.travelled',payload:{region}}]};
  }],
+ ['travel.tick',(snapshot)=>{
+   const current=snapshot.world.runtime.travel03B;
+   if(!current||!validateTravelState(current,worldRegistry))throw Error('Invalid travel state');
+   const step=advanceTravel(current,worldRegistry,routeAccess());
+   if(!step.ok)throw Error(step.reason);
+   const region=step.state.position.kind==='site'?siteToRegion.get(step.state.position.siteId):null;
+   const runtime={...snapshot.world.runtime,travel03B:step.state,...(region?{region}:{})};
+   return {outcome:'success',nextState:{...snapshot,
+    world:{...snapshot.world,runtime,activeRegionId:region??snapshot.world.activeRegionId},
+    player:{...snapshot.player,regionId:region??snapshot.player.regionId}},
+    events:[{type:step.arrived?'world.travelled':'world.travel_tick',payload:{arrived:step.arrived}}]};
+ }],
  ['dungeon.enter',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,pos:[2,2]}}},events:[{type:'dungeon.entered',payload:{}}]})],
  ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false}}},events:[{type:'dungeon.left',payload:{}}]})],
  ['dungeon.move',(snapshot,command)=>{
@@ -73,7 +91,14 @@ export function createMainV2Inventory(uiItems,options={}) {
    return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,pos:[...to]}}},events:[{type:'dungeon.moved',payload:{to}}]};
  }]
  ]);
- const dispatcher=new V2ActionDispatcher(registry,handlers);
+ const dispatcher=new V2ActionDispatcher(registry,handlers,(current,action)=>{
+  if(action.type==='travel.tick'){
+   const step=advanceTravel(current.world.runtime.travel03B,worldRegistry,routeAccess());
+   if(!step.ok)throw Error(step.reason);
+   return {turns:1,worldUnits:step.worldUnits};
+  }
+  return {turns:1,worldUnits:1};
+ });
  const projected=()=>state.itemWorld.items
   .filter(item=>state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
   .map(item=>({...templates.get(item.definitionId),id:item.id,qty:item.quantity}));
@@ -94,6 +119,29 @@ export function createMainV2Inventory(uiItems,options={}) {
     }
     return result;
   },
+  worldRegions(){return worldRegistry.definition.regions.map(r=>({id:r.id,name:r.name,siteId:r.siteIds[0],worldPoint:r.worldPoint}))},
+  routePreview(region,policy='fast'){
+   const to=regionToSite.get(region),current=state.world.runtime.travel03B;
+   if(!to)return {ok:false,reason:'UNKNOWN_SITE'};
+   if(current?.progress)return {ok:false,reason:'TRAVEL_IN_PROGRESS'};
+   const from=current?.position.kind==='site'?current.position.siteId:regionToSite.get(state.world.runtime.region);
+   if(!from)return {ok:false,reason:'UNKNOWN_SITE'};
+   return planTravel(worldRegistry,from,to,policy,routeAccess());
+  },
+  travelState(){return structuredClone(state.world.runtime.travel03B)},
+  travelBegin(plan){
+   if(state.world.runtime.travel03B?.progress)return false;
+   const checked=planTravel(worldRegistry,plan.originSiteId,plan.destinationSiteId,plan.routingPolicy,routeAccess());
+   if(!checked.ok||JSON.stringify(checked.plan)!==JSON.stringify(plan))return false;
+   state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:beginTravel(plan)}}};return true;
+  },
+  travelPause(){const current=state.world.runtime.travel03B;if(!current)return false;
+   state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:pauseTravel(current)}}};return true},
+  travelResume(){const current=state.world.runtime.travel03B;if(!current?.progress||!validateTravelState(current,worldRegistry))return false;
+   state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:resumeTravel(current)}}};return true},
+  travelCancel(){const current=state.world.runtime.travel03B;if(!current?.progress)return false;
+   try{const next=cancelTravel(current);state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:next}}};return true}catch{return false}},
+  travelTick(){return this.dispatch('travel.tick')},
   prepareDiscard(selections){return prepareBulkDiscard(state,selections,registry)},
   confirmDiscard(preview){
    const outcome=confirmBulkDiscard(state,preview,registry);
