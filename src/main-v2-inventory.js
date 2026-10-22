@@ -17,8 +17,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  const worldBuilt=buildWorldRegistry(SOMNIUM_WORLD_03A);
  if(!worldBuilt.ok)throw Error('Invalid 03-A world graph');
  const worldRegistry=worldBuilt.registry;
- const regionToSite=new Map(worldRegistry.regions.values().map(r=>[r.name,r.siteIds[0]]));
- const siteToRegion=new Map(worldRegistry.sites.values().map(site=>[site.id,worldRegistry.regions.get(site.regionId)?.name]));
+ const regionToSite=new Map(Array.from(worldRegistry.regions.values(),r=>[r.name,r.siteIds[0]]));
+ const siteToRegion=new Map(Array.from(worldRegistry.sites.values(),site=>[site.id,worldRegistry.regions.get(site.regionId)?.name]));
  const routeAccess=()=>({knownSites:new Set(worldRegistry.sites.keys()),knownHazards:new Set(),allowedRequirements:new Set()});
  const slot={slotId:'main-manual',worldId:'main-world',kind:'manual',label:'메인 UI 저장',savedAt:'2000-01-01T00:00:00Z',revision:0};
  const store=new IndexedDbSavesV2(registry,'somnium-main-v2');
