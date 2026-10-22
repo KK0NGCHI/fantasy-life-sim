@@ -13,7 +13,7 @@ test('one-way or blocked floor portal is rejected',()=>{
 });
 test('disconnected public region is rejected regardless of world map display coordinates',()=>{
  const world=copy(SOMNIUM_WORLD_03A);
- world.routes=world.routes.filter(e=>!e.id.endsWith('/labyrinth'));
+ world.routes=world.routes.filter(e=>!e.fromSiteId.endsWith('/labyrinth')&&!e.toSiteId.endsWith('/labyrinth'));
  assert.ok(validateWorldTopology(world).some(x=>x.code==='UNREACHABLE_REGION'));
 });
 test('03-A runtime is preflighted, cloned, rejects missing IDs and invalid player location',()=>{
