@@ -334,9 +334,10 @@ const slotHeading=make('div',{class:'save-manager-section-heading'},dialog);
 make('h3',{text:'저장 슬롯'},slotHeading);
 make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
  const actions=make('div',{class:'save-manager-actions'},dialog);
- const list=make('div',{class:'save-manager-list'},dialog);
+ const list=make('section',{class:'save-manager-list','aria-label':'저장된 슬롯 목록'},dialog);
+ const footer=make('div',{class:'save-manager-footer'},dialog);
  const close=()=>{dialog.close();dialog.remove()};
- btn('닫기',close,'btn ui-secondary save-manager-close',actions);
+ btn('닫기',close,'btn ui-secondary save-manager-close',footer);
  btn('새 수동 저장',async()=>{try{
   mainV2.captureCheckpoint(s);mainV2.syncVitals(s);
   const label=window.prompt('저장 이름을 입력하세요.','수동 저장')??'';
@@ -344,7 +345,7 @@ make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
   const saved=await mainV2.save('manual','manual-'+crypto.randomUUID(),label.trim());
   nextLog('시스템','수동 저장 완료: '+saved.slot.label);await refresh();
  }catch(e){window.alert('저장 실패: '+e.message)}},'btn ui-primary',actions);
- btn('퀵세이브',async()=>{try{await quickSave();await refresh()}catch(e){window.alert(e.message)}},'btn',actions);
+ btn('퀵세이브',async()=>{try{await quickSave();await refresh()}catch(e){window.alert(e.message)}},'btn ui-secondary',actions);
  btn('JSON 가져오기',()=>{
   const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
   input.onchange=async()=>{const file=input.files?.[0];if(!file)return;
@@ -372,11 +373,11 @@ make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
    make('div',{class:'muted',text:'Revision '+entry.revision+' · '+(entry.save?.slot.savedAt??'최신 저장을 읽을 수 없음')},info);
    const buttons=make('div',{class:'save-manager-slot-actions'},row);
    if(entry.status==='valid'){
-    btn('불러오기',()=>{close();requestLoadApproval(entry.save,entry.slotId)},'btn',buttons);
+    btn('불러오기',()=>{close();requestLoadApproval(entry.save,entry.slotId)},'btn ui-primary',buttons);
     btn('백업',()=>{const blob=new Blob([JSON.stringify(entry.save,null,2)],{type:'application/json'});
      const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
      a.download='somnium-'+entry.slotId+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-    },'btn',buttons);
+    },'btn ui-secondary',buttons);
    }
    btn('이전 기록',async()=>{
     const revisions=await mainV2.recoveryCandidates(entry.slotId);
@@ -385,7 +386,7 @@ make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
     for(const r of revisions){
      btn('Revision '+r.save.slot.revision+' · '+r.save.slot.savedAt,()=>{close();requestLoadApproval(r.save,'복구 후보')},'btn',area);
     }
-   },'btn',buttons);
+   },'btn ui-secondary',buttons);
   }
  }
  dialog.addEventListener('close',()=>dialog.remove(),{once:true});
