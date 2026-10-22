@@ -47,3 +47,18 @@ test('equipment requires equip capability',()=>{
  const s=state(),fail=run(s,{type:'item.move',itemId:'berry',to:{kind:'equipped',ownerId:'player',slotId:'hand'}});
  assert.equal(fail.outcome,'failed');
 });
+
+test('split quantity preserves individual attributes and one-turn semantics',()=>{
+ const s=state();const split=run(s,{type:'item.split',itemId:'ore',newId:'ore-2',quantity:2});
+ assert.equal(split.accepted,true);assert.equal(split.nextState.turn,3);
+ const parts=split.nextState.itemWorld.items;
+ assert.equal(parts.find(i=>i.id==='ore').quantity,1);
+ assert.deepEqual(parts.find(i=>i.id==='ore-2'),{...s.itemWorld.items.find(i=>i.id==='ore'),id:'ore-2',quantity:2});
+});
+test('equipping an occupied slot and storing a box inside itself fail without partial mutation',()=>{
+ const s=state();const equipped=run(s,{type:'item.move',itemId:'ore',to:{kind:'equipped',ownerId:'player',slotId:'hand'}});
+ assert.equal(equipped.outcome,'failed');
+ const self=run(s,{type:'item.move',itemId:'box',to:{kind:'container',containerId:'box'}});
+ assert.equal(self.accepted,true);assert.equal(self.outcome,'failed');assert.equal(self.nextState.turn,3);
+ assert.deepEqual(self.nextState.itemWorld,s.itemWorld);
+});
