@@ -24,7 +24,7 @@ export function createMainV2Inventory(uiItems) {
    containers:[]
   }
  };
- let revision=null;
+ const revisions=new Map();
  const handlers=new Map([
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
  ['world.travel',(snapshot,command)=>{
@@ -48,7 +48,8 @@ export function createMainV2Inventory(uiItems) {
  const replace=(candidate,expectedRevision=null)=>{
   const checked=prepareV2Load(candidate,registry);
   if(!checked.ok)throw new Error(checked.reason);
-  state=structuredClone(checked.state);revision=expectedRevision;
+  state=structuredClone(checked.state);
+  if(expectedRevision!==null&&candidate?.slot?.slotId)revisions.set(candidate.slot.slotId,expectedRevision);
  };
  return {
   registry,projected,current,
@@ -67,20 +68,34 @@ export function createMainV2Inventory(uiItems) {
    if(![hp,mp,hunger].every(Number.isFinite))return;
    state={...state,player:{...state.player,currentHp:hp,currentMp:mp,hunger}};
   },
-  async save(){
-   const envelope=createSaveV2(state,{...slot,savedAt:new Date().toISOString()},'main-prototype',registry);
-   const saved=await store.commit(envelope,revision);
-   revision=saved.slot.revision;return saved;
+  async save(kind='quick',slotId=kind==='quick'?'main-manual':kind==='auto'?'main-auto':'manual-'+crypto.randomUUID(),label=''){
+   if(!['manual','quick','auto'].includes(kind)||!slotId||typeof label!=='string')throw Error('Invalid save slot');
+   const meta={...slot,slotId,kind,label:label||kind+' 저장',savedAt:new Date().toISOString()};
+   const envelope=createSaveV2(state,meta,'main-prototype',registry);
+   let expected=revisions.has(slotId)?revisions.get(slotId):null;
+   if(expected===null){
+    const existing=await store.listSlots();
+    const found=existing.find(x=>x.slotId===slotId);
+    if(found)throw Error('이미 존재하는 슬롯입니다. 슬롯을 불러오거나 새 이름으로 저장하세요.');
+   }
+   const saved=await store.commit(envelope,expected);
+   revisions.set(slotId,saved.slot.revision);return saved;
   },
-  async loadCandidate(){
-   const found=await store.loadLatest(slot.slotId);
-   if(!found)throw new Error('저장된 메인 v2 슬롯이 없습니다.');
+  async listSlots(){return store.listSlots()},
+  async loadCandidate(slotId='main-manual'){
+   const found=await store.loadLatest(slotId);
+   if(!found)throw new Error('저장된 슬롯이 없습니다.');
    return found;
   },
-  async recoveryCandidates(){return store.listRevisions(slot.slotId)},
+  async recoveryCandidates(slotId='main-manual'){return store.listRevisions(slotId)},
   applyApprovedSave(candidate){
-   replace(candidate,candidate.slot?.slotId===slot.slotId?candidate.slot.revision:null);
+   replace(candidate,candidate.slot?.revision??null);
   },
-  clearRevision(){revision=null}
+  async exportCandidate(slotId){
+   const found=await store.loadLatest(slotId);
+   if(!found)throw Error('저장된 슬롯이 없습니다.');
+   return found;
+  },
+  clearRevision(){revisions.clear()}
  };
 }
