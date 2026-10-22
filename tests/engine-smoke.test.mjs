@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { ENGINE_STAGE, GAME_STATE_SCHEMA_VERSION } from '../dist/engine/index.js';
 test('compiled engine exports stage and schema version', () => {
-  assert.equal(ENGINE_STAGE, '01-A');
+  assert.equal(ENGINE_STAGE, '01-B');
   assert.equal(GAME_STATE_SCHEMA_VERSION, 1);
 });
 test('existing browser UI entrypoint remains unchanged', () => {
