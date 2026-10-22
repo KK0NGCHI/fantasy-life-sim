@@ -63,4 +63,4 @@ export interface GameEvent {
 }
 export type DispatchResult =
   | { readonly accepted: true; readonly outcome: 'success' | 'failed'; readonly turnsSpent: 1; readonly nextState: GameState; readonly events: readonly GameEvent[] }
-  | { readonly accepted: false; readonly reason: 'INVALID_COMMAND' | 'BUSY'; readonly turnsSpent: 0 };
+  | { readonly accepted: false; readonly reason: 'INVALID_COMMAND' | 'BUSY' | 'EXECUTION_ERROR'; readonly turnsSpent: 0 };
