@@ -38,7 +38,7 @@ function iconify(){if(window.lucide?.createIcons){window.lucide.createIcons()}el
 function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:0,pos:[2,2],dungeon:false,hp:100,mp:80,hunger:85,day:1,hour:8,items:safeCopy(baseItems),logs:[],filter:'전체',search:'',sort:'name',selectedItem:null,selectedIds:[],logFilter:'전체',logSearch:'',pinnedIds:[],expandedLogs:[],collapsed:true,viewFont:100,theme:'aurora',auto:{hp:{on:true,pct:35},mp:{on:false,pct:20},hunger:{on:true,pct:25}}}}
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 const mainV2=createMainV2Inventory(s.items);
-function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;s.day=current.world.runtime.day;s.hour=current.world.runtime.hour;}}
+function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
 
@@ -103,7 +103,7 @@ function world(){
    nextLog('이동','여행 중 인카운터가 발생했습니다.');
    render();encounterPopup();return;
   }
-  nextLog('이동',s.region+'에 도착했습니다. 이동 시간 '+result.turnsSpent+'턴.');
+  nextLog('이동',s.region+'에 도착했습니다. 현재 시각 '+String(s.hour).padStart(2,'0')+':00');
   render();
  }
  if(travel?.progress){
@@ -127,7 +127,7 @@ function world(){
    const preview=make('div',{class:'travel-preview'},actions);
    if(!result.ok){make('p',{text:'이동할 수 없습니다: '+result.reason},preview);return}
    make('strong',{text:s.region+' → '+region},preview);
-   make('p',{text:'예상 이동 '+result.plan.totalTurns+'턴 · 세계 시간 '+result.plan.totalWorldUnits+'단위'},preview);
+   make('p',{text:'예상 이동 '+result.plan.totalTurns+'턴 · 이동 시간 '+mainV2.formatTravelSeconds(result.plan.totalWorldUnits)},preview);
    btn('이동하기',()=>{if(!mainV2.travelBegin(result.plan)){nextLog('위험','이동 계획을 다시 확인해야 합니다.');render();return}
     mainV2.travelResume();runTravel()},'btn',preview);
   };
