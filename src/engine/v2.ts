@@ -17,3 +17,8 @@ export {shouldAutoSave} from './save/autosave.js';
 export type {GameStateV2,SaveEnvelopeV2} from './save/save-v2.js';
 export type {ItemCatalog,ItemRegistry,ValidationIssue} from './data/item-registry.js';
 export type {ItemInstanceDraft,ItemDefinition,MaterialDefinition,EffectDefinition,RecipeDefinition} from './data/item-model.js';
+
+export {buildWorldRegistry,validateWorldDefinition,validatePlayerLocation,deriveSiteSeed} from './world/world-model.js';
+export {createSiteLifecycle,advanceSiteLifecycle} from './world/lifecycle.js';
+export {SOMNIUM_REGION_IDS,SOMNIUM_WORLD_03A} from './world/somnium-world.js';
+export type {WorldDefinition,WorldRegistry,RegionDefinition,SiteDefinition,MapDefinition,RouteDefinition,TerrainDefinition,FieldLifecyclePolicy,SiteLifecycleState,WorldRuntime03A,PlayerLocation,WorldValidationIssue} from './world/world-model.js';
