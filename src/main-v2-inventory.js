@@ -25,7 +25,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,day:1,hour:8,travel03B:null}},progression:{skillExperience:{}},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1'}},progression:{skillExperience:{}},flags:{},
   itemWorld:{
    items:uiItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:uiItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -67,6 +67,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  // Travel is simulated in memory and committed in a single v2 action. Encounters
  // interrupt after a completed travel turn. Never advance real time or RNG in UI.
  function simulateJourney(snapshot){
+  if(snapshot.world.runtime.timeBasis!=='seconds-v1')throw Error('Legacy abstract clock: explicit migration required');
   let travel=snapshot.world.runtime.travel03B;
   if(!travel?.progress||travel.progress.status!=='moving')throw Error('Travel not active');
   let rng=snapshot.rng,turns=0,units=0,encounter=false,arrival=false;
@@ -142,6 +143,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   },
   worldRegions(){return worldRegistry.definition.regions.map(r=>({id:r.id,name:r.name,siteId:r.siteIds[0],worldPoint:r.worldPoint}))},
   routePreview(region,policy='fast'){
+   if(state.world.runtime.timeBasis!=='seconds-v1')return {ok:false,reason:'LEGACY_TIME_MIGRATION_REQUIRED'};
    const to=regionToSite.get(region),current=state.world.runtime.travel03B;
    if(!to)return {ok:false,reason:'UNKNOWN_SITE'};
    if(current?.progress)return {ok:false,reason:'TRAVEL_IN_PROGRESS'};
@@ -151,6 +153,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   },
   travelState(){return structuredClone(state.world.runtime.travel03B)},
   travelBegin(plan){
+   if(state.world.runtime.timeBasis!=='seconds-v1')return false;
    if(state.world.runtime.travel03B?.progress)return false;
    const checked=planTravel(worldRegistry,plan.originSiteId,plan.destinationSiteId,plan.routingPolicy,routeAccess());
    if(!checked.ok||JSON.stringify(checked.plan)!==JSON.stringify(plan))return false;
@@ -158,11 +161,11 @@ export function createMainV2Inventory(uiItems,options={}) {
   },
   travelPause(){const current=state.world.runtime.travel03B;if(!current)return false;
    state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:pauseTravel(current)}}};return true},
-  travelResume(){const current=state.world.runtime.travel03B;if(!current?.progress||!validateTravelState(current,worldRegistry))return false;
+  travelResume(){if(state.world.runtime.timeBasis!=='seconds-v1')return false;const current=state.world.runtime.travel03B;if(!current?.progress||!validateTravelState(current,worldRegistry))return false;
    state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:resumeTravel(current)}}};return true},
   travelCancel(){const current=state.world.runtime.travel03B;if(!current?.progress)return false;
    try{const next=cancelTravel(current);state={...state,world:{...state.world,runtime:{...state.world.runtime,travel03B:next}}};return true}catch{return false}},
-  travelSkip(){return this.dispatch('travel.skip')},
+  travelSkip(){if(state.world.runtime.timeBasis!=='seconds-v1')return {accepted:false,reason:'INVALID_COMMAND',turnsSpent:0};return this.dispatch('travel.skip')},
   prepareDiscard(selections){return prepareBulkDiscard(state,selections,registry)},
   confirmDiscard(preview){
    const outcome=confirmBulkDiscard(state,preview,registry);
