@@ -9,6 +9,7 @@ export type ItemCommand =
  | { readonly type:'item.move'; readonly itemId:string; readonly to:ItemLocation }
  | { readonly type:'item.consume'; readonly itemId:string; readonly quantity:number }
  | { readonly type:'item.merge'; readonly fromId:string; readonly intoId:string }
+ | { readonly type:'item.split'; readonly itemId:string; readonly newId:string; readonly quantity:number }
  | { readonly type:'item.craft'; readonly recipeId:string; readonly selections:readonly { readonly itemId:string; readonly quantity:number }[]; readonly resultId:string };
 export type ItemOutcome =
  | { readonly accepted:true; readonly outcome:'success'|'failed'; readonly turnsSpent:1; readonly nextState:GameStateV2; readonly events:readonly {readonly type:string;readonly payload:Readonly<Record<string,unknown>>}[] }
@@ -82,7 +83,10 @@ export function dispatchItemAction(state:GameStateV2,command:ItemCommand,registr
       if(containerIndex<0||!registry.items.get(items[containerIndex]!.definitionId)?.capabilities.includes('storage')||!playerOwns(command.to.containerId))outcome='failed';
     }else if(command.to.kind==='inventory'||command.to.kind==='equipped'){
       if(command.to.ownerId!==state.player.id)outcome='failed';
-      if(command.to.kind==='equipped' && !registry.items.get(items[index]!.definitionId)?.capabilities.includes('equip'))outcome='failed';
+      if(command.to.kind==='equipped') {
+        if(!registry.items.get(items[index]!.definitionId)?.capabilities.includes('equip'))outcome='failed';
+        if(placements.some(p=>p.itemId!==command.itemId&&p.location.kind==='equipped'&&p.location.ownerId===state.player.id&&p.location.slotId===command.to.slotId))outcome='failed';
+      }
     }else outcome='failed'; // Moving to the world requires a world-placement action in a later stage.
     if(outcome==='success'&&current){
       if(current.kind==='container'){const containerId=current.containerId;const c=containers.find(c=>c.containerId===containerId);const at=c?.itemIds.indexOf(command.itemId)??-1;if(at>=0)c!.itemIds.splice(at,1);}
@@ -109,6 +113,18 @@ export function dispatchItemAction(state:GameStateV2,command:ItemCommand,registr
       containers.some(c=>c.containerId===from.id||c.containerId===into.id))outcome='failed';
    else {replaceQuantity(into.id,from.quantity+into.quantity);replaceQuantity(from.id,0);}
    eventType='item.merged';eventPayload={fromId:command.fromId,intoId:command.intoId};
+ } else if(command.type==='item.split'){
+   if(!ident(command.itemId)||!ident(command.newId)||!positive(command.quantity)||find(command.itemId)<0||find(command.newId)>=0||command.itemId===command.newId)return rejected('INVALID_COMMAND');
+   const original=items[find(command.itemId)]!;
+   const origin=location(command.itemId);
+   if(!playerOwns(command.itemId)||!origin||original.quantity<=command.quantity||containers.some(c=>c.containerId===command.itemId))outcome='failed';
+   else {
+     replaceQuantity(command.itemId,original.quantity-command.quantity);
+     items.push({...clone(original),id:command.newId,quantity:command.quantity});
+     placements.push({itemId:command.newId,location:clone(origin)});
+     if(origin.kind==='container')containers.find(c=>c.containerId===origin.containerId)?.itemIds.push(command.newId);
+   }
+   eventType='item.split';eventPayload={itemId:command.itemId,newId:command.newId,quantity:command.quantity};
  } else if(command.type==='item.craft'){
    const recipe=registry.recipes.get(command.recipeId);
    if(!ident(command.recipeId)||!ident(command.resultId)||!Array.isArray(command.selections)||!recipe)return rejected('INVALID_COMMAND');
@@ -132,7 +148,12 @@ export function dispatchItemAction(state:GameStateV2,command:ItemCommand,registr
    eventType='item.crafted';eventPayload={recipeId:command.recipeId,resultId:command.resultId};
  }else return rejected('INVALID_COMMAND');
  const changed={items,placements,containers};
- if(validateItemWorld(changed,registry).length)return rejected('INVALID_STATE');
+ if(validateItemWorld(changed,registry).length){
+   // A well-formed game attempt which cannot produce a valid world is a failed attempt.
+   outcome='failed';
+   eventType='item.action_failed';
+   return {accepted:true,outcome,turnsSpent:1,nextState:{...state,turn:state.turn+1},events:[{type:eventType,payload:{reason:'ILLEGAL_PLACEMENT'}}]};
+ }
  return {accepted:true,outcome,turnsSpent:1,nextState:{...state,turn:state.turn+1,itemWorld:changed},
    events:[{type:outcome==='failed'?'item.action_failed':eventType,payload:eventPayload}]};
 }
