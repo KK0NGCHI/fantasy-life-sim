@@ -77,54 +77,61 @@ for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'b
 
 }
 function world(){
-const el=head('세계 지도','목적지를 선택하면 경로를 미리 확인할 수 있습니다.');
-el.classList.add('world-screen');
-const travel=mainV2.travelState();
-const grid=make('div',{class:'mapgrid world-v4'},el);
-const icons=['house','sprout','trees','waves','leaf','mountain','pickaxe','snowflake','sun','anchor','sailboat','flame','landmark','church','sparkles','footprints'];
-const hues=['town','field','forest','water','forest','mountain','ore','snow','desert','water','water','volcano','mystic','ruin','mystic','dungeon'];
-const actions=make('section',{class:'travel-actions','aria-label':'광역 여행'},el);
-const subtitle=make('p',{class:'muted'},actions);
-const routePolicy=make('select',{class:'input','aria-label':'경로 선택 기준'},actions);
-routePolicy.innerHTML='<option value="fast">빠른 경로</option><option value="safe">안전 경로</option><option value="fewestTurns">적은 턴 경로</option>';
-routePolicy.hidden=!!travel?.progress;
-if(travel?.progress){
- const progress=travel.progress;
- subtitle.textContent='여행 중: '+progress.plan.siteIds.map(id=>mainV2.worldRegions().find(r=>r.siteId===id)?.name??id).join(' → ');
- make('p',{class:'muted',text:'진행 구간 '+(progress.edgeIndex+1)+'/'+progress.plan.routeEdgeIds.length+' · '+progress.status},actions);
- const buttons=make('div',{class:'travel-controls'},actions);
- if(progress.status==='moving')btn('일시정지',()=>{mainV2.travelPause();render()},'btn',buttons);
- else btn('재개',()=>{mainV2.travelResume();render()},'btn',buttons);
- btn('1턴 진행',()=>{
-   const result=mainV2.travelTick();
-   if(!result.accepted){nextLog('위험','여행 진행 불가: '+result.reason);return render()}
-   refreshV2Inventory();nextLog('이동','광역 여행 1턴 진행');
-   render();
- },'btn',buttons);
- const cancel=btn('여행 취소',()=>{if(!mainV2.travelCancel())nextLog('위험','구간 이동 중에는 취소할 수 없습니다. 일시정지 후 구간을 완료하세요.');render()},'btn',buttons);
- cancel.title='이동 구간 중간에서는 취소할 수 없습니다';
-}else{
- subtitle.textContent='지역 선택 → 경로 미리보기 → 이동 시작. 경로 확인만으로는 턴이 지나지 않습니다.';
-}
-for(let i=0;i<REGIONS.length;i++){
- const region=REGIONS[i];
- const button=make('button',{class:'region region-'+hues[i]+(region===s.region?' active':''),type:'button','aria-label':region},grid);
- button.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';
- button.disabled=!!travel?.progress;
- button.onclick=()=>{
-  const result=mainV2.routePreview(region,routePolicy.value);
-  const old=actions.querySelector('.travel-preview');old?.remove();
-  const preview=make('div',{class:'travel-preview'},actions);
-  if(!result.ok){make('p',{text:'경로를 선택할 수 없습니다: '+result.reason},preview);return}
-  const names=result.plan.siteIds.map(id=>mainV2.worldRegions().find(r=>r.siteId===id)?.name??id);
-  make('strong',{text:names.join(' → ')},preview);
-  make('p',{text:result.plan.totalTurns+'턴 · 세계시간 '+result.plan.totalWorldUnits+'단위 (시험용 경로)'},preview);
-  btn('이동 시작',()=>{
-   if(!mainV2.travelBegin(result.plan)){nextLog('위험','경로가 변경되었거나 시작할 수 없습니다.');return render()}
-   mainV2.travelResume();nextLog('이동','광역 여행을 시작합니다.');render();
-  },'btn',preview);
- };
-}
+ const el=head('세계 지도','목적지를 선택하면 보이지 않는 교통로를 따라 자동으로 이동합니다.');
+ el.classList.add('world-screen');
+ const grid=make('div',{class:'mapgrid world-v4'},el);
+ const icons=['house','sprout','trees','waves','leaf','mountain','pickaxe','snowflake','sun','anchor','sailboat','flame','landmark','church','sparkles','footprints'];
+ const hues=['town','field','forest','water','forest','mountain','ore','snow','desert','water','water','volcano','mystic','ruin','mystic','dungeon'];
+ const actions=make('section',{class:'travel-actions','aria-label':'광역 여행'},el);
+ const travel=mainV2.travelState();
+ function encounterPopup(){
+  const dlg=make('dialog',{class:'inventory-discard-dialog','aria-label':'여행 중 인카운터'},document.body);
+  make('h2',{text:'여행 중 예상치 못한 사건'},dlg);
+  make('p',{text:'이동 중 우연한 사건을 마주했습니다. 사건 처리는 향후 인카운터 시스템과 연결됩니다.'},dlg);
+  const controls=make('div',{class:'inventory-discard-dialog-actions'},dlg);
+  const close=()=>{dlg.close();dlg.remove()};
+  btn('여행 계속',()=>{close();mainV2.travelResume();runTravel()},'btn',controls);
+  btn('일시정지',()=>{close();render()},'btn',controls);
+  dlg.addEventListener('close',()=>dlg.remove(),{once:true});dlg.showModal();
+ }
+ function runTravel(){
+  const result=mainV2.travelSkip();
+  if(!result.accepted){nextLog('위험','광역 이동 처리 실패: '+result.reason);render();return}
+  refreshV2Inventory();
+  const event=result.events.find(e=>e.type==='world.travel_encounter');
+  if(event){
+   nextLog('이동','여행 중 인카운터가 발생했습니다.');
+   render();encounterPopup();return;
+  }
+  nextLog('이동',s.region+'에 도착했습니다. 이동 시간 '+result.turnsSpent+'턴.');
+  render();
+ }
+ if(travel?.progress){
+  make('p',{text:'진행 중인 여행: '+(mainV2.worldRegions().find(r=>r.siteId===travel.progress.plan.destinationSiteId)?.name??'목적지')},actions);
+  const controls=make('div',{class:'travel-controls'},actions);
+  btn('남은 여행 진행',()=>{mainV2.travelResume();runTravel()},'btn',controls);
+  btn('여행 취소',()=>{if(!mainV2.travelCancel())nextLog('위험','구간 도중에는 여행 취소가 불가능합니다.');render()},'btn',controls);
+ }else{
+  make('p',{class:'muted',text:'지역 간 실제 거리는 지도 배치와 무관합니다. 이동은 자동으로 처리되며 우연한 사건이 발생하면 잠시 중단됩니다.'},actions);
+ }
+ const policy=make('select',{class:'input','aria-label':'이동 경로 정책'},actions);
+ policy.innerHTML='<option value="fast">빠른 경로</option><option value="safe">안전 경로</option><option value="fewestTurns">적은 턴 경로</option>';
+ policy.hidden=!!travel?.progress;
+ for(let i=0;i<REGIONS.length;i++){
+  const region=REGIONS[i],button=make('button',{class:'region region-'+hues[i]+(region===s.region?' active':''),type:'button','aria-label':region},grid);
+  button.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';
+  button.disabled=!!travel?.progress;
+  button.onclick=()=>{
+   const result=mainV2.routePreview(region,policy.value);
+   actions.querySelector('.travel-preview')?.remove();
+   const preview=make('div',{class:'travel-preview'},actions);
+   if(!result.ok){make('p',{text:'이동할 수 없습니다: '+result.reason},preview);return}
+   make('strong',{text:s.region+' → '+region},preview);
+   make('p',{text:'예상 이동 '+result.plan.totalTurns+'턴 · 세계 시간 '+result.plan.totalWorldUnits+'단위'},preview);
+   btn('이동하기',()=>{if(!mainV2.travelBegin(result.plan)){nextLog('위험','이동 계획을 다시 확인해야 합니다.');render();return}
+    mainV2.travelResume();runTravel()},'btn',preview);
+  };
+ }
 }
 
 function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·전투 공식이 아닙니다.</p>'}
