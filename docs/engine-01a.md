@@ -27,3 +27,9 @@ The browser prototype still runs without npm. A package lock should be generated
 - Item quality, stacking, skills and economy formulas remain undecided.
 
 User decision preserved: an accepted in-game failed action consumes 1 turn; malformed or busy technical requests are rejected without consuming turns. These are **types only**; no dispatch currently exists.
+
+## Design authority
+
+The reconciled reference is [Engine 01–02 design](./engine-01-02-design.md). It preserves the user's pasted proposal while overriding undecided alternatives with confirmed decisions: accepted failures spend one turn, IndexedDB + external backup, and TypeScript for the engine. Stage 01-A is a build/type-contract milestone, not a playable action engine.
+
+On macOS, use `python3 -m http.server 8000` to serve the unchanged UI. A `GET /favicon.ico 404` means the browser requested an optional icon that is absent; it does not indicate a game or engine failure. The supplied server log demonstrates HTTP success but does not establish that `npm run check` ran on that Mac.
