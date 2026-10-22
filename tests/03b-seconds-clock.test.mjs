@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {gameClockAt,formatTravelSeconds,GAME_DAY_SECONDS} from '../dist/engine/v2.js';
+import {gameClockAt,formatTravelSeconds,GAME_DAY_SECONDS,createSaveV2} from '../dist/engine/v2.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 const items=[{id:'test:berry',name:'열매',group:'식재료',qty:2,tags:[]}];
 const preferences={getItem:()=>null,setItem:()=>{}};
@@ -23,14 +23,17 @@ test('03-B main UI preview uses seconds, clock advances without overwriting lega
  assert.ok(a.current().clock.elapsedUnits>0);
  assert.equal(a.gameTime().day,1);
 });
-test('03-B unsupported time basis refuses travel rather than interpreting old values as seconds',()=>{
+test('03-B legacy v2 backup keeps abstract units and refuses seconds travel',()=>{
  const a=createMainV2Inventory(items,{preferences});
- const previous=a.current();
- const legacy=structuredClone(previous);
+ const legacy=structuredClone(a.current());
  delete legacy.world.runtime.timeBasis;
  legacy.clock.elapsedUnits=58;
- // Directly replacing state is intentionally not exposed. A legacy save is rejected at the
- // approved restore boundary, while modern saves preserve their explicit seconds marker.
- assert.equal(previous.world.runtime.timeBasis,'seconds-v1');
- assert.equal(legacy.world.runtime.timeBasis,undefined);
+ const slot={slotId:'legacy',worldId:'main-world',kind:'manual',label:'Legacy time',savedAt:'2026-01-01T00:00:00Z',revision:1};
+ const originalSave=createSaveV2(legacy,slot,'main-prototype',a.registry);
+ a.applyApprovedSave(originalSave);
+ assert.equal(a.current().clock.elapsedUnits,58);
+ assert.equal(a.gameTime(),null);
+ assert.equal(a.routePreview('숲').reason,'LEGACY_TIME_MIGRATION_REQUIRED');
+ assert.equal(a.travelSkip().accepted,false);
+ assert.equal(a.current().clock.elapsedUnits,58);
 });
