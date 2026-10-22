@@ -33,3 +33,6 @@ export { IndexedDbSavesV2 } from './save/indexeddb-v2.js';
 
 export { dispatchItemAction } from './core/item-actions-v2.js';
 export type { ItemCommand, ItemOutcome } from './core/item-actions-v2.js';
+
+export { prepareBulkDiscard, confirmBulkDiscard, pickupWorldItem } from './core/item-transfer-v2.js';
+export type { ItemSelection, DiscardPreview, DiscardResult, PickupResult } from './core/item-transfer-v2.js';
