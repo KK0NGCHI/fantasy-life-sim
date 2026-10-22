@@ -46,7 +46,7 @@ const THEMES=[{"id":"aurora","name":"오로라","mode":"light","colors":["#9667d
 function useTheme(id,persist=true){if(!THEMES.some(t=>t.id===id))id='aurora';s.theme=id;document.documentElement.dataset.theme=id;document.documentElement.style.colorScheme='light';if(persist){try{localStorage.setItem('fantasy-ui-theme',id)}catch{}}}
 try{const stored=localStorage.getItem('fantasy-ui-theme');if(THEMES.some(t=>t.id===stored))s.theme=stored}catch{}
 
-function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===kind&&last.text===text){last.count=(last.count||1)+1;last.lastTurn=s.turn;return}const id='log-'+Date.now()+'-'+Math.random().toString(36).slice(2);s.logs.unshift({id,kind,text,detail,turn:s.turn,count:1,pin:false});if(s.logs.length>LOG_LIMIT)s.logs.length=LOG_LIMIT}
+function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===kind&&last.text===text){last.count=(last.count||1)+1;last.lastTurn=s.turn;}else{const id='log-'+Date.now()+'-'+Math.random().toString(36).slice(2);s.logs.unshift({id,kind,text,detail,turn:s.turn,count:1,pin:false});if(s.logs.length>LOG_LIMIT)s.logs.length=LOG_LIMIT;}mainV2.captureCheckpoint(s)}
 const make=(tag,props={},parent)=>{const e=document.createElement(tag);for(const [k,v]of Object.entries(props)){if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k==='class')e.className=v;else e.setAttribute(k,v)}if(parent)parent.append(e);return e};
 function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',text,class:classes},parent);b.addEventListener('click',fn);return b}
 function top(){
@@ -315,6 +315,8 @@ async function openSaveManager(){
  make('h2',{text:'저장 관리자'},dialog);
  make('p',{class:'muted',text:'수동 슬롯은 개수 제한이 없습니다. 불러오기와 복구에는 별도 승인이 필요합니다.'},dialog);
  const policyBox=make('section',{class:'save-manager-autosave ui-form-section'},dialog);
+ const saveWarning=mainV2.getAutosaveError();
+ if(saveWarning)make('p',{class:'muted',text:'이전 자동 저장 실패: '+saveWarning+' · 중요한 진행은 수동 백업으로 보관하세요.'},dialog);
 make('h3',{text:'자동 저장'},policyBox);
 const interval=make('div',{class:'save-manager-field'},policyBox);
 const frequencyLabel=make('label',{for:'saveInterval',text:'자동 저장 간격 (행동 수)'},interval);
@@ -328,7 +330,7 @@ btn('설정 적용',()=>{
  const everyActions=Number(frequency.value);
  if(!Number.isSafeInteger(everyActions)||everyActions<1){window.alert('자동 저장 간격은 1 이상의 정수여야 합니다.');return}
  mainV2.configureAutosave({everyActions,eventTypes:eventInput.checked?['world.travelled','dungeon.entered','dungeon.left']:[]});
- window.alert('자동 저장 설정을 적용했습니다.');
+ window.alert('자동 저장 설정을 적용했습니다. 다음 실행에도 유지됩니다.');
 },'btn ui-primary',policyActions);
 const slotHeading=make('div',{class:'save-manager-section-heading'},dialog);
 make('h3',{text:'저장 슬롯'},slotHeading);
