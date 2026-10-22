@@ -1,5 +1,5 @@
 import type { SaveSlot } from './save-format.js';
-import type { SaveEnvelopeV2V2 } from './save-v2.js';
+import type { SaveEnvelopeV2 } from './save-v2.js';
 import type { ItemRegistry } from '../data/item-registry.js';
 import { decodeSaveV2 } from './save-v2.js';
 
