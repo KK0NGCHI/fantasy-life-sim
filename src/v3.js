@@ -50,10 +50,12 @@ function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===
 const make=(tag,props={},parent)=>{const e=document.createElement(tag);for(const [k,v]of Object.entries(props)){if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k==='class')e.className=v;else e.setAttribute(k,v)}if(parent)parent.append(e);return e};
 function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',text,class:classes},parent);b.addEventListener('click',fn);return b}
 function top(){
-$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+s.day+'일</span><span>'+svgIcon('clock')+' '+String(s.hour).padStart(2,'0')+':00</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span><button type="button" class="top-settings" id="settingsControl" aria-label="설정" title="설정">'+svgIcon('settings')+'</button></div>';
-$('#settingsControl').onclick=()=>openPage('설정');
-const saveButton=make('button',{type:'button',class:'top-settings',title:'저장 관리자','aria-label':'저장 관리자'},$('#top .top-meta'));
-saveButton.innerHTML=svgIcon('save');saveButton.onclick=()=>openSaveManager();
+$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+s.day+'일</span><span>'+svgIcon('clock')+' '+String(s.hour).padStart(2,'0')+':00</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
+const group=$('#top .top-meta');
+const save=make('button',{type:'button',class:'top-settings ui-icon-button',title:'저장 관리자','aria-label':'저장 관리자'},group);
+save.innerHTML=svgIcon('save');save.onclick=()=>openSaveManager();
+const settings=make('button',{type:'button',class:'top-settings ui-icon-button',id:'settingsControl',title:'설정','aria-label':'설정'},group);
+settings.innerHTML=svgIcon('settings');settings.onclick=()=>openPage('설정');
 }
 
 function side(){ /* v0.3: persistent left navigation removed in favor of bottom controls */ }
@@ -312,30 +314,36 @@ async function openSaveManager(){
  const dialog=make('dialog',{id:'saveManagerDialog',class:'inventory-discard-dialog save-manager-dialog','aria-label':'저장 관리자'},document.body);
  make('h2',{text:'저장 관리자'},dialog);
  make('p',{class:'muted',text:'수동 슬롯은 개수 제한이 없습니다. 불러오기와 복구에는 별도 승인이 필요합니다.'},dialog);
- const policyBox=make('div',{class:'save-manager-autosave'},dialog);
- make('label',{text:'자동 저장 간격 (행동 수)'},policyBox);
- const frequency=make('input',{type:'number',min:'1',max:'100000',value:String(mainV2.getAutosavePolicy().everyActions),'aria-label':'자동 저장 간격'},policyBox);
- const eventToggle=make('label',{},policyBox);
- const eventInput=make('input',{type:'checkbox'},eventToggle);
- eventInput.checked=mainV2.getAutosavePolicy().eventTypes.length>0;
- make('span',{text:'지역 이동·던전 진입/퇴장에서도 저장'},eventToggle);
- btn('자동 저장 설정 적용',()=>{
-   const everyActions=Number(frequency.value);
-   if(!Number.isSafeInteger(everyActions)||everyActions<1){window.alert('자동 저장 간격은 1 이상의 정수여야 합니다.');return}
-   mainV2.configureAutosave({everyActions,eventTypes:eventInput.checked?['world.travelled','dungeon.entered','dungeon.left']:[]});
-   window.alert('자동 저장 설정을 적용했습니다.');
- },'btn',policyBox);
+ const policyBox=make('section',{class:'save-manager-autosave ui-form-section'},dialog);
+make('h3',{text:'자동 저장'},policyBox);
+const interval=make('div',{class:'save-manager-field'},policyBox);
+const frequencyLabel=make('label',{for:'saveInterval',text:'자동 저장 간격 (행동 수)'},interval);
+const frequency=make('input',{id:'saveInterval',type:'number',min:'1',max:'100000',value:String(mainV2.getAutosavePolicy().everyActions),'aria-label':'자동 저장 간격'},interval);
+const eventToggle=make('label',{class:'save-manager-toggle'},policyBox);
+const eventInput=make('input',{type:'checkbox'},eventToggle);
+eventInput.checked=mainV2.getAutosavePolicy().eventTypes.length>0;
+make('span',{text:'지역 이동·던전 진입/퇴장 시에도 저장'},eventToggle);
+const policyActions=make('div',{class:'save-manager-policy-actions'},policyBox);
+btn('설정 적용',()=>{
+ const everyActions=Number(frequency.value);
+ if(!Number.isSafeInteger(everyActions)||everyActions<1){window.alert('자동 저장 간격은 1 이상의 정수여야 합니다.');return}
+ mainV2.configureAutosave({everyActions,eventTypes:eventInput.checked?['world.travelled','dungeon.entered','dungeon.left']:[]});
+ window.alert('자동 저장 설정을 적용했습니다.');
+},'btn ui-primary',policyActions);
+const slotHeading=make('div',{class:'save-manager-section-heading'},dialog);
+make('h3',{text:'저장 슬롯'},slotHeading);
+make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
  const actions=make('div',{class:'save-manager-actions'},dialog);
  const list=make('div',{class:'save-manager-list'},dialog);
  const close=()=>{dialog.close();dialog.remove()};
- btn('닫기',close,'btn',actions);
+ btn('닫기',close,'btn ui-secondary save-manager-close',actions);
  btn('새 수동 저장',async()=>{try{
   mainV2.captureCheckpoint(s);mainV2.syncVitals(s);
   const label=window.prompt('저장 이름을 입력하세요.','수동 저장')??'';
   if(!label.trim())return;
   const saved=await mainV2.save('manual','manual-'+crypto.randomUUID(),label.trim());
   nextLog('시스템','수동 저장 완료: '+saved.slot.label);await refresh();
- }catch(e){window.alert('저장 실패: '+e.message)}},'btn',actions);
+ }catch(e){window.alert('저장 실패: '+e.message)}},'btn ui-primary',actions);
  btn('퀵세이브',async()=>{try{await quickSave();await refresh()}catch(e){window.alert(e.message)}},'btn',actions);
  btn('JSON 가져오기',()=>{
   const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
@@ -351,11 +359,11 @@ async function openSaveManager(){
     requestLoadApproval(normalized,'JSON 백업');
    }catch(e){window.alert('가져오기 실패: '+e.message)}
   };input.click();
- },'btn',actions);
+ },'btn ui-secondary',actions);
  async function refresh(){
   list.replaceChildren();
   const slots=await mainV2.listSlots();
-  if(!slots.length)make('p',{class:'muted',text:'저장 슬롯이 없습니다.'},list);
+  if(!slots.length){const empty=make('div',{class:'save-manager-empty'},list);make('strong',{text:'저장 슬롯이 없습니다'},empty);make('p',{class:'muted',text:'새 수동 저장 버튼으로 슬롯을 생성할 수 있습니다.'},empty);}
   for(const entry of slots){
    const row=make('div',{class:'save-manager-slot'},list);
    const kind=entry.save?.slot.kind??'unknown';
