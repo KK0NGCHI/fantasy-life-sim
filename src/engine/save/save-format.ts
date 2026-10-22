@@ -24,12 +24,13 @@ const obj=(x:unknown): x is Record<string,unknown> => x!==null && typeof x==='ob
 const str=(x:unknown):x is string=>typeof x==='string'&&x.trim().length>0;
 const uint=(x:unknown):x is number=>typeof x==='number'&&Number.isSafeInteger(x)&&x>=0;
 const finite=(x:unknown):x is number=>typeof x==='number'&&Number.isFinite(x);
+const exactKeys=(x:Record<string,unknown>,keys:readonly string[]):boolean=>Object.keys(x).every(k=>keys.includes(k));
 function checkState(x: unknown): x is GameState {
- if(!obj(x)||x.schemaVersion!==1||!uint(x.turn)||!obj(x.clock)||!uint(x.clock.elapsedUnits))return false;
+ if(!obj(x)||x.schemaVersion!==1||!uint(x.turn)||!obj(x.clock)||!uint(x.clock.elapsedUnits)||!exactKeys(x.clock,['elapsedUnits']))return false;
  if(!obj(x.rng)||!str(x.rng.algorithm)||!str(x.rng.seed)||!Array.isArray(x.rng.state)||!x.rng.state.every(uint))return false;
  if(!obj(x.player)||!str(x.player.id)||!str(x.player.regionId)||!finite(x.player.currentHp)||!finite(x.player.currentMp)||!finite(x.player.hunger)||!Array.isArray(x.player.statusEffects))return false;
  if(!x.player.statusEffects.every((e:unknown)=>obj(e)&&str(e.id)&&str(e.definitionId)&&(e.remainingTurns===null||uint(e.remainingTurns))))return false;
- if(!obj(x.inventory)||!Array.isArray(x.inventory.items)||!x.inventory.items.every((i:unknown)=>obj(i)&&str(i.id)&&str(i.definitionId)&&uint(i.quantity)&&i.quantity>0))return false;
+ if(!obj(x.inventory)||!Array.isArray(x.inventory.items)||!x.inventory.items.every((i:unknown)=>obj(i)&&str(i.id)&&str(i.definitionId)&&uint(i.quantity)&&i.quantity>0&&exactKeys(i,['id','definitionId','quantity'])))return false;
  if(new Set(x.inventory.items.map((i: {id:string})=>i.id)).size!==x.inventory.items.length)return false;
  if(!obj(x.world)||!str(x.world.activeRegionId)||!obj(x.progression)||!obj(x.progression.skillExperience)||!obj(x.flags))return false;
  if(Object.values(x.progression.skillExperience).some(v=>!finite(v))||Object.values(x.flags).some(v=>typeof v!=='boolean'))return false;
