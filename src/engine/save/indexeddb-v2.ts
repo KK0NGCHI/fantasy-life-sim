@@ -79,6 +79,32 @@ export class IndexedDbSavesV2 {
    });
   }finally{db.close();}
  }
+
+ /** Lists saved slots without mutating them, exposing corruption rather than silently falling back. */
+ async listSlots():Promise<readonly {slotId:string;revision:number;status:'valid'|'damaged';save:SaveEnvelopeV2|null}[]>{
+  const db=await this.open();
+  try{return await new Promise((resolve,reject)=>{
+   const tx=db.transaction(['pointers','snapshots'],'readonly');
+   const pointers=tx.objectStore('pointers'),snapshots=tx.objectStore('snapshots');
+   const list:{slotId:string;revision:number;status:'valid'|'damaged';save:SaveEnvelopeV2|null}[]=[];
+   const request=pointers.getAll();
+   request.onsuccess=()=>{
+    for(const pointer of request.result as Pointer[]){
+     const snap=snapshots.get(pointer.snapshotKey);
+     snap.onsuccess=()=>{
+      const raw=(snap.result as Stored|undefined)?.save;
+      const check=decodeSaveV2(raw,this.registry);
+      list.push({slotId:pointer.slotId,revision:pointer.revision,
+       status:check.ok?'valid':'damaged',save:check.ok?check.save:null});
+     };
+    }
+   };
+   tx.oncomplete=()=>resolve(list.sort((a,b)=>a.slotId.localeCompare(b.slotId)));
+   tx.onerror=()=>reject(tx.error??new Error('Slot listing failed'));
+   tx.onabort=()=>reject(tx.error??new Error('Slot listing aborted'));
+  });}finally{db.close();}
+ }
+
  /** Recovery candidates are read without mutating the active slot pointer. */
  async listRevisions(slotId:string):Promise<readonly SavedRevision[]>{
   const db=await this.open();
