@@ -66,3 +66,26 @@ border-radius:8px;
 .dialog-body{padding-top:13px}
 .region-scene{padding:17px;margin-bottom:10px}
 }
+
+
+/* Contextual discard mode: no selection chrome until requested. */
+.inventory-discard-controls{display:inline-flex;align-items:center;gap:6px;margin-inline-start:auto}
+.inventory-discard-controls [hidden],.inventory-discard-hint[hidden]{display:none!important}
+.inventory-discard-trigger,.inventory-discard-confirm,.inventory-discard-cancel{min-height:34px}
+.inventory-discard-confirm{background:var(--theme-accent,#7e60ad);color:white;border-color:transparent}
+.inventory-discard-confirm:disabled{opacity:.45;cursor:not-allowed}
+.inventory-discard-mode .inventory-choice{transition:background-color .13s ease,border-color .13s ease}
+.inventory-discard-mode .inventory-choice.discard-marked{background:color-mix(in srgb,var(--theme-accent,#785bb6) 12%,transparent);outline:1px solid var(--theme-accent,#785bb6);outline-offset:-1px}
+.inventory-check-label{display:inline-flex;gap:9px;align-items:center;cursor:pointer;min-height:38px;padding-inline:8px}
+.inventory-check-label input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:19px;height:19px;border:1.5px solid var(--theme-border,#89838f);border-radius:6px;background:var(--theme-surface,#fff);display:grid;place-content:center;cursor:pointer}
+.inventory-check-label input[type=checkbox]:checked{background:var(--theme-accent,#785bb6);border-color:var(--theme-accent,#785bb6)}
+.inventory-check-label input[type=checkbox]:checked::after{content:'✓';color:white;font-size:14px;font-weight:800}
+.inventory-check-label input[type=checkbox]:focus-visible{outline:3px solid var(--theme-accent,#785bb6);outline-offset:3px}
+.inventory-select-all.inventory-check-label{padding:5px 9px;margin-bottom:8px;border-radius:9px;background:var(--theme-surface,#f8f8f8)}
+.inventory-discard-hint{margin:8px 0;color:var(--theme-muted,#676472)}
+.inventory-discard-dialog{max-width:480px;width:min(92vw,480px);border:1px solid var(--theme-border,#ccc);border-radius:16px;padding:22px;background:var(--theme-surface,#fff);color:var(--theme-text,#222);box-shadow:0 18px 70px #0003}
+.inventory-discard-dialog::backdrop{background:#16131b99}
+.inventory-discard-dialog li{padding:3px 0}
+.inventory-discard-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.inventory-discard-danger{background:#a83245;color:white;border-color:#a83245}
+@media(max-width:650px){.inventory-discard-controls{margin-inline-start:0}.inventory-toolbar{flex-wrap:wrap}}
