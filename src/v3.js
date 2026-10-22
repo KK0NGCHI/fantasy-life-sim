@@ -90,7 +90,7 @@ function world(){
   make('p',{text:'이동 중 우연한 사건을 마주했습니다. 사건 처리는 향후 인카운터 시스템과 연결됩니다.'},dlg);
   const controls=make('div',{class:'inventory-discard-dialog-actions'},dlg);
   const close=()=>{dlg.close();dlg.remove()};
-  btn('여행 계속',()=>{close();mainV2.travelResume();runTravel()},'btn',controls);
+  btn('확인 후 계속',()=>{close();if(mainV2.travelState()?.progress){mainV2.travelResume();runTravel()}else render()},'btn',controls);
   btn('일시정지',()=>{close();render()},'btn',controls);
   dlg.addEventListener('close',()=>dlg.remove(),{once:true});dlg.showModal();
  }
