@@ -16,7 +16,8 @@ test('main UI projects canonical v2 item state and refuses discard without confi
 test('main UI v2 adapter rejects stale modal and preserves data',()=>{
  const adapter=createMainV2Inventory(fixtures());
  const p=adapter.prepareDiscard([{itemId:'mock:ore',quantity:1}]);assert.equal(p.ok,true);
- adapter.syncVitals({turn:2,hp:90,mp:70,hunger:55});
+ const advanced=adapter.dispatch('life.activity',{name:'휴식한다'});
+ assert.equal(advanced.accepted,true);
  assert.throws(()=>adapter.confirmDiscard(p.preview));
  assert.equal(adapter.projected()[0].qty,5);
 });
