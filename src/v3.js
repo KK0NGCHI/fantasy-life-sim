@@ -125,7 +125,7 @@ function world(){
    const result=mainV2.routePreview(region,policy.value);
    actions.querySelector('.travel-preview')?.remove();
    const preview=make('div',{class:'travel-preview'},actions);
-   if(!result.ok){make('p',{text:'이동할 수 없습니다: '+result.reason},preview);return}
+   if(!result.ok){make('p',{text:result.reason==='LEGACY_TIME_MIGRATION_REQUIRED'?'이 저장 파일은 이전 추상 시간 규격입니다. 안전한 시간 이전 기능이 구현되기 전에는 새 방식으로 광역 이동할 수 없습니다.':'이동할 수 없습니다: '+result.reason},preview);return}
    make('strong',{text:s.region+' → '+region},preview);
    make('p',{text:'예상 이동 '+result.plan.totalTurns+'턴 · 이동 시간 '+mainV2.formatTravelSeconds(result.plan.totalWorldUnits)},preview);
    btn('이동하기',()=>{if(!mainV2.travelBegin(result.plan)){nextLog('위험','이동 계획을 다시 확인해야 합니다.');render();return}
