@@ -1,9 +1,11 @@
+import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
 import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave} from '../dist/engine/v2.js';
 
 /** Bridge for the existing main UI fixture. Game item identity, quantity and ownership live in v2.
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
  */
-export function createMainV2Inventory(uiItems) {
+export function createMainV2Inventory(uiItems,options={}) {
+ const preferences=options.preferences??(typeof localStorage==='undefined'?null:localStorage);
  const templates=new Map(uiItems.map(item=>[item.id,{...item}]));
  const categories=[...new Set(uiItems.map(x=>x.group))];
  const catalog={categories,rarities:[],materials:[],effects:[],items:uiItems.map(item=>({
@@ -26,7 +28,8 @@ export function createMainV2Inventory(uiItems) {
  };
  const revisions=new Map();
  let actionsSinceAuto=0;
- let autoPolicy={everyActions:20,eventTypes:['world.travelled','dungeon.entered','dungeon.left']};
+ let autoPolicy=readAutoPolicy(preferences);
+ let autosaveError=null;
  let autoQueue=Promise.resolve();
  async function saveInto(kind,slotId,label){
    if(!['manual','quick','auto'].includes(kind)||!slotId||typeof label!=='string')throw Error('Invalid save slot');
@@ -42,7 +45,9 @@ export function createMainV2Inventory(uiItems) {
     }
    }
    const saved=await store.commit(envelope,revisions.has(slotId)?revisions.get(slotId):expected);
-   revisions.set(slotId,saved.slot.revision);return saved;
+   revisions.set(slotId,saved.slot.revision);
+   if(kind==='auto')autosaveError=null;
+   return saved;
  }
  function enqueueAuto(){
   autoQueue=autoQueue.then(async()=>{
@@ -51,7 +56,7 @@ export function createMainV2Inventory(uiItems) {
     if(existing)revisions.set('main-auto',existing.slot.revision);
    }
    await saveInto('auto','main-auto','자동 저장');
-  }).catch(error=>{console.warn('Somnium autosave failed:',error)});
+  }).catch(error=>{autosaveError=String(error?.message??error);console.warn('Somnium autosave failed:',error)});
  }
  const handlers=new Map([
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
@@ -111,10 +116,12 @@ export function createMainV2Inventory(uiItems) {
   },
   checkpoint(){return structuredClone(state.world.runtime?.journal??{logs:[],visitedRegions:[]})},
   configureAutosave(policy){
-   if(!policy||!Number.isSafeInteger(policy.everyActions)||policy.everyActions<1||!Array.isArray(policy.eventTypes)||!policy.eventTypes.every(x=>typeof x==='string'&&x.length))throw Error('Invalid autosave policy');
+   if(!validateAutoPolicy(policy))throw Error('Invalid autosave policy');
+   writeAutoPolicy(preferences,policy);
    autoPolicy={everyActions:policy.everyActions,eventTypes:[...policy.eventTypes]};
   },
   getAutosavePolicy(){return structuredClone(autoPolicy)},
+  getAutosaveError(){return autosaveError},
   async flushAutosave(){await autoQueue},
   async save(kind='quick',slotId=kind==='quick'?'main-manual':kind==='auto'?'main-auto':'manual-'+crypto.randomUUID(),label=''){
    return saveInto(kind,slotId,label);
