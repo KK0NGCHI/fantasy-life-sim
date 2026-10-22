@@ -150,3 +150,10 @@ border-radius:8px;
 .inventory-discard-mode .inventory-choice:focus-within .inventory-check-label input[type=checkbox]:checked{
   background:var(--theme-accent,#785bb6);
 }
+
+.save-manager-dialog{max-width:760px;width:min(94vw,760px);max-height:85vh;overflow:auto}
+.save-manager-actions,.save-manager-slot-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.save-manager-actions{padding:12px 0;border-bottom:1px solid var(--theme-border,#ddd)}
+.save-manager-slot{padding:12px 0;border-bottom:1px solid var(--theme-border,#ddd);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.save-manager-slot .muted{font-size:12px;margin-top:4px}
+.save-manager-revisions{display:flex;flex-wrap:wrap;gap:6px;width:100%;padding:6px 0}
