@@ -27,3 +27,5 @@ export {validateWorldTopology,validateWorldRuntime03A,prepareWorldRuntime03ALoad
 
 export {planTravel,beginTravel,advanceTravel,pauseTravel,resumeTravel,cancelTravel,validateTravelState} from './world/travel.js';
 export type {TravelPlan,TravelState,TravelProgress,RoutePolicy,RouteResult,TravelAccess,TravelStep} from './world/travel.js';
+
+export {GAME_DAY_SECONDS,GAME_START_SECONDS,assertGameSeconds,gameClockAt,formatTravelSeconds} from './world/time-seconds.js';
