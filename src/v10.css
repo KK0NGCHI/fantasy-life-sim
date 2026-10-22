@@ -155,3 +155,14 @@ body .save-manager-dialog .save-manager-empty{
  body .save-manager-dialog .save-manager-section-heading{align-items:flex-start}
  body .save-manager-dialog .save-manager-actions{flex-wrap:wrap}
 }
+
+
+/* 03-B route preview and travel controls use existing theme primitives. */
+.travel-actions{display:flex;flex-direction:column;gap:14px;margin:16px 0 20px;padding:18px 20px;border:1px solid var(--theme-line);border-radius:12px;background:var(--theme-surface)}
+.travel-actions>p{margin:0}.travel-controls{display:flex;flex-wrap:wrap;gap:10px}
+.travel-actions .btn{min-height:38px;padding:8px 15px;border-radius:9px}
+.travel-preview{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px;border-radius:10px;background:var(--theme-panel);border:1px solid var(--theme-line)}
+.travel-preview>p{margin:0}
+.travel-preview .btn{background:var(--somnium-action);color:#fff;border-color:var(--somnium-action)}
+.travel-preview .btn:hover{background:var(--somnium-action-hover);color:#fff}
+.world-screen .region:disabled{opacity:.7;cursor:not-allowed}
