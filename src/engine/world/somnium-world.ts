@@ -26,13 +26,14 @@ const maps:MapDefinition[]=entries.map(([id])=>({
  entrances:[{id:'core:entry/'+id,x:2,y:2,destinationSiteId:site(id),destinationFloor:0,destinationEntryId:'core:entry/'+id}]
 }));
 /** Explicit narrative travel links. UI 4×4 position has no bearing on distance. */
+// 03-B seconds-v1: worldUnits are game seconds ONLY for new timeBasis-tagged worlds.
 const routeSpecs=[
- ['town','plains',2,4],['town','forest',3,6],['town','river',3,7],
- ['plains','forest',2,4],['plains','river',3,6],['forest','wetland',4,9],
- ['forest','mountains',5,12],['mountains','mine',3,7],['mountains','snowfield',7,18],
- ['mountains','volcano',11,30],['river','coast',7,17],['coast','sea',9,24],
- ['coast','desert',14,36],['desert','ruins',6,16],['ruins','graveyard',5,12],
- ['ruins','pantheon',8,20],['graveyard','labyrinth',7,18],['mine','labyrinth',10,26]
+ ['town','plains',2,900],['town','forest',3,1500],['town','river',3,2100],
+ ['plains','forest',2,1200],['plains','river',3,1800],['forest','wetland',4,2700],
+ ['forest','mountains',5,3900],['mountains','mine',3,2400],['mountains','snowfield',7,12600],
+ ['mountains','volcano',11,28800],['river','coast',7,8100],['coast','sea',9,14400],
+ ['coast','desert',14,28800],['desert','ruins',6,5400],['ruins','graveyard',5,3900],
+ ['ruins','pantheon',8,7200],['graveyard','labyrinth',7,6300],['mine','labyrinth',10,10800]
 ] as const;
 const routes:RouteDefinition[]=routeSpecs.map(([from,to,turns,worldUnits])=>({
  id:'core:route/'+from+'-'+to,fromSiteId:site(from),toSiteId:site(to),
