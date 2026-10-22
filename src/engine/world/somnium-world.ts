@@ -25,9 +25,18 @@ const maps:MapDefinition[]=entries.map(([id])=>({
  tiles:['# # # # #','# . . . #','# . . . #','# . . . #','# # # # #'].map(r=>r.split(' ').map(t=>tile(t==='#'?'wall':'ground')).join(' ')),
  entrances:[{id:'core:entry/'+id,x:2,y:2,destinationSiteId:site(id),destinationFloor:0,destinationEntryId:'core:entry/'+id}]
 }));
-const routes:RouteDefinition[]=entries.slice(1).map(([id],i)=>({
- id:'core:route/'+id,fromSiteId:site(entries[i]![0]),toSiteId:site(id),
- bidirectional:true,turns:1,worldUnits:3,requirementTags:[],hazardTags:[]
+/** Explicit narrative travel links. UI 4×4 position has no bearing on distance. */
+const routeSpecs=[
+ ['town','plains',2,4],['town','forest',3,6],['town','river',3,7],
+ ['plains','forest',2,4],['plains','river',3,6],['forest','wetland',4,9],
+ ['forest','mountains',5,12],['mountains','mine',3,7],['mountains','snowfield',7,18],
+ ['mountains','volcano',11,30],['river','coast',7,17],['coast','sea',9,24],
+ ['coast','desert',14,36],['desert','ruins',6,16],['ruins','graveyard',5,12],
+ ['ruins','pantheon',8,20],['graveyard','labyrinth',7,18],['mine','labyrinth',10,26]
+] as const;
+const routes:RouteDefinition[]=routeSpecs.map(([from,to,turns,worldUnits])=>({
+ id:'core:route/'+from+'-'+to,fromSiteId:site(from),toSiteId:site(to),
+ bidirectional:true,turns,worldUnits,requirementTags:[],hazardTags:[]
 }));
 /** 03-A fixture: every region is registered; terrain values and topology are test data, not production balance. */
 export const SOMNIUM_WORLD_03A:WorldDefinition={
