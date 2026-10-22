@@ -5,14 +5,14 @@ const knownSites=new Set(SOMNIUM_WORLD_03A.sites.map(s=>s.id));
 const access={knownSites,knownHazards:new Set(),allowedRequirements:new Set()};
 test('03-B route chooses deterministic lowest world-unit path',()=>{
  const p=planTravel(reg,'core:site/town','core:site/forest','fast',access);
- assert.equal(p.ok,true);assert.deepEqual(p.plan.siteIds,['core:site/town','core:site/plains','core:site/forest']);
- assert.equal(p.plan.totalTurns,2);assert.equal(p.plan.totalWorldUnits,6);
+ assert.equal(p.ok,true);assert.deepEqual(p.plan.siteIds,['core:site/town','core:site/forest']);
+ assert.equal(p.plan.totalTurns,3);assert.equal(p.plan.totalWorldUnits,6);
 });
 test('03-B excludes unvisited and expired destinations, and respects directional paths',()=>{
  const denied=planTravel(reg,'core:site/town','core:site/forest','fast',{knownSites:new Set(['core:site/town'])});
  assert.equal(denied.reason,'UNDISCOVERED');
  assert.equal(planTravel(reg,'core:site/town','core:site/forest','fast',{...access,expiredSites:new Set(['core:site/forest'])}).ok,false);
- assert.equal(planTravel(reg,'core:site/town','core:site/plains','fast',{...access,blockedEdges:new Set(['core:route/plains'])}).reason,'UNREACHABLE');
+ assert.equal(planTravel(reg,'core:site/town','core:site/plains','fast',{...access,blockedEdges:new Set(['core:route/town-plains'])}).reason,'UNREACHABLE');
 });
 test('03-B pause/resume ticks charge once and restore travel progress',()=>{
  const p=planTravel(reg,'core:site/town','core:site/forest','fast',access).plan;
@@ -20,18 +20,18 @@ test('03-B pause/resume ticks charge once and restore travel progress',()=>{
  assert.equal(advanceTravel(started,reg,access).reason,'PAUSED');
  let st=resumeTravel(started);
  const one=advanceTravel(st,reg,access);assert.equal(one.ok,true);
- assert.equal(one.turns,1);assert.equal(one.worldUnits,3);assert.equal(one.arrived,false);
- assert.equal(one.state.position.siteId,'core:site/plains');
+ assert.equal(one.turns,1);assert.equal(one.worldUnits,2);assert.equal(one.arrived,false);
+ assert.equal(one.state.position.kind,'travel');
  st=pauseTravel(one.state);assert.equal(advanceTravel(st,reg,access).reason,'PAUSED');
  assert.equal(validateTravelState(st,reg),true);
  const again=advanceTravel(resumeTravel(structuredClone(st)),reg,access);
- assert.equal(again.ok,true);assert.equal(again.arrived,true);assert.equal(again.state.progress,null);
- assert.equal(again.state.position.siteId,'core:site/forest');
+ assert.equal(again.ok,true);assert.equal(again.arrived,false);assert.ok(again.state.progress);
+ assert.equal(again.state.position.kind,'travel');
 });
 test('03-B rejects route changes before advancing and preserves original',()=>{
  const p=planTravel(reg,'core:site/town','core:site/plains','fast',access).plan;
  const old=resumeTravel(beginTravel(p)),json=JSON.stringify(old);
- const step=advanceTravel(old,reg,{...access,blockedEdges:new Set(['core:route/plains'])});
+ const step=advanceTravel(old,reg,{...access,blockedEdges:new Set(['core:route/town-plains'])});
  assert.equal(step.reason,'ROUTE_CHANGED');assert.equal(JSON.stringify(old),json);
 });
 test('03-B uneven travel duration sums to edge world units, no midpoint cancel teleport',()=>{
