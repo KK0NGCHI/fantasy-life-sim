@@ -85,7 +85,8 @@ export function dispatchItemAction(state:GameStateV2,command:ItemCommand,registr
       if(command.to.ownerId!==state.player.id)outcome='failed';
       if(command.to.kind==='equipped') {
         if(!registry.items.get(items[index]!.definitionId)?.capabilities.includes('equip'))outcome='failed';
-        if(placements.some(p=>p.itemId!==command.itemId&&p.location.kind==='equipped'&&p.location.ownerId===state.player.id&&p.location.slotId===command.to.slotId))outcome='failed';
+        const targetSlotId=command.to.slotId;
+        if(placements.some(p=>p.itemId!==command.itemId&&p.location.kind==='equipped'&&p.location.ownerId===state.player.id&&p.location.slotId===targetSlotId))outcome='failed';
       }
     }else outcome='failed'; // Moving to the world requires a world-placement action in a later stage.
     if(outcome==='success'&&current){
