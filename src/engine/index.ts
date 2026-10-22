@@ -13,3 +13,7 @@ export { dispatchTimedAction, defaultTiming } from './core/timed-dispatch.js';
 export type { TimingPolicy, ActionTiming } from './core/timed-dispatch.js';
 export { shouldStopAuto, findSafePath, AutoController } from './core/automation.js';
 export type { AutoTile, AutoSensors, AutoThresholds, AutoPauseReason } from './core/automation.js';
+
+export { buildItemRegistry, validateItemInstances, canStackItems, mergeItemStacks } from './data/item-registry.js';
+export type { ItemCatalog, ItemRegistry, ValidationIssue } from './data/item-registry.js';
+export type { ItemDefinition, MaterialDefinition, EffectDefinition, ItemInstanceDraft, ItemEffect, ItemLocation, ContainerContents, RecipeDefinition, IngredientMatcher, IngredientRequirement } from './data/item-model.js';
