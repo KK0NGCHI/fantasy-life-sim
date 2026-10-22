@@ -1,4 +1,4 @@
-import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2} from '../dist/engine/v2.js';
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave} from '../dist/engine/v2.js';
 
 /** Bridge for the existing main UI fixture. Game item identity, quantity and ownership live in v2.
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
@@ -25,6 +25,30 @@ export function createMainV2Inventory(uiItems) {
   }
  };
  const revisions=new Map();
+ let actionsSinceAuto=0;
+ let autoPolicy={everyActions:20,eventTypes:['world.travelled','dungeon.entered','dungeon.left']};
+ let autoQueue=Promise.resolve();
+ async function saveInto(kind,slotId,label){
+   if(!['manual','quick','auto'].includes(kind)||!slotId||typeof label!=='string')throw Error('Invalid save slot');
+   const meta={...slot,slotId,kind,label:label||kind+' 저장',savedAt:new Date().toISOString()};
+   const envelope=createSaveV2(state,meta,'main-prototype',registry);
+   const expected=revisions.has(slotId)?revisions.get(slotId):null;
+   if(expected===null){
+    const existing=await store.listSlots();
+    if(existing.some(x=>x.slotId===slotId))throw Error('이미 존재하는 슬롯입니다. 먼저 슬롯을 불러오세요.');
+   }
+   const saved=await store.commit(envelope,expected);
+   revisions.set(slotId,saved.slot.revision);return saved;
+ }
+ function enqueueAuto(){
+  autoQueue=autoQueue.then(async()=>{
+   if(!revisions.has('main-auto')){
+    const existing=await store.loadLatest('main-auto');
+    if(existing)revisions.set('main-auto',existing.slot.revision);
+   }
+   await saveInto('auto','main-auto','자동 저장');
+  }).catch(error=>{console.warn('Somnium autosave failed:',error)});
+ }
  const handlers=new Map([
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
  ['world.travel',(snapshot,command)=>{
@@ -55,7 +79,10 @@ export function createMainV2Inventory(uiItems) {
   registry,projected,current,
   dispatch(type,payload={}){
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
-    if(result.accepted)state=result.nextState;
+    if(result.accepted){
+     state=result.nextState;actionsSinceAuto++;
+     if(shouldAutoSave(actionsSinceAuto,result.events,autoPolicy)){actionsSinceAuto=0;enqueueAuto()}
+    }
     return result;
   },
   prepareDiscard(selections){return prepareBulkDiscard(state,selections,registry)},
@@ -68,18 +95,14 @@ export function createMainV2Inventory(uiItems) {
    if(![hp,mp,hunger].every(Number.isFinite))return;
    state={...state,player:{...state.player,currentHp:hp,currentMp:mp,hunger}};
   },
+  configureAutosave(policy){
+   if(!policy||!Number.isSafeInteger(policy.everyActions)||policy.everyActions<1||!Array.isArray(policy.eventTypes)||!policy.eventTypes.every(x=>typeof x==='string'&&x.length))throw Error('Invalid autosave policy');
+   autoPolicy={everyActions:policy.everyActions,eventTypes:[...policy.eventTypes]};
+  },
+  getAutosavePolicy(){return structuredClone(autoPolicy)},
+  async flushAutosave(){await autoQueue},
   async save(kind='quick',slotId=kind==='quick'?'main-manual':kind==='auto'?'main-auto':'manual-'+crypto.randomUUID(),label=''){
-   if(!['manual','quick','auto'].includes(kind)||!slotId||typeof label!=='string')throw Error('Invalid save slot');
-   const meta={...slot,slotId,kind,label:label||kind+' 저장',savedAt:new Date().toISOString()};
-   const envelope=createSaveV2(state,meta,'main-prototype',registry);
-   let expected=revisions.has(slotId)?revisions.get(slotId):null;
-   if(expected===null){
-    const existing=await store.listSlots();
-    const found=existing.find(x=>x.slotId===slotId);
-    if(found)throw Error('이미 존재하는 슬롯입니다. 슬롯을 불러오거나 새 이름으로 저장하세요.');
-   }
-   const saved=await store.commit(envelope,expected);
-   revisions.set(slotId,saved.slot.revision);return saved;
+   return saveInto(kind,slotId,label);
   },
   async listSlots(){return store.listSlots()},
   async loadCandidate(slotId='main-manual'){
