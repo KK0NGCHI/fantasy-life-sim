@@ -23,7 +23,7 @@ const sites:SiteDefinition[]=entries.map(([id,,type]):SiteDefinition=>({
 const maps:MapDefinition[]=entries.map(([id])=>({
  id:'core:map/'+id,siteId:site(id),floor:0,width:5,height:5,
  tiles:['# # # # #','# . . . #','# . . . #','# . . . #','# # # # #'].map(r=>r.split(' ').map(t=>tile(t==='#'?'wall':'ground')).join(' ')),
- entrances:[]
+ entrances:[{id:'core:entry/'+id,x:2,y:2,destinationSiteId:site(id),destinationFloor:0,destinationEntryId:'core:entry/'+id}]
 }));
 const routes:RouteDefinition[]=entries.slice(1).map(([id],i)=>({
  id:'core:route/'+id,fromSiteId:site(entries[i]![0]),toSiteId:site(id),
