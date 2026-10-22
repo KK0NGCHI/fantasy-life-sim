@@ -1,0 +1,50 @@
+# 02-A 사전 설계: Elin을 참고한 아이템 데이터 구조
+
+**상태: 설계 제안 / 실제 GameState 적용 전** · 2026-10-22
+
+이 문서는 01-C 이후, 02-A 구현 전에 기초 데이터 모델을 정비하기 위한 검토 결과다. 원본 `src/data.js`는 UI 샘플이며 실제 게임 밸런스 정의가 아니다. 현행 `core/contracts.ts`의 `ItemInstance`를 바로 대체하지 않고, `src/engine/data/item-model.ts`에 독립된 **후보 계약**을 추가한다.
+
+## 조사 출처와 사실
+
+- [Elin Thing Source Sheet](https://elin-modding-resources.github.io/Elin.Docs/articles/10_Source%20Sheets/thing): 아이템 종류 ID, 분류, 기본 소재, 품질/희귀도, 무게, 특성, 요소, 태그, 제작 재료, 용기 특성을 구분함.
+- [Elin Material Source Sheet](https://elin-modding-resources.github.io/Elin.Docs/articles/10_Source%20Sheets/material): 별도 소재 정의; 소재 경도·무게·등급·분류와 다양한 특성.
+- [Elin Items – Ylvapedia](https://ylvapedia.wiki/wiki/Elin%3AItems): 제작과 품질/특성 계승은 숙련 및 제작 종류와 연관; 요리와 일반 제작의 계승 규칙이 같지 않음.
+- [Elin Modding Source Sheets](https://elin-modding-resources.github.io/Elin.Docs/articles/2_Getting%20Started/modding_cheatsheet): Thing / Food / Recipe / Category / Material / Element 등의 정의 분리.
+
+외부 자료에 포함된 특정 확률, 수식, 희귀도 이름/등급을 이 프로젝트의 확정 규칙으로 사용하지 않는다. Elin의 파일 형식(XLSX) 자체도 강제하지 않는다.
+
+## 제안 구조
+
+1. **정적 정의**: `ItemDefinition`, `MaterialDefinition`, `EffectDefinition`, `RecipeDefinition`. 정적 정의는 게임 콘텐츠에 두고 인스턴스의 ID로 참조한다.
+2. **개별 상태**: `ItemInstanceDraft`는 고유 ID와 아이템 정의 ID, 수량, 선택적 소재·품질·희귀도·강화·효과·컨디션을 보유한다. 미정 값은 선택 속성으로 남긴다.
+3. **기능 vs 검색 태그**: `capabilities`는 먹기/설치/장착 등의 행동 가능성을 표현하고 `tags`는 분류·필터·제작 조건에 사용. 효과·능력 보정은 별도 `EffectDefinition`.
+4. **위치와 보관**: 아이템 소유/장착/배치 위치를 `ItemLocation`으로 별도 표현한다. 컨테이너 내부는 개별 인스턴스를 ID로 참조해 순환 JSON 구조를 방지한다.
+5. **레시피**: 특정 아이템/소재/카테고리/태그 중 조건을 만족하는 재료를 허용하고, 필수/선택 재료를 구분한다. 실제 제작 계승 정책과 수율은 02-A 이후 논의한다.
+6. **이름**: 세이브에 화면 표시 이름을 복제하지 않고 정적 정의의 지역화 키를 보관. 소재·품질에 따른 이름 조합은 표시 레이어에서 수행.
+
+## 기존 엔진과 호환성
+
+- `GameState.inventory.items: ItemInstance[]`는 **현재 그대로 유지**. 신규 모델은 별도 파일에 정의만 추가.
+- `src/v3.js`, `src/data.js`, 저장 스키마/턴 규칙/난수 루틴 **변경 없음**.
+- 이 모델을 GameState에 도입할 때 런타임 검증, ID 참조 무결성, 옛 데이터 마이그레이션, 중복 인스턴스 ID, 소유 위치 한 곳만 유지, 컨테이너 순환 방지 등의 테스트를 구현.
+- 저장 방식은 IndexedDB + 외부 파일 백업이라는 기존 확정 결정을 유지.
+
+## 게임 규칙으로 남겨둔 결정
+
+1. **소재**: 동일한 아이템 종류에 소재가 달라질 수 있는 적용 범위 및 소재 계수.
+2. **품질/희귀도/강화**: 세 값의 명칭·범위·상호작용·저주/축복과의 관계.
+3. **중첩**: 재료 품질/출처/신선도 등이 다를 때 하나의 스택으로 합칠지 여부; 스택 최대 수량.
+4. **용기**: 보관 용량·무게 경감·중첩 용기 허용·설치물의 인벤토리 여부.
+5. **제작**: 여러 재료 특성의 계승(요리와 비요리 구별), 선택 재료, 숙련 보정과 재료 손실.
+6. **음식**: 신선도·부패·요리 등급과 채집·농업의 개별 상태 단위.
+
+02-A에서 모든 수치를 확정할 필요는 없다. 그러나 **중첩 기준**과 **품질·희귀도·강화의 분리 여부**는 실제 ItemInstance 마이그레이션에 앞서 결정해야 한다.
+
+## 다음 단계 검증
+
+- 정의 ID의 유일성·참조 무결성 검사
+- 정적 정의가 바뀌어도 인스턴스 ID가 보존되는지 검사
+- 재료 조건 OR/AND 및 수량 검사
+- 소재·효과·컨테이너 ID 참조 검증
+- 동등 스택 병합/분할의 정보 손실 방지
+- 저장 후 불러오기에서 식별자·효과·상태 보존
