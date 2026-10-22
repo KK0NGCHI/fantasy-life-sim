@@ -2,7 +2,7 @@
 <body><h1>일괄 버리기 확인 팝업 — 독립 검증</h1><p>선택 항목을 확인한 뒤 삭제합니다. 삭제 시 아이템은 지도에 남지 않고 소멸합니다. 실제 게임 UI와 연결한 페이지는 아닙니다.</p><button id="start">아이템 2종 선택 후 버리기</button><pre id="output">변경 없음</pre>
 <dialog id="confirm" aria-labelledby="heading"><h2 id="heading">선택 아이템을 영구 삭제할까요?</h2><p>삭제한 아이템은 월드에 남지 않습니다.</p><ul id="items"></ul><button id="cancel" autofocus>취소</button><button id="approve">선택 항목 영구 삭제</button></dialog>
 <script type="module">
-import {buildItemRegistry,createRandomState,previewDiscard,discardSelected} from '../dist/engine/index.js';
+import {buildItemRegistry,createRandomState,prepareBulkDiscard,confirmBulkDiscard} from '../dist/engine/index.js';
 const reg=buildItemRegistry({items:[{id:'ore',nameKey:'ore',categoryId:'resource',tags:[],capabilities:[]}],materials:[],effects:[],categories:['resource'],rarities:[]}).registry;
 let state={schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('fixture'),
 player:{id:'player',regionId:'camp',currentHp:10,currentMp:10,hunger:0,statusEffects:[]},
@@ -12,15 +12,15 @@ const dlg=document.querySelector('#confirm'),out=document.querySelector('#output
 let pending=null;function show(){out.textContent=JSON.stringify({turn:state.turn,items:state.itemWorld.items},null,2)}
 document.querySelector('#start').onclick=()=>{
  const selections=[{itemId:'a',quantity:2},{itemId:'b',quantity:2}];
- const p=previewDiscard(state,selections);if(!p.ok){out.textContent='검증 실패';return;}
- pending={turn:state.turn,selections};const list=document.querySelector('#items');list.replaceChildren();
- for(const x of p.summary){const li=document.createElement('li');li.textContent=x.itemId+' × '+x.quantity;list.append(li);}
+ const p=prepareBulkDiscard(state,selections,reg);if(!p.ok){out.textContent='검증 실패';return;}
+ pending=p.preview;const list=document.querySelector('#items');list.replaceChildren();
+ for(const x of selections){const li=document.createElement('li');li.textContent=x.itemId+' × '+x.quantity;list.append(li);}
  dlg.showModal();
 };
 document.querySelector('#cancel').onclick=()=>{pending=null;dlg.close();show()};
 dlg.addEventListener('cancel',()=>{pending=null});
 document.querySelector('#approve').onclick=()=>{
- if(!pending)return;const result=discardSelected(state,pending.selections,reg,pending);
+ if(!pending)return;const result=confirmBulkDiscard(state,pending,reg);
  pending=null;dlg.close();if(result.accepted)state=result.nextState;show();
 };show();
 </script></body></html>
