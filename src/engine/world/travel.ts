@@ -70,6 +70,7 @@ export function resumeTravel(state:TravelState):TravelState{
  return state.progress?{...state,progress:{...state.progress,status:'moving',interruptionReason:null}}:state;
 }
 export function cancelTravel(state:TravelState):TravelState{
+ if(state.position.kind==='travel')throw new RangeError('Cannot cancel between sites; pause or finish the edge');
  return {...state,progress:null};
 }
 /** Static compatibility preflight for resumable travel; never mutate the saved snapshot. */
