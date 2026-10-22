@@ -38,7 +38,8 @@ function iconify(){if(window.lucide?.createIcons){window.lucide.createIcons()}el
 function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:0,pos:[2,2],dungeon:false,hp:100,mp:80,hunger:85,day:1,hour:8,items:safeCopy(baseItems),logs:[],filter:'전체',search:'',sort:'name',selectedItem:null,selectedIds:[],logFilter:'전체',logSearch:'',pinnedIds:[],expandedLogs:[],collapsed:true,viewFont:100,theme:'aurora',auto:{hp:{on:true,pct:35},mp:{on:false,pct:20},hunger:{on:true,pct:25}}}}
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 const mainV2=createMainV2Inventory(s.items);
-function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;}const LOG_LIMIT=500;
+function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;s.day=current.world.runtime.day;s.hour=current.world.runtime.hour;}}
+function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
 
 const THEMES=[{"id":"aurora","name":"오로라","mode":"light","colors":["#9667d9","#75b4f4","#f4a2d1"],"source":"게임 기본"},{"id":"rose-dawn","name":"장미빛 새벽","mode":"light","colors":["#907aa9","#286983","#b4637a"],"source":"로즈 파인"},{"id":"solarized","name":"솔라라이즈드","mode":"light","colors":["#268bd2","#2aa198","#b58900"],"source":"솔라라이즈드"},{"id":"citrus","name":"시트러스","mode":"light","colors":["#65a30d","#f59e0b","#0d9488"],"source":"라임·호박·청록"},{"id":"red","name":"석류빛","mode":"light","colors":["#d94358","#f5a65b","#7697c7"],"source":"붉은색 중심"},{"id":"blue","name":"푸른 항해","mode":"light","colors":["#267bcc","#70c8e5","#f1c17d"],"source":"파란색 중심"},{"id":"lavender","name":"라벤더 들판","mode":"light","colors":["#9273ce","#c09bea","#97c9a7"],"source":"라벤더·세이지"},{"id":"cocoa","name":"살구 코코아","mode":"light","colors":["#b97a58","#f4b98c","#93b1a6"],"source":"따뜻한 브라운"}];
@@ -59,7 +60,7 @@ function tabs(target,names,handler){const e=make('div',{class:'tabs'},target);fo
 function section(el,title){const sec=make('section',{class:'section'},el);make('h2',{text:title},sec);return sec}
 function changeTab(t){s.tab=t;if(overlayPage)drawOverlay();else drawMain();iconify()}
 function openPage(name){if(autoTimer)stopAuto();if(['인벤토리','캐릭터','숙련','도감','신앙'].includes(name)){if(!overlayPage)overlayReturnTab=s.tab;overlayReturn=document.activeElement;overlayPage=name;s.tab=name==='인벤토리'?'전체':name==='캐릭터'?'기본 정보':name==='숙련'?'생활':name==='도감'?'발견 목록':'개요';render();return;}overlayPage=null;if(s.page!==name)previousPage=s.page;s.page=name;s.tab=name==='생활'?'개요':name==='제작'?'제작법':'기본';render()}
-function act(name){if(name==='던전에 진입한다'){s.dungeon=true;s.page='던전';s.tab='탐색';s.turn++;nextLog('탐험','지하미궁에 들어섰습니다.','고정 예시 지도이며 실제 절차적 생성은 아직 없습니다.');return render()}if(name==='작업대를 사용한다')return openPage('제작');s.turn++;nextLog('생활',actionLabel(name)+'을(를) 실행했습니다.','실제 생산·성장·시간 계산 없이 UI 로그만 생성했습니다.');render()}
+function act(name){if(name==='던전에 진입한다'){if(!executeV2('dungeon.enter',{}))return render();s.page='던전';s.tab='탐색';nextLog('탐험','지하미궁에 들어섰습니다.','고정 예시 지도이며 실제 절차적 생성은 아직 없습니다.');return render()}if(name==='작업대를 사용한다')return openPage('제작');if(!executeV2('life.activity',{name}))return render();nextLog('생활',actionLabel(name)+'을(를) 실행했습니다.','생산·성장 효과는 아직 없는 기본 행동입니다.');render()}
 function regionActions(){return ACTIONS[s.region]||['주변을 살핀다','휴식한다']}
 function lifestyle(){
 const el=head(s.region,'');const hue={'거점 마을':'town','초원·농경지':'pasture','숲':'forest','강·호수':'river','습지':'marsh','산맥':'mountain','광산':'mine','설원':'snow','사막':'desert','해안·항구':'coast','바다':'ocean','화산지대':'volcano','고대 유적':'ruins','폐허·묘지':'grave','만신전':'temple','지하미궁':'dungeon'}[s.region]||'pasture';
@@ -77,7 +78,7 @@ const grid=make('div',{class:'mapgrid world-v4'},el);
 const icons=['house','sprout','trees','waves','leaf','mountain','pickaxe','snowflake','sun','anchor','sailboat','flame','landmark','church','sparkles','footprints'];
 const hues=['town','field','forest','water','forest','mountain','ore','snow','desert','water','water','volcano','mystic','ruin','mystic','dungeon'];
 for(let i=0;i<REGIONS.length;i++){const region=REGIONS[i],b=make('button',{class:'region region-'+hues[i]+(region===s.region?' active':''),type:'button','aria-label':region},grid);
-b.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';b.onclick=()=>{s.region=region;s.page='생활';s.tab='개요';s.dungeon=false;s.turn++;nextLog('이동',region+'에 도착했습니다.','이동 시간은 미구현입니다.');render()}}
+b.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';b.onclick=()=>{if(!executeV2('world.travel',{region}))return render();s.page='생활';s.tab='개요';nextLog('이동',region+'에 도착했습니다.');render()}}
 }
 
 function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·전투 공식이 아닙니다.</p>'}
@@ -216,7 +217,7 @@ const x=make('div',{class:'panegrid'},el);
 make('div',{html:'<div class="empty">항목 없음</div>'},x);
 make('aside',{class:'detail',html:'<h3>상세</h3>'},x);
 }
-function dungeonMove(dx,dy){if(s.page!=='던전'||!s.dungeon)return;const [x,y]=s.pos,nx=x+dx,ny=y+dy,t=TILES[ny]?.[nx];if(!t||t==='#')return;s.pos=[nx,ny];s.turn++;if(t==='!'){nextLog('위험','위험한 지형을 발견했습니다.','자동 이동은 위험 타일에서 정지합니다.');stopAuto()}else if(t==='>')nextLog('탐험','계단 발견','다음 층 생성은 미구현입니다.');else if(t==='o'||t==='*')nextLog('탐험','광맥 발견','채광은 미구현입니다.');else nextLog('탐험','한 칸 이동','던전 이동은 실제 동작하지만 경로 생성은 고정입니다.');render()}
+function dungeonMove(dx,dy){if(s.page!=='던전'||!s.dungeon)return;const [x,y]=s.pos,nx=x+dx,ny=y+dy,t=TILES[ny]?.[nx];if(!t||t==='#')return;if(!executeV2('dungeon.move',{to:[nx,ny]}))return render();if(t==='!'){nextLog('위험','위험한 지형을 발견했습니다.','자동 이동은 위험 타일에서 정지합니다.');stopAuto()}else if(t==='>')nextLog('탐험','계단 발견','다음 층 생성은 미구현입니다.');else if(t==='o'||t==='*')nextLog('탐험','광맥 발견','채광은 미구현입니다.');else nextLog('탐험','한 칸 이동','던전 이동은 실제 동작하지만 경로 생성은 고정입니다.');render()}
 function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}}
 function autoStep(){if(!s.dungeon||s.page!=='던전'){stopAuto();return}for(const [key,value]of [['hp',s.hp],['mp',s.mp],['hunger',s.hunger]])if(s.auto[key].on&&value<=s.auto[key].pct){stopAuto();nextLog('위험','자동 탐색 중단','설정된 '+key+' 임계값에 도달했습니다.');return render()}const [x,y]=s.pos,options=[[1,0],[0,1],[-1,0],[0,-1]].filter(([dx,dy])=>TILES[y+dy]?.[x+dx]&&TILES[y+dy][x+dx]!=='#');if(!options.length){stopAuto();return}const [dx,dy]=options[s.turn%options.length];dungeonMove(dx,dy)}
 function dungeon(){
@@ -238,7 +239,7 @@ btn(autoTimer?'자동 탐색 중지':'자동 탐색 시작',()=>{
  if(autoTimer){stopAuto();nextLog('시스템','자동 이동 중지');render()}
  else{autoTimer=setInterval(autoStep,550);nextLog('시스템','자동 이동 시연 시작');render()}
 },'btn primary',actions);
-btn('던전 나가기',()=>{stopAuto();s.dungeon=false;s.page='생활';s.tab='개요';s.turn++;nextLog('탐험','던전에서 나왔습니다.');render()},'btn',actions);
+btn('던전 나가기',()=>{stopAuto();if(!executeV2('dungeon.leave',{}))return render();s.page='생활';s.tab='개요';nextLog('탐험','던전에서 나왔습니다.');render()},'btn',actions);
 const sec=section(right,'자동 중단 조건');
 for(const [key,name]of [['hp','HP'],['mp','MP'],['hunger','허기']]){
  const r=make('label',{class:'formrow dungeon-threshold'},sec),c=make('input',{type:'checkbox'},r);
@@ -280,7 +281,7 @@ async function quickLoad(){
   const close=()=>{dialog.close();dialog.remove()};
   btn('취소',close,'btn',actions);
   btn('불러오기',()=>{
-   mainV2.applyApprovedSave(saved);refreshV2Inventory();s.selectedIds=[];s.selectedItem=null;close();
+   stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();s.page=s.dungeon?'던전':'생활';s.selectedIds=[];s.selectedItem=null;close();
    nextLog('시스템','승인된 v2 저장 데이터를 불러왔습니다.');render();
   },'btn inventory-discard-confirm',actions);
   dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
