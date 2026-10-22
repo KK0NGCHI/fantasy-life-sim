@@ -89,7 +89,7 @@ export function dispatchItemAction(state:GameStateV2,command:ItemCommand,registr
       const p=placements.findIndex(p=>p.itemId===command.itemId);
       placements[p]={itemId:command.itemId,location:clone(command.to)};
       if(command.to.kind==='container') {
-        let c=containers.find(c=>c.containerId===command.to.containerId);
+        const destinationId=command.to.containerId;let c=containers.find(c=>c.containerId===destinationId);
         if(!c){c={containerId:command.to.containerId,itemIds:[]};containers.push(c);}
         c.itemIds.push(command.itemId);
       }
