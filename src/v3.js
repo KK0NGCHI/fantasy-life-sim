@@ -271,7 +271,7 @@ const save=section(el,'목업 퀵세이브');const actions=make('div',{class:'ro
 btn('F5 · 퀵세이브',quickSave,'btn primary',actions);btn('F9 · 퀵로드',quickLoad,'btn',actions);
 btn('초기화',()=>{if(!confirm('목업 상태를 초기화할까요?'))return;stopAuto();const selectedTheme=s.theme;s=fresh();useTheme(selectedTheme);nextLog('시스템','목업 초기화');render()},'btn',actions)
 }
-async function quickSave(){try{mainV2.syncVitals(s);const saved=await mainV2.save('quick');nextLog('시스템','v2 인벤토리와 진행 상태를 IndexedDB에 저장했습니다 (revision '+saved.slot.revision+').');render()}catch(e){nextLog('위험','v2 저장 실패: '+e.message);render()}}
+async function quickSave(){try{mainV2.captureCheckpoint(s);mainV2.syncVitals(s);const saved=await mainV2.save('quick');nextLog('시스템','v2 인벤토리와 진행 상태를 IndexedDB에 저장했습니다 (revision '+saved.slot.revision+').');render()}catch(e){nextLog('위험','v2 저장 실패: '+e.message);render()}}
 async function quickLoad(){
  inventoryDiscardMode=false;
  try{
@@ -283,7 +283,7 @@ async function quickLoad(){
   const close=()=>{dialog.close();dialog.remove()};
   btn('취소',close,'btn',actions);
   btn('불러오기',()=>{
-   stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();s.page=s.dungeon?'던전':'생활';s.selectedIds=[];s.selectedItem=null;close();
+   stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();s.logs=mainV2.checkpoint().logs;s.page=s.dungeon?'던전':'생활';s.selectedIds=[];s.selectedItem=null;close();
    nextLog('시스템','승인된 v2 저장 데이터를 불러왔습니다.');render();
   },'btn inventory-discard-confirm',actions);
   dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
@@ -300,7 +300,7 @@ function requestLoadApproval(saved,origin='저장 슬롯'){
  const close=()=>{dialog.close();dialog.remove()};
  btn('취소',close,'btn',buttons);
  btn('불러오기 승인',()=>{try{
-  stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();s.page=s.dungeon?'던전':'생활';
+  stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();s.logs=mainV2.checkpoint().logs;s.page=s.dungeon?'던전':'생활';
   s.selectedIds=[];s.selectedItem=null;inventoryDiscardMode=false;close();
   nextLog('시스템','승인한 저장 상태를 복구했습니다.');render();
  }catch(error){close();nextLog('위험','복구 실패: '+error.message);render()}},'btn inventory-discard-confirm',buttons);
@@ -330,7 +330,7 @@ async function openSaveManager(){
  const close=()=>{dialog.close();dialog.remove()};
  btn('닫기',close,'btn',actions);
  btn('새 수동 저장',async()=>{try{
-  mainV2.syncVitals(s);
+  mainV2.captureCheckpoint(s);mainV2.syncVitals(s);
   const label=window.prompt('저장 이름을 입력하세요.','수동 저장')??'';
   if(!label.trim())return;
   const saved=await mainV2.save('manual','manual-'+crypto.randomUUID(),label.trim());
