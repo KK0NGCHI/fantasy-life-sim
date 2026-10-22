@@ -44,7 +44,7 @@ export function decodeSave(raw:unknown):DecodeResult {
     !str(raw.contentVersion)||!checkState(raw.state))return {ok:false,reason:'INVALID_DATA'};
  // Reject unknown top-level state keys to avoid silently losing future item-instance fields.
  if(Object.keys(raw.state).some(k=>!['schemaVersion','turn','clock','rng','player','inventory','world','progression','flags'].includes(k)))return {ok:false,reason:'INCOMPATIBLE_VERSION'};
- return {ok:true,save:structuredClone(raw) as SaveEnvelope};
+ return {ok:true,save:structuredClone(raw) as unknown as SaveEnvelope};
 }
 export function createSave(state:GameState,slot:SaveSlot,contentVersion:string):SaveEnvelope {
  const data={format:'somnium-save',saveVersion:1,contentVersion,slot,state} as const;
