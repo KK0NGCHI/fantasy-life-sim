@@ -95,11 +95,12 @@ make('label',{class:'tiny muted',text:'필터'},toolbar);
 const filter=make('select',{class:'input','aria-label':'인벤토리 분류 필터'},toolbar);
 filter.innerHTML='<option value="전체">전체 분류</option>'+categories.filter(c=>c!=='전체').map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');filter.value=s.filter||'전체';
 const total=make('span',{class:'tiny muted'},toolbar);
+const discardActionBar=make('div',{class:'inventory-discard-actionbar'},el);
 const pane=make('div',{class:'panegrid inventory-layout'},el);
 const list=make('div',{class:'inventory-list'},pane);
 const detail=make('aside',{class:'inventory-detail','aria-label':'선택한 아이템 상세'},pane);
 const selected=new Set(inventoryDiscardMode?s.selectedIds:[]);
-const discardControls=make('div',{class:'inventory-discard-controls'},toolbar);
+const discardControls=make('div',{class:'inventory-discard-controls'},discardActionBar);
 const discardButton=btn('버리기',()=>{
  if(inventoryDiscardMode)return;
  inventoryDiscardMode=true;selected.clear();s.selectedIds=[];redraw();
@@ -138,18 +139,12 @@ let items=s.items.filter(i=>(s.tab==='전체'||i.group===s.tab)&&(s.filter==='�
 items.sort((a,b)=>s.sort==='qty'?b.qty-a.qty:String(a[s.sort]).localeCompare(String(b[s.sort]),'ko'));
 total.textContent=items.length+'종'+(inventoryDiscardMode?' · 버리기 '+selected.size+'종 선택':'');
 discardButton.hidden=inventoryDiscardMode;confirmButton.hidden=!inventoryDiscardMode;cancelButton.hidden=!inventoryDiscardMode;
+discardControls.setAttribute('data-mode',inventoryDiscardMode?'selecting':'idle');
 confirmButton.disabled=selected.size===0;
 hint.hidden=!inventoryDiscardMode;hint.textContent=inventoryDiscardMode?'버릴 아이템을 선택하세요. 확인을 누르면 최종 삭제 팝업이 열립니다.':'';
 list.classList.toggle('inventory-discard-mode',inventoryDiscardMode);
 list.replaceChildren();
-if(inventoryDiscardMode){
- const selectAll=make('label',{class:'inventory-select-all inventory-check-label'},list);
- const all=make('input',{type:'checkbox',id:'selectAllItems','aria-label':'현재 필터의 아이템 전체 선택'},selectAll);
- make('span',{text:'현재 목록 전체 선택'},selectAll);
- all.checked=items.length>0&&items.every(i=>selected.has(i.id));
- all.indeterminate=items.some(i=>selected.has(i.id))&&!all.checked;
- all.onchange=()=>{items.forEach(i=>all.checked?selected.add(i.id):selected.delete(i.id));s.selectedIds=[...selected];redraw()};
-}
+
 for(const item of items){
  const row=make('div',{class:'inventory-choice'+(s.selectedItem===item.id?' selected':'')+(selected.has(item.id)&&inventoryDiscardMode?' discard-marked':'')},list);
  if(inventoryDiscardMode){
