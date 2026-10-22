@@ -1,5 +1,5 @@
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
-import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom} from '../dist/engine/v2.js';
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom,gameClockAt,formatTravelSeconds} from '../dist/engine/v2.js';
 
 /** Bridge for the existing main UI fixture. Game item identity, quantity and ownership live in v2.
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
@@ -141,6 +141,8 @@ export function createMainV2Inventory(uiItems,options={}) {
     }
     return result;
   },
+  gameTime(){return state.world.runtime.timeBasis==='seconds-v1'?gameClockAt(state.clock.elapsedUnits):null},
+  formatTravelSeconds(seconds){return formatTravelSeconds(seconds)},
   worldRegions(){return worldRegistry.definition.regions.map(r=>({id:r.id,name:r.name,siteId:r.siteIds[0],worldPoint:r.worldPoint}))},
   routePreview(region,policy='fast'){
    if(state.world.runtime.timeBasis!=='seconds-v1')return {ok:false,reason:'LEGACY_TIME_MIGRATION_REQUIRED'};
