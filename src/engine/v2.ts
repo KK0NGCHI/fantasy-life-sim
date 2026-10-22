@@ -24,3 +24,6 @@ export {SOMNIUM_REGION_IDS,SOMNIUM_WORLD_03A} from './world/somnium-world.js';
 export type {WorldDefinition,WorldRegistry,RegionDefinition,SiteDefinition,MapDefinition,RouteDefinition,TerrainDefinition,FieldLifecyclePolicy,SiteLifecycleState,WorldRuntime03A,PlayerLocation,WorldValidationIssue} from './world/world-model.js';
 
 export {validateWorldTopology,validateWorldRuntime03A,prepareWorldRuntime03ALoad,createInitialWorldRuntime03A,siteGenerationSeed} from './world/world-integrity.js';
+
+export {planTravel,beginTravel,advanceTravel,pauseTravel,resumeTravel,cancelTravel,validateTravelState} from './world/travel.js';
+export type {TravelPlan,TravelState,TravelProgress,RoutePolicy,RouteResult,TravelAccess,TravelStep} from './world/travel.js';
