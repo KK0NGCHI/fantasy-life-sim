@@ -35,9 +35,13 @@ export function createMainV2Inventory(uiItems) {
    const expected=revisions.has(slotId)?revisions.get(slotId):null;
    if(expected===null){
     const existing=await store.listSlots();
-    if(existing.some(x=>x.slotId===slotId))throw Error('이미 존재하는 슬롯입니다. 먼저 슬롯을 불러오세요.');
+    const found=existing.find(x=>x.slotId===slotId);
+    if(found){
+     if(kind==='quick'&&found.status==='valid')revisions.set(slotId,found.revision);
+     else throw Error('이미 존재하거나 손상된 슬롯입니다. 덮어쓰지 않고 복구 후보를 확인하세요.');
+    }
    }
-   const saved=await store.commit(envelope,expected);
+   const saved=await store.commit(envelope,revisions.has(slotId)?revisions.get(slotId):expected);
    revisions.set(slotId,saved.slot.revision);return saved;
  }
  function enqueueAuto(){
