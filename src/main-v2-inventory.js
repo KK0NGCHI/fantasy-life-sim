@@ -106,6 +106,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  const replace=(candidate,expectedRevision=null)=>{
   const checked=prepareV2Load(candidate,registry);
   if(!checked.ok)throw new Error(checked.reason);
+  const travel=checked.state.world?.runtime?.travel03B;
+  if(travel!==undefined&&travel!==null&&!validateTravelState(travel,worldRegistry))throw new Error('Invalid 03-B travel state');
   state=structuredClone(checked.state);
   if(expectedRevision!==null&&candidate?.slot?.slotId)revisions.set(candidate.slot.slotId,expectedRevision);
  };
