@@ -56,3 +56,10 @@ test('legacy conversion preflight keeps original and explicitly requires approva
  assert.equal(prepareLegacyGameState({...v1,inventory:{items:[{id:'x',definitionId:'missing',quantity:1}]}},registry).ok,false);
  assert.equal(prepareV2Load(createSaveV2(initial,slot,'demo',registry),registry).originalVersion,2);
 });
+
+test('canonical v2 entrypoint identifies 02-C and schema v2',async()=>{
+ const api=await import('../dist/engine/v2.js');
+ assert.equal(api.ENGINE_STAGE_V2,'02-C');
+ assert.equal(api.ACTIVE_GAME_STATE_SCHEMA_VERSION,2);
+ assert.equal(typeof api.V2ActionDispatcher,'function');
+});
