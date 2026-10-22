@@ -1,0 +1,157 @@
+@import url("./v9.css");
+
+/* Visual correction pass: theme-derived accessible, dark colored actions. */
+:root{
+  --somnium-action:color-mix(in srgb,var(--theme-primary) 76%,#172033);
+  --somnium-action-hover:color-mix(in srgb,var(--theme-primary) 62%,#172033);
+  --somnium-row-hover:color-mix(in srgb,var(--theme-primary) 12%,var(--theme-surface));
+  --somnium-row-selected:color-mix(in srgb,var(--theme-primary) 22%,var(--theme-surface));
+}
+
+/* Exact font family from the publisher's webfont. Prevent old body/control selectors
+   from overriding it; leave icon SVG and browser OS native popup unaffected. */
+html,html body,body .v3-shell,body .v3-shell :is(button,input,select,textarea,option,dialog),
+body :is(.inventory-discard-dialog,.save-manager-dialog),
+body :is(.inventory-discard-dialog,.save-manager-dialog) :is(button,input,select,textarea){
+  font-family:"SUIT Variable","Malgun Gothic","맑은 고딕",sans-serif;
+}
+body .v3-shell h1{font-size:25px}
+body .v3-shell button{font-weight:600}
+
+/* Actual dark, flat button (not inset shadow). */
+body .v3-shell .inventory-discard-actionbar .inventory-discard-trigger,
+body .v3-shell .inventory-discard-actionbar .inventory-discard-trigger:active{
+  background:var(--somnium-action)!important;
+  color:#fff!important;
+  border:1px solid var(--somnium-action)!important;
+  background-image:none!important;box-shadow:none!important;text-shadow:none!important;
+}
+body .v3-shell .inventory-discard-actionbar .inventory-discard-trigger:hover,
+body .v3-shell .inventory-discard-actionbar .inventory-discard-trigger:focus-visible{
+  background:var(--somnium-action-hover)!important;
+  color:#fff!important;
+  border-color:var(--somnium-action-hover)!important;box-shadow:none!important;transform:none;
+}
+/* Each inventory row owns its entire painting area. Legacy child button hover,
+   label panels, ::before decorations, and checked backgrounds cannot split the fill. */
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice{
+  position:relative;isolation:isolate;
+  display:flex;align-items:stretch;gap:0;
+  background:var(--theme-surface)!important;
+  border:1px solid var(--theme-line);border-radius:11px;padding:0;
+  overflow:hidden;
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice:hover,
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice:focus-within{
+  background:var(--somnium-row-hover)!important;
+  border-color:color-mix(in srgb,var(--theme-primary) 55%,var(--theme-line));
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice.discard-marked,
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice.discard-marked:hover,
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice.discard-marked:focus-within{
+  background:var(--somnium-row-selected)!important;
+  border-color:var(--somnium-action)!important;
+  outline:1px solid var(--somnium-action);outline-offset:-1px;
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice :is(.inventory-check-label,.inventory-item-button),
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice :is(.inventory-check-label,.inventory-item-button):hover,
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice :is(.inventory-check-label,.inventory-item-button):focus-visible,
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice .inventory-item-button.selected{
+  background:transparent!important;
+  background-color:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;outline:none;
+  border:0!important;color:var(--theme-text)!important;
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice .inventory-item-button{
+  flex:1;min-width:0;margin:0;border-radius:0;align-self:stretch;padding:12px 10px;
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice .inventory-check-label{
+  display:flex;align-items:center;justify-content:center;
+  flex:0 0 52px;width:52px;margin:0;padding:0;min-height:100%;border-radius:0;
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice .inventory-check-label input[type="checkbox"]{
+  border-color:var(--somnium-action);background:var(--theme-surface);
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice .inventory-check-label input[type="checkbox"]:checked{
+  background:var(--somnium-action);border-color:var(--somnium-action);
+}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice .inventory-check-label input[type="checkbox"]:checked::after{color:white}
+body .v3-shell .inventory-list.inventory-discard-mode .inventory-choice .inventory-check-label:hover{
+  background:transparent!important;
+}
+
+/* A coherent Windows-like modal with separate sections and sensible spacing. */
+body .save-manager-dialog{
+  box-sizing:border-box;padding:24px!important;max-width:760px;
+  border-radius:16px;background:var(--theme-surface);
+}
+body .save-manager-dialog>.muted{margin:0 0 28px;line-height:1.65}
+body .save-manager-dialog .save-manager-autosave{
+  display:flex;flex-direction:column;align-items:stretch;gap:0;
+  padding:0 0 24px;margin:0;border-bottom:1px solid var(--theme-line)
+}
+body .save-manager-dialog .save-manager-autosave>h3{margin:0 0 18px;font-size:16px}
+body .save-manager-dialog .save-manager-field{
+  display:flex;flex-direction:column;align-items:flex-start;gap:9px;
+  margin:0 0 20px;
+}
+body .save-manager-dialog .save-manager-field label{font-size:13px;font-weight:650}
+body .save-manager-dialog .save-manager-toggle{
+  display:flex;align-items:center;gap:12px;margin:0 0 20px;
+  cursor:pointer;min-height:30px
+}
+body .save-manager-dialog .save-manager-policy-actions{
+  display:flex;justify-content:flex-end;margin:0;gap:8px;
+}
+body .save-manager-dialog .save-manager-section-heading{
+  margin-top:20px;margin-bottom:14px;
+  display:flex;justify-content:space-between;align-items:center;gap:12px;
+}
+body .save-manager-dialog .save-manager-actions{
+  display:flex;align-items:center;gap:10px;
+  margin:0 0 20px;padding:0 0 20px;
+  border-bottom:1px solid var(--theme-line);
+}
+body .save-manager-dialog .save-manager-list{
+  display:flex;flex-direction:column;gap:14px;
+  padding:0 0 20px;
+}
+body .save-manager-dialog .save-manager-slot{
+  padding:18px;gap:16px;border-radius:12px;
+}
+body .save-manager-dialog .save-manager-slot-actions{gap:10px}
+body .save-manager-dialog .save-manager-footer{
+  margin-top:20px;padding-top:18px;
+  border-top:1px solid var(--theme-line);
+  display:flex;justify-content:flex-end;
+}
+body .save-manager-dialog .btn{
+  min-height:40px;padding:9px 16px;border-radius:9px;
+  font-size:13px;font-weight:650;line-height:1.4;
+  box-shadow:none!important;
+}
+body .save-manager-dialog .btn.ui-primary{
+  background:var(--somnium-action)!important;color:#fff!important;
+  border-color:var(--somnium-action)!important;
+}
+body .save-manager-dialog .btn.ui-primary:hover{
+  background:var(--somnium-action-hover)!important;color:#fff!important;
+  border-color:var(--somnium-action-hover)!important;
+}
+body .save-manager-dialog .btn.ui-secondary{
+  background:var(--theme-surface)!important;color:var(--theme-text)!important;
+  border:1px solid var(--theme-line)!important;
+}
+body .save-manager-dialog .btn.ui-secondary:hover{
+  background:var(--theme-hover)!important;
+  border-color:var(--theme-primary)!important;
+}
+body .save-manager-dialog .save-manager-empty{
+  padding:30px 20px;min-height:85px;border-radius:12px;
+}
+@media(max-width:640px){
+ body .save-manager-dialog{padding:18px!important}
+ body .save-manager-dialog .save-manager-section-heading{align-items:flex-start}
+ body .save-manager-dialog .save-manager-actions{flex-wrap:wrap}
+}
