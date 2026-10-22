@@ -79,7 +79,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    if(travel.position.kind==='site'||arrival){
     const draw=drawRandom(rng,'world');rng=draw.rng;
     // Encounter roll per actual road segment; no item weight effects.
-    if(!arrival&&draw.value<0.12){encounter=true;travel=pauseTravel(travel);break}
+    if(draw.value<0.12){encounter=true;travel=pauseTravel(travel);break}
    }
    if(arrival)break;
   }
