@@ -95,6 +95,17 @@ export function createMainV2Inventory(uiItems) {
    if(![hp,mp,hunger].every(Number.isFinite))return;
    state={...state,player:{...state.player,currentHp:hp,currentMp:mp,hunger}};
   },
+  /** Per-save game-facing journal, not display preferences. Never store arbitrary UI objects. */
+  captureCheckpoint(ui){
+   if(!ui||!Array.isArray(ui.logs)||ui.logs.length>500)throw Error('Invalid journal');
+   const logs=ui.logs.map(x=>{
+    if(!x||typeof x.kind!=='string'||typeof x.text!=='string'||x.kind.length>80||x.text.length>1200)throw Error('Invalid journal entry');
+    return {kind:x.kind,text:x.text,detail:typeof x.detail==='string'?x.detail.slice(0,3000):'',turn:Number.isSafeInteger(x.turn)?x.turn:state.turn,count:Number.isSafeInteger(x.count)&&x.count>0?x.count:1};
+   });
+   const journal={logs,visitedRegions:Array.isArray(ui.visitedRegions)?ui.visitedRegions.filter(x=>typeof x==='string').slice(0,100):[]};
+   state={...state,world:{...state.world,runtime:{...state.world.runtime,journal}}};
+  },
+  checkpoint(){return structuredClone(state.world.runtime?.journal??{logs:[],visitedRegions:[]})},
   configureAutosave(policy){
    if(!policy||!Number.isSafeInteger(policy.everyActions)||policy.everyActions<1||!Array.isArray(policy.eventTypes)||!policy.eventTypes.every(x=>typeof x==='string'&&x.length))throw Error('Invalid autosave policy');
    autoPolicy={everyActions:policy.everyActions,eventTypes:[...policy.eventTypes]};
