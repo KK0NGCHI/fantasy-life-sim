@@ -17,6 +17,8 @@ export interface ItemDefinition {
   readonly categoryId: ItemCategoryId;
   readonly tags: readonly string[];
   readonly defaultMaterialId?: MaterialId;
+  /** Explicit opt-in; omitted means the item cannot be assigned a material. */
+  readonly allowsMaterial?: boolean;
   /** Behaviour flags, not statistical modifiers or search tags. */
   readonly capabilities: readonly DefinitionId[];
   /** Properties shared by all instances; numbers live in a future balance pack. */
