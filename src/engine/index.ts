@@ -30,3 +30,6 @@ export type { AutoSavePolicy } from './save/autosave.js';
 export { createSaveV2, decodeSaveV2, parseBackupV2, exportBackupV2, migrateV1ToV2 } from './save/save-v2.js';
 export type { GameStateV2, SaveEnvelopeV2, V2Result } from './save/save-v2.js';
 export { IndexedDbSavesV2 } from './save/indexeddb-v2.js';
+
+export { dispatchItemAction } from './core/item-actions-v2.js';
+export type { ItemCommand, ItemOutcome } from './core/item-actions-v2.js';
