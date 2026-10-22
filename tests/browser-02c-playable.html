@@ -87,18 +87,18 @@ $('#save').onclick=async()=>{try{
  const saved=await store.commit(createSaveV2(state,{...slot,savedAt:new Date().toISOString()},'demo',registry),revision);
  revision=saved.slot.revision;log('저장 완료 · revision '+revision);
 }catch(e){log('저장 실패: '+e.message)}};
-function offerLoad(candidate,why){
+function offerLoad(candidate,why,slotRevision=null){
  const result=prepareV2Load(candidate,registry);if(!result.ok){log('불러오기 거부: '+result.reason);return;}
- pendingLoad=result;$('#loadExplanation').textContent=why+' · '+result.originalVersion+'세대 데이터를 승인하면 현재 상태를 교체합니다.';
+ pendingLoad={...result,slotRevision};$('#loadExplanation').textContent=why+' · '+result.originalVersion+'세대 데이터를 승인하면 현재 상태를 교체합니다.';
  $('#loadConfirm').showModal();
 }
-$('#load').onclick=async()=>{try{const saved=await store.loadLatest(slot.slotId);if(!saved){log('저장된 데이터가 없습니다');return;}offerLoad(saved,'저장 슬롯 불러오기');}catch(e){
+$('#load').onclick=async()=>{try{const saved=await store.loadLatest(slot.slotId);if(!saved){log('저장된 데이터가 없습니다');return;}offerLoad(saved,'저장 슬롯 불러오기',saved.slot.revision);}catch(e){
  log('최신 저장 오류: '+e.message+' · 이전 정상 저장은 자동 적용하지 않습니다');
  const prior=await store.listRevisions(slot.slotId);
  if(prior.length)offerLoad(prior[0].save,'이전 정상 저장 복구 후보');}};
 $('#loadCancel').onclick=()=>{pendingLoad=null;$('#loadConfirm').close()};
 $('#loadConfirm').addEventListener('cancel',()=>{pendingLoad=null});
-$('#loadApprove').onclick=()=>{if(!pendingLoad)return;state=structuredClone(pendingLoad.state);pendingLoad=null;revision=null;$('#loadConfirm').close();log('불러오기 승인 · 현재 상태 교체');render()};
+$('#loadApprove').onclick=()=>{if(!pendingLoad)return;state=structuredClone(pendingLoad.state);revision=pendingLoad.slotRevision;pendingLoad=null;$('#loadConfirm').close();log('불러오기 승인 · 현재 상태 교체');render()};
 $('#export').onclick=()=>{try{const data=exportBackupV2(createSaveV2(state,{...slot,savedAt:new Date().toISOString()},'demo',registry),registry);
  const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob);
  const a=document.createElement('a');a.href=url;a.download='somnium-backup-v2.json';a.click();URL.revokeObjectURL(url);
@@ -106,7 +106,7 @@ $('#export').onclick=()=>{try{const data=exportBackupV2(createSaveV2(state,{...s
 $('#import').onclick=()=>$('#file').click();
 $('#file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;
  if(file.size>8_000_000){log('백업 크기 제한 초과');return;}
- const raw=await file.text(),result=parseBackupV2(raw,registry);if(result.ok)offerLoad(result.save,'JSON 백업 가져오기');else log('백업 검증 실패: '+result.reason);
+ const raw=await file.text();try{const candidate=JSON.parse(raw);offerLoad(candidate,'JSON 백업 가져오기 (필요 시 v1→v2 전환)');}catch{log('JSON 백업 형식 오류');}
  e.target.value='';};
 render();log('02-C 실행형 v2 화면 준비');
 </script></body></html>
