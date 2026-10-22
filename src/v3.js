@@ -85,6 +85,9 @@ const icons=['house','sprout','trees','waves','leaf','mountain','pickaxe','snowf
 const hues=['town','field','forest','water','forest','mountain','ore','snow','desert','water','water','volcano','mystic','ruin','mystic','dungeon'];
 const actions=make('section',{class:'travel-actions','aria-label':'광역 여행'},el);
 const subtitle=make('p',{class:'muted'},actions);
+const routePolicy=make('select',{class:'input','aria-label':'경로 선택 기준'},actions);
+routePolicy.innerHTML='<option value="fast">빠른 경로</option><option value="safe">안전 경로</option><option value="fewestTurns">적은 턴 경로</option>';
+routePolicy.hidden=!!travel?.progress;
 if(travel?.progress){
  const progress=travel.progress;
  subtitle.textContent='여행 중: '+progress.plan.siteIds.map(id=>mainV2.worldRegions().find(r=>r.siteId===id)?.name??id).join(' → ');
@@ -109,7 +112,7 @@ for(let i=0;i<REGIONS.length;i++){
  button.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';
  button.disabled=!!travel?.progress;
  button.onclick=()=>{
-  const result=mainV2.routePreview(region,'fast');
+  const result=mainV2.routePreview(region,routePolicy.value);
   const old=actions.querySelector('.travel-preview');old?.remove();
   const preview=make('div',{class:'travel-preview'},actions);
   if(!result.ok){make('p',{text:'경로를 선택할 수 없습니다: '+result.reason},preview);return}
