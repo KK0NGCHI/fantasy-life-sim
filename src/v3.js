@@ -82,6 +82,7 @@ b.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';b.onclick=()=>{s.re
 
 function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·전투 공식이 아닙니다.</p>'}
 function inventory(){
+mainV2.syncVitals(s);
 refreshV2Inventory();
 const el=head('인벤토리','');
 tabs(el,['전체','장비','식재료','재료','광석','약초','도구','기타'],changeTab);
