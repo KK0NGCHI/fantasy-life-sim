@@ -20,3 +20,9 @@ export type { ItemDefinition, MaterialDefinition, EffectDefinition, ItemInstance
 
 export { validateItemWorld, prepareInventoryMigration } from './data/item-world.js';
 export type { ItemWorldSnapshot, ItemPlacement } from './data/item-world.js';
+
+export { createSave, decodeSave, parseBackup, exportBackup, prepareLoad } from './save/save-format.js';
+export type { SaveKind, SaveSlot, SaveEnvelope, DecodeResult } from './save/save-format.js';
+export { IndexedDbSaves, SaveConflictError } from './save/indexeddb.js';
+export { shouldAutoSave } from './save/autosave.js';
+export type { AutoSavePolicy } from './save/autosave.js';
