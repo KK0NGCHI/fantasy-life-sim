@@ -21,7 +21,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  const siteToRegion=new Map(Array.from(worldRegistry.sites.values(),site=>[site.id,worldRegistry.regions.get(site.regionId)?.name]));
  const routeAccess=()=>({knownSites:new Set(worldRegistry.sites.keys()),knownHazards:new Set(),allowedRequirements:new Set()});
  const slot={slotId:'main-manual',worldId:'main-world',kind:'manual',label:'메인 UI 저장',savedAt:'2000-01-01T00:00:00Z',revision:0};
- const store=new IndexedDbSavesV2(registry,'somnium-main-v2');
+ const store=new IndexedDbSavesV2(registry,'somnium-main-v2'); // legacy v2 snapshots unchanged
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
