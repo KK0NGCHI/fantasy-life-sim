@@ -5,6 +5,7 @@ const context=await browser.newContext({baseURL:'http://127.0.0.1:8000'});
 const page=await context.newPage(),errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 try{
+ page.setDefaultTimeout(7000);
  await page.goto('/',{waitUntil:'domcontentloaded'});
  await page.locator('#top .top-title').waitFor();
  assert.match(await page.locator('#top').innerText(),/08:00:00/);
@@ -25,7 +26,7 @@ try{
  await page.getByRole('button',{name:'지하미궁',exact:true}).click();
  await page.getByRole('button',{name:'이동하기'}).click();
  let arrived=false;
- for(let attempt=0;attempt<40;attempt++){
+ for(let attempt=0;attempt<8;attempt++){
    const encounter=page.getByRole('dialog',{name:'여행 중 인카운터'});
    if(await encounter.isVisible()){
      await encounter.getByRole('button',{name:'확인 후 계속'}).click();
