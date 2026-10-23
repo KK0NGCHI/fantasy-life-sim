@@ -26,7 +26,7 @@
 git fetch origin
 git switch feat/03f-integration-stability
 git pull --ff-only
-npm ci
+npm install
 npm run check
 py -m http.server 8000
 ```
