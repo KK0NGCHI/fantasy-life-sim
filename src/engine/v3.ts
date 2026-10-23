@@ -22,5 +22,5 @@ export {localVisibility,localPortal,safeLocalRoute,rememberLocalVision} from './
 export {generateLocalMap,validateGenerationProfile} from './world/local-generator.js';
 export type {GenerationProfile,GeneratedLocalMap} from './world/local-generator.js';
 
-export {validateWorldSnapshot03E,createWorldSnapshot03E,withGeneratedMap,recordWorldSight,withWorldDelta,restoreWorldSnapshot03E} from './world/world-persistence-03e.js';
+export {validateWorldSnapshot03E,createWorldSnapshot03E,withGeneratedMap,recordWorldSight,withWorldDelta,recordWorldLocation,restoreWorldSnapshot03E} from './world/world-persistence-03e.js';
 export type {WorldSnapshot03E} from './world/world-persistence-03e.js';
