@@ -198,7 +198,17 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(candidate?.saveVersion!==3)throw Error('v2는 승인형 이전 후에만 적용 가능합니다.');
   // Stage validation before touching live state or map registry.
   const candidateWorld=loaded.world?.runtime?.world03E;
-  let checkedRegistry=options.generatedWorld===true?registryFromMaps(generatedMaps):worldRegistry;
+  if(options.generatedWorld===true&&persistedWorld&&!candidateWorld&&loaded.world.runtime.dungeon)
+   throw Error('이전 생성형 던전 저장에는 지형 스냅샷이 없습니다. 원본 슬롯을 유지하고 별도 이전 절차가 필요합니다.');
+  const legacyMaps=options.generatedWorld===true&&persistedWorld?[
+   {siteId:'core:site/labyrinth',algorithm:'dungeon',floor:0},
+   {siteId:'core:site/labyrinth',algorithm:'cavern',floor:-1},
+   {siteId:'core:site/forest',algorithm:'forest',floor:0}
+  ].map(({siteId,algorithm,floor})=>generateLocalMap(worldRegistry,{
+   id:'core:generator/'+algorithm,version:1,algorithm,width:24,height:24,
+   siteId,floor,maxAttempts:4
+  },'somnium-03d-preview-v1').map):generatedMaps;
+  let checkedRegistry=options.generatedWorld===true?registryFromMaps(legacyMaps):worldRegistry;
   if(candidateWorld){
    const restored=restoreWorldSnapshot03E(candidateWorld,worldRegistry);
    checkedRegistry=registryFromMaps(Object.values(restored.generatedMaps));
