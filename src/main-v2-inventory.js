@@ -133,6 +133,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const loaded=candidate?.saveVersion===3?asV2(checked.save.state):checked.state;
   const travel=loaded.world?.runtime?.travel03B;
   if(travel!==undefined&&travel!==null&&!validateTravelState(travel,worldRegistry))throw new Error('Invalid 03-B travel state');
+  if(candidate?.saveVersion!==3)throw Error('v2는 승인형 이전 후에만 적용 가능합니다.');
   state=structuredClone(loaded);
   if(expectedRevision!==null&&candidate?.slot?.slotId)revisions.set(candidate.slot.slotId,expectedRevision);
  };
