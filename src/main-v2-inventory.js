@@ -1,3 +1,5 @@
+import {createInitialWorldRuntime03A} from '../dist/engine/world/world-integrity.js';
+import {createWorldSnapshot03E,withGeneratedMap,recordWorldSight,recordWorldLocation,restoreWorldSnapshot03E} from '../dist/engine/world/world-persistence-03e.js';
 import {activityPreview} from './region-activities.js';
 import {actionSeconds} from '../dist/engine/world/action-seconds.js';
 import {resolveLocalStep,localArrival} from '../dist/engine/world/local-movement.js';
@@ -25,21 +27,28 @@ export function createMainV2Inventory(uiItems,options={}) {
  // 03-D prototype is opt-in to protect legacy fixtures and existing save assumptions.
  // Formal per-world seed, generated snapshot and Delta persistence are 03-E gates.
  let localRegistry=worldRegistry;
- if(options.generatedWorld===true){
-  const worldSeed=options.worldSeed??'somnium-03d-preview-v1';
-  const replacements=[
-   {siteId:'core:site/labyrinth',algorithm:'dungeon',floor:0},
-   {siteId:'core:site/labyrinth',algorithm:'cavern',floor:-1},
-   {siteId:'core:site/forest',algorithm:'forest',floor:0}
-  ].map(({siteId,algorithm,floor})=>generateLocalMap(worldRegistry,{
-   id:'core:generator/'+algorithm,version:1,algorithm,width:24,height:24,
-   siteId,floor,maxAttempts:4
-  },worldSeed).map);
+ const persistedWorld=options.worldPersistence03E===true;
+ const freshSeed=persistedWorld?(options.worldSeed??('somnium-'+crypto.randomUUID())):(options.worldSeed??'somnium-03d-preview-v1');
+ const generatedMaps=options.generatedWorld===true?[
+  {siteId:'core:site/labyrinth',algorithm:'dungeon',floor:0},
+  {siteId:'core:site/labyrinth',algorithm:'cavern',floor:-1},
+  {siteId:'core:site/forest',algorithm:'forest',floor:0}
+ ].map(({siteId,algorithm,floor})=>generateLocalMap(worldRegistry,{
+  id:'core:generator/'+algorithm,version:1,algorithm,width:24,height:24,
+  siteId,floor,maxAttempts:4
+ },freshSeed).map):[];
+ const registryFromMaps=maps=>{
   const definition=structuredClone(worldRegistry.definition);
-  definition.maps=definition.maps.map(m=>replacements.find(g=>g.siteId===m.siteId&&g.floor===m.floor)??m);
+  definition.maps=definition.maps.map(m=>maps.find(g=>g.id===m.id)??m);
   const built=buildWorldRegistry(definition);
-  if(!built.ok)throw Error('Invalid generated 03-D geometry: '+JSON.stringify(built.issues));
-  localRegistry=built.registry;
+  if(!built.ok)throw Error('Invalid persisted geometry: '+JSON.stringify(built.issues));
+  return built.registry;
+ };
+ if(generatedMaps.length)localRegistry=registryFromMaps(generatedMaps);
+ let initialWorld03E=null;
+ if(persistedWorld){
+  initialWorld03E=createWorldSnapshot03E(createInitialWorldRuntime03A(worldRegistry,freshSeed),worldRegistry);
+  for(const map of generatedMaps)initialWorld03E=withGeneratedMap(initialWorld03E,map,worldRegistry);
  }
  const regionToSite=new Map(Array.from(worldRegistry.regions.values(),r=>[r.name,r.siteIds[0]]));
  const siteToRegion=new Map(Array.from(worldRegistry.sites.values(),site=>[site.id,worldRegistry.regions.get(site.regionId)?.name]));
@@ -54,7 +63,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1'}},progression:{skillExperience:{}},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{})}},progression:{skillExperience:{}},flags:{},
   itemWorld:{
    items:uiItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:uiItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -179,6 +188,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   .filter(item=>state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
   .map(item=>({...templates.get(item.definitionId),id:item.id,qty:item.quantity}));
  const current=()=>structuredClone(state);
+ const validateLocalPosition=(reg,p)=>{const map=[...reg.maps.values()].find(m=>m.siteId===p.siteId&&m.floor===p.floor);return !!map&&p.x>=0&&p.y>=0&&p.x<map.width&&p.y<map.height&&!!reg.terrains.get(map.tiles[p.y]?.split(' ')[p.x])?.traversable};
  const replace=(candidate,expectedRevision=null)=>{
   const checked=candidate?.saveVersion===3?decodeSaveV3(candidate,registry):prepareV2Load(candidate,registry);
   if(!checked.ok)throw new Error(checked.reason);
@@ -186,7 +196,19 @@ export function createMainV2Inventory(uiItems,options={}) {
   const travel=loaded.world?.runtime?.travel03B;
   if(travel!==undefined&&travel!==null&&!validateTravelState(travel,worldRegistry))throw new Error('Invalid 03-B travel state');
   if(candidate?.saveVersion!==3)throw Error('v2는 승인형 이전 후에만 적용 가능합니다.');
+  // Stage validation before touching live state or map registry.
+  const candidateWorld=loaded.world?.runtime?.world03E;
+  let checkedRegistry=options.generatedWorld===true?registryFromMaps(generatedMaps):worldRegistry;
+  if(candidateWorld){
+   const restored=restoreWorldSnapshot03E(candidateWorld,worldRegistry);
+   checkedRegistry=registryFromMaps(Object.values(restored.generatedMaps));
+   const pos=loaded.world.runtime.pos;
+   const siteId=loaded.world.runtime.localSiteId??'core:site/labyrinth';
+   if(loaded.world.runtime.dungeon&&!validateLocalPosition(checkedRegistry,{siteId,floor:loaded.world.runtime.localFloor??0,x:pos[0],y:pos[1]}))
+    throw Error('Saved local position not traversable in recorded world');
+  }
   state=structuredClone(loaded);
+  localRegistry=checkedRegistry;
   if(expectedRevision!==null&&candidate?.slot?.slotId)revisions.set(candidate.slot.slotId,expectedRevision);
  };
  return {
@@ -200,7 +222,18 @@ export function createMainV2Inventory(uiItems,options={}) {
   dispatch(type,payload={}){
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
-     state=result.nextState;actionsSinceAuto++;
+     state=result.nextState;
+     if(state.world.runtime.dungeon&&state.world.runtime.world03E&&['dungeon.enter','dungeon.move','dungeon.portal'].includes(type)){
+      const position=localPosition(state);
+      const old=state.world.runtime.world03E;
+      const located=recordWorldLocation(old,position,worldRegistry);
+      const map=[...localRegistry.maps.values()].find(m=>m.siteId===position.siteId&&m.floor===position.floor);
+      const previous=located.world.seenCells[map.id]??[];
+      const visible=localVisibility(localRegistry,position,previous).visible;
+      const recorded=recordWorldSight(located,map.id,visible,worldRegistry);
+      state={...state,world:{...state.world,runtime:{...state.world.runtime,world03E:recorded}}};
+     }
+     actionsSinceAuto++;
      if(shouldAutoSave(actionsSinceAuto,result.events,autoPolicy)){actionsSinceAuto=0;enqueueAuto()}
     }
     return result;
