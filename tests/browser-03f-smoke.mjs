@@ -34,7 +34,8 @@ try{
    }
    const progress=page.getByRole('button',{name:'남은 여행 진행'});
    if(await progress.isVisible()){await progress.click();continue;}
-   await page.getByRole('button',{name:'생활',exact:true}).first().click();
+   await page.locator('#bottomNav button[aria-label="생활"]').click();
+   if(attempt===0)console.log('AFTER_LIFESTYLE_CLICK',JSON.stringify({heading:await page.locator('#main h1').innerText(), buttons:await page.locator('#main button').allTextContents()}));
    if(await page.getByRole('button',{name:'던전 진입'}).isVisible()){arrived=true;break;}
    if(attempt===0||attempt===59)console.log('TRAVEL_LIFESTYLE_DIAGNOSTIC',JSON.stringify({screen:(await page.locator('#main').innerText()).slice(0,1300), buttons:await page.locator('#main button').allTextContents(), current:await page.locator('#bottomNav .current').allTextContents()}));
    await page.getByRole('button',{name:'세계 지도',exact:true}).first().click();
