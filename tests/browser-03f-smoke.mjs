@@ -95,7 +95,9 @@ try{
    sameClock:JSON.stringify(before.clock)===JSON.stringify(restored.current().clock),
    sameRng:JSON.stringify(before.rng)===JSON.stringify(restored.current().rng),
    sameMap:JSON.stringify(tiles)===JSON.stringify(restored.localMap().tiles),cells:restored.rememberedCells().length,
-   stairs:route.length>0&&down.accepted&&up.accepted&&floorDown===-1&&floorUp===0};
+   stairs:route.length>0&&down.accepted&&up.accepted&&floorDown===-1&&floorUp===0,
+   stairDebug:{routeLength:route.length,goal,downAccepted:down.accepted,downReason:down.reason,
+    upAccepted:up.accepted,upReason:up.reason,floorDown,floorUp}};
  });
  assert.equal(dungeonRuntime.ok,true);
  assert.equal(dungeonRuntime.sameWorld,true);
@@ -103,7 +105,7 @@ try{
  assert.equal(dungeonRuntime.sameRng,true);
  assert.equal(dungeonRuntime.sameMap,true);
  assert.ok(dungeonRuntime.cells>0);
- assert.equal(dungeonRuntime.stairs,true);
+ assert.equal(dungeonRuntime.stairs,true,JSON.stringify(dungeonRuntime.stairDebug));
  assert.deepEqual(errors,[]);
  console.log('03-F Chromium browser smoke: render, F5 commit, reload, F9 approval, 16 regions PASS');
 }finally{await browser.close();}
