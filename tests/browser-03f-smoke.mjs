@@ -26,7 +26,7 @@ try{
  await page.getByRole('button',{name:'지하미궁',exact:true}).click();
  await page.getByRole('button',{name:'이동하기'}).click();
  let arrived=false;
- for(let attempt=0;attempt<8;attempt++){
+ for(let attempt=0;attempt<60;attempt++){
    const encounter=page.getByRole('dialog',{name:'여행 중 인카운터'});
    if(await encounter.isVisible()){
      await encounter.getByRole('button',{name:'확인 후 계속'}).click();
@@ -36,7 +36,7 @@ try{
    if(await progress.isVisible()){await progress.click();continue;}
    await page.getByRole('button',{name:'생활',exact:true}).first().click();
    if(await page.getByRole('button',{name:'던전 진입'}).isVisible()){arrived=true;break;}
-   if(attempt===0)console.log('TRAVEL_LIFESTYLE_DIAGNOSTIC',JSON.stringify((await page.locator('#main').innerText()).slice(0,1300)));
+   if(attempt===0||attempt===59)console.log('TRAVEL_LIFESTYLE_DIAGNOSTIC',JSON.stringify((await page.locator('#main').innerText()).slice(0,1300)));
    await page.getByRole('button',{name:'세계 지도',exact:true}).first().click();
  }
  if(!arrived)throw Error('WORLD_DUNGEON_ARRIVAL_UI: '+JSON.stringify({
