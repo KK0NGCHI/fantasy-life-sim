@@ -50,7 +50,11 @@ function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===
 const make=(tag,props={},parent)=>{const e=document.createElement(tag);for(const [k,v]of Object.entries(props)){if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k==='class')e.className=v;else e.setAttribute(k,v)}if(parent)parent.append(e);return e};
 function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',text,class:classes},parent);b.addEventListener('click',fn);return b}
 function top(){
-$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+s.day+'일</span><span>'+svgIcon('clock')+' '+String(s.hour).padStart(2,'0')+':00</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
+const gameClock=mainV2.gameTime();
+const day=gameClock?.day??s.day;
+const hour=gameClock?.hour??s.hour;
+const minute=gameClock?.minute??(s.minute??0);
+$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+day+'일</span><span>'+svgIcon('clock')+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+'</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
 const group=$('#top .top-meta');
 const save=make('button',{type:'button',class:'top-settings ui-icon-button',title:'저장 관리자','aria-label':'저장 관리자'},group);
 save.innerHTML=svgIcon('save');save.onclick=()=>openSaveManager();
