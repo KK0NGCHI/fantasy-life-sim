@@ -15,7 +15,7 @@
 3. **Automatic exploration:** replace the demo neighbor-choice tick with known-only hazard-safe route planning and proper interruption, reusing common dispatcher.
 4. **Location consistency:** derive region/site from one canonical position when formal WorldRuntime03A is promoted into the save schema in 03-E. Current `world.runtime.pos` is still the established v3/v2 bridge, not the final world-state contract.
 5. **Browser verification:** navigate in Mac Chrome and Safari; check blocked movement costs, displayed map coordinates, all direction keys/buttons, time +6 seconds per ground step, F5/F9 save and restore; verify legacy v2 slots untouched.
-6. Pass `npm run check` and integrated GitHub CI. No automatic merge.
+6. GitHub Actions `Engine 01-A` and `Prototype checks` **passed** at `a9f54023158638ce6cdac7d1f979dc6761bc387d`. Local Mac `npm run check` and browser QA remain pending. No automatic merge.
 
 ## Mac test
 ```bash
