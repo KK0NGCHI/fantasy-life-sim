@@ -205,18 +205,18 @@ export function createMainV2Inventory(uiItems,options={}) {
   async save(kind='quick',slotId=kind==='quick'?'main-manual':kind==='auto'?'main-auto':'manual-'+crypto.randomUUID(),label=''){
    return saveInto(kind,slotId,label);
   },
-  async listSlots(){return store.listSlots()},
-  async loadCandidate(slotId='main-manual'){
-   const found=await store.loadLatest(slotId);
+  async listSlots(){const modern=await store.listSlots();const legacy=await legacyStore.listSlots();return [...modern.map(x=>({...x,source:'v3'})),...legacy.map(x=>({...x,source:'v2'}))]},
+  async loadCandidate(slotId='main-manual',source='v3'){
+   const found=await (source==='v2'?legacyStore:store).loadLatest(slotId);
    if(!found)throw new Error('저장된 슬롯이 없습니다.');
    return found;
   },
-  async recoveryCandidates(slotId='main-manual'){return store.listRevisions(slotId)},
+  async recoveryCandidates(slotId='main-manual',source='v3'){return (source==='v2'?legacyStore:store).listRevisions(slotId)},
   applyApprovedSave(candidate){
    replace(candidate,candidate.slot?.revision??null);
   },
-  async exportCandidate(slotId){
-   const found=await store.loadLatest(slotId);
+  async exportCandidate(slotId,source='v3'){
+   const found=await (source==='v2'?legacyStore:store).loadLatest(slotId);
    if(!found)throw Error('저장된 슬롯이 없습니다.');
    return found;
   },
