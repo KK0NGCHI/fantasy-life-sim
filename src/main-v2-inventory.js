@@ -23,6 +23,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  const slot={slotId:'main-manual',worldId:'main-world',kind:'manual',label:'메인 UI 저장',savedAt:'2000-01-01T00:00:00Z',revision:0};
  const legacyStore=new IndexedDbSavesV2(registry,'somnium-main-v2');
  const store=new IndexedDbSavesV3(registry,'somnium-main-v3');
+ const asV3=()=>{const {schemaVersion,clock,...rest}=structuredClone(state);return {...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}}};
+ const asV2=input=>{const {schemaVersion,clock,...rest}=structuredClone(input);return {...rest,schemaVersion:2,clock:{elapsedUnits:clock.elapsedSeconds}}};
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
@@ -41,7 +43,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  async function saveInto(kind,slotId,label){
    if(!['manual','quick','auto'].includes(kind)||!slotId||typeof label!=='string')throw Error('Invalid save slot');
    const meta={...slot,slotId,kind,label:label||kind+' 저장',savedAt:new Date().toISOString()};
-   const envelope=createSaveV2(state,meta,'main-prototype',registry);
+   if(state.world.runtime.timeBasis!=='seconds-v1')throw Error('구형 시간 데이터는 별도 이전 승인이 필요합니다.');
+   const envelope=createSaveV3(asV3(),meta,'main-prototype',registry);
    const expected=revisions.has(slotId)?revisions.get(slotId):null;
    if(expected===null){
     const existing=await store.listSlots();
