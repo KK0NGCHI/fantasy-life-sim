@@ -54,3 +54,9 @@ If `py` isn't installed, use `python -m http.server 8000`. Open http://localhost
 ## References
 - GitHub protected branches and required checks: https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
 - GitHub troubleshooting required status checks: https://docs.github.com/en/pull-requests/how-tos/merge-and-close-pull-requests/troubleshooting-required-status-checks
+
+## Automated real-browser acceptance (03-F continuation)
+- `tests/browser-03f-smoke.mjs` runs real Chromium, uses actual IndexedDB, verifies F5 persisted quick save, reload, F9 approval, and 16-region map rendering.
+- The GitHub `browser-chromium` CI job installs a temporary pinned Playwright version without changing package manifest, compiles the engine and serves the game locally. This is a Linux headless Chromium smoke only, **not** Windows Edge GUI acceptance.
+- `windows-smoke` is Node/TypeScript integration on Windows runner. Preserve human Edge/Chrome interaction checks as outstanding.
+- Avoid using `npm ci` until a reviewed lockfile is committed; current install uses `npm install`.
