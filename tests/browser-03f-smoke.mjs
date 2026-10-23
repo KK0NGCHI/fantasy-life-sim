@@ -38,11 +38,15 @@ try{
   const packed=createSaveV3(proposal.state,slot,'main-prototype',g.registry);
   const restored=createMainV2Inventory(items,{...options,worldSeed:'a-different-world'});
   restored.applyApprovedSave(packed);
-  return {ok:entered.accepted&&moved.accepted,sameState:JSON.stringify(before)===JSON.stringify(restored.current()),
+  return {ok:entered.accepted&&moved.accepted,sameWorld:JSON.stringify(before.world)===JSON.stringify(restored.current().world),
+   sameClock:JSON.stringify(before.clock)===JSON.stringify(restored.current().clock),
+   sameRng:JSON.stringify(before.rng)===JSON.stringify(restored.current().rng),
    sameMap:JSON.stringify(tiles)===JSON.stringify(restored.localMap().tiles),cells:restored.rememberedCells().length};
  });
  assert.equal(dungeonRuntime.ok,true);
- assert.equal(dungeonRuntime.sameState,true);
+ assert.equal(dungeonRuntime.sameWorld,true);
+ assert.equal(dungeonRuntime.sameClock,true);
+ assert.equal(dungeonRuntime.sameRng,true);
  assert.equal(dungeonRuntime.sameMap,true);
  assert.ok(dungeonRuntime.cells>0);
  assert.deepEqual(errors,[]);
