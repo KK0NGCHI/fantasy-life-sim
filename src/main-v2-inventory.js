@@ -1,5 +1,6 @@
 import {actionSeconds} from '../dist/engine/world/action-seconds.js';
 import {resolveLocalStep,localArrival} from '../dist/engine/world/local-movement.js';
+import {localVisibility,safeLocalRoute} from '../dist/engine/world/local-exploration.js';
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
 import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom,gameClockAt,formatTravelSeconds,IndexedDbSavesV3,createSaveV3,decodeSaveV3,prepareV2ToV3Migration,prepareSecondsV2ToV3} from '../dist/engine/v2.js';
 
@@ -154,6 +155,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  return {
   registry,projected,current,
   localMap(){return structuredClone([...worldRegistry.maps.values()].find(m=>m.siteId==='core:site/labyrinth'&&m.floor===0));},
+  localView(remembered=[]){const [x,y]=state.world.runtime.pos;return localVisibility(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},remembered);},
+  localRoute(goal,known){const [x,y]=state.world.runtime.pos;return safeLocalRoute(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},{siteId:'core:site/labyrinth',floor:0,x:goal[0],y:goal[1]},new Set(known));},
   dispatch(type,payload={}){
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
