@@ -40,7 +40,7 @@ function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 let localRemembered=[];
 let autoTarget=0;
-const mainV2=createMainV2Inventory(s.items,{generatedWorld:true});
+const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true});
 function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
@@ -319,7 +319,7 @@ const floorMap=mainV2.localMap();
 map.style.gridTemplateColumns='repeat('+floorMap.width+',clamp(13px,1.8vw,24px))';
 map.style.overflow='auto';
 const localTiles=mainV2.localMap().tiles.map(row=>row.split(' ').map(id=>id==='core:terrain/wall'?'#':'.'));
-const view=mainV2.localView(localRemembered);localRemembered=view.remembered;const visible=new Set(view.visible),remembered=new Set(view.remembered);
+const view=mainV2.localView(mainV2.rememberedCells().length?mainV2.rememberedCells():localRemembered);localRemembered=view.remembered;const visible=new Set(view.visible),remembered=new Set(view.remembered);
 const mapWidth=localTiles[0].length;
 const stairCells=new Set(floorMap.entrances.filter(e=>e.destinationFloor!==mainV2.localFloor()).map(e=>e.y*mapWidth+e.x));
 for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
