@@ -18,14 +18,19 @@ const regions:RegionDefinition[]=entries.map(([id,name],i)=>({
 const sites:SiteDefinition[]=entries.map(([id,,type]):SiteDefinition=>({
  id:site(id),regionId:region(id),type,
  generation:id==='town'||id==='plains'?'fixed':'seeded',
- templateId:'core:template/'+id,floors:[0],entryId:'core:entry/'+id,
+ templateId:'core:template/'+id,floors:id==='labyrinth'?[0,-1]:[0],entryId:'core:entry/'+id,
  lifecycle:id==='plains'?{kind:'renewable',renewalUnits:86400}:id==='labyrinth'?{kind:'repeatable',regenerationUnits:259200}:{kind:'permanent'}
 }));
 const maps:MapDefinition[]=entries.map(([id])=>({
  id:'core:map/'+id,siteId:site(id),floor:0,width:5,height:5,
  tiles:['# # # # #','# . . . #','# . . . #','# . . . #','# # # # #'].map(r=>r.split(' ').map(t=>tile(t==='#'?'wall':'ground')).join(' ')),
- entrances:[{id:'core:entry/'+id,x:2,y:2,destinationSiteId:site(id),destinationFloor:0,destinationEntryId:'core:entry/'+id}]
+ entrances:[{id:'core:entry/'+id,x:2,y:2,destinationSiteId:site(id),destinationFloor:0,destinationEntryId:'core:entry/'+id},...(id==='labyrinth'?[{id:'core:entry/labyrinth-down',x:3,y:3,destinationSiteId:site(id),destinationFloor:-1,destinationEntryId:'core:entry/labyrinth-up'}]:[])]
 }));
+maps.push({
+ id:'core:map/labyrinth-b1',siteId:site('labyrinth'),floor:-1,width:5,height:5,
+ tiles:['# # # # #','# . . . #','# . . . #','# . . . #','# # # # #'].map(row=>row.split(' ').map(t=>tile(t==='#'?'wall':'ground')).join(' ')),
+ entrances:[{id:'core:entry/labyrinth-up',x:1,y:1,destinationSiteId:site('labyrinth'),destinationFloor:0,destinationEntryId:'core:entry/labyrinth-down'}]
+});
 /** Explicit narrative travel links. UI 4×4 position has no bearing on distance. */
 // 03-B seconds-v1: worldUnits are game seconds ONLY for new timeBasis-tagged worlds.
 const routeSpecs=[
