@@ -29,3 +29,7 @@ export {planTravel,beginTravel,advanceTravel,pauseTravel,resumeTravel,cancelTrav
 export type {TravelPlan,TravelState,TravelProgress,RoutePolicy,RouteResult,TravelAccess,TravelStep} from './world/travel.js';
 
 export {GAME_DAY_SECONDS,GAME_START_SECONDS,assertGameSeconds,gameClockAt,formatTravelSeconds} from './world/time-seconds.js';
+
+export {decodeSaveV3,createSaveV3,parseBackupV3,exportBackupV3,prepareV2ToV3Migration,prepareSecondsV2ToV3} from './save/save-v3.js';
+export {IndexedDbSavesV3} from './save/indexeddb-v3.js';
+export type {GameStateV3,SaveEnvelopeV3} from './save/save-v3.js';
