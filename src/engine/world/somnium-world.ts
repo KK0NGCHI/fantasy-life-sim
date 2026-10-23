@@ -14,11 +14,12 @@ export const SOMNIUM_REGION_IDS=entries.map(([id])=>region(id));
 const regions:RegionDefinition[]=entries.map(([id,name],i)=>({
  id:region(id),name,biomeId:'core:biome/'+id,worldPoint:{x:i%5,y:Math.floor(i/5)},siteIds:[site(id)]
 }));
+// Stable public region anchors never expire; generated temporary sites are distinct later sites.
 const sites:SiteDefinition[]=entries.map(([id,,type]):SiteDefinition=>({
  id:site(id),regionId:region(id),type,
  generation:id==='town'||id==='plains'?'fixed':'seeded',
  templateId:'core:template/'+id,floors:[0],entryId:'core:entry/'+id,
- lifecycle:id==='town'?{kind:'permanent'}:id==='plains'?{kind:'renewable',renewalUnits:120}:id==='labyrinth'?{kind:'repeatable',regenerationUnits:360}:{kind:'temporary',lifetimeUnits:900}
+ lifecycle:id==='plains'?{kind:'renewable',renewalUnits:86400}:id==='labyrinth'?{kind:'repeatable',regenerationUnits:259200}:{kind:'permanent'}
 }));
 const maps:MapDefinition[]=entries.map(([id])=>({
  id:'core:map/'+id,siteId:site(id),floor:0,width:5,height:5,
