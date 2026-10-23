@@ -295,19 +295,20 @@ if(!choices.length){stopAuto();nextLog('시스템','자동 탐색 경로 없음'
 const route=choices[autoTarget++%choices.length],direction=route[0];
 dungeonMove(direction==='east'?1:direction==='west'?-1:0,direction==='south'?1:direction==='north'?-1:0)}
 function dungeon(){
-const el=head('지하미궁','');
+const el=head('지하미궁',mainV2.localFloor()===0?'지상층':'지하 '+Math.abs(mainV2.localFloor())+'층');
 el.classList.add('dungeon-screen');
 const layout=make('div',{class:'dungeonlayout dungeon-v7'},el);
 const left=make('div',{class:'dungeon-map-pane'},layout);
 const right=make('aside',{class:'dungeon-controls'},layout);
 const map=make('div',{class:'tilemap',role:'img','aria-label':'03-C 지역 레지스트리 시험 지도'},left);
+const portal=mainV2.localPortal();
 const localTiles=mainV2.localMap().tiles.map(row=>row.split(' ').map(id=>id==='core:terrain/wall'?'#':'.'));
 const view=mainV2.localView(localRemembered);localRemembered=view.remembered;const visible=new Set(view.visible),remembered=new Set(view.remembered);
 const mapWidth=localTiles[0].length;
 for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
  const idx=y*mapWidth+x,v=localTiles[y][x],player=s.pos[0]===x&&s.pos[1]===y,known=remembered.has(idx),inSight=visible.has(idx);
  const tile=make('span',{class:'tile '+(!known?'unseen ':!inSight?'remembered ':'')+(player?'player':v==='#'?'wall':v==='o'||v==='*'?'ore':v==='>'?'stairs':v==='!'?'warning':''),
- html:player?svgIcon('user-round'):v==='o'||v==='*'?svgIcon('gem'):v==='>'?svgIcon('arrow-down'):v==='!'?svgIcon('skull'):''},map);
+ html:player?svgIcon('user-round'):portal&&portal.x!==undefined&&mainV2.localMap().entrances.some(e=>e.x===x&&e.y===y&&e.destinationFloor!==mainV2.localFloor())?svgIcon('arrow-down'):''},map);
  tile.title=!known?'미탐색':player?'플레이어':v==='#'?'벽':v==='!'?'위험':v==='>'?'계단':v==='o'?'광맥':'바닥';
 }
 make('h2',{text:'탐색 제어'},right);
@@ -316,6 +317,7 @@ btn(autoTimer?'자동 탐색 중지':'자동 탐색 시작',()=>{
  if(autoTimer){stopAuto();nextLog('시스템','자동 이동 중지');render()}
  else{autoTimer=setInterval(autoStep,550);nextLog('시스템','자동 이동 시연 시작');render()}
 },'btn primary',actions);
+if(portal)btn('계단 이용',()=>{stopAuto();if(!executeV2('dungeon.portal',{}))return render();localRemembered=[];autoTarget=0;nextLog('탐험','층을 이동했습니다.');render()},'btn',actions);
 btn('던전 나가기',()=>{stopAuto();if(!executeV2('dungeon.leave',{}))return render();s.page='생활';s.tab='개요';nextLog('탐험','던전에서 나왔습니다.');render()},'btn',actions);
 const sec=section(right,'자동 중단 조건');
 for(const [key,name]of [['hp','HP'],['mp','MP'],['hunger','허기']]){
