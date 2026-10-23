@@ -275,18 +275,28 @@ const x=make('div',{class:'panegrid'},el);
 make('div',{html:'<div class="empty">항목 없음</div>'},x);
 make('aside',{class:'detail',html:'<h3>상세</h3>'},x);
 }
-function dungeonMove(dx,dy){if(s.page!=='던전'||!s.dungeon)return;const [x,y]=s.pos,nx=x+dx,ny=y+dy,t=TILES[ny]?.[nx];if(!t||t==='#')return;if(!executeV2('dungeon.move',{to:[nx,ny]}))return render();if(t==='!'){nextLog('위험','위험한 지형을 발견했습니다.','자동 이동은 위험 타일에서 정지합니다.');stopAuto()}else if(t==='>')nextLog('탐험','계단 발견','다음 층 생성은 미구현입니다.');else if(t==='o'||t==='*')nextLog('탐험','광맥 발견','채광은 미구현입니다.');else nextLog('탐험','한 칸 이동','던전 이동은 실제 동작하지만 경로 생성은 고정입니다.');render()}
+function dungeonMove(dx,dy){
+ if(s.page!=='던전'||!s.dungeon)return;
+ const direction=dx===1&&dy===0?'east':dx===-1&&dy===0?'west':dx===0&&dy===1?'south':dx===0&&dy===-1?'north':null;
+ if(!direction)return;
+ const before=[...s.pos];
+ if(!executeV2('dungeon.move',{direction}))return render();
+ if(before[0]===s.pos[0]&&before[1]===s.pos[1])nextLog('탐험','벽에 막혔습니다.','이동 시도에 1턴과 6초가 소모되었습니다.');
+ else nextLog('탐험','한 칸 이동','03-C 월드 레지스트리 기반의 이동입니다.');
+ render();
+}
 function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}}
-function autoStep(){if(!s.dungeon||s.page!=='던전'){stopAuto();return}for(const [key,value]of [['hp',s.hp],['mp',s.mp],['hunger',s.hunger]])if(s.auto[key].on&&value<=s.auto[key].pct){stopAuto();nextLog('위험','자동 탐색 중단','설정된 '+key+' 임계값에 도달했습니다.');return render()}const [x,y]=s.pos,options=[[1,0],[0,1],[-1,0],[0,-1]].filter(([dx,dy])=>TILES[y+dy]?.[x+dx]&&TILES[y+dy][x+dx]!=='#');if(!options.length){stopAuto();return}const [dx,dy]=options[s.turn%options.length];dungeonMove(dx,dy)}
+function autoStep(){if(!s.dungeon||s.page!=='던전'){stopAuto();return}for(const [key,value]of [['hp',s.hp],['mp',s.mp],['hunger',s.hunger]])if(s.auto[key].on&&value<=s.auto[key].pct){stopAuto();nextLog('위험','자동 탐색 중단','설정된 '+key+' 임계값에 도달했습니다.');return render()}const [x,y]=s.pos,rows=mainV2.localMap().tiles.map(row=>row.split(' ')),options=[[1,0],[0,1],[-1,0],[0,-1]].filter(([dx,dy])=>rows[y+dy]?.[x+dx]==='core:terrain/ground');if(!options.length){stopAuto();return}const [dx,dy]=options[s.turn%options.length];dungeonMove(dx,dy)}
 function dungeon(){
 const el=head('지하미궁','');
 el.classList.add('dungeon-screen');
 const layout=make('div',{class:'dungeonlayout dungeon-v7'},el);
 const left=make('div',{class:'dungeon-map-pane'},layout);
 const right=make('aside',{class:'dungeon-controls'},layout);
-const map=make('div',{class:'tilemap',role:'img','aria-label':'고정 예시 던전 지도'},left);
-for(let y=0;y<TILES.length;y++)for(let x=0;x<TILES[y].length;x++){
- const v=TILES[y][x],player=s.pos[0]===x&&s.pos[1]===y;
+const map=make('div',{class:'tilemap',role:'img','aria-label':'03-C 지역 레지스트리 시험 지도'},left);
+const localTiles=mainV2.localMap().tiles.map(row=>row.split(' ').map(id=>id==='core:terrain/wall'?'#':'.'));
+for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
+ const v=localTiles[y][x],player=s.pos[0]===x&&s.pos[1]===y;
  const tile=make('span',{class:'tile '+(player?'player':v==='#'?'wall':v==='o'||v==='*'?'ore':v==='>'?'stairs':v==='!'?'warning':''),
  html:player?svgIcon('user-round'):v==='o'||v==='*'?svgIcon('gem'):v==='>'?svgIcon('arrow-down'):v==='!'?svgIcon('skull'):''},map);
  tile.title=player?'플레이어':v==='#'?'벽':v==='!'?'위험':v==='>'?'계단':v==='o'?'광맥':'바닥';
