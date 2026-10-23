@@ -23,17 +23,14 @@ test('03-B main UI preview uses seconds, clock advances without overwriting lega
  assert.ok(a.current().clock.elapsedUnits>0);
  assert.equal(a.gameTime().day,1);
 });
-test('03-B legacy v2 backup keeps abstract units and refuses seconds travel',()=>{
+test('legacy v2 is never silently applied to the v3 seconds runtime',()=>{
  const a=createMainV2Inventory(items,{preferences});
  const legacy=structuredClone(a.current());
  delete legacy.world.runtime.timeBasis;
  legacy.clock.elapsedUnits=58;
  const slot={slotId:'legacy',worldId:'main-world',kind:'manual',label:'Legacy time',savedAt:'2026-01-01T00:00:00Z',revision:1};
  const originalSave=createSaveV2(legacy,slot,'main-prototype',a.registry);
- a.applyApprovedSave(originalSave);
- assert.equal(a.current().clock.elapsedUnits,58);
- assert.equal(a.gameTime(),null);
- assert.equal(a.routePreview('숲').reason,'LEGACY_TIME_MIGRATION_REQUIRED');
- assert.equal(a.travelSkip().accepted,false);
- assert.equal(a.current().clock.elapsedUnits,58);
+ const before=a.current();
+ assert.throws(()=>a.applyApprovedSave(originalSave),/v2/);
+ assert.deepEqual(a.current(),before);
 });
