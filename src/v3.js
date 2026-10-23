@@ -436,22 +436,22 @@ make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
    const row=make('div',{class:'save-manager-slot'},list);
    const kind=entry.save?.slot.kind??'unknown';
    const info=make('div',{},row);
-   make('strong',{text:(entry.save?.slot.label??entry.slotId)+' · '+(entry.status==='damaged'?'손상됨':kind)},info);
+   make('strong',{text:(entry.save?.slot.label??entry.slotId)+' · '+entry.source+' · '+(entry.status==='damaged'?'손상됨':kind)},info);
    make('div',{class:'muted',text:'Revision '+entry.revision+' · '+(entry.save?.slot.savedAt??'최신 저장을 읽을 수 없음')},info);
    const buttons=make('div',{class:'save-manager-slot-actions'},row);
    if(entry.status==='valid'){
-    btn('불러오기',()=>{close();requestLoadApproval(entry.save,entry.slotId)},'btn ui-primary',buttons);
+    btn(entry.source==='v2'?'v3로 이전':'불러오기',()=>{close();if(entry.source==='v2')requestLegacyMigration(entry.save,entry.slotId);else requestLoadApproval(entry.save,entry.slotId)},'btn ui-primary',buttons);
     btn('백업',()=>{const blob=new Blob([JSON.stringify(entry.save,null,2)],{type:'application/json'});
      const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
      a.download='somnium-'+entry.slotId+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
     },'btn ui-secondary',buttons);
    }
    btn('이전 기록',async()=>{
-    const revisions=await mainV2.recoveryCandidates(entry.slotId);
+    const revisions=await mainV2.recoveryCandidates(entry.slotId,entry.source);
     const area=make('div',{class:'save-manager-revisions'},row);
     if(!revisions.length)make('span',{text:'정상 복구 후보가 없습니다.'},area);
     for(const r of revisions){
-     btn('Revision '+r.save.slot.revision+' · '+r.save.slot.savedAt,()=>{close();requestLoadApproval(r.save,'복구 후보')},'btn',area);
+     btn('Revision '+r.save.slot.revision+' · '+r.save.slot.savedAt,()=>{close();if(entry.source==='v2')requestLegacyMigration(r.save,'v2 복구 후보');else requestLoadApproval(r.save,'복구 후보')},'btn',area);
     }
    },'btn ui-secondary',buttons);
   }
