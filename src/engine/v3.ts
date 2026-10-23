@@ -16,3 +16,5 @@ export type {V3Duration,V3DurationPolicy,V3DispatchResult} from './core/v3-dispa
 
 export {resolveLocalStep,recordLocalVisit,localArrival} from './world/local-movement.js';
 export type {CardinalDirection,LocalStepResult,LocalVisitResult} from './world/local-movement.js';
+
+export {localVisibility,localPortal,safeLocalRoute,rememberLocalVision} from './world/local-exploration.js';
