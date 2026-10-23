@@ -49,3 +49,6 @@ python3 -m http.server 8000
 - https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API/Using_IndexedDB
 - https://developer.mozilla.org/en-US/docs/Web/API/IDBDatabase/transaction
 - https://developer.mozilla.org/en-US/docs/Web/API/Window/structuredClone
+
+## v3 디스패처 추가
+`src/engine/v3.ts`의 `V3ActionDispatcher`는 v3 스키마를 직접 입력받아 초/턴을 한 번만 부과한다. 기존 아이템 처리기와 검증된 v2 dispatch 규칙을 내부 재사용한다. 메인 UI는 이행 안정성을 위해 v2 행동 어댑터 + v3 영속 변환을 계속 사용한다. 따라서 v3 저장 완성과 UI 내부 타입의 전면 전환은 구분한다.
