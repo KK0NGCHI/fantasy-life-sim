@@ -13,3 +13,6 @@ export {SECONDS_PER_ACTION,actionSeconds} from './world/action-seconds.js';
 
 export {V3ActionDispatcher} from './core/v3-dispatch.js';
 export type {V3Duration,V3DurationPolicy,V3DispatchResult} from './core/v3-dispatch.js';
+
+export {resolveLocalStep,recordLocalVisit,localArrival} from './world/local-movement.js';
+export type {CardinalDirection,LocalStepResult,LocalVisitResult} from './world/local-movement.js';
