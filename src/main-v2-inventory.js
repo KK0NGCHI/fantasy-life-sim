@@ -214,6 +214,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  return {
   registry,projected,current,
   localSite(){return localSite(state);},
+  rememberedCells(){const snapshot=state.world.runtime.world03E;const map=[...localRegistry.maps.values()].find(m=>m.siteId===localSite(state)&&m.floor===(state.world.runtime.localFloor??0));return snapshot?.world?.seenCells?.[map?.id]??[];},
   localMap(){return structuredClone([...localRegistry.maps.values()].find(m=>m.siteId===localSite(state)&&m.floor===(state.world.runtime.localFloor??0)));},
   localView(remembered=[]){const [x,y]=state.world.runtime.pos;return localVisibility(localRegistry,localPosition(state),remembered);},
   localFloor(){return state.world.runtime.localFloor??0;},
