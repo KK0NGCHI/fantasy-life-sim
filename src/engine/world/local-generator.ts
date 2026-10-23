@@ -43,7 +43,7 @@ function connected(grid:string[][],start:XY,goal:XY):boolean{
   if(seen.has(k)||grid[y]?.[x]!==GROUND)continue;
   if(x===goal[0]&&y===goal[1])return true;
   seen.add(k);
-  for(const [dx,dy] of [[0,1],[1,0],[0,-1],[-1,0]])if(inBounds(x+dx,y+dy,w,h))queue.push([x+dx,y+dy]);
+  for(const [dx,dy] of ([[0,1],[1,0],[0,-1],[-1,0]] as const))if(inBounds(x+dx,y+dy,w,h))queue.push([x+dx,y+dy]);
  }
  return false;
 }
