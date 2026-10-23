@@ -35,10 +35,10 @@ let overlayPage=null,overlayReturn=null,overlayReturnTab=null,conditionExpanded=
 function svgIcon(name){return '<i data-lucide="'+esc(name)+'" aria-hidden="true"></i>'}
 function iconify(){if(window.lucide?.createIcons){window.lucide.createIcons()}else if(!document.querySelector('#lucide-load-warning')){const note=document.createElement('span');note.id='lucide-load-warning';note.className='sr';note.textContent='아이콘 라이브러리를 불러오지 못했습니다.';document.body.append(note)}}
 
-function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:0,pos:[2,2],dungeon:false,hp:100,mp:80,hunger:85,day:1,hour:8,items:safeCopy(baseItems),logs:[],filter:'전체',search:'',sort:'name',selectedItem:null,selectedIds:[],logFilter:'전체',logSearch:'',pinnedIds:[],expandedLogs:[],collapsed:true,viewFont:100,theme:'aurora',auto:{hp:{on:true,pct:35},mp:{on:false,pct:20},hunger:{on:true,pct:25}}}}
+function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:0,pos:[2,2],dungeon:false,hp:100,mp:80,hunger:85,day:1,hour:8,minute:0,second:0,items:safeCopy(baseItems),logs:[],filter:'전체',search:'',sort:'name',selectedItem:null,selectedIds:[],logFilter:'전체',logSearch:'',pinnedIds:[],expandedLogs:[],collapsed:true,viewFont:100,theme:'aurora',auto:{hp:{on:true,pct:35},mp:{on:false,pct:20},hunger:{on:true,pct:25}}}}
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 const mainV2=createMainV2Inventory(s.items);
-function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;}}
+function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
 
@@ -54,7 +54,8 @@ const gameClock=mainV2.gameTime();
 const day=gameClock?.day??s.day;
 const hour=gameClock?.hour??s.hour;
 const minute=gameClock?.minute??(s.minute??0);
-$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+day+'일</span><span>'+svgIcon('clock')+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+'</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
+const second=gameClock?.second??(s.second??0);
+$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+day+'일</span><span>'+svgIcon('clock')+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+':'+String(second).padStart(2,'0')+'</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
 const group=$('#top .top-meta');
 const save=make('button',{type:'button',class:'top-settings ui-icon-button',title:'저장 관리자','aria-label':'저장 관리자'},group);
 save.innerHTML=svgIcon('save');save.onclick=()=>openSaveManager();
