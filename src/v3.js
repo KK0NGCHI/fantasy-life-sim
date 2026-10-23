@@ -46,20 +46,31 @@ const THEMES=[{"id":"aurora","name":"오로라","mode":"light","colors":["#9667d
 function useTheme(id,persist=true){if(!THEMES.some(t=>t.id===id))id='aurora';s.theme=id;document.documentElement.dataset.theme=id;document.documentElement.style.colorScheme='light';if(persist){try{localStorage.setItem('fantasy-ui-theme',id)}catch{}}}
 try{const stored=localStorage.getItem('fantasy-ui-theme');if(THEMES.some(t=>t.id===stored))s.theme=stored}catch{}
 
-function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===kind&&last.text===text){last.count=(last.count||1)+1;last.lastTurn=s.turn;}else{const id='log-'+Date.now()+'-'+Math.random().toString(36).slice(2);s.logs.unshift({id,kind,text,detail,turn:s.turn,count:1,pin:false});if(s.logs.length>LOG_LIMIT)s.logs.length=LOG_LIMIT;}mainV2.captureCheckpoint(s)}
+function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===kind&&last.text===text){last.count=(last.count||1)+1;last.lastTurn=s.turn;}else{const id='log-'+Date.now()+'-'+Math.random().toString(36).slice(2);s.logs.unshift({id,kind,text,detail,turn:s.turn,count:1,pin:false});if(s.logs.length>LOG_LIMIT)s.logs.length=LOG_LIMIT;}mainV2.captureCheckpoint(s);refreshHeaderClock()}
 const make=(tag,props={},parent)=>{const e=document.createElement(tag);for(const [k,v]of Object.entries(props)){if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k==='class')e.className=v;else e.setAttribute(k,v)}if(parent)parent.append(e);return e};
 function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',text,class:classes},parent);b.addEventListener('click',fn);return b}
+// Header clock is a projection of the committed engine snapshot, never UI day/hour.
+function refreshHeaderClock(){
+ const clock=mainV2.gameTime();
+ const node=document.querySelector('#gameClockValue');
+ if(!clock||!node)return;
+ node.textContent=String(clock.hour).padStart(2,'0')+':'+String(clock.minute).padStart(2,'0');
+ node.title='게임 시간: '+clock.day+'일차 '+String(clock.hour).padStart(2,'0')+':'+String(clock.minute).padStart(2,'0')+':'+String(clock.second).padStart(2,'0')+' · 누적 '+mainV2.current().clock.elapsedUnits+'초';
+ const date=document.querySelector('#gameClockDay');
+ if(date)date.textContent=String(clock.day)+'일';
+}
 function top(){
 const gameClock=mainV2.gameTime();
 const day=gameClock?.day??s.day;
 const hour=gameClock?.hour??s.hour;
 const minute=gameClock?.minute??(s.minute??0);
-$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+day+'일</span><span>'+svgIcon('clock')+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+'</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
+$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 <span id="gameClockDay">'+day+'일</span></span><span>'+svgIcon('clock')+' <span id="gameClockValue">'+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+'</span></span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
 const group=$('#top .top-meta');
 const save=make('button',{type:'button',class:'top-settings ui-icon-button',title:'저장 관리자','aria-label':'저장 관리자'},group);
 save.innerHTML=svgIcon('save');save.onclick=()=>openSaveManager();
 const settings=make('button',{type:'button',class:'top-settings ui-icon-button',id:'settingsControl',title:'설정','aria-label':'설정'},group);
 settings.innerHTML=svgIcon('settings');settings.onclick=()=>openPage('설정');
+refreshHeaderClock();
 }
 
 function side(){ /* v0.3: persistent left navigation removed in favor of bottom controls */ }
@@ -519,7 +530,7 @@ const finish=e=>{if(handle.hasPointerCapture(e.pointerId)){handle.releasePointer
 handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
 handle.addEventListener('keydown',e=>{const delta=e.key==='ArrowUp'?20:e.key==='ArrowDown'?-20:e.key==='Home'?10000:e.key==='End'?-10000:null;if(delta===null)return;e.preventDefault();update(logHeight+delta,true)});
 }
-function render(){useTheme(s.theme||'aurora',false);document.documentElement.style.fontSize=s.viewFont*.15+'px';top();drawMain();playerPanel();logs();bottomMenu();initPanelSplitter();drawOverlay();iconify()}
+function render(){refreshV2Inventory();useTheme(s.theme||'aurora',false);document.documentElement.style.fontSize=s.viewFont*.15+'px';top();drawMain();playerPanel();logs();bottomMenu();initPanelSplitter();drawOverlay();iconify()}
 
 document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const active=document.activeElement;if(['INPUT','TEXTAREA','SELECT'].includes(active?.tagName))return;const k=e.key;if(k==='F5'){e.preventDefault();quickSave()}else if(k==='F9'){e.preventDefault();quickLoad()}else if(k==='Escape'&&overlayPage){closeOverlay()}else if(k.toLowerCase()==='i'){e.preventDefault();openPage('인벤토리')}else if(k.toLowerCase()==='c'){e.preventDefault();openPage('캐릭터')}else if(k.toLowerCase()==='m'){e.preventDefault();openPage('세계 지도')}else if(s.dungeon&&s.page==='던전'&&!overlayPage){const directions={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],a:[-1,0],s:[0,1],d:[1,0]};if(directions[k]){e.preventDefault();dungeonMove(...directions[k])}}});
 document.body.innerHTML='<div class="shell v3-shell"><header class="top" id="top"></header><main class="center" id="main"></main><aside class="rightpanel"><section class="playerpanel" id="player" aria-label="플레이어 정보"></section><div id="panelSplitter" class="panel-splitter" role="separator" tabindex="0" aria-label="플레이어와 로그 패널 높이 조절" aria-orientation="horizontal" aria-valuemin="165" aria-valuenow="274" aria-valuemax="800" title="드래그하여 크기 조절 · 위아래 방향키"></div><section class="log" id="log" aria-label="사건 기록"></section></aside><footer class="bottom" id="bottom"></footer></div>';nextLog('시스템','게임 화면을 열었습니다.');render();
