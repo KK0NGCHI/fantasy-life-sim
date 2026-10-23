@@ -36,7 +36,7 @@ try{
    if(await progress.isVisible()){await progress.click();continue;}
    await page.getByRole('button',{name:'생활',exact:true}).first().click();
    if(await page.getByRole('button',{name:'던전 진입'}).isVisible()){arrived=true;break;}
-   if(attempt===0||attempt===59)console.log('TRAVEL_LIFESTYLE_DIAGNOSTIC',JSON.stringify((await page.locator('#main').innerText()).slice(0,1300)));
+   if(attempt===0||attempt===59)console.log('TRAVEL_LIFESTYLE_DIAGNOSTIC',JSON.stringify({screen:(await page.locator('#main').innerText()).slice(0,1300), buttons:await page.locator('#main button').allTextContents(), current:await page.locator('#bottomNav .current').allTextContents()}));
    await page.getByRole('button',{name:'세계 지도',exact:true}).first().click();
  }
  if(!arrived)throw Error('WORLD_DUNGEON_ARRIVAL_UI: '+JSON.stringify({
