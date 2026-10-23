@@ -62,6 +62,12 @@ export function recordWorldSight(snapshot:WorldSnapshot03E,mapId:string,visible:
  const issues=validateWorldSnapshot03E(next,base);if(issues.length)throw Error(issues.join(','));
  return next;
 }
+export function recordWorldLocation(snapshot:WorldSnapshot03E,location:PlayerLocation,base:WorldRegistry):WorldSnapshot03E{
+ const next={...snapshot,world:{...snapshot.world,location:{...location},
+  discovery:{...snapshot.world.discovery,[location.siteId]:'visited' as const}}};
+ const issues=validateWorldSnapshot03E(next,base);if(issues.length)throw Error(issues.join(','));
+ return next;
+}
 export function withWorldDelta(snapshot:WorldSnapshot03E,siteId:string,key:string,value:boolean|string|number,base:WorldRegistry):WorldSnapshot03E{
  const next={...snapshot,deltas:{...snapshot.deltas,[siteId]:{...(snapshot.deltas[siteId]??{}),[key]:value}}};
  const issues=validateWorldSnapshot03E(next,base);if(issues.length)throw Error(issues.join(','));
