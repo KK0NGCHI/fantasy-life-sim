@@ -166,3 +166,8 @@ body .save-manager-dialog .save-manager-empty{
 .travel-preview .btn{background:var(--somnium-action);color:#fff;border-color:var(--somnium-action)}
 .travel-preview .btn:hover{background:var(--somnium-action-hover);color:#fff}
 .world-screen .region:disabled{opacity:.7;cursor:not-allowed}
+
+/* 03-C local visibility states; unknown terrain must not be readable. */
+.dungeon-map-pane .tile.unseen{background:var(--surface-muted,#222)!important;border-color:transparent!important;color:transparent!important;opacity:.22}
+.dungeon-map-pane .tile.remembered{opacity:.5;filter:grayscale(.9)}
+.dungeon-map-pane .tile.stairs{outline:2px solid var(--accent,#8476c4);outline-offset:-2px}
