@@ -1,3 +1,6 @@
+import {buildWorldRegistry} from '../world/world-model.js';
+import {SOMNIUM_WORLD_03A} from '../world/somnium-world.js';
+import {validateWorldSnapshot03E} from '../world/world-persistence-03e.js';
 import type {GameStateV2,SaveEnvelopeV2} from './save-v2.js';
 import type {ItemRegistry} from '../data/item-registry.js';
 import type {SaveSlot} from './save-format.js';
@@ -24,6 +27,13 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
  if(!obj(clock)||!keys(clock,['elapsedSeconds','calendarId','startSecondOfDay'])||
   !seconds(clock.elapsedSeconds)||clock.calendarId!=='somnium-calendar-v1'||clock.startSecondOfDay!==28800)return {ok:false,reason:'INVALID_DATA'};
  if(!obj(raw.state.world)||!obj(raw.state.world.runtime)||raw.state.world.runtime.timeBasis!=='seconds-v1')return {ok:false,reason:'INVALID_DATA'};
+ // Existing v3 saves without world03E remain valid and are never silently converted.
+ // When present, the complete generated map snapshot is validated before any restore.
+ if(Object.hasOwn(raw.state.world.runtime,'world03E')){
+  const built=buildWorldRegistry(SOMNIUM_WORLD_03A);
+  if(!built.ok||validateWorldSnapshot03E(raw.state.world.runtime.world03E,built.registry).length)
+   return {ok:false,reason:'INVALID_DATA'};
+ }
  const source=structuredClone(raw.state) as unknown as Record<string,unknown>;
  source.schemaVersion=2;source.clock={elapsedUnits:clock.elapsedSeconds};
  // Reuse every existing item, RNG, world-root, progress and envelope validation.
