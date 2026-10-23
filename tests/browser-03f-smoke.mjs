@@ -47,6 +47,20 @@ try{
  await page.getByRole('button',{name:'던전 진입'}).click();
  await page.locator('.dungeon-screen .tile.player').waitFor();
  assert.equal(await page.locator('.dungeon-screen .tile').count(),576);
+ await page.getByRole('button',{name:'자동 탐색 시작'}).click();
+ await page.getByRole('button',{name:'자동 탐색 중지'}).click();
+ await page.keyboard.press('ArrowRight');
+ const dungeonClock=await page.locator('#top .top-meta').innerText();
+ await page.keyboard.press('F5');
+ await page.getByText(/IndexedDB에 저장했습니다/).first().waitFor({timeout:15000});
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.keyboard.press('F9');
+ const restoredDungeon=page.getByRole('dialog',{name:'저장 상태 불러오기 확인'});
+ await restoredDungeon.waitFor();
+ await restoredDungeon.getByRole('button',{name:'불러오기'}).click();
+ await page.locator('.dungeon-screen .tile.player').waitFor();
+ assert.equal(await page.locator('.dungeon-screen .tile').count(),576);
+ assert.equal(await page.locator('#top .top-meta').innerText(),dungeonClock);
  await page.getByRole('button',{name:'던전 나가기'}).click();
  // Validate the dungeon runtime in a real browser process, independently from
  // the unresolved world-map-to-dungeon navigation UI path.
@@ -59,6 +73,18 @@ try{
   const g=createMainV2Inventory(items,options);
   const entered=g.dispatch('dungeon.enter',{}),moved=g.dispatch('dungeon.move',{direction:'east'});
   const before=g.current(),tiles=g.localMap().tiles;
+  const route=[];const map=g.localMap();const goal=map.entrances.find(x=>x.destinationFloor===-1);
+  const start=g.current().world.runtime.pos;const queue=[[start[0],start[1],[]]],visited=new Set();
+  while(queue.length){const [x,y,path]=queue.shift(),k=x+','+y;if(visited.has(k))continue;visited.add(k);
+   if(x===goal.x&&y===goal.y){route.push(...path);break;}
+   for(const [direction,dx,dy] of [['east',1,0],['west',-1,0],['north',0,-1],['south',0,1]]){
+    const nx=x+dx,ny=y+dy;if(map.tiles[ny]?.split(' ')[nx]==='core:terrain/ground'&&!visited.has(nx+','+ny))queue.push([nx,ny,[...path,direction]]);
+   }
+  }
+  const stairWorld=createMainV2Inventory(items,options);stairWorld.dispatch('dungeon.enter');
+  for(const d of route){const step=stairWorld.dispatch('dungeon.move',{direction:d});if(!step.accepted)return {ok:false,reason:'stair path rejected'};}
+  const down=stairWorld.dispatch('dungeon.portal',{}),floorDown=stairWorld.localFloor();
+  const up=stairWorld.dispatch('dungeon.portal',{}),floorUp=stairWorld.localFloor();
   const slot={slotId:'03f-browser',worldId:'main-world',kind:'manual',label:'Browser',savedAt:'2026-10-24T00:00:00Z',revision:0};
   const proposal=prepareSecondsV2ToV3(createSaveV2(before,slot,'main-prototype',g.registry),g.registry);
   if(!proposal.ok)return {ok:false,reason:proposal.reason};
@@ -68,7 +94,8 @@ try{
   return {ok:entered.accepted&&moved.accepted,sameWorld:JSON.stringify(before.world)===JSON.stringify(restored.current().world),
    sameClock:JSON.stringify(before.clock)===JSON.stringify(restored.current().clock),
    sameRng:JSON.stringify(before.rng)===JSON.stringify(restored.current().rng),
-   sameMap:JSON.stringify(tiles)===JSON.stringify(restored.localMap().tiles),cells:restored.rememberedCells().length};
+   sameMap:JSON.stringify(tiles)===JSON.stringify(restored.localMap().tiles),cells:restored.rememberedCells().length,
+   stairs:route.length>0&&down.accepted&&up.accepted&&floorDown===-1&&floorUp===0};
  });
  assert.equal(dungeonRuntime.ok,true);
  assert.equal(dungeonRuntime.sameWorld,true);
@@ -76,6 +103,7 @@ try{
  assert.equal(dungeonRuntime.sameRng,true);
  assert.equal(dungeonRuntime.sameMap,true);
  assert.ok(dungeonRuntime.cells>0);
+ assert.equal(dungeonRuntime.stairs,true);
  assert.deepEqual(errors,[]);
  console.log('03-F Chromium browser smoke: render, F5 commit, reload, F9 approval, 16 regions PASS');
 }finally{await browser.close();}
