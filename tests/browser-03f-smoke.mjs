@@ -83,6 +83,7 @@ try{
   }
   const stairWorld=createMainV2Inventory(items,options);stairWorld.dispatch('dungeon.enter');
   for(const d of route){const step=stairWorld.dispatch('dungeon.move',{direction:d});if(!step.accepted)return {ok:false,reason:'stair path rejected'};}
+  const beforePortal=stairWorld.localPortal(),positionBefore=stairWorld.current().world.runtime.pos;
   const down=stairWorld.dispatch('dungeon.portal',{}),floorDown=stairWorld.localFloor();
   const up=stairWorld.dispatch('dungeon.portal',{}),floorUp=stairWorld.localFloor();
   const slot={slotId:'03f-browser',worldId:'main-world',kind:'manual',label:'Browser',savedAt:'2026-10-24T00:00:00Z',revision:0};
@@ -96,7 +97,7 @@ try{
    sameRng:JSON.stringify(before.rng)===JSON.stringify(restored.current().rng),
    sameMap:JSON.stringify(tiles)===JSON.stringify(restored.localMap().tiles),cells:restored.rememberedCells().length,
    stairs:route.length>0&&down.accepted&&up.accepted&&floorDown===-1&&floorUp===0,
-   stairDebug:{routeLength:route.length,goal,downAccepted:down.accepted,downReason:down.reason,
+   stairDebug:{routeLength:route.length,goal,beforePortal,positionBefore,downAccepted:down.accepted,downReason:down.reason,
     upAccepted:up.accepted,upReason:up.reason,floorDown,floorUp}};
  });
  assert.equal(dungeonRuntime.ok,true);
