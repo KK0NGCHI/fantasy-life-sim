@@ -403,12 +403,12 @@ make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
    if(file.size>8000000){window.alert('백업 파일 크기 초과');return}
    try{
     const raw=JSON.parse(await file.text());
-    const {prepareV2Load,createSaveV2}=await import('../dist/engine/v2.js');
-    const checked=prepareV2Load(raw,mainV2.registry);
+    const {decodeSaveV3,decodeSaveV2}=await import('../dist/engine/v2.js');
+    const checked=raw.saveVersion===3?decodeSaveV3(raw,mainV2.registry):decodeSaveV2(raw,mainV2.registry);
     if(!checked.ok)throw Error(checked.reason);
     close();
-    const normalized=createSaveV2(checked.state,{slotId:'import-'+crypto.randomUUID(),worldId:'main-world',kind:'manual',label:'JSON 가져오기',savedAt:new Date().toISOString(),revision:0},'main-prototype',mainV2.registry);
-    requestLoadApproval(normalized,'JSON 백업');
+    if(raw.saveVersion===2)requestLegacyMigration(checked.save,'JSON 백업');
+    else requestLoadApproval(checked.save,'JSON 백업');
    }catch(e){window.alert('가져오기 실패: '+e.message)}
   };input.click();
  },'btn ui-secondary',actions);
