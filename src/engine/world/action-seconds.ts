@@ -3,6 +3,7 @@
  */
 export const SECONDS_PER_ACTION=Object.freeze({
  'life.activity':60,
+ 'world.travel':900,
  'dungeon.move':6,
  'dungeon.enter':10,
  'dungeon.leave':10,
