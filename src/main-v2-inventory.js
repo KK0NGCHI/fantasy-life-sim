@@ -1,3 +1,4 @@
+import {actionSeconds} from '../dist/engine/world/action-seconds.js';
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
 import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom,gameClockAt,formatTravelSeconds,IndexedDbSavesV3,createSaveV3,decodeSaveV3,prepareV2ToV3Migration,prepareSecondsV2ToV3} from '../dist/engine/v2.js';
 
@@ -121,7 +122,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    return {turns:1,worldUnits:1};
+    return {turns:1,worldUnits:actionSeconds(action.type)};
  });
  const projected=()=>state.itemWorld.items
   .filter(item=>state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
