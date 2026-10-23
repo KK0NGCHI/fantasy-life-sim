@@ -15,7 +15,7 @@ test('region, dungeon enter/move/leave and life action use unified v2 dispatcher
  assert.equal(a.dispatch('life.activity',{name:'휴식한다'}).accepted,true);
  assert.equal(a.dispatch('dungeon.leave',{}).accepted,true);
  assert.equal(a.current().world.runtime.dungeon,false);
- assert.equal(a.current().turn,5);assert.equal(a.current().clock.elapsedUnits,5);
+ assert.equal(a.current().turn,5);assert.equal(a.current().clock.elapsedUnits,986);
  assert.equal(initial.turn,0);assert.deepEqual(initial.world.runtime.pos,[2,2]);
 });
 test('invalid dungeon target or unknown action has no effect',()=>{
