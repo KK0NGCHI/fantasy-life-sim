@@ -34,7 +34,7 @@ try{
   if(await page.locator('.region-scene.scene-dungeon').count())break;
   await page.getByRole('button',{name:'세계 지도'}).first().click();
  }
- await page.getByRole('button',{name:/던전에 진입한다/}).click();
+ await page.getByRole('button',{name:'던전 진입'}).click();
  await page.locator('.dungeon-screen .tile.player').waitFor();
  const mapBefore=await page.locator('.dungeon-screen .tile').count();
  assert.equal(mapBefore,24*24);
