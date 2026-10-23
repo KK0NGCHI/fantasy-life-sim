@@ -302,14 +302,17 @@ const left=make('div',{class:'dungeon-map-pane'},layout);
 const right=make('aside',{class:'dungeon-controls'},layout);
 const map=make('div',{class:'tilemap',role:'img','aria-label':'03-C 지역 레지스트리 시험 지도'},left);
 const portal=mainV2.localPortal();
+const floorMap=mainV2.localMap();
+map.style.gridTemplateColumns='repeat('+floorMap.width+',min(2.6vw,36px))';
 const localTiles=mainV2.localMap().tiles.map(row=>row.split(' ').map(id=>id==='core:terrain/wall'?'#':'.'));
 const view=mainV2.localView(localRemembered);localRemembered=view.remembered;const visible=new Set(view.visible),remembered=new Set(view.remembered);
 const mapWidth=localTiles[0].length;
+const stairCells=new Set(floorMap.entrances.filter(e=>e.destinationFloor!==mainV2.localFloor()).map(e=>e.y*mapWidth+e.x));
 for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
  const idx=y*mapWidth+x,v=localTiles[y][x],player=s.pos[0]===x&&s.pos[1]===y,known=remembered.has(idx),inSight=visible.has(idx);
- const tile=make('span',{class:'tile '+(!known?'unseen ':!inSight?'remembered ':'')+(player?'player':v==='#'?'wall':v==='o'||v==='*'?'ore':v==='>'?'stairs':v==='!'?'warning':''),
- html:player?svgIcon('user-round'):portal&&portal.x!==undefined&&mainV2.localMap().entrances.some(e=>e.x===x&&e.y===y&&e.destinationFloor!==mainV2.localFloor())?svgIcon('arrow-down'):''},map);
- tile.title=!known?'미탐색':player?'플레이어':v==='#'?'벽':v==='!'?'위험':v==='>'?'계단':v==='o'?'광맥':'바닥';
+ const tile=make('span',{class:'tile '+(!known?'unseen ':!inSight?'remembered ':'')+(player?'player':!known?'':stairCells.has(idx)?'stairs':v==='#'?'wall':''),
+ html:player?svgIcon('user-round'):known&&stairCells.has(idx)?svgIcon('arrow-down'):''},map);
+ tile.title=!known?'미탐색':player?'플레이어':stairCells.has(idx)?'계단':v==='#'?'벽':'바닥';
 }
 make('h2',{text:'탐색 제어'},right);
 const actions=make('div',{class:'dungeon-main-actions'},right);
