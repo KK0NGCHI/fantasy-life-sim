@@ -19,3 +19,19 @@ jobs:
         run: |
           git diff --exit-code -- index.html src/v3.js src/v8.css
           test -f dist/engine/index.js
+
+  windows-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Windows compiler and engine integration regressions
+        run: npm run check
+      - name: Verify generated engine artifact
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'dist/engine/index.js')) { throw 'Engine artifact missing' }
