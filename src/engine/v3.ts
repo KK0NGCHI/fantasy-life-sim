@@ -18,3 +18,6 @@ export {resolveLocalStep,recordLocalVisit,localArrival} from './world/local-move
 export type {CardinalDirection,LocalStepResult,LocalVisitResult} from './world/local-movement.js';
 
 export {localVisibility,localPortal,safeLocalRoute,rememberLocalVision} from './world/local-exploration.js';
+
+export {generateLocalMap,validateGenerationProfile} from './world/local-generator.js';
+export type {GenerationProfile,GeneratedLocalMap} from './world/local-generator.js';
