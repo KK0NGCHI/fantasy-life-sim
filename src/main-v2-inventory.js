@@ -1,4 +1,5 @@
 import {actionSeconds} from '../dist/engine/world/action-seconds.js';
+import {resolveLocalStep,localArrival} from '../dist/engine/world/local-movement.js';
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
 import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom,gameClockAt,formatTravelSeconds,IndexedDbSavesV3,createSaveV3,decodeSaveV3,prepareV2ToV3Migration,prepareSecondsV2ToV3} from '../dist/engine/v2.js';
 
@@ -109,12 +110,18 @@ export function createMainV2Inventory(uiItems,options={}) {
     events:[{type:result.encounter?'world.travel_encounter':result.arrival?'world.travelled':'world.travel_progress',
        payload:{encounter:result.encounter,arrived:result.arrival}}]};
  }],
- ['dungeon.enter',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,pos:[2,2]}}},events:[{type:'dungeon.entered',payload:{}}]})],
+ ['dungeon.enter',(snapshot)=>{const entry=localArrival(worldRegistry,'core:site/labyrinth');return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,pos:[entry.x,entry.y]}}},events:[{type:'dungeon.entered',payload:{}}]};}],
  ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false}}},events:[{type:'dungeon.left',payload:{}}]})],
  ['dungeon.move',(snapshot,command)=>{
-   const to=command.payload.to;
-   if(!Array.isArray(to)||to.length!==2||!to.every(Number.isSafeInteger))throw Error('Invalid tile');
-   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,pos:[...to]}}},events:[{type:'dungeon.moved',payload:{to}}]};
+   const direction=command.payload.direction;
+   if(!snapshot.world.runtime.dungeon||typeof direction!=='string'||!['north','south','east','west'].includes(direction))throw Error('Invalid local action');
+   const [x,y]=snapshot.world.runtime.pos;
+   const step=resolveLocalStep(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},direction);
+   if(step.status==='invalid')throw Error('Invalid local position');
+   if(step.status==='hazard')throw Error('Known hazard requires explicit handling');
+   if(step.status==='blocked')return {outcome:'failed',nextState:snapshot,events:[{type:'dungeon.blocked',payload:{direction}}]};
+   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,pos:[step.location.x,step.location.y]}}},events:[{type:'dungeon.moved',payload:{to:[step.location.x,step.location.y]}}]};
+
  }]
  ]);
  const dispatcher=new V2ActionDispatcher(registry,handlers,(current,action)=>{
@@ -122,6 +129,12 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='dungeon.move'){
+     const [x,y]=current.world.runtime.pos;
+     const step=resolveLocalStep(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},action.payload.direction);
+     if(step.status==='invalid'||step.status==='hazard')throw Error('Invalid local duration');
+     return {turns:1,worldUnits:step.elapsedSeconds};
+    }
     return {turns:1,worldUnits:actionSeconds(action.type)};
  });
  const projected=()=>state.itemWorld.items
@@ -140,6 +153,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  };
  return {
   registry,projected,current,
+  localMap(){return structuredClone([...worldRegistry.maps.values()].find(m=>m.siteId==='core:site/labyrinth'&&m.floor===0));},
   dispatch(type,payload={}){
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
