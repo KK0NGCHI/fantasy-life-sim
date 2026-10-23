@@ -64,7 +64,7 @@ export function prepareV2ToV3Migration(raw:unknown,registry:ItemRegistry,approve
  const {schemaVersion:_s,clock:_c,...rest}=base;
  const state:GameStateV3={...rest,schemaVersion:3,
   clock:{elapsedSeconds:0,calendarId:'somnium-calendar-v1',startSecondOfDay:28800},
-  world:{...(rest.world as object),runtime:{...runtime,timeBasis:'seconds-v1',day:1,hour:8,travel03B:null}} as GameStateV3['world']};
+  world:{...(rest.world as object),runtime:{...runtime,timeBasis:'seconds-v1',day:1,hour:8,travel03B:null}} as unknown as GameStateV3['world']};
  return {ok:true,state};
 }
 /** Converts only a validated, explicitly seconds-tagged transitional v2 save.
