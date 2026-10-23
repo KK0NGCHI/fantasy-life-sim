@@ -343,6 +343,22 @@ async function quickLoad(){
  }
 }
 
+function requestLegacyMigration(saved,origin='구형 저장'){
+ const isSeconds=saved.state?.world?.runtime?.timeBasis==='seconds-v1';
+ const dialog=make('dialog',{class:'inventory-discard-dialog save-manager-confirm','aria-label':'v2 시간 이전 승인'},document.body);
+ make('h2',{text:'구형 v2 저장을 v3로 이전하시겠습니까?'},dialog);
+ make('p',{text:isSeconds
+  ?'이 저장은 이미 초 단위로 기록되어 경과 시간을 보존합니다. 새 v3 슬롯을 별도로 생성하고 원본은 유지합니다.'
+  :'이 저장의 과거 시간 단위는 정의되지 않았습니다. 세계 시계를 1일차 오전 8시로 초기화하며, 시간에 의존하는 여행·필드 기록이 있으면 이전을 거부합니다. 원본은 그대로 유지합니다.'},dialog);
+ const actions=make('div',{class:'inventory-discard-dialog-actions'},dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ btn('취소',close,'btn',actions);
+ btn('새 슬롯으로 이전 승인',async()=>{try{
+  const migrated=await mainV2.migrateLegacyCandidate(saved,true);
+  close();requestLoadApproval(migrated,origin+' → v3');
+ }catch(e){window.alert('안전한 이전 실패: '+e.message)}},'btn ui-primary',actions);
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
 function requestLoadApproval(saved,origin='저장 슬롯'){
  const dialog=make('dialog',{class:'inventory-discard-dialog save-manager-confirm','aria-label':'게임 불러오기 확인'},document.body);
  make('h2',{text:origin+'을(를) 불러올까요?'},dialog);
