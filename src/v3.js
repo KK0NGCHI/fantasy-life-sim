@@ -1,3 +1,4 @@
+import {activityAt,accessDeepField,DEEP_FIELDS,DANGEROUS_REGIONS} from './region-activities.js';
 import {createMainV2Inventory} from './main-v2-inventory.js';
 
 import {REGIONS,ACTIONS,START_ITEMS,SKILLS,TILES} from './data.js';
@@ -81,7 +82,18 @@ const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업�
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
-if(s.region==='숲'){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon('trees')+'<span>숲길 탐험</span>';b.addEventListener('click',()=>{if(!executeV2('dungeon.enter',{siteId:'core:site/forest'}))return render();s.page='던전';s.tab='탐색';localRemembered=[];autoTarget=0;nextLog('탐험','숲길의 생성형 필드에 들어섰습니다.');render()});}
+const actualSkills=mainV2.current().progression?.skillExperience??{};
+for(const activity of activityAt(s.region)){
+ const gate=DEEP_FIELDS.some(f=>f.id===activity.id)?accessDeepField(activity,actualSkills):{ok:true};
+ const button=btn(activity.name+(gate.ok?'':' · 숙련 필요'),()=>{
+  if(!executeV2('region.activity',{activityId:activity.id}))return render();
+  nextLog('탐험',activity.name+' 활동을 수행했습니다.','활동 처리만 구현되어 있습니다. 보상과 전투 인카운터는 후속 단계에서 연결됩니다.');
+  render();
+ },'v3-action',actions);
+ button.disabled=!gate.ok;
+ if(!gate.ok)button.title='탐색 + '+activity.profession+' 숙련 필요 (실제 성장 데이터 기준)';
+}
+if(DANGEROUS_REGIONS.has(s.region))make('p',{class:'muted',text:'주의: 이 지역은 이후 환경·전투 인카운터가 발생할 수 있는 위험 필드입니다. 현재 전투 시스템은 아직 연결되지 않았습니다.'},el);
 
 }
 function world(){
