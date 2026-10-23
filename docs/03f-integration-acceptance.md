@@ -60,3 +60,13 @@ If `py` isn't installed, use `python -m http.server 8000`. Open http://localhost
 - The GitHub `browser-chromium` CI job installs a temporary pinned Playwright version without changing package manifest, compiles the engine and serves the game locally. This is a Linux headless Chromium smoke only, **not** Windows Edge GUI acceptance.
 - `windows-smoke` is Node/TypeScript integration on Windows runner. Preserve human Edge/Chrome interaction checks as outstanding.
 - Avoid using `npm ci` until a reviewed lockfile is committed; current install uses `npm install`.
+
+## 03-F final integration checkpoint (2026-10-24)
+- Final verified functional commit: `2a066d5797bd77a3d9d59c0d776a67e24af79e53`.
+- GitHub Actions: Engine 01-A Linux job **success**; Windows smoke **success**; Linux headless Chromium **success**; Prototype checks **success** (verify latest documentation-only run separately).
+- Actual Chromium UI path now covers world map -> multi-segment travel (with encounter resume) -> lifestyle -> dungeon entry -> rendered 24×24 tile map -> auto-explore start/stop -> cardinal movement -> F5 quicksave -> page reload -> F9 approved restore -> dungeon exit.
+- Earlier false negative came from an ambiguous `생활` button locator. Test now targets `#bottomNav button[aria-label="생활"]`; it doesn't bypass or fake navigation.
+- Browser-executed deterministic engine round-trip also verifies saved map/world/clock/RNG/discovery and reciprocal stairs 0↔−1. A test defect (route planned from x=3 while replay started at x=2) was corrected. This stair verification is engine-driven inside the real browser, **not** clicking the real UI stair button.
+- The three CI jobs are automated acceptance, not proof of a human Windows Edge/Chrome GUI session. User's prior general "검수 ok" was acknowledged but must not be represented as detailed manual proof of all scenarios.
+- Missing game content (skill growth, combat encounters, object-specific world Deltas, legacy in-dungeon save migration) stays tracked outside 03-F. Existing data and save databases untouched; `main` unmerged; stacked Draft PR #39 awaits integration approval.
+- Further UI stair-click and high-duration auto-explore endurance validation may be taken as separate post-03-F QA, not silently declared tested.
