@@ -137,6 +137,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='dungeon.portal')return {turns:1,worldUnits:6};
     if(action.type==='dungeon.move'){
      const [x,y]=current.world.runtime.pos;
      const step=resolveLocalStep(worldRegistry,{siteId:'core:site/labyrinth',floor:current.world.runtime.localFloor??0,x,y},action.payload.direction);
