@@ -10,3 +10,6 @@ export {IndexedDbSavesV3} from './save/indexeddb-v3.js';
 export type {GameStateV3,SaveEnvelopeV3} from './save/save-v3.js';
 export {GAME_DAY_SECONDS,GAME_START_SECONDS,gameClockAt,formatTravelSeconds,assertGameSeconds} from './world/time-seconds.js';
 export {SECONDS_PER_ACTION,actionSeconds} from './world/action-seconds.js';
+
+export {V3ActionDispatcher} from './core/v3-dispatch.js';
+export type {V3Duration,V3DurationPolicy,V3DispatchResult} from './core/v3-dispatch.js';
