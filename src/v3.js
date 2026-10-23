@@ -71,7 +71,7 @@ function tabs(target,names,handler){const e=make('div',{class:'tabs'},target);fo
 function section(el,title){const sec=make('section',{class:'section'},el);make('h2',{text:title},sec);return sec}
 function changeTab(t){s.tab=t;if(overlayPage)drawOverlay();else drawMain();iconify()}
 function openPage(name){if(autoTimer)stopAuto();if(['인벤토리','캐릭터','숙련','도감','신앙'].includes(name)){if(!overlayPage)overlayReturnTab=s.tab;overlayReturn=document.activeElement;overlayPage=name;s.tab=name==='인벤토리'?'전체':name==='캐릭터'?'기본 정보':name==='숙련'?'생활':name==='도감'?'발견 목록':'개요';render();return;}overlayPage=null;if(s.page!==name)previousPage=s.page;s.page=name;s.tab=name==='생활'?'개요':name==='제작'?'제작법':'기본';render()}
-function act(name){if(name==='던전에 진입한다'){if(!executeV2('dungeon.enter',{}))return render();s.page='던전';s.tab='탐색';localRemembered=[];autoTarget=0;nextLog('탐험','지하미궁에 들어섰습니다.','고정 예시 지도이며 실제 절차적 생성은 아직 없습니다.');return render()}if(name==='작업대를 사용한다')return openPage('제작');if(!executeV2('life.activity',{name}))return render();nextLog('생활',actionLabel(name)+'을(를) 실행했습니다.','생산·성장 효과는 아직 없는 기본 행동입니다.');render()}
+function act(name){if(name==='던전에 진입한다'){if(!executeV2('dungeon.enter',{}))return render();s.page='던전';s.tab='탐색';localRemembered=[];autoTarget=0;nextLog('탐험','지하미궁의 생성형 지도에 진입했습니다.');return render()}if(name==='작업대를 사용한다')return openPage('제작');if(!executeV2('life.activity',{name}))return render();nextLog('생활',actionLabel(name)+'을(를) 실행했습니다.','생산·성장 효과는 아직 없는 기본 행동입니다.');render()}
 function regionActions(){return ACTIONS[s.region]||['주변을 살핀다','휴식한다']}
 function lifestyle(){
 const el=head(s.region,'');const hue={'거점 마을':'town','초원·농경지':'pasture','숲':'forest','강·호수':'river','습지':'marsh','산맥':'mountain','광산':'mine','설원':'snow','사막':'desert','해안·항구':'coast','바다':'ocean','화산지대':'volcano','고대 유적':'ruins','폐허·묘지':'grave','만신전':'temple','지하미궁':'dungeon'}[s.region]||'pasture';
@@ -81,6 +81,7 @@ const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업�
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
+if(s.region==='숲'){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon('trees')+'<span>숲길 탐험</span>';b.addEventListener('click',()=>{if(!executeV2('dungeon.enter',{siteId:'core:site/forest'}))return render();s.page='던전';s.tab='탐색';localRemembered=[];autoTarget=0;nextLog('탐험','숲길의 생성형 필드에 들어섰습니다.');render()});}
 
 }
 function world(){
@@ -295,7 +296,7 @@ if(!choices.length){stopAuto();nextLog('시스템','자동 탐색 경로 없음'
 const route=choices[autoTarget++%choices.length],direction=route[0];
 dungeonMove(direction==='east'?1:direction==='west'?-1:0,direction==='south'?1:direction==='north'?-1:0)}
 function dungeon(){
-const el=head('지하미궁',mainV2.localFloor()===0?'지상층':'지하 '+Math.abs(mainV2.localFloor())+'층');
+const el=head(mainV2.localSite()==='core:site/forest'?'숲길':'지하미궁',mainV2.localFloor()===0?'지상층':'지하 '+Math.abs(mainV2.localFloor())+'층');
 el.classList.add('dungeon-screen');
 const layout=make('div',{class:'dungeonlayout dungeon-v7'},el);
 const left=make('div',{class:'dungeon-map-pane'},layout);
