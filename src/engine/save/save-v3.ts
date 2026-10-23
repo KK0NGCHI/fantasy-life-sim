@@ -53,7 +53,7 @@ export function prepareV2ToV3Migration(raw:unknown,registry:ItemRegistry,approve
  const decoded=decodeSaveV2(raw,registry);
  if(!decoded.ok)return {ok:false,reason:'INVALID_V2'};
  if(!approvedReset)return {ok:false,reason:'APPROVAL_REQUIRED'};
- const old=decoded.save.state, runtime=old.world.runtime as Record<string,unknown>|undefined;
+ const old=decoded.save.state, runtime=(old.world as unknown as Record<string,unknown>).runtime as Record<string,unknown>|undefined;
  if(!runtime||runtime.travel03B&&typeof runtime.travel03B==='object'&&
   (runtime.travel03B as Record<string,unknown>).progress)return {ok:false,reason:'ACTIVE_TRAVEL'};
  if(runtime.lifecycle&&Object.keys(runtime.lifecycle as object).length||
@@ -64,7 +64,7 @@ export function prepareV2ToV3Migration(raw:unknown,registry:ItemRegistry,approve
  const {schemaVersion:_s,clock:_c,...rest}=base;
  const state:GameStateV3={...rest,schemaVersion:3,
   clock:{elapsedSeconds:0,calendarId:'somnium-calendar-v1',startSecondOfDay:28800},
-  world:{...rest.world,runtime:{...runtime,timeBasis:'seconds-v1',day:1,hour:8,travel03B:null}}};
+  world:{...(rest.world as object),runtime:{...runtime,timeBasis:'seconds-v1',day:1,hour:8,travel03B:null}} as GameStateV3['world']};
  return {ok:true,state};
 }
 /** Converts only a validated, explicitly seconds-tagged transitional v2 save.
@@ -73,7 +73,7 @@ export function prepareV2ToV3Migration(raw:unknown,registry:ItemRegistry,approve
 export function prepareSecondsV2ToV3(raw:unknown,registry:ItemRegistry){
  const decoded=decodeSaveV2(raw,registry);
  if(!decoded.ok)return {ok:false as const,reason:'INVALID_V2'};
- const state=decoded.save.state, runtime=state.world.runtime as Record<string,unknown>|undefined;
+ const state=decoded.save.state, runtime=(state.world as unknown as Record<string,unknown>).runtime as Record<string,unknown>|undefined;
  if(runtime?.timeBasis!=='seconds-v1')return {ok:false as const,reason:'ABSTRACT_TIME'};
  const {schemaVersion:_s,clock:_c,...rest}=structuredClone(state);
  return {ok:true as const,state:{...rest,schemaVersion:3 as const,
