@@ -21,6 +21,30 @@ try{
  await page.getByText(/승인된 v2 저장 데이터를 불러왔습니다/).first().waitFor();
  await page.getByRole('button',{name:'세계 지도'}).first().click();
  assert.equal(await page.locator('.mapgrid .region').count(),16);
+ // End-to-end world navigation is a separate user-visible contract.
+ await page.getByRole('button',{name:'지하미궁',exact:true}).click();
+ await page.getByRole('button',{name:'이동하기'}).click();
+ let arrived=false;
+ for(let attempt=0;attempt<40;attempt++){
+   const encounter=page.getByRole('dialog',{name:'여행 중 인카운터'});
+   if(await encounter.isVisible()){
+     await encounter.getByRole('button',{name:'확인 후 계속'}).click();
+     continue;
+   }
+   const progress=page.getByRole('button',{name:'남은 여행 진행'});
+   if(await progress.isVisible()){await progress.click();continue;}
+   await page.getByRole('button',{name:'생활',exact:true}).first().click();
+   if(await page.getByRole('button',{name:'던전 진입'}).isVisible()){arrived=true;break;}
+   await page.getByRole('button',{name:'세계 지도',exact:true}).first().click();
+ }
+ if(!arrived)throw Error('WORLD_DUNGEON_ARRIVAL_UI: '+JSON.stringify({
+   heading:await page.locator('#main').innerText(),
+   activeRegion:await page.locator('.mapgrid .region.active').getAttribute('aria-label').catch(()=>null)
+ }));
+ await page.getByRole('button',{name:'던전 진입'}).click();
+ await page.locator('.dungeon-screen .tile.player').waitFor();
+ assert.equal(await page.locator('.dungeon-screen .tile').count(),576);
+ await page.getByRole('button',{name:'던전 나가기'}).click();
  // Validate the dungeon runtime in a real browser process, independently from
  // the unresolved world-map-to-dungeon navigation UI path.
  const dungeonRuntime=await page.evaluate(async()=>{
