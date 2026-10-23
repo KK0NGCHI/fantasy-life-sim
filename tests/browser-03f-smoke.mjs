@@ -81,7 +81,7 @@ try{
     const nx=x+dx,ny=y+dy;if(map.tiles[ny]?.split(' ')[nx]==='core:terrain/ground'&&!visited.has(nx+','+ny))queue.push([nx,ny,[...path,direction]]);
    }
   }
-  const stairWorld=createMainV2Inventory(items,options);stairWorld.dispatch('dungeon.enter');
+  const stairWorld=createMainV2Inventory(items,options);stairWorld.dispatch('dungeon.enter');stairWorld.dispatch('dungeon.move',{direction:'east'});
   for(const d of route){const step=stairWorld.dispatch('dungeon.move',{direction:d});if(!step.accepted)return {ok:false,reason:'stair path rejected'};}
   const beforePortal=stairWorld.localPortal(),positionBefore=stairWorld.current().world.runtime.pos;
   const down=stairWorld.dispatch('dungeon.portal',{}),floorDown=stairWorld.localFloor();
