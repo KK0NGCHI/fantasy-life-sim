@@ -1,5 +1,5 @@
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
-import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom,gameClockAt,formatTravelSeconds} from '../dist/engine/v2.js';
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom,gameClockAt,formatTravelSeconds,IndexedDbSavesV3,createSaveV3,decodeSaveV3,prepareV2ToV3Migration,prepareSecondsV2ToV3} from '../dist/engine/v2.js';
 
 /** Bridge for the existing main UI fixture. Game item identity, quantity and ownership live in v2.
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
@@ -21,7 +21,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  const siteToRegion=new Map(Array.from(worldRegistry.sites.values(),site=>[site.id,worldRegistry.regions.get(site.regionId)?.name]));
  const routeAccess=()=>({knownSites:new Set(worldRegistry.sites.keys()),knownHazards:new Set(),allowedRequirements:new Set()});
  const slot={slotId:'main-manual',worldId:'main-world',kind:'manual',label:'메인 UI 저장',savedAt:'2000-01-01T00:00:00Z',revision:0};
- const store=new IndexedDbSavesV2(registry,'somnium-main-v2'); // legacy v2 snapshots unchanged
+ const legacyStore=new IndexedDbSavesV2(registry,'somnium-main-v2');
+ const store=new IndexedDbSavesV3(registry,'somnium-main-v3');
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
