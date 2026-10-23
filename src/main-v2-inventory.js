@@ -1,6 +1,6 @@
 import {actionSeconds} from '../dist/engine/world/action-seconds.js';
 import {resolveLocalStep,localArrival} from '../dist/engine/world/local-movement.js';
-import {localVisibility,safeLocalRoute} from '../dist/engine/world/local-exploration.js';
+import {localVisibility,safeLocalRoute,localPortal} from '../dist/engine/world/local-exploration.js';
 import {readAutoPolicy,writeAutoPolicy,validateAutoPolicy} from './autosave-preferences.js';
 import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,confirmBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,shouldAutoSave,buildWorldRegistry,SOMNIUM_WORLD_03A,planTravel,beginTravel,resumeTravel,pauseTravel,cancelTravel,advanceTravel,validateTravelState,drawRandom,gameClockAt,formatTravelSeconds,IndexedDbSavesV3,createSaveV3,decodeSaveV3,prepareV2ToV3Migration,prepareSecondsV2ToV3} from '../dist/engine/v2.js';
 
@@ -31,7 +31,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1'}},progression:{skillExperience:{}},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1'}},progression:{skillExperience:{}},flags:{},
   itemWorld:{
    items:uiItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:uiItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -111,13 +111,20 @@ export function createMainV2Inventory(uiItems,options={}) {
     events:[{type:result.encounter?'world.travel_encounter':result.arrival?'world.travelled':'world.travel_progress',
        payload:{encounter:result.encounter,arrived:result.arrival}}]};
  }],
- ['dungeon.enter',(snapshot)=>{const entry=localArrival(worldRegistry,'core:site/labyrinth');return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,pos:[entry.x,entry.y]}}},events:[{type:'dungeon.entered',payload:{}}]};}],
- ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false}}},events:[{type:'dungeon.left',payload:{}}]})],
+ ['dungeon.enter',(snapshot)=>{const entry=localArrival(worldRegistry,'core:site/labyrinth');return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,localFloor:entry.floor,pos:[entry.x,entry.y]}}},events:[{type:'dungeon.entered',payload:{}}]};}],
+ ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false,localFloor:0}}},events:[{type:'dungeon.left',payload:{}}]})],
+ ['dungeon.portal',(snapshot)=>{
+   if(!snapshot.world.runtime.dungeon)throw Error('Not exploring');
+   const [x,y]=snapshot.world.runtime.pos;
+   const target=localPortal(worldRegistry,{siteId:'core:site/labyrinth',floor:snapshot.world.runtime.localFloor??0,x,y});
+   if(!target)throw Error('No linked portal');
+   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,localFloor:target.floor,pos:[target.x,target.y]}}},events:[{type:'dungeon.portal_used',payload:{floor:target.floor}}]};
+ }],
  ['dungeon.move',(snapshot,command)=>{
    const direction=command.payload.direction;
    if(!snapshot.world.runtime.dungeon||typeof direction!=='string'||!['north','south','east','west'].includes(direction))throw Error('Invalid local action');
    const [x,y]=snapshot.world.runtime.pos;
-   const step=resolveLocalStep(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},direction);
+   const step=resolveLocalStep(worldRegistry,{siteId:'core:site/labyrinth',floor:snapshot.world.runtime.localFloor??0,x,y},direction);
    if(step.status==='invalid')throw Error('Invalid local position');
    if(step.status==='hazard')throw Error('Known hazard requires explicit handling');
    if(step.status==='blocked')return {outcome:'failed',nextState:snapshot,events:[{type:'dungeon.blocked',payload:{direction}}]};
@@ -132,7 +139,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   }
     if(action.type==='dungeon.move'){
      const [x,y]=current.world.runtime.pos;
-     const step=resolveLocalStep(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},action.payload.direction);
+     const step=resolveLocalStep(worldRegistry,{siteId:'core:site/labyrinth',floor:current.world.runtime.localFloor??0,x,y},action.payload.direction);
      if(step.status==='invalid'||step.status==='hazard')throw Error('Invalid local duration');
      return {turns:1,worldUnits:step.elapsedSeconds};
     }
@@ -154,9 +161,11 @@ export function createMainV2Inventory(uiItems,options={}) {
  };
  return {
   registry,projected,current,
-  localMap(){return structuredClone([...worldRegistry.maps.values()].find(m=>m.siteId==='core:site/labyrinth'&&m.floor===0));},
-  localView(remembered=[]){const [x,y]=state.world.runtime.pos;return localVisibility(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},remembered);},
-  localRoute(goal,known){const [x,y]=state.world.runtime.pos;return safeLocalRoute(worldRegistry,{siteId:'core:site/labyrinth',floor:0,x,y},{siteId:'core:site/labyrinth',floor:0,x:goal[0],y:goal[1]},new Set(known));},
+  localMap(){return structuredClone([...worldRegistry.maps.values()].find(m=>m.siteId==='core:site/labyrinth'&&m.floor===(state.world.runtime.localFloor??0)));},
+  localView(remembered=[]){const [x,y]=state.world.runtime.pos;return localVisibility(worldRegistry,{siteId:'core:site/labyrinth',floor:state.world.runtime.localFloor??0,x,y},remembered);},
+  localFloor(){return state.world.runtime.localFloor??0;},
+  localPortal(){const [x,y]=state.world.runtime.pos;return localPortal(worldRegistry,{siteId:'core:site/labyrinth',floor:state.world.runtime.localFloor??0,x,y});},
+  localRoute(goal,known){const [x,y]=state.world.runtime.pos;return safeLocalRoute(worldRegistry,{siteId:'core:site/labyrinth',floor:state.world.runtime.localFloor??0,x,y},{siteId:'core:site/labyrinth',floor:state.world.runtime.localFloor??0,x:goal[0],y:goal[1]},new Set(known));},
   dispatch(type,payload={}){
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
