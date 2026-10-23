@@ -213,6 +213,16 @@ export function createMainV2Inventory(uiItems,options={}) {
    return found;
   },
   async recoveryCandidates(slotId='main-manual',source='v3'){return (source==='v2'?legacyStore:store).listRevisions(slotId)},
+  async migrateLegacyCandidate(candidate,approvedReset){
+   if(candidate?.saveVersion!==2)throw Error('v2 저장만 이전할 수 있습니다.');
+   const converted=candidate.state?.world?.runtime?.timeBasis==='seconds-v1'
+    ?prepareSecondsV2ToV3(candidate,registry)
+    :prepareV2ToV3Migration(candidate,registry,approvedReset);
+   if(!converted.ok)throw Error('시간 이전 불가: '+converted.reason);
+   const newSlot={...candidate.slot,slotId:'migrated-'+crypto.randomUUID(),label:'v3 이전: '+candidate.slot.label,revision:0,savedAt:new Date().toISOString(),kind:'manual'};
+   const proposed=createSaveV3(converted.state,newSlot,candidate.contentVersion,registry);
+   return store.commit(proposed,null);
+  },
   applyApprovedSave(candidate){
    replace(candidate,candidate.slot?.revision??null);
   },
