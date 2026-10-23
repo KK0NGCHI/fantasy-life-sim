@@ -2,7 +2,7 @@ import type {WorldDefinition,RegionDefinition,SiteDefinition,MapDefinition,Route
 const entries=[
  ['town','거점 마을','settlement'],['plains','초원·농경지','field'],['forest','숲','field'],
  ['river','강·호수','field'],['wetland','습지','field'],['mountains','산맥','field'],
- ['mine','광산','dungeon'],['snowfield','설원','field'],['desert','사막','field'],
+ ['mine','광산','field'],['snowfield','설원','field'],['desert','사막','field'],
  ['coast','해안·항구','field'],['sea','바다','field'],['volcano','화산지대','field'],
  ['ruins','고대 유적','special'],['graveyard','폐허·묘지','special'],
  ['pantheon','만신전','special'],['labyrinth','지하미궁','dungeon']
