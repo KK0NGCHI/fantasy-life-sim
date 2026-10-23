@@ -6,7 +6,7 @@ test('header source clock advances seconds for short actions and minutes for lif
  const a=app();assert.deepEqual(a.gameTime(),{day:1,hour:8,minute:0,second:0});
  assert.equal(a.dispatch('dungeon.enter',{}).accepted,true);
  assert.deepEqual(a.gameTime(),{day:1,hour:8,minute:0,second:10});
- assert.equal(a.dispatch('dungeon.move',{to:[3,2]}).accepted,true);
+ assert.equal(a.dispatch('dungeon.move',{direction:'east'}).accepted,true);
  assert.deepEqual(a.gameTime(),{day:1,hour:8,minute:0,second:16});
  for(let i=0;i<6;i++)assert.equal(a.dispatch('life.activity',{name:'나뭇가지 줍기'}).accepted,true);
  assert.deepEqual(a.gameTime(),{day:1,hour:8,minute:6,second:16});
