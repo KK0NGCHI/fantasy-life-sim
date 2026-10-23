@@ -1,3 +1,4 @@
+import {activityPreview} from './region-activities.js';
 import {actionSeconds} from '../dist/engine/world/action-seconds.js';
 import {resolveLocalStep,localArrival} from '../dist/engine/world/local-movement.js';
 import {localVisibility,safeLocalRoute,localPortal} from '../dist/engine/world/local-exploration.js';
@@ -132,6 +133,12 @@ export function createMainV2Inventory(uiItems,options={}) {
     player:{...snapshot.player,regionId:region??snapshot.player.regionId}},
     events:[{type:result.encounter?'world.travel_encounter':result.arrival?'world.travelled':'world.travel_progress',
        payload:{encounter:result.encounter,arrived:result.arrival}}]};
+ }],
+ ['region.activity',(snapshot,command)=>{
+   if(snapshot.world.runtime.dungeon)throw Error('Cannot start a regional activity during dungeon exploration');
+   const result=activityPreview(snapshot.world.runtime.region,command.payload.activityId,snapshot.progression?.skillExperience??{});
+   if(!result.ok)throw Error(result.reason);
+   return {outcome:'success',nextState:snapshot,events:[{type:'region.activity_performed',payload:{activityId:command.payload.activityId,activityKind:result.kind,encounterEligible:result.encounterEligible,combatStarted:false}}]};
  }],
  ['dungeon.enter',(snapshot,command)=>{const target=command.payload.siteId??'core:site/labyrinth';if(!['core:site/labyrinth','core:site/forest'].includes(target))throw Error('Invalid local site');if(target==='core:site/forest'&&snapshot.world.runtime.region!=='숲')throw Error('Forest region required');const entry=localArrival(localRegistry,target);return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,localSiteId:entry.siteId,localFloor:entry.floor,pos:[entry.x,entry.y]}}},events:[{type:'dungeon.entered',payload:{}}]};}],
  ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false,localFloor:0}}},events:[{type:'dungeon.left',payload:{}}]})],
