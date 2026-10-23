@@ -16,7 +16,7 @@ test('logical turns are independent of game seconds for life and dungeon actions
  assert.equal(life.nextState.clock.elapsedUnits,60);
  a.dispatch('dungeon.enter',{});
  assert.equal(a.current().clock.elapsedUnits,70);
- a.dispatch('dungeon.move',{to:[3,2]});
+ a.dispatch('dungeon.move',{direction:'east'});
  assert.equal(a.current().turn,3);
  assert.equal(a.current().clock.elapsedUnits,76);
  assert.deepEqual(gameClockAt(76),{day:1,hour:8,minute:1,second:16});
