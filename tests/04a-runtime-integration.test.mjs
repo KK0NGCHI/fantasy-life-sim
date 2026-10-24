@@ -59,3 +59,13 @@ test('04-A new dungeon discovery grants real exploration XP only for unseen cell
  assert.ok(current>=after);
  assert.ok(g.rememberedCells().length>=beforeSeen);
 });
+
+test('04-A attribute selection is validated and locks after first accepted action',()=>{
+ const g=make({progression04A:true});
+ assert.equal(g.setInitialAttributes({근력:5,지능:5}).attributes.근력,15);
+ assert.throws(()=>g.setInitialAttributes({지능:6}),/Creation budget|Invalid/);
+ assert.equal(g.progression04A().attributes.근력,15);
+ g.dispatch('life.activity',{name:'휴식한다'});
+ assert.throws(()=>g.setInitialAttributes({지각:4}),/locked/);
+ assert.equal(g.progression04A().attributes.근력,15);
+});
