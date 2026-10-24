@@ -156,6 +156,20 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(!turns)throw Error('No travel progress');
   return {travel,rng,turns,units,encounter,arrival};
  }
+ // A side discovery can occur at most once per 600 seconds of real game-clock progress.
+ // Crossing a single fixed clock boundary avoids extra rolls from subdividing work.
+ // The action's original dispatcher owns its time cost; no nested dispatch/time billing.
+ const sideOpportunity=(before,seconds)=>Number.isSafeInteger(seconds)&&seconds>0&&
+   Math.floor((before.clock.elapsedUnits+seconds)/INCIDENTAL_ACTIVITY_SECONDS_05A)>
+   Math.floor(before.clock.elapsedUnits/INCIDENTAL_ACTIVITY_SECONDS_05A);
+ const sideResult=(before,base,kind,elapsed,region)=>{
+  if(!sideOpportunity(before,elapsed)||!incidentalTables05A[region+':'+kind])return base;
+  // Evaluate with authoritative RNG after the primary action. Ignore user-supplied outcomes.
+  const withRegion={...base.nextState,world:{...base.nextState.world,runtime:{
+    ...base.nextState.world.runtime,region}}};
+  const extra=handlers.get('resource.incidental.search')(withRegion,{payload:{activity:kind}});
+  return {...base,nextState:extra.nextState,events:[...base.events,...extra.events]};
+ };
  const handlers=new Map([
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
  ['world.travel',(snapshot,command)=>{
@@ -167,11 +181,14 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(snapshot);
    const region=result.travel.position.kind==='site'?siteToRegion.get(result.travel.position.siteId):null;
    const runtime={...snapshot.world.runtime,travel03B:result.travel,...(region?{region}:{})};
-   return {outcome:'success',nextState:{...snapshot,rng:result.rng,
+   const base={outcome:'success',nextState:{...snapshot,rng:result.rng,
     world:{...snapshot.world,runtime,activeRegionId:region??snapshot.world.activeRegionId},
     player:{...snapshot.player,regionId:region??snapshot.player.regionId}},
     events:[{type:result.encounter?'world.travel_encounter':result.arrival?'world.travelled':'world.travel_progress',
        payload:{encounter:result.encounter,arrived:result.arrival}}]};
+  // Route travel uses the destination region only when actually arrived.
+  if(!region)return base;
+  return sideResult(snapshot,base,'explore',result.units,region);
  }],
  ['origin.insight',(snapshot,command)=>{
    if(snapshot.world.runtime.dungeon)throw Error('Origin insight is a regional interaction');
@@ -318,24 +335,23 @@ export function createMainV2Inventory(uiItems,options={}) {
   const progression=prior&&result.xp>0?{...snapshot.progression,system04A:awardProgression(prior,{
     actionId:'05a:'+nodeId+':'+snapshot.turn,skillId:SKILL_DEFINITIONS.find(x=>x.name===xpSkill).id,xp:result.xp
    })}:snapshot.progression;
-  return {outcome:result.qty>0?'success':'failed',nextState:{...snapshot,rng:outcome.rng,itemWorld,progression,
+  const base={outcome:result.qty>0?'success':'failed',nextState:{...snapshot,rng:outcome.rng,itemWorld,progression,
    world:{...snapshot.world,runtime:{...snapshot.world.runtime,resource05A:{
     ...snapshot.world.runtime.resource05A,nodes:{...snapshot.world.runtime.resource05A.nodes,[nodeId]:result.node}
    }}}},
    events:[{type:'resource.work_done',payload:{resourceId:result.resource.id,name:result.resource.name,
     activity:result.activity,qty:result.qty,xp:result.xp,progress:result.node.progress}}]};
+  // The timer roll was already used by dispatcher to determine work duration.
+  const spent=workDuration05A(def.activity,timer.value);
+  return sideResult(snapshot,base,result.activity,spent,snapshot.world.runtime.region);
  }],
  ['region.activity',(snapshot,command)=>{
    if(snapshot.world.runtime.dungeon)throw Error('Cannot start a regional activity during dungeon exploration');
    const result=activityPreview(snapshot.world.runtime.region,command.payload.activityId,snapshot.progression?.system04A?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(snapshot.progression.system04A.skills[def.id])])):snapshot.progression?.skillExperience??{});
    if(!result.ok)throw Error(result.reason);
    const event={type:'region.activity_performed',payload:{activityId:command.payload.activityId,activityKind:result.kind,encounterEligible:result.encounterEligible,combatStarted:false}};
-   const table=incidentalTables05A[snapshot.world.runtime.region+':'+result.kind];
-   if(!table)return {outcome:'success',nextState:snapshot,events:[event]};
-   // Reuse only the pure handler transition, not dispatcher.dispatch:
-   // the region activity has already accounted for time and its original gate.
-   const extra=handlers.get('resource.incidental.search')(snapshot,{payload:{activity:result.kind}});
-   return {outcome:'success',nextState:extra.nextState,events:[event,...extra.events]};
+   return sideResult(snapshot,{outcome:'success',nextState:snapshot,events:[event]},
+    result.kind,actionSeconds('region.activity'),snapshot.world.runtime.region);
  }],
  ['dungeon.enter',(snapshot,command)=>{const target=command.payload.siteId??'core:site/labyrinth';if(!['core:site/labyrinth','core:site/forest'].includes(target))throw Error('Invalid local site');if(target==='core:site/forest'&&snapshot.world.runtime.region!=='숲')throw Error('Forest region required');const entry=localArrival(localRegistry,target);return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,localSiteId:entry.siteId,localFloor:entry.floor,pos:[entry.x,entry.y]}}},events:[{type:'dungeon.entered',payload:{}}]};}],
  ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false,localFloor:0}}},events:[{type:'dungeon.left',payload:{}}]})],
