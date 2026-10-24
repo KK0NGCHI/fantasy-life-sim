@@ -1,6 +1,6 @@
 import {ecologyClimate05A} from './ecology-climate-05a.js';
 import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_MAP_05A} from './botanical-ecology-adapter-05a.js';
-import {ecologySiteId,ecologyInteract} from './ecology-core-05a.js';
+import {ecologySiteId,ecologyInteract,ecologyReconcile} from './ecology-core-05a.js';
 import {eligibleBotanicalObservations05A,botanicalCanHarvest05A,botanicalMarkHarvest05A} from './botanical-lifecycle-05a.js';
 import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 import {validateIncidentalTable05A,resolveIncidentalActivity05A,INCIDENTAL_ACTIVITY_SECONDS_05A} from './incidental-resources-05a.js';
@@ -254,14 +254,16 @@ export function createMainV2Inventory(uiItems,options={}) {
   let updatedEcoSite=null;
   if(found&&botanical){
    if(resource05A.ecologySites){
-    const id=ecologySiteId(runtime.region,botanical.id);
-    const site=resource05A.ecologySites[id],def=BOTANICAL_ECOLOGY_MAP_05A.get(botanical.id);
-    if(!site||!def)found=false;
+    const def=BOTANICAL_ECOLOGY_MAP_05A.get(botanical.id);
+    const sites=Object.values(resource05A.ecologySites).filter(site=>site.region===runtime.region&&site.speciesId===botanical.id).sort((a,b)=>a.patch-b.patch);
+    const available=def?sites.map(site=>ecologyReconcile(site,def,snapshot.clock.elapsedUnits)).filter(site=>site.remaining>0):[];
+    if(!available.length)found=false;
     else{
+     const site=available[Math.floor(b.value*available.length)];
      const attempt=ecologyInteract(site,def,{
       region:runtime.region,season,daypart,weather:ecoWeather,
       mature:true,bloom:botanical.part==='flower'
-     },{second:snapshot.clock.elapsedUnits,roll:b.value,action:'gather'});
+     },{second:snapshot.clock.elapsedUnits,roll:c.value,action:'gather'});
      if(!attempt.ok)found=false;
      else updatedEcoSite=attempt.site;
     }
