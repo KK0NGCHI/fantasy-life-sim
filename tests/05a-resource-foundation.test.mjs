@@ -21,7 +21,7 @@ test('05-A harvesting cannot duplicate consumed node and respects discovery, reg
  let n=nodes[id];
  for(let i=0;i<5;i++){const result=gatherResource05A({...nodes,[id]:n},id,'숲',i*50);assert.equal(result.ok,true);n=result.node;}
  assert.equal(gatherResource05A({...nodes,[id]:n},id,'숲',250).reason,'DEPLETED');
- assert.equal(resourceAt05A(n,RESOURCES_05A[0],3*86400).remaining,1);
+ assert.equal(resourceAt05A(n,RESOURCES_05A[0],3*86400+200).remaining,1);
 });
 test('05-A full state action: only valid harvest changes XP, item world and clock; v3 roundtrip',()=>{
  const g=make();
@@ -29,7 +29,7 @@ test('05-A full state action: only valid harvest changes XP, item world and cloc
  assert.equal(g.dispatch('resource.gather',{nodeId:'missing'}).accepted,false);
  const before=g.current();assert.equal(before.clock.elapsedUnits,0);
  const result=g.dispatch('resource.gather',{nodeId:'resource05a:wild-herb:01'});
- assert.equal(result.accepted,true);
+ assert.equal(result.accepted,true,JSON.stringify(result));
  assert.equal(g.current().clock.elapsedUnits,50);
  assert.equal(g.current().world.runtime.resource05A.nodes['resource05a:wild-herb:01'].remaining,4);
  assert.equal(g.current().progression.system04A.skills['skill-09'],7);
