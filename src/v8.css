@@ -169,3 +169,10 @@ border-radius:8px;
 #attributeCreationDialog .dialog-wrap{max-width:620px;width:min(90vw,620px);padding:1.25rem}
 #attributeCreationDialog select{padding:.6rem;max-width:100%;border-radius:8px;background:var(--surface,#fff);color:inherit}
 @media(max-width:450px){.creation-attribute-row{grid-template-columns:minmax(72px,1fr) 34px 40px 34px;gap:.3rem;padding:.4rem}}
+
+/* 04-B origin choice: readable staged selection within the existing character dialog. */
+#originCreationDialog .dialog-wrap{max-width:640px;width:min(92vw,640px);padding:1.4rem}
+#originCreationDialog label{display:block;margin-top:.85rem;margin-bottom:.25rem;font-weight:700}
+#originCreationDialog select{width:100%;padding:.65rem;border:1px solid var(--border,#aaa);border-radius:8px;background:var(--surface,#fff);color:inherit}
+.origin-choice-detail{margin-top:1rem;padding:.9rem;border:1px solid var(--border,#aaa);border-radius:10px;line-height:1.55}
+.origin-choice-detail h3{margin-top:0}
