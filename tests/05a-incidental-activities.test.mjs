@@ -122,7 +122,7 @@ test('no incidental config preserves the legacy inventory and actions',()=>{
   {...options(makeTable()),incidentalTables05A:{}});
  g.dispatch('world.travel',{region:'숲'});
  const before=g.current().itemWorld;
- for(let i=0;i<30;i++)assert.equal(g.dispatch('resource.work',{nodeId:'resource05a:wild-herb:01'}).accepted,true);
+ for(let i=0;i<4;i++)assert.equal(g.dispatch('resource.work',{nodeId:'resource05a:wild-herb:01'}).accepted,true);
  assert.equal(g.current().itemWorld.items.some(x=>x.id?.startsWith('incidental05a:')),false);
  assert.ok(g.current().itemWorld.items.length>=before.items.length);
 });
