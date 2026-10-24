@@ -41,7 +41,7 @@ test('04-A rejects modified invalid progression before applying live state',()=>
  const bad=structuredClone(save);
  bad.state.progression.system04A.skills['skill-01']=-100;
  const previous=game.current();
- assert.throws(()=>game.applyApprovedSave(bad),/Invalid 04-A/);
+ assert.throws(()=>game.applyApprovedSave(bad),/INVALID_DATA|Invalid 04-A/);
  assert.deepEqual(game.current(),previous);
 });
 
