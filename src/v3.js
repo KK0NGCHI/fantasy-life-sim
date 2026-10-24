@@ -247,13 +247,58 @@ filter.onchange=()=>{s.filter=filter.value;redraw()};
 redraw();
 }
 
+function openAttributeCreation(){
+ const current=mainV2.progression04A();
+ if(!current)return;
+ const canEdit=mainV2.current().turn===0&&current.awards.length===0&&Object.values(current.skills).every(x=>x===0);
+ if(!canEdit){nextLog('안내','게임 진행 이후에는 초기 능력치 배분을 변경할 수 없습니다.');render();return;}
+ const previous=document.getElementById('attributeCreationDialog');previous?.remove();
+ const dlg=make('dialog',{id:'attributeCreationDialog',class:'large-dialog','aria-label':'초기 능력치 배분'},document.body);
+ const body=make('div',{class:'dialog-wrap'},dlg);
+ make('h2',{text:'초기 능력치 배분'},body);
+ make('p',{class:'muted',text:'7개 능력치는 모두 10에서 시작합니다. 추가 10점을 배분하며 능력치별 시작 상한은 15입니다. 확정 후 게임을 시작하거나 저장하면 변경할 수 없습니다.'},body);
+ const summary=make('p',{class:'creation-summary','aria-live':'polite'},body);
+ const controls=make('div',{class:'creation-attributes'},body);
+ const alloc=Object.fromEntries(ATTRIBUTES.map(key=>[key,0]));
+ const presets={균형형:{근력:2,민첩:2,체력:2,지각:1,지능:1,의지:1,매력:1},탐사형:{지각:5,민첩:3,지능:2},제작형:{지능:5,민첩:3,지각:2},전투형:{근력:4,체력:4,민첩:2}};
+ const select=make('select',{'aria-label':'능력치 배분 프리셋'},body);
+ for(const name of ['직접 배분',...Object.keys(presets)])make('option',{value:name,text:name},select);
+ const refresh=()=>{
+  const spent=Object.values(alloc).reduce((a,b)=>a+b,0);
+  summary.textContent='사용한 포인트 '+spent+'/10 · 남은 포인트 '+(10-spent);
+  controls.innerHTML='';
+  for(const key of ATTRIBUTES){
+   const row=make('div',{class:'creation-attribute-row'},controls);
+   make('strong',{text:key},row);
+   const minus=btn('−',()=>{if(alloc[key]>0){alloc[key]--;select.value='직접 배분';refresh()}},'btn',row);
+   minus.setAttribute('aria-label',key+' 1 감소');minus.disabled=alloc[key]===0;
+   make('output',{text:String(10+alloc[key]),'aria-label':key+' 현재 수치'},row);
+   const plus=btn('+',()=>{if(alloc[key]<5&&spent<10){alloc[key]++;select.value='직접 배분';refresh()}},'btn',row);
+   plus.setAttribute('aria-label',key+' 1 증가');plus.disabled=alloc[key]===5||spent>=10;
+  }
+ };
+ select.addEventListener('change',()=>{const preset=presets[select.value]??{};for(const key of ATTRIBUTES)alloc[key]=preset[key]??0;refresh()});
+ const footer=make('div',{class:'creation-footer'},body);
+ const cancel=btn('취소',()=>dlg.close(),'btn',footer);
+ const confirm=btn('배분 확정',()=>{try{mainV2.setInitialAttributes(alloc);dlg.close();render()}catch(error){summary.textContent=String(error.message??error);summary.setAttribute('role','alert')}},'btn primary',footer);
+ dlg.addEventListener('close',()=>{dlg.remove()});refresh();dlg.showModal();cancel.focus();
+}
 function character(){
-const el=head('캐릭터','');tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);
-const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('aside',{class:'detail'},pane);
-if(s.tab==='기본 정보')left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong></div><div class="textrow"><strong>종족 · 직업</strong><span>미정</span></div><div class="textrow"><strong>레벨 · EXP</strong><span>미정</span></div>';
-else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">없음</p>';
-else left.innerHTML='<h2>'+esc(s.tab)+'</h2>';
-right.innerHTML='<h3>'+esc(s.tab)+'</h3>';
+ const el=head('캐릭터','');
+ tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);
+ const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('aside',{class:'detail'},pane);
+ const p=mainV2.progression04A();
+ if(s.tab==='기본 정보'){
+  left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong></div><div class="textrow"><strong>종족 · 직업</strong><span>미정</span></div><div class="textrow"><strong>전체 레벨</strong><span>없음 · 개별 숙련으로 성장</span></div>';
+ }else if(s.tab==='능력치'&&p){
+  left.innerHTML='<h2>기본 능력치</h2>'+ATTRIBUTES.map(k=>'<div class="textrow"><strong>'+esc(k)+'</strong><span>'+p.attributes[k]+' · 훈련 '+p.training[k]+'</span></div>').join('');
+  if(mainV2.current().turn===0&&p.awards.length===0&&Object.values(p.skills).every(x=>x===0))btn('초기 능력치 배분',openAttributeCreation,'btn',left);
+  make('p',{class:'muted',text:'시작 배분은 최초 행동 또는 저장 전까지 변경할 수 있습니다. 수치는 현재 시험안입니다.'},left);
+ }else if(s.tab==='능력치'){
+  make('p',{class:'muted',text:'기존 저장에는 04-A 능력치 데이터가 없습니다. 자동 이전하지 않습니다.'},left);
+ }else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">없음</p>';
+ else left.innerHTML='<h2>'+esc(s.tab)+'</h2>';
+ right.innerHTML='<h3>'+esc(s.tab)+'</h3><p class="muted">각 능력치는 개별 숙련의 행동 성능에 보조적으로 기여합니다.</p>';
 }
 function skills(){
  const p=mainV2.progression04A();
