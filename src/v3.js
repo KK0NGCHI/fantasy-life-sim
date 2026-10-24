@@ -1,3 +1,4 @@
+import {SPECIES,BACKGROUNDS} from './character-origin-04b.js';
 import {SKILL_DEFINITIONS,skillLevel,skillThreshold,ATTRIBUTES} from './progression-system.js';
 import {activityAt,accessDeepField,DEEP_FIELDS,DANGEROUS_REGIONS} from './region-activities.js';
 import {createMainV2Inventory} from './main-v2-inventory.js';
@@ -247,6 +248,33 @@ filter.onchange=()=>{s.filter=filter.value;redraw()};
 redraw();
 }
 
+function openOriginCreation(){
+ const current=mainV2.origin04B();
+ if(current){nextLog('안내','종족과 배경은 이미 확정되어 변경할 수 없습니다.');render();return;}
+ if(mainV2.current().turn!==0){nextLog('안내','종족·배경은 첫 행동 이전에만 선택할 수 있습니다.');render();return;}
+ const existing=document.getElementById('originCreationDialog');existing?.remove();
+ const dlg=make('dialog',{id:'originCreationDialog',class:'large-dialog','aria-label':'종족과 배경 선택'},document.body);
+ const wrap=make('div',{class:'dialog-wrap'},dlg);
+ make('h2',{text:'종족과 배경'},wrap);
+ make('p',{class:'muted',text:'종족은 체형과 고유 특징을, 배경은 첫 숙련과 영구 전용 능력을 결정합니다. 선택 후에는 변경할 수 없습니다.'},wrap);
+ const speciesLabel=make('label',{text:'종족'},wrap);
+ const race=make('select',{'aria-label':'종족 선택'},wrap);
+ for(const value of SPECIES)make('option',{value:value.id,text:value.name},race);
+ const backgroundLabel=make('label',{text:'배경'},wrap);
+ const bg=make('select',{'aria-label':'배경 선택'},wrap);
+ for(const value of BACKGROUNDS)make('option',{value:value.id,text:value.name},bg);
+ const detail=make('div',{class:'origin-choice-detail','aria-live':'polite'},wrap);
+ const update=()=>{
+  const a=SPECIES.find(x=>x.id===race.value),b=BACKGROUNDS.find(x=>x.id===bg.value);
+  const size={medium:'보통',small:'소형',tiny:'초소형'}[a.size];
+  detail.innerHTML='<h3>'+esc(a.name)+' · '+esc(b.name)+'</h3><p>신체 크기: '+size+' (타일 점유는 모두 1칸)</p><p>종족 특성: '+esc(a.trait)+'</p><p>시작 숙련: '+esc(b.primary)+' 3레벨 / '+esc(b.secondary)+' 2레벨</p><p>고유 능력: <strong>'+esc(b.ability)+'</strong> — 해당 배경에서만 보유</p><p class="muted">종족 특성·배경 고유 능력의 특수 행동은 관련 게임 시스템이 구현될 때 활성화됩니다.</p>';
+ };
+ race.onchange=update;bg.onchange=update;update();
+ const footer=make('div',{class:'creation-footer'},wrap);
+ const cancel=btn('취소',()=>dlg.close(),'btn',footer);
+ btn('종족·배경 확정',()=>{try{mainV2.chooseOrigin04B(race.value,bg.value);dlg.close();render()}catch(error){detail.textContent=String(error.message??error);detail.setAttribute('role','alert')}},'btn primary',footer);
+ dlg.addEventListener('close',()=>dlg.remove());dlg.showModal();cancel.focus();
+}
 function openAttributeCreation(){
  const current=mainV2.progression04A();
  if(!current)return;
@@ -288,8 +316,11 @@ function character(){
  tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);
  const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('aside',{class:'detail'},pane);
  const p=mainV2.progression04A();
+ const origin=mainV2.origin04B();
  if(s.tab==='기본 정보'){
-  left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong></div><div class="textrow"><strong>종족 · 직업</strong><span>미정</span></div><div class="textrow"><strong>전체 레벨</strong><span>없음 · 개별 숙련으로 성장</span></div>';
+  left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong></div><div class="textrow"><strong>종족 · 배경</strong><span>'+(origin?esc(SPECIES.find(x=>x.id===origin.speciesId).name)+' · '+esc(BACKGROUNDS.find(x=>x.id===origin.backgroundId).name):'선택 전')+'</span></div><div class="textrow"><strong>신체 크기</strong><span>'+(origin?({medium:'보통',small:'소형',tiny:'초소형'}[origin.bodySize]):'선택 전')+'</span></div><div class="textrow"><strong>전체 레벨</strong><span>없음 · 개별 숙련으로 성장</span></div>';
+  if(origin){const background=BACKGROUNDS.find(x=>x.id===origin.backgroundId);make('p',{class:'muted',text:'배경 고유 능력: '+background.ability+' (관련 콘텐츠는 후속 구현)'},left)}
+  else if(p&&mainV2.current().turn===0)btn('종족·배경 선택',openOriginCreation,'btn',left);
  }else if(s.tab==='능력치'&&p){
   left.innerHTML='<h2>기본 능력치</h2>'+ATTRIBUTES.map(k=>'<div class="textrow"><strong>'+esc(k)+'</strong><span>'+p.attributes[k]+' · 훈련 '+p.training[k]+'</span></div>').join('');
   if(mainV2.current().turn===0&&p.awards.length===0&&Object.values(p.skills).every(x=>x===0))btn('초기 능력치 배분',openAttributeCreation,'btn',left);
