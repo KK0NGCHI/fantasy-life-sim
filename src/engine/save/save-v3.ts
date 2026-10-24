@@ -41,8 +41,8 @@ function validProgressionExtension(progression:unknown):boolean{
   if(!obj(x)||!exact(x,['schema','ruleVersion','attributes','training','skills','awards'])||
    x.schema!==1||x.ruleVersion!==1||!obj(x.attributes)||!obj(x.training)||!obj(x.skills)||
    !exact(x.attributes,attrKeys)||!exact(x.training,attrKeys)||!exact(x.skills,skillKeys)||
-   !attrKeys.every(k=>uint(x.attributes[k])&&Number(x.attributes[k])>=10&&uint(x.training[k]))||
-   !skillKeys.every(k=>uint(x.skills[k]))||!Array.isArray(x.awards)||x.awards.length>10000||
+   !attrKeys.every(k=>uint((x.attributes as Record<string,unknown>)[k])&&Number((x.attributes as Record<string,unknown>)[k])>=10&&uint((x.training as Record<string,unknown>)[k]))||
+   !skillKeys.every(k=>uint((x.skills as Record<string,unknown>)[k]))||!Array.isArray(x.awards)||x.awards.length>10000||
    !x.awards.every(a=>typeof a==='string'&&a.length>0&&a.length<=160)||
    new Set(x.awards).size!==x.awards.length)return false;
  }
