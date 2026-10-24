@@ -2,7 +2,7 @@ import {ecologyClimate05A} from '../src/ecology-climate-05a.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createEcologySite,ecologyInteract,ecologyReconcile,ecologyAdvance,validateEcologyDefinition} from '../src/ecology-core-05a.js';
-import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_DEFS_05A,BOTANICAL_ECOLOGY_MAP_05A} from '../src/botanical-ecology-adapter-05a.js';
+import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_DEFS_05A,BOTANICAL_ECOLOGY_MAP_05A,BOTANICAL_SEED_ITEMS_05A} from '../src/botanical-ecology-adapter-05a.js';
 import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
@@ -103,14 +103,27 @@ test('discovered patch supports direct harvest, stock cap, rejection, and game t
   if(selected)break;
  }
  assert.ok(selected);
- const original=g.current(),before=original.itemWorld.items.reduce((v,x)=>v+(x.definitionId===selected.speciesId?x.quantity:0),0);
+ const original=g.current(),before=original.itemWorld.items.reduce((v,x)=>v+(x.definitionId===selected.speciesId||x.definitionId===selected.speciesId+':seed'?x.quantity:0),0);
  const result=g.dispatch('botanical.patch.harvest',{siteId:selected.id});
  assert.equal(result.accepted,true,JSON.stringify(result));
  const now=g.current();
  assert.equal(now.clock.elapsedUnits-original.clock.elapsedUnits,60);
- const after=now.itemWorld.items.reduce((v,x)=>v+(x.definitionId===selected.speciesId?x.quantity:0),0);
+ const after=now.itemWorld.items.reduce((v,x)=>v+(x.definitionId===selected.speciesId||x.definitionId===selected.speciesId+':seed'?x.quantity:0),0);
  assert.equal(after,before+1);
  assert.equal(now.world.runtime.resource05A.ecologySites[selected.id].remaining,selected.remaining-1);
  const attempt=g.dispatch('botanical.patch.harvest',{siteId:'eco05a:unknown'});
  assert.equal(attempt.accepted,false);
+});
+
+test('seed outputs are distinct, valid species stage rewards registered in the inventory',()=>{
+ const g=make();
+ assert.ok(BOTANICAL_SEED_ITEMS_05A.length>40);
+ for(const item of BOTANICAL_SEED_ITEMS_05A)assert.ok(g.registry.items.has(item.id));
+ const d=BOTANICAL_ECOLOGY_MAP_05A.get('item05a:plantago-major');
+ const site=createEcologySite(d,'초원·농경지');
+ const seed=ecologyInteract(site,d,{region:'초원·농경지',season:'spring',mature:true,bloom:true},{second:0,roll:0.95});
+ assert.equal(seed.outputs[0].itemId,'item05a:plantago-major:seed');
+ assert.equal(seed.outputs[0].part,'seed');
+ const immature=ecologyInteract(site,d,{region:'초원·농경지',season:'spring',mature:true,bloom:false},{second:0,roll:0.95});
+ assert.equal(immature.outputs[0].itemId,'item05a:plantago-major');
 });
