@@ -1,4 +1,4 @@
-import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS,discoverResource05A} from './resources-05a.js';
+import {RESOURCES_05A,createResourceNodes05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS,discoverResource05A} from './resources-05a.js';
 import {resolveOriginInteraction} from './origin-interactions-04c.js';
 import {createOrigin,validateOrigin,applyOriginToProgression} from './character-origin-04b.js';
 import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel,awardProgression} from './progression-system.js';
@@ -201,31 +201,6 @@ export function createMainV2Inventory(uiItems,options={}) {
    events:[{type:'resource.work_done',payload:{resourceId:result.resource.id,name:result.resource.name,
     activity:result.activity,qty:result.qty,xp:result.xp,progress:result.node.progress}}]};
  }],
- ['resource.gather',(snapshot,command)=>{try{
-  const nodes=snapshot.world.runtime.resource05A?.nodes;
-  if(snapshot.world.runtime.dungeon||!nodes)throw Error('RESOURCE_SYSTEM_UNAVAILABLE');
-  const result=gatherResource05A(nodes,command.payload?.nodeId,snapshot.world.runtime.region,snapshot.clock.elapsedUnits);
-  if(!result.ok)throw Error(result.reason);
-  const resource=result.resource;
-  const itemId='gather05a:'+resource.id;
-  const original=snapshot.itemWorld.items.find(x=>x.id===itemId);
-  const items=original?snapshot.itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+1}:x):
-   [...snapshot.itemWorld.items,{id:itemId,definitionId:resource.itemId,quantity:1}];
-  const placements=original?snapshot.itemWorld.placements:
-   [...snapshot.itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}];
-  const previous=snapshot.progression?.system04A;
-  const skill=SKILL_DEFINITIONS.find(x=>x.name==='채집');
-  const progression=previous?{...snapshot.progression,system04A:awardProgression(previous,{
-   actionId:'resource:'+resource.id+':'+snapshot.turn,skillId:skill.id,xp:resource.xp
-  })}:snapshot.progression;
-  return {outcome:'success',nextState:{...snapshot,
-   itemWorld:{...snapshot.itemWorld,items,placements},progression,
-   world:{...snapshot.world,runtime:{...snapshot.world.runtime,resource05A:{
-     ...snapshot.world.runtime.resource05A,nodes:{...nodes,[command.payload.nodeId]:result.node}
-   }}}},
-   events:[{type:'resource.gathered',payload:{resourceId:resource.id,name:resource.name,qty:1,xp:previous?resource.xp:0}}]};
- }catch(error){console.error('05-A gather diagnosis:',error);throw error;}
- }],
  ['region.activity',(snapshot,command)=>{
    if(snapshot.world.runtime.dungeon)throw Error('Cannot start a regional activity during dungeon exploration');
    const result=activityPreview(snapshot.world.runtime.region,command.payload.activityId,snapshot.progression?.system04A?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(snapshot.progression.system04A.skills[def.id])])):snapshot.progression?.skillExperience??{});
@@ -265,7 +240,6 @@ export function createMainV2Inventory(uiItems,options={}) {
      if(!def)throw Error('Unknown resource duration');
      return {turns:1,worldUnits:workDuration05A(def.activity,drawRandom(current.rng,'action').value)};
     }
-    if(action.type==='resource.gather')return {turns:1,worldUnits:50};
     if(action.type==='origin.insight')return {turns:1,worldUnits:60};
     if(action.type==='dungeon.portal')return {turns:1,worldUnits:6};
     if(action.type==='dungeon.move'){
