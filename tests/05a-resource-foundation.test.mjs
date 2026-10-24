@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,resourceAt05A} from '../src/resources-05a.js';
+import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,resourceAt05A,activeResourceSeconds05A,workDuration05A,workResource05A} from '../src/resources-05a.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
 const item=[{id:'test:stone',name:'돌',group:'재료',qty:1,tags:[]}];
@@ -40,4 +40,41 @@ test('05-A full state action: only valid harvest changes XP, item world and cloc
  assert.deepEqual(restored.current().world.runtime.resource05A,g.current().world.runtime.resource05A);
  assert.deepEqual(restored.current().itemWorld,g.current().itemWorld);
  assert.deepEqual(restored.current().progression,g.current().progression);
+});
+
+test('05-A four activity rules: valid progress, tool gates, only completed outputs award XP',()=>{
+ const nodes=createResourceNodes05A();
+ const treeId='resource05a:oak-log:01',oreId='resource05a:stone:01',fishId='resource05a:small-fish:01';
+ assert.equal(workResource05A(nodes,treeId,'숲',0).reason,'TOOL_REQUIRED');
+ const chopped=workResource05A(nodes,treeId,'숲',0,{toolKind:'axe',toolRank:1});
+ assert.equal(chopped.ok,true);assert.equal(chopped.qty,0);assert.equal(chopped.node.progress,1);
+ const mined=workResource05A(nodes,oreId,'광산',0,{toolKind:'pickaxe',toolRank:1});
+ assert.equal(mined.qty,0);assert.equal(mined.node.progress,1);
+ const missed=workResource05A(nodes,fishId,'강·호수',0,{toolKind:'rod',toolRank:1,outcomeRoll:0.7});
+ assert.equal(missed.qty,0);assert.equal(missed.node.remaining,12);
+ const caught=workResource05A(nodes,fishId,'강·호수',0,{toolKind:'rod',toolRank:1,outcomeRoll:0.001});
+ assert.equal(caught.qty,1);assert.equal(caught.xp,10);assert.equal(caught.node.remaining,11);
+ assert.equal(workResource05A(nodes,'resource05a:iron-ore:01','광산',0,{toolKind:'pickaxe',toolRank:1}).reason,'TOOL_REQUIRED');
+ for(const a of ['gather','logging','mining','fishing']){
+  const base={gather:50,logging:65,mining:70,fishing:60}[a],span=a==='gather'?5:10;
+  for(const roll of [0,0.5,0.999999])assert.ok(Math.abs(workDuration05A(a,roll)-base)<=span);
+ }
+});
+test('05-A 28-day season boundary freezes herb regeneration in winter',()=>{
+ const def=RESOURCES_05A.find(x=>x.id==='resource05a:wild-herb');
+ const node={...createResourceNodes05A()['resource05a:wild-herb:01'],remaining:0};
+ const early=resourceAt05A(node,def,84*86400-28800);
+ const winter=resourceAt05A(early,def,112*86400-28800);
+ assert.equal(winter.remaining,early.remaining);
+ assert.equal(activeResourceSeconds05A(def,84*86400-28800,112*86400-28800),0);
+});
+test('05-A bounded work to log completion and save file rejects corrupted resource fields',()=>{
+ const g=make();assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
+ const done=g.workUntil05A('resource05a:oak-log:01',50);
+ assert.equal(done.accepted,true);assert.equal(done.qty,5);assert.ok(done.actions>=35&&done.actions<=50);
+ assert.equal(g.projected().find(x=>x.id==='gather05a:resource05a:oak-log').qty,5);
+ const save=saved(g),altered=structuredClone(save);
+ altered.state.world.runtime.resource05A.nodes['resource05a:oak-log:01'].remaining=-2;
+ assert.equal(decodeSaveV3(altered,g.registry).ok,false);
+ assert.equal(decodeSaveV3(save,g.registry).ok,true);
 });
