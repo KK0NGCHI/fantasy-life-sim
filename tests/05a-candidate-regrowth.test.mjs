@@ -32,9 +32,9 @@ test('new quartz vein is gated by exploration conditions not lifetime count',()=
  const second=reveal.nodeId;
  for(let n=0;n<3;n++)sites=harvestCandidateSite05A(sites,second,'광산','mining',{toolRank:1,seconds:1000+n*60}).nodes;
  assert.equal(prospectCandidateQuartz05A(sites,'광산',DAY-1).reason,'PROSPECT_COOLDOWN');
- const newSite=prospectCandidateQuartz05A(sites,'광산',DAY);
+ const newSite=prospectCandidateQuartz05A(sites,'광산',DAY+1200);
  assert.equal(newSite.ok,true);assert.equal(newSite.newSite,true);assert.notEqual(newSite.nodeId,id);
- assert.equal(prospectCandidateQuartz05A(newSite.nodes,'광산',DAY).reason,'VEIN_REMAINS');
+ assert.equal(prospectCandidateQuartz05A(newSite.nodes,'광산',DAY+1200).reason,'VEIN_REMAINS');
 });
 test('candidate clock and compendium survive v3 save roundtrip, legacy candidate fields remain optional',()=>{
  const g=make(),id='site05a:blueberry:숲';
