@@ -50,9 +50,9 @@ export function resourceAt05A(node,definition,seconds){
   const units=Math.floor(total/step);
   next.recoveryProgress=total%step;
   if(definition.activity==='logging'||definition.id==='resource05a:stone'){
-   if(units>0){next.remaining=definition.capacity;next.progress=0;next.cycle=(next.cycle??0)+1;
+   if(units>0&&next.remaining===0){next.remaining=definition.capacity;next.progress=0;next.cycle=(next.cycle??0)+1;
     next.recoveryProgress=0;}
-  }else if(units>0)next.remaining=Math.min(definition.capacity,next.remaining+units);
+  }else if(units>0&&definition.activity!=='logging'&&definition.id!=='resource05a:stone')next.remaining=Math.min(definition.capacity,next.remaining+units);
  }else if(next.remaining>=definition.capacity)next.recoveryProgress=0;
  next.lastSecond=seconds;
  return next;
@@ -135,7 +135,7 @@ export function discoverResource05A(nodes,resourceId,region,seconds){
  const initialCounts={'resource05a:stone':6,'resource05a:coal':3,'resource05a:copper-ore':4,'resource05a:iron-ore':3};
  const initial=initialCounts[resourceId];
  if(!initial)return {ok:false,reason:'NO_DISCOVERABLE_SITES'};
- const day=Math.floor((seconds+28800)/DAY);
+ const day=Math.floor(seconds/DAY);
  const week=Math.floor(day/7);
  const perPeriod=resourceId==='resource05a:iron-ore'?1:2;
  const extra=resourceId==='resource05a:stone'?day*2:week*perPeriod;
