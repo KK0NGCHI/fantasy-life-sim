@@ -69,7 +69,7 @@ const candidateCaps05A:Readonly<Record<string,number>>={
  'source05a:mussel':4,'source05a:marsh-bell':2,'source05a:sacred-oak':1
 };
 function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
- if(!keys(x,['schema','nodes','candidateSites','compendium']))return false;
+ if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites']))return false;
  if(Object.hasOwn(x,'candidateSites')){
   if(!obj(x.candidateSites)||Object.keys(x.candidateSites).length>100)return false;
   if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered','lastSecond','recoveryProgress'])&&
@@ -78,6 +78,18 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
    uint(v.remaining)&&Number(v.remaining)<=(candidateCaps05A[v.sourceId]??-1)&&typeof v.discovered==='boolean'&&
    (!Object.hasOwn(v,'lastSecond')||(uint(v.lastSecond)&&Number(v.lastSecond)<=now))&&
    (!Object.hasOwn(v,'recoveryProgress')||(typeof v.recoveryProgress==='number'&&Number.isFinite(v.recoveryProgress)&&v.recoveryProgress>=0&&v.recoveryProgress<=3*86400))))return false;
+ }
+ if(Object.hasOwn(x,'ecologySites')){
+  if(!obj(x.ecologySites)||Object.keys(x.ecologySites).length>250)return false;
+  if(!Object.entries(x.ecologySites).every(([id,v])=>
+   obj(v)&&keys(v,['id','speciesId','region','patch','remaining','updatedAt','discovered'])&&
+   id.startsWith('eco05a:')&&id.length<=220&&v.id===id&&
+   typeof v.speciesId==='string'&&v.speciesId.startsWith('item05a:')&&v.speciesId.length<=150&&
+   typeof v.region==='string'&&v.region.length<80&&uint(v.patch)&&Number(v.patch)<=10&&
+   uint(v.remaining)&&Number(v.remaining)<=10&&uint(v.updatedAt)&&Number(v.updatedAt)<=now&&
+   typeof v.discovered==='boolean'&&
+   id==='eco05a:'+encodeURIComponent(String(v.region))+':'+encodeURIComponent(String(v.speciesId))+':'+String(v.patch)
+  ))return false;
  }
  if(Object.hasOwn(x,'compendium')){
   if(!obj(x.compendium)||!keys(x.compendium,['sourceIds','itemIds'])||
