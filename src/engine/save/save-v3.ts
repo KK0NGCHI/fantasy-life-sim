@@ -71,7 +71,7 @@ function validResource05A(runtime:Record<string,unknown>,now:number):boolean{
  return Object.entries(x.nodes).every(([key,value])=>{
   if(!obj(value)||!keys(value,['resourceId','remaining','progress','lastSecond','recoveryProgress','discovered','cycle']))return false;
   const cap=resourceCaps05A[String(value.resourceId)];
-  return Number.isSafeInteger(cap)&&key.startsWith(String(value.resourceId)+':')&&key.length<=140&&
+  return typeof cap==='number'&&Number.isSafeInteger(cap)&&key.startsWith(String(value.resourceId)+':')&&key.length<=140&&
    uint(value.remaining)&&Number(value.remaining)<=cap&&uint(value.progress)&&Number(value.progress)<=200&&
    uint(value.lastSecond)&&Number(value.lastSecond)<=now&&
    uint(value.recoveryProgress)&&Number(value.recoveryProgress)<60*86400&&
