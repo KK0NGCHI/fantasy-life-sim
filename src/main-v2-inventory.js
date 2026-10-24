@@ -219,11 +219,10 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(pool){
    const first=drawRandom(rng,'action'),second=drawRandom(first.rng,'action');
    rng=second.rng;
-   const calendar=gameClockAt(snapshot.clock.elapsedUnits);
    const season=['spring','summer','autumn','winter'][Math.floor((Math.floor((snapshot.clock.elapsedUnits+28800)/86400)%112)/28)];
    const hour=Math.floor(((snapshot.clock.elapsedUnits+28800)%86400)/3600);
    const daypart=hour<6?'dawn':hour<18?'day':hour<21?'dusk':'night';
-   const pick=rollAvailableResourcePool05A(pool,{region:runtime.region,season,daypart,weather:command.payload?.weather??'clear'},
+   const pick=rollAvailableResourcePool05A(pool,{region:runtime.region,season,daypart,weather:'clear'},
     {tierRoll:first.value,outputRoll:second.value,mode:command.payload?.poolMode??'eligible-only'});
    if(!pick.ok)throw Error(pick.reason);
    rewards=pick.itemId?[{itemId:pick.itemId,quantity:1,sourceId:site.sourceId,region:runtime.region,traits:[]}]:[];
