@@ -64,3 +64,18 @@ test('game-time budget is stable for repeated commands (no free reroll)',()=>{
  for(let i=0;i<10;i++)assert.equal(g.dispatch('resource.incidental.search',{activity:'explore'}).accepted,true);
  assert.equal(g.current().clock.elapsedUnits-before,6000);
 });
+
+test('existing region.activity can award incidental finds without a second time charge',()=>{
+ const ruinsPool={...pool,spawnConditions:{regions:['고대 유적']}};
+ const table={region:'고대 유적',activity:'investigate',triggerChance:1,rewardMode:'item',pool:ruinsPool};
+ const optionsRuins={...options(makeTable()),incidentalTables05A:{'고대 유적:investigate':table}};
+ const g=createMainV2Inventory([{id:'test:initial',name:'기본',group:'재료',qty:1,tags:[]}],optionsRuins);
+ assert.equal(g.dispatch('world.travel',{region:'고대 유적'}).accepted,true);
+ const before=g.current().clock.elapsedUnits;
+ const result=g.dispatch('region.activity',{activityId:'core:activity/ancient-ruins'});
+ assert.equal(result.accepted,true,JSON.stringify(result));
+ const after=g.current();
+ assert.equal(after.itemWorld.items.find(x=>x.definitionId==='item05a:blueberry')?.quantity,1);
+ assert.ok(after.clock.elapsedUnits>before);
+ assert.ok(after.clock.elapsedUnits-before<600,'must not charge standalone 600s incidental time');
+});
