@@ -2,7 +2,7 @@
  * These are playable starter values, not approved final ecology or rarity.
  * No speculative 80-species botanical entries are shipped.
  */
-import {BOTANICAL_ALL_05A} from './botanical-species-05a.js';
+import {BOTANICAL_PROFILES_05A} from './botanical-profiles-05a.js';
 const entries=[
  ['숲','explore','item05a:wild-herb',0.20],
  ['숲','gather','item05a:mushroom',0.10],
@@ -23,5 +23,9 @@ const noRegrowth={kind:'none'};
 export const ACTIVITY_TABLES_05A=Object.freeze(Object.fromEntries(entries.map(([region,activity,itemId,triggerChance])=>[
  region+':'+activity,Object.freeze({region,activity,triggerChance,rewardMode:'item',
  pool:{id:'activity05a:'+region+':'+activity,spawnConditions:{regions:[region]},regenerationPolicy:noRegrowth,
- disappearancePolicy:'persist',tiers:[{id:'common',weight:1,outputs:[{itemId,weight:4},...BOTANICAL_ALL_05A.filter(s=>s.regions.includes(region)&&activity==='explore'&&s.harvestMode!=='observe').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons}}))]}]}})
+ disappearancePolicy:'persist',tiers:[
+ {id:'common',weight:70,outputs:[{itemId,weight:4},...BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='common'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons}}))]},
+ {id:'uncommon',weight:25,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='uncommon'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons}}))},
+ {id:'rare',weight:5,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='rare'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons}}))}
+ ].filter(t=>t.outputs.length)}})
 ])));
