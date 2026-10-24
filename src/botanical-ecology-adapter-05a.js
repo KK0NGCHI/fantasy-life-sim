@@ -11,10 +11,13 @@ export const BOTANICAL_ECOLOGY_DEFS_05A=Object.freeze(BOTANICAL_PROFILES_05A.map
   regrowSeconds:botanicalRenewalSeconds05A(p),mode:p.interaction,
   seasons:p.seasons,...(p.renewalClass==='rain-pulse'?{weather:['rain']}:{}),
   ...(p.purpose==='night-bloom'?{dayparts:['night']}:{}),
-  outputs:[output]});
+  outputs:p.dropEnabled?[output,{id:p.id+':seed',part:'seed',stage:'bloom',weight:0.2}]:[output]});
  if(!validateEcologyDefinition(def))throw Error('INVALID_BOTANICAL_ECOLOGY:'+p.id);
  return def;
 }));
+export const BOTANICAL_SEED_ITEMS_05A=Object.freeze(BOTANICAL_PROFILES_05A.filter(p=>p.dropEnabled).map(p=>Object.freeze({
+ id:p.id+':seed',name:p.name+' 씨앗',family:'seed'
+})));
 export const BOTANICAL_ECOLOGY_MAP_05A=new Map(BOTANICAL_ECOLOGY_DEFS_05A.map(d=>[d.id,d]));
 export function createBotanicalEcology05A(second=0){
  const classes=new Map(BOTANICAL_PROFILES_05A.map(p=>[p.id,p.encounterClass]));
