@@ -68,14 +68,16 @@ const candidateCaps05A:Readonly<Record<string,number>>={
  'source05a:blueberry':4,'source05a:reed':5,'source05a:quartz':3,
  'source05a:mussel':4,'source05a:marsh-bell':2,'source05a:sacred-oak':1
 };
-function validCandidates05A(x:Record<string,unknown>):boolean{
+function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
  if(!keys(x,['schema','nodes','candidateSites','compendium']))return false;
  if(Object.hasOwn(x,'candidateSites')){
   if(!obj(x.candidateSites)||Object.keys(x.candidateSites).length>100)return false;
-  if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered'])&&
+  if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered','lastSecond','recoveryProgress'])&&
    id.startsWith('site05a:')&&id.length<=140&&typeof v.sourceId==='string'&&
    Object.hasOwn(candidateCaps05A,v.sourceId)&&typeof v.region==='string'&&v.region.length<=50&&
-   uint(v.remaining)&&Number(v.remaining)<=(candidateCaps05A[v.sourceId]??-1)&&typeof v.discovered==='boolean'))return false;
+   uint(v.remaining)&&Number(v.remaining)<=(candidateCaps05A[v.sourceId]??-1)&&typeof v.discovered==='boolean'&&
+   (!Object.hasOwn(v,'lastSecond')||(uint(v.lastSecond)&&Number(v.lastSecond)<=now))&&
+   (!Object.hasOwn(v,'recoveryProgress')||(typeof v.recoveryProgress==='number'&&Number.isFinite(v.recoveryProgress)&&v.recoveryProgress>=0&&v.recoveryProgress<=3*86400))))return false;
  }
  if(Object.hasOwn(x,'compendium')){
   if(!obj(x.compendium)||!keys(x.compendium,['sourceIds','itemIds'])||
@@ -89,7 +91,7 @@ function validCandidates05A(x:Record<string,unknown>):boolean{
 function validResource05A(runtime:Record<string,unknown>,now:number):boolean{
  if(!Object.hasOwn(runtime,'resource05A'))return true;
  const x=runtime.resource05A;
- if(!obj(x)||!validCandidates05A(x)||x.schema!==1||!obj(x.nodes)||Object.keys(x.nodes).length>6000)return false;
+ if(!obj(x)||!validCandidates05A(x,now)||x.schema!==1||!obj(x.nodes)||Object.keys(x.nodes).length>6000)return false;
  return Object.entries(x.nodes).every(([key,value])=>{
   if(!obj(value)||!keys(value,['resourceId','remaining','progress','lastSecond','recoveryProgress','discovered','cycle']))return false;
   const cap=resourceCaps05A[String(value.resourceId)];
