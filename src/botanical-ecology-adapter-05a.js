@@ -17,9 +17,13 @@ export const BOTANICAL_ECOLOGY_DEFS_05A=Object.freeze(BOTANICAL_PROFILES_05A.map
 }));
 export const BOTANICAL_ECOLOGY_MAP_05A=new Map(BOTANICAL_ECOLOGY_DEFS_05A.map(d=>[d.id,d]));
 export function createBotanicalEcology05A(second=0){
- return Object.fromEntries(BOTANICAL_ECOLOGY_DEFS_05A.flatMap(def=>def.habitats.map(region=>{
-  const site=createEcologySite(def,region,0,second);
-  return [site.id,site];
+ const classes=new Map(BOTANICAL_PROFILES_05A.map(p=>[p.id,p.encounterClass]));
+ return Object.fromEntries(BOTANICAL_ECOLOGY_DEFS_05A.flatMap(def=>def.habitats.flatMap(region=>{
+  const count=classes.get(def.id)==='common'?2:1;
+  return Array.from({length:count},(_,patch)=>{
+   const site=createEcologySite(def,region,patch,second);
+   return [site.id,site];
+  });
  })));
 }
 export function visibleBotanicalEcology05A(sites,region){
