@@ -18,7 +18,7 @@ try{
  await creation.waitFor();
  await creation.getByRole('combobox',{name:'능력치 배분 프리셋'}).selectOption('제작형');
  assert.match(await creation.locator('.creation-summary').innerText(),/남은 포인트 0/);
- assert.equal(await creation.getByRole('output',{name:'지능 현재 수치'}).innerText(),'15');
+ assert.equal(await creation.locator('.creation-attribute-row').filter({hasText:'지능'}).locator('output').innerText(),'15');
  await creation.getByRole('button',{name:'배분 확정'}).click();
  await page.getByRole('button',{name:'닫기'}).first().click();
  // F5 is intercepted by the app, not browser refresh. Wait for durable transaction result.
