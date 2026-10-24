@@ -1,3 +1,4 @@
+import {createOrigin,validateOrigin,applyOriginToProgression} from './character-origin-04b.js';
 import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel,awardProgression} from './progression-system.js';
 import {createInitialWorldRuntime03A} from '../dist/engine/world/world-integrity.js';
 import {createWorldSnapshot03E,withGeneratedMap,recordWorldSight,recordWorldLocation,restoreWorldSnapshot03E} from '../dist/engine/world/world-persistence-03e.js';
@@ -198,6 +199,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(travel!==undefined&&travel!==null&&!validateTravelState(travel,worldRegistry))throw new Error('Invalid 03-B travel state');
   if(candidate?.saveVersion!==3)throw Error('v2는 승인형 이전 후에만 적용 가능합니다.');
   // Stage validation before touching live state or map registry.
+  const origin=loaded.progression?.origin04B;
+  if(origin!==undefined&&!validateOrigin(origin))throw Error('Invalid 04-B origin payload');
   const newProgress=loaded.progression?.system04A;
   if(newProgress!==undefined&&!validateProgression(newProgress))throw Error('Invalid 04-A progression payload');
   const candidateWorld=loaded.world?.runtime?.world03E;
@@ -228,11 +231,21 @@ export function createMainV2Inventory(uiItems,options={}) {
   registry,projected,current,
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
+  origin04B(){return state.progression?.origin04B?structuredClone(state.progression.origin04B):null;},
+  chooseOrigin04B(speciesId,backgroundId){
+   if(!state.progression?.system04A)throw Error('04-B origin requires a new progression character');
+   if(state.turn!==0||state.progression.origin04B||state.progression.system04A.awards.length||revisions.size)throw Error('Origin selection is locked');
+   const origin=createOrigin(speciesId,backgroundId);
+   const progressed=applyOriginToProgression(state.progression.system04A,origin);
+   state={...state,progression:{...state.progression,origin04B:origin,system04A:progressed}};
+   return structuredClone(origin);
+  },
   setInitialAttributes(allocation){
    if(!state.progression?.system04A)throw Error('No 04-A progression on legacy save');
-   if(state.turn!==0||Object.values(state.progression.system04A.skills).some(x=>x>0)||state.progression.system04A.awards.length||revisions.size)throw Error('Creation attributes are locked after play or saving');
+   if(state.turn!==0||state.progression.system04A.awards.length||revisions.size)throw Error('Creation attributes are locked after play or saving');
    const next=createProgression(allocation);
-   state={...state,progression:{...state.progression,system04A:next}};
+   const combined=state.progression.origin04B?applyOriginToProgression(next,state.progression.origin04B):next;
+   state={...state,progression:{...state.progression,system04A:combined}};
    return structuredClone(next);
   },
   localSite(){return localSite(state);},
