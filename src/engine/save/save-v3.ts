@@ -87,7 +87,7 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
   if(!Object.entries(forest.trees).every(([id,t])=>obj(t)&&
    keys(t,['id','region','speciesId','ageDays','health','alive','deadwood'])&&
    typeof t.region==='string'&&t.region.length>0&&t.region.length<80&&
-   ['oak','pine'].includes(t.speciesId)&&id===t.id&&
+   typeof t.speciesId==='string'&&['oak','pine'].includes(t.speciesId)&&id===t.id&&
    id==='tree05c:'+encodeURIComponent(String(t.region))+':'+t.speciesId+':0'&&
    uint(t.ageDays)&&Number(t.ageDays)<=100000&&uint(t.health)&&Number(t.health)<=100&&
    typeof t.alive==='boolean'&&uint(t.deadwood)&&Number(t.deadwood)<=1000))return false;
