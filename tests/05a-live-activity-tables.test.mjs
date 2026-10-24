@@ -1,3 +1,4 @@
+import {BOTANICAL_PROFILES_05A} from '../src/botanical-profiles-05a.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
@@ -53,7 +54,7 @@ test('curated plant entries are taxonomically distinct, source-linked and season
  assert.equal(BOTANICAL_SPECIES_05A.length,6);
  assert.equal(BOTANICAL_ALL_05A.length,80);
  assert.equal(new Set(BOTANICAL_SPECIES_05A.map(s=>s.scientificName)).size,6);
- for(const sp of BOTANICAL_ALL_05A.filter(x=>x.harvestMode!=='observe')){
+ for(const sp of BOTANICAL_ALL_05A.filter(x=>BOTANICAL_PROFILES_05A.find(p=>p.id===x.id).dropEnabled)){
   assert.ok(sp.source||sp.researchSource);
   assert.ok(sp.seasons.length>0);
   for(const reg of sp.regions){
@@ -98,7 +99,7 @@ test('a newly obtained botanical persists in a version-3 save',()=>{
 });
 
 test('observe-only protected candidates never appear as harvest loot',()=>{
- for(const species of BOTANICAL_ALL_05A.filter(x=>x.harvestMode==='observe')){
+ for(const species of BOTANICAL_PROFILES_05A.filter(x=>!x.dropEnabled)){
   for(const table of Object.values(ACTIVITY_TABLES_05A))
    assert.equal(table.pool.tiers.some(t=>t.outputs.some(o=>o.itemId===species.id)),false);
  }
@@ -106,4 +107,31 @@ test('observe-only protected candidates never appear as harvest loot',()=>{
 test('all 80 species are represented as known inventory definitions',()=>{
  const g=make();
  for(const plant of BOTANICAL_ALL_05A)assert.ok(g.registry.items.has(plant.id),plant.id);
+});
+
+test('all 80 botanical profiles have an explicit purpose, part, rarity and encounter disposition',()=>{
+ assert.equal(BOTANICAL_PROFILES_05A.length,80);
+ assert.equal(new Set(BOTANICAL_PROFILES_05A.map(p=>p.id)).size,80);
+ for(const profile of BOTANICAL_PROFILES_05A){
+  assert.ok(['leaf','flower','stem','root'].includes(profile.part),profile.id);
+  assert.ok(profile.purpose,profile.id);
+  assert.ok(['common','uncommon','rare'].includes(profile.encounterClass),profile.id);
+  assert.ok(['renewable','seasonal','slow','rain-pulse'].includes(profile.renewalClass),profile.id);
+  assert.equal(profile.dropEnabled,profile.interaction==='gather');
+ }
+});
+test('rarity groups have only seasonally eligible known non-observation plants',()=>{
+ for(const [key,table] of Object.entries(ACTIVITY_TABLES_05A)){
+  for(const tier of table.pool.tiers){
+   assert.ok(tier.outputs.length>0,key);
+   for(const output of tier.outputs){
+    const profile=BOTANICAL_PROFILES_05A.find(p=>p.id===output.itemId);
+    if(!profile)continue;
+    assert.equal(profile.dropEnabled,true);
+    assert.ok(profile.regions.includes(table.region));
+    assert.equal(profile.encounterClass,tier.id);
+    assert.deepEqual(output.conditions.seasons,profile.seasons);
+   }
+  }
+ }
 });
