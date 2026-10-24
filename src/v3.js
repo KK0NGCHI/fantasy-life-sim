@@ -121,8 +121,17 @@ if(['숲','광산','강·호수'].includes(s.region)){
     const row=make('div',{class:'resource05a-row'},results);
     make('strong',{text:def.name+' · '+nodeId.split(':').at(-1)},row);
     make('span',{text:'가용 '+updated.remaining+'/'+def.capacity+(updated.progress?' · 작업 진행 '+updated.progress:'')},row);
+    const ownedTools=mainV2.availableTools05A(def.activity);
+    let chosenTool=ownedTools[0]?.id??null;
+    if(ownedTools.length>0){
+     const chooser=make('select',{'aria-label':def.name+' 사용 도구'},row);
+     for(const item of ownedTools){
+      const opt=make('option',{text:item.name},chooser);opt.value=item.id;
+     }
+     chooser.addEventListener('change',()=>{chosenTool=chooser.value;});
+    }
     const step=btn('1회 작업',()=>{
-     if(!executeV2('resource.work',{nodeId}))return render();
+     if(!executeV2('resource.work',{nodeId,...(chosenTool?{toolId:chosenTool}:{})}))return render();
      const current=mainV2.current();
      nextLog('자원 작업',def.name+' 작업 완료','현재 가용 '+current.world.runtime.resource05A.nodes[nodeId].remaining+'/'+def.capacity);
      render();
@@ -130,7 +139,7 @@ if(['숲','광산','강·호수'].includes(s.region)){
     step.disabled=updated.remaining===0;
     const bulk=btn('성과까지 (최대 50회)',()=>{
      mainV2.syncVitals(s);
-     const summary=mainV2.workUntil05A(nodeId);
+     const summary=mainV2.workUntil05A(nodeId,50,chosenTool);
      refreshV2Inventory();
      nextLog('자원 작업',def.name+' · '+summary.actions+'회, '+summary.seconds+'게임초','획득 '+summary.qty+'개 · 숙련 +'+summary.xp+' XP');
      render();
