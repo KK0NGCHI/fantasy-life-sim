@@ -1,3 +1,4 @@
+import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
 import {validateIncidentalTable05A,resolveIncidentalActivity05A,INCIDENTAL_ACTIVITY_SECONDS_05A} from './incidental-resources-05a.js';
 import {rollAvailableResourcePool05A,validateResourcePool05A} from './resource-pools-05a.js';
 import {BOTANICAL_ITEMS_05A} from './botanical-species-05a.js';
@@ -218,6 +219,16 @@ export function createMainV2Inventory(uiItems,options={}) {
     ...snapshot.world.runtime.resource05A,nodes:result.nodes
   }}}},events:[{type:'resource.site_discovered',payload:{nodeId:result.nodeId,name:def.name,newSite:result.newSite}}]};
  }],
+ ['botanical.observe',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime;
+  if(runtime.dungeon||!runtime.resource05A)throw Error('BOTANICAL_UNAVAILABLE');
+  const available=eligibleBotanicalObservations05A(runtime.region,snapshot.clock.elapsedUnits,snapshot.flags);
+  const species=available.find(p=>p.id===command.payload?.itemId);
+  if(!species)throw Error('BOTANICAL_NOT_OBSERVABLE');
+  const flag='botany05a:observed:'+species.id;
+  return {outcome:'success',nextState:{...snapshot,flags:{...snapshot.flags,[flag]:true}},
+   events:[{type:'botanical.observed',payload:{itemId:species.id,name:species.name,region:runtime.region}}]};
+ }],
  ['resource.incidental.search',(snapshot,command)=>{
   const runtime=snapshot.world.runtime;
   if(runtime.dungeon||!runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
@@ -390,6 +401,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='botanical.observe')return {turns:1,worldUnits:600};
     if(action.type==='resource.incidental.search')return {turns:1,worldUnits:INCIDENTAL_ACTIVITY_SECONDS_05A};
     if(action.type==='resource.candidate.prospect')return {turns:1,worldUnits:600};
     if(action.type==='resource.candidate.discover')return {turns:1,worldUnits:600};
