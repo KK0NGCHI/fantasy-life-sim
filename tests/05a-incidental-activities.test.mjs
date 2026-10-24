@@ -65,17 +65,44 @@ test('game-time budget is stable for repeated commands (no free reroll)',()=>{
  assert.equal(g.current().clock.elapsedUnits-before,6000);
 });
 
-test('existing region.activity can award incidental finds without a second time charge',()=>{
+test('existing region activity side reward only occurs on eligible elapsed-time boundaries',()=>{
  const ruinsPool={...pool,spawnConditions:{regions:['고대 유적']}};
  const table={region:'고대 유적',activity:'investigate',triggerChance:1,rewardMode:'item',pool:ruinsPool};
  const optionsRuins={...options(makeTable()),incidentalTables05A:{'고대 유적:investigate':table}};
  const g=createMainV2Inventory([{id:'test:initial',name:'기본',group:'재료',qty:1,tags:[]}],optionsRuins);
  assert.equal(g.dispatch('world.travel',{region:'고대 유적'}).accepted,true);
- const before=g.current().clock.elapsedUnits;
- const result=g.dispatch('region.activity',{activityId:'core:activity/ancient-ruins'});
- assert.equal(result.accepted,true,JSON.stringify(result));
- const after=g.current();
- assert.equal(after.itemWorld.items.find(x=>x.definitionId==='item05a:blueberry')?.quantity,1);
- assert.ok(after.clock.elapsedUnits>before);
- assert.ok(after.clock.elapsedUnits-before<600,'must not charge standalone 600s incidental time');
+ const start=g.current().clock.elapsedUnits;
+ let rewards=0;
+ for(let i=0;i<120;i++){
+  const previous=g.current();
+  const result=g.dispatch('region.activity',{activityId:'core:activity/ancient-ruins'});
+  assert.equal(result.accepted,true,JSON.stringify(result));
+  const after=g.current();
+  const prior=previous.itemWorld.items.find(x=>x.definitionId==='item05a:blueberry')?.quantity??0;
+  const current=after.itemWorld.items.find(x=>x.definitionId==='item05a:blueberry')?.quantity??0;
+  assert.ok(current-prior===0||current-prior===1);
+  rewards+=current-prior;
+  assert.ok(rewards<=Math.floor((after.clock.elapsedUnits-start)/600)+1);
+ }
+ assert.ok(rewards>0);
+});
+test('short work actions do not award extra discovery rolls per click',()=>{
+ const table={...makeTable(),activity:'gather'};
+ const g=createMainV2Inventory([{id:'test:initial',name:'기본',group:'재료',qty:1,tags:[]}],
+  {...options(makeTable()),incidentalTables05A:{'숲:gather':table}});
+ assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
+ const site='resource05a:wild-herb:01';
+ const start=g.current().clock.elapsedUnits;
+ let found=0;
+ for(let i=0;i<45;i++){
+  const before=g.current();
+  const result=g.dispatch('resource.work',{nodeId:site});
+  assert.equal(result.accepted,true,JSON.stringify(result));
+  const after=g.current();
+  const prev=before.itemWorld.items.find(x=>x.id==='incidental05a:item05a:blueberry')?.quantity??0;
+  const qty=after.itemWorld.items.find(x=>x.id==='incidental05a:item05a:blueberry')?.quantity??0;
+  found+=qty-prev;
+  assert.ok(found<=Math.floor((after.clock.elapsedUnits-start)/600)+1);
+ }
+ assert.ok(found>0);
 });
