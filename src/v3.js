@@ -43,7 +43,7 @@ function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 let localRemembered=[];
 let autoTarget=0;
-const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true});
+const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true});
 function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
@@ -85,6 +85,28 @@ const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업�
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
+if(s.region==='숲'){
+ const resources=mainV2.resources05A();
+ if(resources){
+  const panel=make('section',{class:'resource05a-panel','aria-label':'숲의 채집'},el);
+  make('h3',{text:'채집 · 발견한 자원 지점'},panel);
+  make('p',{class:'muted',text:'채집은 1회당 50게임초가 흐르며 군락의 잔량과 인벤토리, 채집 숙련이 함께 변합니다. 다른 자원 활동은 후속 작업입니다.'},panel);
+  for(const [nodeId,node] of Object.entries(resources.nodes)){
+   if(!node.discovered||!['resource05a:wild-herb','resource05a:mushroom','resource05a:grass'].includes(node.resourceId))continue;
+   const names={'resource05a:wild-herb':'야생 약초','resource05a:mushroom':'일반 버섯','resource05a:grass':'들풀'};
+   const row=make('div',{class:'resource05a-row'},panel);
+   make('span',{text:names[node.resourceId]+' · 잔량 '+node.remaining},row);
+   const b=btn('채집하기',()=>{
+    const before=mainV2.current().progression?.system04A?.skills?.['skill-09']??0;
+    if(!executeV2('resource.gather',{nodeId}))return render();
+    const after=mainV2.current().progression?.system04A?.skills?.['skill-09']??0;
+    nextLog('채집',names[node.resourceId]+' 1개 획득','채집 숙련 +'+(after-before)+' XP');
+    render();
+   },'btn',row);
+   b.disabled=node.remaining===0;
+  }
+ }
+}
 const actualSkills=mainV2.current().progression?.skillExperience??{};
 for(const activity of activityAt(s.region)){
  const gate=DEEP_FIELDS.some(f=>f.id===activity.id)?accessDeepField(activity,actualSkills):{ok:true};
