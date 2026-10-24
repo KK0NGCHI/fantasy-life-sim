@@ -164,3 +164,21 @@ test('05-A tool rank gates and output capacity remain bounded',()=>{
  assert.equal(first.xp,0);
  assert.equal(second.xp,0);
 });
+
+test('05-A tools: unavailable forged material is rejected without clock or node mutation',()=>{
+ const g=make();
+ assert.equal(g.availableTools05A('mining').length,1);
+ assert.equal(g.availableTools05A('mining')[0].id,'tool05a:pickaxe');
+ assert.equal(g.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const before=structuredClone(g.current());
+ const forged=g.dispatch('resource.work',{nodeId:'resource05a:stone:01',toolId:'tool05a:pickaxe:steel'});
+ assert.equal(forged.accepted,false);
+ assert.deepEqual(g.current(),before);
+ const valid=g.dispatch('resource.work',{nodeId:'resource05a:stone:01',toolId:'tool05a:pickaxe'});
+ assert.equal(valid.accepted,true);
+ assert.equal(g.current().world.runtime.resource05A.nodes['resource05a:stone:01'].progress,1);
+ const raw=saved(g),target=make();
+ target.applyApprovedSave(raw);
+ assert.deepEqual(target.availableTools05A('mining'),g.availableTools05A('mining'));
+ assert.deepEqual(target.current().world.runtime.resource05A,g.current().world.runtime.resource05A);
+});
