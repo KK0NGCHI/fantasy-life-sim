@@ -69,7 +69,7 @@ const candidateCaps05A:Readonly<Record<string,number>>={
  'source05a:mussel':4,'source05a:marsh-bell':2,'source05a:sacred-oak':1
 };
 function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
- if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites']))return false;
+ if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed']))return false;
  if(Object.hasOwn(x,'candidateSites')){
   if(!obj(x.candidateSites)||Object.keys(x.candidateSites).length>100)return false;
   if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered','lastSecond','recoveryProgress'])&&
@@ -79,6 +79,7 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
    (!Object.hasOwn(v,'lastSecond')||(uint(v.lastSecond)&&Number(v.lastSecond)<=now))&&
    (!Object.hasOwn(v,'recoveryProgress')||(typeof v.recoveryProgress==='number'&&Number.isFinite(v.recoveryProgress)&&v.recoveryProgress>=0&&v.recoveryProgress<=3*86400))))return false;
  }
+ if(Object.hasOwn(x,'ecologyClimateSeed')&&(typeof x.ecologyClimateSeed!=='string'||x.ecologyClimateSeed.length<1||x.ecologyClimateSeed.length>200))return false;
  if(Object.hasOwn(x,'ecologySites')){
   if(!obj(x.ecologySites)||Object.keys(x.ecologySites).length>250)return false;
   if(!Object.entries(x.ecologySites).every(([id,v])=>
