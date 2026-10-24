@@ -155,7 +155,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    return {outcome:'success',nextState:{...snapshot,flags:{...snapshot.flags,[result.flagKey]:true}},
      events:[{type:'origin.insight_discovered',payload:{id:result.interaction.id,description:result.interaction.description}}]};
  }],
- ['resource.gather',(snapshot,command)=>{
+ ['resource.gather',(snapshot,command)=>{try{
   const nodes=snapshot.world.runtime.resource05A?.nodes;
   if(snapshot.world.runtime.dungeon||!nodes)throw Error('RESOURCE_SYSTEM_UNAVAILABLE');
   const result=gatherResource05A(nodes,command.payload?.nodeId,snapshot.world.runtime.region,snapshot.clock.elapsedUnits);
@@ -178,6 +178,7 @@ export function createMainV2Inventory(uiItems,options={}) {
      ...snapshot.world.runtime.resource05A,nodes:{...nodes,[command.payload.nodeId]:result.node}
    }}}},
    events:[{type:'resource.gathered',payload:{resourceId:resource.id,name:resource.name,qty:1,xp:previous?resource.xp:0}}]};
+ }catch(error){console.error('05-A gather diagnosis:',error);throw error;}
  }],
  ['region.activity',(snapshot,command)=>{
    if(snapshot.world.runtime.dungeon)throw Error('Cannot start a regional activity during dungeon exploration');
