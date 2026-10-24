@@ -81,3 +81,17 @@ export function resourcePoolProbabilities05A(pool,context){
  }
  return {items,none};
 }
+
+/** Reweight eligible outputs and nonempty tiers while preserving within-tier ratios.
+ * Mode 'no-drop' maintains original conditional failure semantics. */
+export function rollAvailableResourcePool05A(pool,context,{tierRoll,outputRoll,mode='eligible-only'}={}){
+ if(mode==='no-drop')return rollResourcePool05A(pool,context,{tierRoll,outputRoll});
+ if(mode!=='eligible-only')throw Error('INVALID_POOL_MODE');
+ if(!validateResourcePool05A(pool))throw Error('INVALID_RESOURCE_POOL');
+ if(!validRoll(tierRoll)||!validRoll(outputRoll))throw Error('INVALID_RANDOM_DRAW');
+ if(!matchesResourceConditions05A(pool.spawnConditions,context)||!matchesResourceConditions05A(pool.harvestConditions,context))return {ok:false,reason:'CONDITIONS_UNMET'};
+ const eligible=pool.tiers.map(t=>({...t,outputs:t.outputs.filter(o=>matchesResourceConditions05A(o.conditions,context))})).filter(t=>t.outputs.length);
+ if(!eligible.length)return {ok:true,itemId:null,tierId:null,reason:'NO_ELIGIBLE_OUTPUT'};
+ const tier=weighted(eligible,tierRoll),output=weighted(tier.outputs,outputRoll);
+ return {ok:true,tierId:tier.id,itemId:output.itemId};
+}
