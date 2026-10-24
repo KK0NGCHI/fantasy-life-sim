@@ -1,3 +1,4 @@
+import {FUNGAL_SPECIES_05B} from './fungal-ecology-05b.js';
 import {botanicalPhenology05A} from './botanical-lifecycle-05a.js';
 /** Provisional activity tables using ONLY existing catalogued items.
  * These are playable starter values, not approved final ecology or rarity.
@@ -28,5 +29,6 @@ export const ACTIVITY_TABLES_05A=Object.freeze(Object.fromEntries(entries.map(([
  {id:'common',weight:70,outputs:[{itemId,weight:4},...BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='common'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons,...(s.renewalClass==='rain-pulse'?{weather:['rain']}:{}),...(s.purpose==='night-bloom'?{dayparts:['night']}: {})}}))]},
  {id:'uncommon',weight:25,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='uncommon'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons,...(s.renewalClass==='rain-pulse'?{weather:['rain']}:{}),...(s.purpose==='night-bloom'?{dayparts:['night']}: {})}}))},
  {id:'rare',weight:5,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='rare'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons,...(s.renewalClass==='rain-pulse'?{weather:['rain']}:{}),...(s.purpose==='night-bloom'?{dayparts:['night']}: {})}}))}
+ ,{id:'fungal',weight:12,outputs:FUNGAL_SPECIES_05B.filter(x=>x.regions.includes(region)&&activity==='explore').map(x=>({itemId:x.id,weight:1,conditions:{seasons:x.seasons}}))}
  ].filter(t=>t.outputs.length)}})
 ])));
