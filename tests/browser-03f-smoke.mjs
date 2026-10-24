@@ -10,6 +10,17 @@ try{
  await page.locator('#top .top-title').waitFor();
  assert.match(await page.locator('#top').innerText(),/08:00:00/);
  assert.equal(await page.locator('#main').isVisible(),true);
+ // 04-B: origin selection is character identity; distinct from attribute budget.
+ await page.getByRole('button',{name:'캐릭터',exact:true}).first().click();
+ await page.getByRole('button',{name:'종족·배경 선택'}).click();
+ const originDialog=page.getByRole('dialog',{name:'종족과 배경 선택'});
+ await originDialog.getByRole('combobox',{name:'종족 선택'}).selectOption('gnome');
+ await originDialog.getByRole('combobox',{name:'배경 선택'}).selectOption('miner');
+ assert.match(await originDialog.locator('.origin-choice-detail').innerText(),/소형/);
+ assert.match(await originDialog.locator('.origin-choice-detail').innerText(),/갱도의 언어/);
+ await originDialog.getByRole('button',{name:'종족·배경 확정'}).click();
+ assert.match(await page.getByRole('dialog',{name:'캐릭터'}).innerText(),/노움 · 광부/);
+ await page.getByRole('button',{name:'닫기'}).first().click();
  // 04-A: creation points are displayed with immediate feedback and confirm semantics.
  await page.getByRole('button',{name:'캐릭터',exact:true}).first().click();
  await page.getByRole('button',{name:'능력치',exact:true}).click();
