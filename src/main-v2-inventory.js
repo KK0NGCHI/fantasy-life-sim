@@ -1,3 +1,4 @@
+import {resolveOriginInteraction} from './origin-interactions-04c.js';
 import {createOrigin,validateOrigin,applyOriginToProgression} from './character-origin-04b.js';
 import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel,awardProgression} from './progression-system.js';
 import {createInitialWorldRuntime03A} from '../dist/engine/world/world-integrity.js';
@@ -145,6 +146,13 @@ export function createMainV2Inventory(uiItems,options={}) {
     events:[{type:result.encounter?'world.travel_encounter':result.arrival?'world.travelled':'world.travel_progress',
        payload:{encounter:result.encounter,arrived:result.arrival}}]};
  }],
+ ['origin.insight',(snapshot,command)=>{
+   if(snapshot.world.runtime.dungeon)throw Error('Origin insight is a regional interaction');
+   const result=resolveOriginInteraction(snapshot.progression?.origin04B,snapshot.world.runtime.region,command.payload.interactionId,snapshot.flags);
+   if(!result.ok)throw Error(result.reason);
+   return {outcome:'success',nextState:{...snapshot,flags:{...snapshot.flags,[result.flagKey]:true}},
+     events:[{type:'origin.insight_discovered',payload:{id:result.interaction.id,description:result.interaction.description}}]};
+ }],
  ['region.activity',(snapshot,command)=>{
    if(snapshot.world.runtime.dungeon)throw Error('Cannot start a regional activity during dungeon exploration');
    const result=activityPreview(snapshot.world.runtime.region,command.payload.activityId,snapshot.progression?.system04A?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(snapshot.progression.system04A.skills[def.id])])):snapshot.progression?.skillExperience??{});
@@ -177,6 +185,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='origin.insight')return {turns:1,worldUnits:60};
     if(action.type==='dungeon.portal')return {turns:1,worldUnits:6};
     if(action.type==='dungeon.move'){
      const [x,y]=current.world.runtime.pos;
