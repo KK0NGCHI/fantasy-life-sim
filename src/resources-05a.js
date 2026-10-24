@@ -122,3 +122,29 @@ export function workResource05A(nodes,nodeId,region,seconds,{toolKind=null,toolR
  if(qty>0){changes.lastSecond=seconds;changes.recoveryProgress=0;}
  return {ok:true,resource:def,node:changes,qty,xp:earned,activity:def.activity};
 }
+
+/** Deterministic, demand-driven regional prospecting. Nonrenewing metal veins
+ * are NEVER reset. Fresh nodes get new IDs and distinct remaining quantities.
+ * Quotas are game-day based; repeated searching cannot bypass them. */
+export function discoverResource05A(nodes,resourceId,region,seconds){
+ const def=RESOURCE_MAP_05A.get(resourceId);
+ if(!def||region!==def.region||!Number.isSafeInteger(seconds)||seconds<0)return {ok:false,reason:'INVALID_PROSPECT'};
+ const oldId=Object.keys(nodes).sort().find(key=>nodes[key].resourceId===resourceId&&!nodes[key].discovered);
+ if(oldId)return {ok:true,nodeId:oldId,nodes:{...nodes,[oldId]:{...nodes[oldId],discovered:true}},newSite:false};
+ if(def.activity!=='mining'||def.id==='resource05a:stone'&&seconds<DAY)return {ok:false,reason:'NO_DISCOVERABLE_SITES'};
+ const initialCounts={'resource05a:stone':6,'resource05a:coal':3,'resource05a:copper-ore':4,'resource05a:iron-ore':3};
+ const initial=initialCounts[resourceId];
+ if(!initial)return {ok:false,reason:'NO_DISCOVERABLE_SITES'};
+ const day=Math.floor((seconds+28800)/DAY);
+ const week=Math.floor(day/7);
+ const perPeriod=resourceId==='resource05a:iron-ore'?1:2;
+ const extra=resourceId==='resource05a:stone'?day*2:week*perPeriod;
+ const known=Object.values(nodes).filter(x=>x.resourceId===resourceId).length;
+ if(known>=initial+extra)return {ok:false,reason:'SUPPLY_NOT_READY'};
+ if(Object.keys(nodes).length>=6000)return {ok:false,reason:'RESOURCE_HISTORY_LIMIT'};
+ const id=resourceId+':prospect:'+String(known-initial+1).padStart(5,'0');
+ if(Object.hasOwn(nodes,id))return {ok:false,reason:'DUPLICATE_SITE'};
+ return {ok:true,nodeId:id,newSite:true,nodes:{...nodes,[id]:{
+  resourceId,remaining:def.capacity,progress:0,lastSecond:seconds,recoveryProgress:0,discovered:true,cycle:0
+ }}};
+}
