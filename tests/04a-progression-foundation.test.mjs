@@ -34,7 +34,7 @@ test('04-A awards once for each action, invalid action and replay cannot farm XP
 test('04-A XP and attribute growth are deterministic across JSON saves',()=>{
  let p=createProgression({근력:5});
  const skill=SKILL_DEFINITIONS.find(s=>s.name==='벌목');
- for(let i=0;i<40;i++)p=awardProgression(p,{actionId:'wood-'+i,skillId:skill.id,xp:20});
+ for(let i=0;i<120;i++)p=awardProgression(p,{actionId:'wood-'+i,skillId:skill.id,xp:20});
  assert.equal(validateProgression(p),true);
  assert.ok(p.attributes.근력>15);
  assert.deepEqual(JSON.parse(JSON.stringify(p)),p);
