@@ -87,11 +87,12 @@ test('existing region activity side reward only occurs on eligible elapsed-time 
  assert.ok(rewards>0);
 });
 test('short work actions do not award extra discovery rolls per click',()=>{
- const table={...makeTable(),activity:'gather'};
+ const table={...makeTable(),activity:'fishing',region:'강·호수',pool:{...pool,spawnConditions:{regions:['강·호수']}}};
  const g=createMainV2Inventory([{id:'test:initial',name:'기본',group:'재료',qty:1,tags:[]}],
-  {...options(makeTable()),incidentalTables05A:{'숲:gather':table}});
+  {...options(makeTable()),incidentalTables05A:{'강·호수:fishing':table}});
  assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
- const site='resource05a:wild-herb:01';
+ assert.equal(g.dispatch('world.travel',{region:'강·호수'}).accepted,true);
+ const site='resource05a:small-fish:01';
  const start=g.current().clock.elapsedUnits;
  let found=0;
  for(let i=0;i<45;i++){
