@@ -64,17 +64,25 @@ export function fungalReconcile05B(site,def,second,worldSeed){
 /** Fruiting requires rain recently, adequate season and correct substrate.
  * A species can survive the season without a fruiting body.
  */
+/** Age since last triggering rain day, including today. The underlying
+ * mycelium persists when a fruit body ages out. Provisional lifecycle:
+ * fresh on rain day, mature next day, old on day 2, decomposed from day 3.
+ */
 export function fungalFruiting05B(species,region,second,seed,substrate){
- if(!species||!species.regions.includes(region))return {present:false,fruiting:false,reason:'WRONG_HABITAT'};
+ if(!Number.isSafeInteger(second)||second<0)throw Error('INVALID_FUNGAL_TIME');
+ if(!species||!species.regions.includes(region))return {present:false,fruiting:false,stage:'absent',reason:'WRONG_HABITAT'};
  const day=Math.floor((second+28800)/86400);
  const season=['spring','summer','autumn','winter'][Math.floor(day%112/28)];
- if(substrate!==undefined&&substrate!==species.substrate)return {present:true,fruiting:false,reason:'WRONG_SUBSTRATE'};
- if(!species.seasons.includes(season))return {present:true,fruiting:false,reason:'OFF_SEASON'};
- for(let d=Math.max(0,day-3);d<=day;d++){
-  if(ecologyClimate05A(seed,region,d*86400).weather==='rain')
-   return {present:true,fruiting:true,reason:'FRUITING'};
+ if(substrate!==undefined&&substrate!==species.substrate)return {present:true,fruiting:false,stage:'dormant',reason:'WRONG_SUBSTRATE'};
+ if(!species.seasons.includes(season))return {present:true,fruiting:false,stage:'dormant',reason:'OFF_SEASON'};
+ let lastWet=-1;
+ for(let d=day;d>=Math.max(0,day-3);d--){
+  if(ecologyClimate05A(seed,region,d*86400).weather==='rain'){lastWet=d;break}
  }
- return {present:true,fruiting:false,reason:'DRY_PERIOD'};
+ if(lastWet<0)return {present:true,fruiting:false,stage:'dormant',reason:'DRY_PERIOD'};
+ const ageDays=day-lastWet;
+ const stage=ageDays===0?'fresh':ageDays===1?'mature':ageDays===2?'aging':'decomposed';
+ return {present:true,fruiting:ageDays<=1,stage,ageDays,reason:ageDays<=1?'FRUITING':stage==='aging'?'AGING':'DECOMPOSED'};
 }
 export function fungalHarvest05B(site,def,second,seed,roll=0){
  const p=FUNGAL_BY_ID_05B.get(site?.speciesId);
