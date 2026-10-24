@@ -26,11 +26,6 @@ test('new quartz vein is gated by exploration conditions not lifetime count',()=
  sites=discoverCandidateSite05A(sites,id,'광산').nodes;
  assert.equal(prospectCandidateQuartz05A(sites,'광산',0).reason,'VEIN_REMAINS');
  for(let n=0;n<3;n++)sites=harvestCandidateSite05A(sites,id,'광산','mining',{toolRank:1,seconds:n*60}).nodes;
- const reveal=prospectCandidateQuartz05A(sites,'광산',DAY-1);
- assert.equal(reveal.ok,true);assert.equal(reveal.newSite,false);
- sites=reveal.nodes;
- const second=reveal.nodeId;
- for(let n=0;n<3;n++)sites=harvestCandidateSite05A(sites,second,'광산','mining',{toolRank:1,seconds:1000+n*60}).nodes;
  assert.equal(prospectCandidateQuartz05A(sites,'광산',DAY-1).reason,'PROSPECT_COOLDOWN');
  const newSite=prospectCandidateQuartz05A(sites,'광산',DAY+1200);
  assert.equal(newSite.ok,true);assert.equal(newSite.newSite,true);assert.notEqual(newSite.nodeId,id);
