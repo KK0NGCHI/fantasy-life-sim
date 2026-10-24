@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createTreeWorld05C,advanceWoodland05C,validateTreeWorld05C} from '../src/woodland-cycle-05c.js';
+import {createTreeWorld05C,createWoodlandSubstrates05C,advanceWoodland05C,validateTreeWorld05C} from '../src/woodland-cycle-05c.js';
 import {createSubstrateWorld05B,substrateId05B} from '../src/fungal-substrates-05b.js';
 import {createFungalEcology05B} from '../src/fungal-ecology-05b.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
