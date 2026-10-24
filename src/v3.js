@@ -1,3 +1,4 @@
+import {RESOURCES_05A,RESOURCE_MAP_05A,resourceAt05A} from './resources-05a.js';
 import {availableOriginInteractions} from './origin-interactions-04c.js';
 import {SPECIES,BACKGROUNDS} from './character-origin-04b.js';
 import {SKILL_DEFINITIONS,skillLevel,skillThreshold,ATTRIBUTES} from './progression-system.js';
@@ -85,26 +86,50 @@ const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업�
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
-if(s.region==='숲'){
- const resources=mainV2.resources05A();
- if(resources){
-  const panel=make('section',{class:'resource05a-panel','aria-label':'숲의 채집'},el);
-  make('h3',{text:'채집 · 발견한 자원 지점'},panel);
-  make('p',{class:'muted',text:'채집은 1회당 50게임초가 흐르며 군락의 잔량과 인벤토리, 채집 숙련이 함께 변합니다. 다른 자원 활동은 후속 작업입니다.'},panel);
-  for(const [nodeId,node] of Object.entries(resources.nodes)){
-   if(!node.discovered||!['resource05a:wild-herb','resource05a:mushroom','resource05a:grass'].includes(node.resourceId))continue;
-   const names={'resource05a:wild-herb':'야생 약초','resource05a:mushroom':'일반 버섯','resource05a:grass':'들풀'};
-   const row=make('div',{class:'resource05a-row'},panel);
-   make('span',{text:names[node.resourceId]+' · 잔량 '+node.remaining},row);
-   const b=btn('채집하기',()=>{
-    const before=mainV2.current().progression?.system04A?.skills?.['skill-09']??0;
-    if(!executeV2('resource.gather',{nodeId}))return render();
-    const after=mainV2.current().progression?.system04A?.skills?.['skill-09']??0;
-    nextLog('채집',names[node.resourceId]+' 1개 획득','채집 숙련 +'+(after-before)+' XP');
-    render();
-   },'btn',row);
-   b.disabled=node.remaining===0;
+if(['숲','광산','강·호수'].includes(s.region)){
+ const snapshot=mainV2.resources05A();
+ if(snapshot){
+  const panel=make('section',{class:'resource05a-panel','aria-label':'지역 자원 활동'},el);
+  make('h3',{text:'자원 활동'},panel);
+  make('p',{class:'muted',text:'활동 종류를 선택하고 발견한 지점을 지정합니다. 실제 결과에 따라 시간·재료·숙련이 함께 변합니다.'},panel);
+  const groups=RESOURCES_05A.filter(r=>r.region===s.region).map(r=>r.activity);
+  const kinds=[...new Set(groups)],titles={gather:'채집',logging:'벌목',mining:'채광',fishing:'낚시'};
+  const tabs=make('div',{class:'resource05a-tabs'},panel);
+  const results=make('div',{class:'resource05a-list'},panel);
+  const state={kind:kinds[0]};
+  function populate(){
+   results.innerHTML='';
+   tabs.innerHTML='';
+   for(const kind of kinds){
+    const b=btn(titles[kind],()=>{state.kind=kind;populate()},'btn',tabs);
+    b.setAttribute('aria-pressed',String(state.kind===kind));
+   }
+   const elapsed=mainV2.current().clock.elapsedUnits;
+   for(const [nodeId,node] of Object.entries(mainV2.resources05A().nodes)){
+    const def=RESOURCE_MAP_05A.get(node.resourceId);
+    if(!node.discovered||!def||def.region!==s.region||def.activity!==state.kind)continue;
+    const updated=resourceAt05A(node,def,elapsed);
+    const row=make('div',{class:'resource05a-row'},results);
+    make('strong',{text:def.name+' · '+nodeId.split(':').at(-1)},row);
+    make('span',{text:'가용 '+updated.remaining+'/'+def.capacity+(updated.progress?' · 작업 진행 '+updated.progress:'')},row);
+    const step=btn('1회 작업',()=>{
+     if(!executeV2('resource.work',{nodeId}))return render();
+     const current=mainV2.current();
+     nextLog('자원 작업',def.name+' 작업 완료','현재 가용 '+current.world.runtime.resource05A.nodes[nodeId].remaining+'/'+def.capacity);
+     render();
+    },'btn',row);
+    step.disabled=updated.remaining===0;
+    const bulk=btn('성과까지 (최대 50회)',()=>{
+     mainV2.syncVitals(s);
+     const summary=mainV2.workUntil05A(nodeId);
+     refreshV2Inventory();
+     nextLog('자원 작업',def.name+' · '+summary.actions+'회, '+summary.seconds+'게임초','획득 '+summary.qty+'개 · 숙련 +'+summary.xp+' XP');
+     render();
+    },'btn',row);
+    bulk.disabled=updated.remaining===0;
+   }
   }
+  populate();
  }
 }
 const actualSkills=mainV2.current().progression?.skillExperience??{};
