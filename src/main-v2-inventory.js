@@ -1,3 +1,4 @@
+import {rollAvailableResourcePool05A,validateResourcePool05A} from './resource-pools-05a.js';
 import {CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 import {createCandidateSites05A,discoverCandidateSite05A,harvestCandidateSite05A,acquiredCompendium05A,SOURCE_WORK_RULES_05A,prospectCandidateQuartz05A,reconcileCandidateSite05A} from './resource-sites-05a.js';
 import {RESOURCES_05A,createResourceNodes05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS,discoverResource05A} from './resources-05a.js';
@@ -18,6 +19,8 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
  */
 export function createMainV2Inventory(uiItems,options={}) {
+ const poolOverrides=options.resourcePools05A??{};
+ if(!poolOverrides||typeof poolOverrides!=='object'||Array.isArray(poolOverrides)||Object.entries(poolOverrides).some(([source,pool])=>!SOURCE_WORK_RULES_05A[source]||!validateResourcePool05A(pool)||pool.tiers.some(t=>t.outputs.some(o=>!CATALOG_ITEMS_05A.some(i=>i.id===o.itemId)))))throw Error('INVALID_RESOURCE_POOL_CONFIG');
  const preferences=options.preferences??(typeof localStorage==='undefined'?null:localStorage);
  const resourceItems=CATALOG_ITEMS_05A.map(r=>({id:r.id,name:r.name,group:'채취 재료',qty:0,tags:[]}));
  const starterTools=[{id:'tool05a:gloves',name:'천 채집 장갑',group:'도구',qty:1,tags:['tool:gather']},{id:'tool05a:axe',name:'석재 벌목 도끼',group:'도구',qty:1,tags:['tool:logging']},{id:'tool05a:pickaxe',name:'석재 곡괭이',group:'도구',qty:1,tags:['tool:mining']},{id:'tool05a:rod',name:'목재 낚싯대',group:'도구',qty:1,tags:['tool:fishing']}];
@@ -211,15 +214,29 @@ export function createMainV2Inventory(uiItems,options={}) {
   const rank=selected?(Number(materialTools05A.find(x=>x.id===selected.definitionId)?.tags.find(t=>t.startsWith('rank:'))?.slice(5)??1)):0;
   const outcome=harvestCandidateSite05A(resources.candidateSites,nodeId,runtime.region,rule.activity,{toolRank:rank,seconds:snapshot.clock.elapsedUnits});
   if(!outcome.ok)throw Error(outcome.reason);
+  const pool=poolOverrides[site.sourceId];
+  let rng=snapshot.rng,rewards=outcome.rewards;
+  if(pool){
+   const first=drawRandom(rng,'action'),second=drawRandom(first.rng,'action');
+   rng=second.rng;
+   const calendar=gameClockAt(snapshot.clock.elapsedUnits);
+   const season=['spring','summer','autumn','winter'][Math.floor((Math.floor((snapshot.clock.elapsedUnits+28800)/86400)%112)/28)];
+   const hour=Math.floor(((snapshot.clock.elapsedUnits+28800)%86400)/3600);
+   const daypart=hour<6?'dawn':hour<18?'day':hour<21?'dusk':'night';
+   const pick=rollAvailableResourcePool05A(pool,{region:runtime.region,season,daypart,weather:command.payload?.weather??'clear'},
+    {tierRoll:first.value,outputRoll:second.value,mode:command.payload?.poolMode??'eligible-only'});
+   if(!pick.ok)throw Error(pick.reason);
+   rewards=pick.itemId?[{itemId:pick.itemId,quantity:1,sourceId:site.sourceId,region:runtime.region,traits:[]}]:[];
+  }
   let itemWorld=snapshot.itemWorld;
-  for(const reward of outcome.rewards){
+  for(const reward of rewards){
    const itemId='candidate05a:'+reward.itemId,old=itemWorld.items.find(x=>x.id===itemId);
    itemWorld={...itemWorld,items:old?itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+reward.quantity}:x):[...itemWorld.items,{id:itemId,definitionId:reward.itemId,quantity:reward.quantity}],
     placements:old?itemWorld.placements:[...itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
   }
-  const compendium=acquiredCompendium05A(resources.compendium,outcome.rewards);
-  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:outcome.nodes,compendium}}}},
-   events:[{type:'resource.candidate_acquired',payload:{nodeId,rewards:outcome.rewards}}]};
+  const compendium=acquiredCompendium05A(resources.compendium,rewards);
+  return {outcome:'success',nextState:{...snapshot,rng,itemWorld,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:outcome.nodes,compendium}}}},
+   events:[{type:'resource.candidate_acquired',payload:{nodeId,rewards}}]};
  }],
  ['resource.work',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon||!snapshot.world.runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
