@@ -228,6 +228,13 @@ export function createMainV2Inventory(uiItems,options={}) {
   registry,projected,current,
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
+  setInitialAttributes(allocation){
+   if(!state.progression?.system04A)throw Error('No 04-A progression on legacy save');
+   if(state.turn!==0||Object.values(state.progression.system04A.skills).some(x=>x>0)||state.progression.system04A.awards.length||revisions.size)throw Error('Creation attributes are locked after play or saving');
+   const next=createProgression(allocation);
+   state={...state,progression:{...state.progression,system04A:next}};
+   return structuredClone(next);
+  },
   localSite(){return localSite(state);},
   rememberedCells(){const snapshot=state.world.runtime.world03E;const map=[...localRegistry.maps.values()].find(m=>m.siteId===localSite(state)&&m.floor===(state.world.runtime.localFloor??0));return snapshot?.world?.seenCells?.[map?.id]??[];},
   localMap(){return structuredClone([...localRegistry.maps.values()].find(m=>m.siteId===localSite(state)&&m.floor===(state.world.runtime.localFloor??0)));},
