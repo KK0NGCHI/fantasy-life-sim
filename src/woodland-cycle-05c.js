@@ -9,6 +9,18 @@ const TREE_TYPES_05C=Object.freeze([
  {id:'pine',regions:['숲','산맥','설원'],growthDays:32,lifespanDays:500,litter:2,wood:14}
 ]);
 export const TREE_DEFINITIONS_05C=TREE_TYPES_05C;
+/** Fill substrate kinds required by the tree/litter/soil cycle in every
+ * tree habitat, rather than silently skipping missing fungal host ledgers.
+ */
+export function createWoodlandSubstrates05C(base){
+ const world={...base};
+ const regions=new Set(TREE_TYPES_05C.flatMap(tree=>tree.regions));
+ for(const region of regions)for(const type of ['leaf-litter','rich-soil','deadwood','living-tree-roots']){
+  const id=substrateId05B(region,type);
+  if(!world[id])world[id]={id,region,type,remaining:type==='living-tree-roots'?100:0,updatedAt:0};
+ }
+ return world;
+}
 export function createTreeWorld05C(){
  return Object.fromEntries(TREE_TYPES_05C.flatMap(species=>species.regions.map(region=>{
   const id='tree05c:'+encodeURIComponent(region)+':'+species.id+':0';
