@@ -14,7 +14,7 @@ The current UI passes `ACTIVITY_TABLES_05A` into `createMainV2Inventory`. A regi
 | 습지 | explore | 16% | 갈대 |
 | 강·호수 | fishing | 8% | 갈대 |
 | 해안·항구 | explore | 12% | 홍합 |
-| 설원 | explore | 3% | 송어 (placeholder; replace with grounded snow-area content) |
+| 설원 | explore | 3% | 일반 돌 (임시 산출물; 설원 고유 자원 미확정) |
 | 사막 | explore | 6% | 일반 돌 |
 | 산맥 | explore | 10% | 일반 돌 |
 | 광산 | mining | 8% | 일반 돌 |
