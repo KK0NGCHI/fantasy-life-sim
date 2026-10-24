@@ -1,4 +1,5 @@
-import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
+import {eligibleBotanicalObservations05A,botanicalCanHarvest05A,botanicalMarkHarvest05A} from './botanical-lifecycle-05a.js';
+import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 import {validateIncidentalTable05A,resolveIncidentalActivity05A,INCIDENTAL_ACTIVITY_SECONDS_05A} from './incidental-resources-05a.js';
 import {rollAvailableResourcePool05A,validateResourcePool05A} from './resource-pools-05a.js';
 import {BOTANICAL_ITEMS_05A} from './botanical-species-05a.js';
@@ -244,7 +245,12 @@ export function createMainV2Inventory(uiItems,options={}) {
     region:runtime.region,activity:kind,season,daypart,weather:runtime.weather05A
    },{trigger:a.value,tier:b.value,output:c.value});
   if(!result.ok)throw Error(result.reason);
-  let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found;
+  let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found,flags=snapshot.flags;
+  const botanical=BOTANICAL_PROFILE_BY_ID_05A.get(result.itemId);
+  if(found&&botanical){
+   const allowed=botanicalCanHarvest05A(flags,botanical,snapshot.clock.elapsedUnits,runtime.weather05A);
+   if(!allowed.ok)found=false;
+  }
   let event={type:'resource.incidental_empty',payload:{activity:kind}};
   if(found&&result.rewardMode==='discover-site'){
    const entry=Object.entries(resource05A.candidateSites??{}).sort(([a],[b])=>a.localeCompare(b))
@@ -256,6 +262,7 @@ export function createMainV2Inventory(uiItems,options={}) {
     event={type:'resource.incidental_discovered',payload:{activity:kind,nodeId,itemId:result.itemId}};
    }else found=false;
   }else if(found){
+   if(botanical)flags=botanicalMarkHarvest05A(flags,botanical,snapshot.clock.elapsedUnits);
    const itemId='incidental05a:'+result.itemId;
    const original=itemWorld.items.find(x=>x.id===itemId);
    itemWorld={...itemWorld,
@@ -267,7 +274,7 @@ export function createMainV2Inventory(uiItems,options={}) {
     [{itemId:result.itemId,quantity:1}])};
    event={type:'resource.incidental_acquired',payload:{activity:kind,itemId:result.itemId,quantity:1}};
   }
-  return {outcome:'success',nextState:{...snapshot,rng:c.rng,itemWorld,
+  return {outcome:'success',nextState:{...snapshot,rng:c.rng,itemWorld,flags,
    world:{...snapshot.world,runtime:{...runtime,resource05A}}},
    events:[event]};
  }],
