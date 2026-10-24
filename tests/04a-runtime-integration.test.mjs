@@ -44,3 +44,18 @@ test('04-A rejects modified invalid progression before applying live state',()=>
  assert.throws(()=>game.applyApprovedSave(bad),/Invalid 04-A/);
  assert.deepEqual(game.current(),previous);
 });
+
+test('04-A new dungeon discovery grants real exploration XP only for unseen cells',()=>{
+ const g=make({progression04A:true});
+ const first=g.progression04A();
+ assert.equal(first.skills['skill-01'],0);
+ assert.equal(g.dispatch('dungeon.enter').accepted,true);
+ const after=g.progression04A().skills['skill-01'];
+ assert.ok(after>0);
+ const beforeSeen=g.rememberedCells().length;
+ g.dispatch('dungeon.move',{direction:'east'});
+ const current=g.progression04A().skills['skill-01'];
+ assert.equal(current,g.rememberedCells().length);
+ assert.ok(current>=after);
+ assert.ok(g.rememberedCells().length>=beforeSeen);
+});
