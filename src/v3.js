@@ -1,3 +1,4 @@
+import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
 import {ACTIVITY_TABLES_05A} from './activity-tables-05a.js';
 import {RESOURCE_SPECIES_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
@@ -89,6 +90,23 @@ const places=make('div',{class:'scene-spots'},hero);
 const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업장','workshop'],['waves','강변','water']]:hue==='forest'?[['trees','숲길','growing'],['leaf','채집지','workshop'],['tent-tree','야영지','water']]:hue==='river'?[['fish','어장','water'],['waves','강변','growing'],['leaf','수풀','workshop']]:[['compass','탐색지','growing'],['pickaxe','자원지','workshop'],['map-pin','지형','water']];
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
+const ecologySites=Object.values(mainV2.current().world.runtime.resource05A?.ecologySites??{}).filter(x=>x.region===s.region&&x.discovered);
+if(ecologySites.length){
+ const ecologicalPanel=make('div',{class:'resource05a-panel','aria-label':'발견한 식물 군락'},el);
+ make('h3',{text:'발견한 식물 군락'},ecologicalPanel);
+ for(const site of ecologySites){
+  const profile=BOTANICAL_PROFILE_BY_ID_05A.get(site.speciesId);
+  if(!profile)continue;
+  const row=make('div',{class:'resource05a-row'},ecologicalPanel);
+  make('strong',{text:profile.name+' · 군락 '+(site.patch+1)},row);
+  make('span',{text:'기록된 잔량 '+site.remaining},row);
+  if(profile.dropEnabled)btn('군락에서 채집 (1분)',()=>{
+   if(!executeV2('botanical.patch.harvest',{siteId:site.id}))return render();
+   nextLog('식물 채집',profile.name+'의 '+profile.part+' 재료를 획득했습니다.');
+   render();
+  },'btn',row);
+ }
+}
 const botanicalObservers=eligibleBotanicalObservations05A(s.region,mainV2.current().clock.elapsedUnits,mainV2.current().flags);
 if(botanicalObservers.length){
  const observationPanel=make('div',{class:'resource05a-panel'},el);
