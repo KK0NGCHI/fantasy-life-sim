@@ -1,4 +1,4 @@
-import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,RESOURCE_MAP_05A} from './resources-05a.js';
+import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS} from './resources-05a.js';
 import {resolveOriginInteraction} from './origin-interactions-04c.js';
 import {createOrigin,validateOrigin,applyOriginToProgression} from './character-origin-04b.js';
 import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel,awardProgression} from './progression-system.js';
@@ -18,9 +18,11 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
 export function createMainV2Inventory(uiItems,options={}) {
  const preferences=options.preferences??(typeof localStorage==='undefined'?null:localStorage);
  const resourceItems=RESOURCES_05A.map(r=>({id:r.itemId,name:r.name,group:'채취 재료',qty:0,tags:[]}));
- const templates=new Map([...uiItems,...resourceItems].map(item=>[item.id,{...item}]));
- const categories=[...new Set([...uiItems,...resourceItems].map(x=>x.group))];
- const catalog={categories,rarities:[],materials:[],effects:[],items:[...uiItems,...resourceItems].map(item=>({
+ const starterTools=[{id:'tool05a:gloves',name:'천 채집 장갑',group:'도구',qty:1,tags:['tool:gather']},{id:'tool05a:axe',name:'석재 벌목 도끼',group:'도구',qty:1,tags:['tool:logging']},{id:'tool05a:pickaxe',name:'석재 곡괭이',group:'도구',qty:1,tags:['tool:mining']},{id:'tool05a:rod',name:'목재 낚싯대',group:'도구',qty:1,tags:['tool:fishing']}];
+ const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
+ const templates=new Map([...initialItems,...resourceItems].map(item=>[item.id,{...item}]));
+ const categories=[...new Set([...initialItems,...resourceItems].map(x=>x.group))];
+ const catalog={categories,rarities:[],materials:[],effects:[],items:[...initialItems,...resourceItems].map(item=>({
   id:item.id,nameKey:item.name,categoryId:item.group,tags:item.tags??[],capabilities:[]
  }))};
  const built=buildItemRegistry(catalog);
@@ -70,8 +72,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
   world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A()}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
-   items:uiItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
-   placements:uiItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
+   items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
+   placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
    containers:[]
   }
  };
@@ -155,6 +157,40 @@ export function createMainV2Inventory(uiItems,options={}) {
    return {outcome:'success',nextState:{...snapshot,flags:{...snapshot.flags,[result.flagKey]:true}},
      events:[{type:'origin.insight_discovered',payload:{id:result.interaction.id,description:result.interaction.description}}]};
  }],
+ ['resource.work',(snapshot,command)=>{
+  if(snapshot.world.runtime.dungeon||!snapshot.world.runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
+  const nodeId=command.payload?.nodeId;
+  const def=RESOURCE_MAP_05A.get(snapshot.world.runtime.resource05A.nodes?.[nodeId]?.resourceId);
+  if(!def)throw Error('RESOURCE_NOT_FOUND');
+  const tools={logging:'tool05a:axe',mining:'tool05a:pickaxe',fishing:'tool05a:rod'};
+  const ownTool=snapshot.itemWorld.items.find(x=>x.definitionId===tools[def.activity]&&x.quantity>0&&
+   snapshot.itemWorld.placements.some(p=>p.itemId===x.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
+  const toolKind=RESOURCE_TOOL_KINDS[def.activity],toolRank=toolKind===null?0:(ownTool?1:0);
+  const timer=drawRandom(snapshot.rng,'action');
+  const outcome=drawRandom(timer.rng,'action');
+  const result=workResource05A(snapshot.world.runtime.resource05A.nodes,nodeId,snapshot.world.runtime.region,snapshot.clock.elapsedUnits,
+   {toolKind:ownTool?toolKind:null,toolRank,outcomeRoll:outcome.value});
+  if(!result.ok)throw Error(result.reason);
+  const itemId='gather05a:'+result.resource.id,original=snapshot.itemWorld.items.find(x=>x.id===itemId);
+  const itemWorld=result.qty===0?snapshot.itemWorld:{
+   ...snapshot.itemWorld,
+   items:original?snapshot.itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+result.qty}:x):
+    [...snapshot.itemWorld.items,{id:itemId,definitionId:result.resource.itemId,quantity:result.qty}],
+   placements:original?snapshot.itemWorld.placements:
+    [...snapshot.itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]
+  };
+  const prior=snapshot.progression?.system04A;
+  const xpSkill={gather:'채집',logging:'벌목',mining:'채광',fishing:'낚시'}[result.activity];
+  const progression=prior&&result.xp>0?{...snapshot.progression,system04A:awardProgression(prior,{
+    actionId:'05a:'+nodeId+':'+snapshot.turn,skillId:SKILL_DEFINITIONS.find(x=>x.name===xpSkill).id,xp:result.xp
+   })}:snapshot.progression;
+  return {outcome:result.qty>0?'success':'failed',nextState:{...snapshot,rng:outcome.rng,itemWorld,progression,
+   world:{...snapshot.world,runtime:{...snapshot.world.runtime,resource05A:{
+    ...snapshot.world.runtime.resource05A,nodes:{...snapshot.world.runtime.resource05A.nodes,[nodeId]:result.node}
+   }}}},
+   events:[{type:'resource.work_done',payload:{resourceId:result.resource.id,name:result.resource.name,
+    activity:result.activity,qty:result.qty,xp:result.xp,progress:result.node.progress}}]};
+ }],
  ['resource.gather',(snapshot,command)=>{try{
   const nodes=snapshot.world.runtime.resource05A?.nodes;
   if(snapshot.world.runtime.dungeon||!nodes)throw Error('RESOURCE_SYSTEM_UNAVAILABLE');
@@ -212,6 +248,12 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='resource.work'){
+     const node=current.world.runtime.resource05A?.nodes?.[action.payload?.nodeId];
+     const def=RESOURCE_MAP_05A.get(node?.resourceId);
+     if(!def)throw Error('Unknown resource duration');
+     return {turns:1,worldUnits:workDuration05A(def.activity,drawRandom(current.rng,'action').value)};
+    }
     if(action.type==='resource.gather')return {turns:1,worldUnits:50};
     if(action.type==='origin.insight')return {turns:1,worldUnits:60};
     if(action.type==='dungeon.portal')return {turns:1,worldUnits:6};
@@ -269,6 +311,21 @@ export function createMainV2Inventory(uiItems,options={}) {
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
   resources05A(){return state.world.runtime.resource05A?structuredClone(state.world.runtime.resource05A):null;},
+  workUntil05A(nodeId,maxAttempts=50){
+   if(!Number.isSafeInteger(maxAttempts)||maxAttempts<1||maxAttempts>50)return {accepted:false,reason:'INVALID_COUNT'};
+   let actions=0,qty=0,xp=0,seconds=0,last=null;
+   for(;actions<maxAttempts;actions++){
+    const before=state.clock.elapsedUnits;
+    const result=this.dispatch('resource.work',{nodeId});
+    if(!result.accepted){last=result;break;}
+    seconds+=state.clock.elapsedUnits-before;
+    for(const event of result.events)if(event.type==='resource.work_done'){
+     qty+=event.payload.qty;xp+=event.payload.xp;
+    }
+    if(qty>0){actions++;break;}
+   }
+   return {accepted:actions>0,actions,qty,xp,seconds,last};
+  },
   origin04B(){return state.progression?.origin04B?structuredClone(state.progression.origin04B):null;},
   chooseOrigin04B(speciesId,backgroundId){
    if(!state.progression?.system04A)throw Error('04-B origin requires a new progression character');
