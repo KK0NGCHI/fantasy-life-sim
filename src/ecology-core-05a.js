@@ -5,11 +5,17 @@
 const isObj=x=>!!x&&typeof x==='object'&&!Array.isArray(x);
 const finite=n=>typeof n==='number'&&Number.isFinite(n);
 const uint=n=>Number.isSafeInteger(n)&&n>=0;
+const validChoices=(x,choices)=>x===undefined||Array.isArray(x)&&x.length>0&&new Set(x).size===x.length&&x.every(v=>choices.includes(v));
 export function validateEcologyDefinition(def){
  return isObj(def)&&typeof def.id==='string'&&def.id.length>0&&
  Array.isArray(def.habitats)&&def.habitats.length>0&&def.habitats.every(x=>typeof x==='string'&&x.length>0)&&
  uint(def.capacity)&&def.capacity>0&&uint(def.regrowSeconds)&&def.regrowSeconds>0&&
- Array.isArray(def.outputs)&&def.outputs.length>0&&def.outputs.every(o=>isObj(o)&&typeof o.id==='string'&&o.id&&
+ validChoices(def.seasons,['spring','summer','autumn','winter'])&&
+ validChoices(def.weather,['clear','rain','snow','fog','storm'])&&
+ validChoices(def.dayparts,['dawn','day','dusk','night'])&&
+ (def.minElevation===undefined||finite(def.minElevation))&&
+ (def.maxDepth===undefined||finite(def.maxDepth))&&
+ Array.isArray(def.outputs)&&def.outputs.length>0&&new Set(def.outputs.map(o=>o?.id)).size===def.outputs.length&&def.outputs.every(o=>isObj(o)&&typeof o.id==='string'&&o.id&&
  finite(o.weight)&&o.weight>0&&['leaf','flower','stem','root','seed','material'].includes(o.part)&&
  ['any','mature','bloom'].includes(o.stage))&&
  ['gather','observe'].includes(def.mode);
