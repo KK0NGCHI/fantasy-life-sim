@@ -19,10 +19,22 @@ export function createMainV2Inventory(uiItems,options={}) {
  const preferences=options.preferences??(typeof localStorage==='undefined'?null:localStorage);
  const resourceItems=RESOURCES_05A.map(r=>({id:r.itemId,name:r.name,group:'채취 재료',qty:0,tags:[]}));
  const starterTools=[{id:'tool05a:gloves',name:'천 채집 장갑',group:'도구',qty:1,tags:['tool:gather']},{id:'tool05a:axe',name:'석재 벌목 도끼',group:'도구',qty:1,tags:['tool:logging']},{id:'tool05a:pickaxe',name:'석재 곡괭이',group:'도구',qty:1,tags:['tool:mining']},{id:'tool05a:rod',name:'목재 낚싯대',group:'도구',qty:1,tags:['tool:fishing']}];
+ const materialTools05A=[
+  ...[['copper',2,'구리'],['iron',3,'철'],['steel',4,'강철']].flatMap(([material,rank,name])=>
+   [['axe','벌목 도끼'],['pickaxe','곡괭이']].map(([kind,label])=>({
+    id:'tool05a:'+kind+':'+material,name:name+' '+label,group:'도구',qty:0,tags:['tool:'+kind,'material:'+material,'rank:'+rank]
+   }))),
+  ...[['processedWood',2,'가공 목재'],['reinforcedWood',3,'강화 목재']].map(([material,rank,name])=>({
+   id:'tool05a:rod:'+material,name:name+' 낚싯대',group:'도구',qty:0,tags:['tool:rod','material:'+material,'rank:'+rank]
+  })),
+  ...[['leather',2,'가죽'],['reinforcedLeather',3,'강화 가죽']].map(([material,rank,name])=>({
+   id:'tool05a:gloves:'+material,name:name+' 채집 장갑',group:'도구',qty:0,tags:['tool:gather','material:'+material,'rank:'+rank]
+  }))
+ ];
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
- const templates=new Map([...initialItems,...resourceItems].map(item=>[item.id,{...item}]));
- const categories=[...new Set([...initialItems,...resourceItems].map(x=>x.group))];
- const catalog={categories,rarities:[],materials:[],effects:[],items:[...initialItems,...resourceItems].map(item=>({
+ const templates=new Map([...initialItems,...resourceItems,...materialTools05A].map(item=>[item.id,{...item}]));
+ const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A].map(x=>x.group))];
+ const catalog={categories,rarities:[],materials:[],effects:[],items:[...initialItems,...resourceItems,...materialTools05A].map(item=>({
   id:item.id,nameKey:item.name,categoryId:item.group,tags:item.tags??[],capabilities:[]
  }))};
  const built=buildItemRegistry(catalog);
@@ -172,14 +184,20 @@ export function createMainV2Inventory(uiItems,options={}) {
   const nodeId=command.payload?.nodeId;
   const def=RESOURCE_MAP_05A.get(snapshot.world.runtime.resource05A.nodes?.[nodeId]?.resourceId);
   if(!def)throw Error('RESOURCE_NOT_FOUND');
-  const tools={logging:'tool05a:axe',mining:'tool05a:pickaxe',fishing:'tool05a:rod'};
-  const ownTool=snapshot.itemWorld.items.find(x=>x.definitionId===tools[def.activity]&&x.quantity>0&&
+  const toolPrefix={logging:'tool05a:axe',mining:'tool05a:pickaxe',fishing:'tool05a:rod',gather:'tool05a:gloves'}[def.activity];
+  const requested=command.payload?.toolId;
+  const owned=snapshot.itemWorld.items.filter(x=>x.quantity>0&&(x.definitionId===toolPrefix||x.definitionId.startsWith(toolPrefix+':'))&&
    snapshot.itemWorld.placements.some(p=>p.itemId===x.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
-  const toolKind=RESOURCE_TOOL_KINDS[def.activity],toolRank=toolKind===null?0:(ownTool?1:0);
+  const chosen=requested?owned.find(x=>x.definitionId===requested):owned[0];
+  if(requested&&!chosen)throw Error('TOOL_NOT_OWNED');
+  const baseRank=chosen?.definitionId===toolPrefix?1:0;
+  const materialRank=materialTools05A.find(x=>x.id===chosen?.definitionId)?.tags.find(x=>x.startsWith('rank:'));
+  const toolRank=chosen?Number(materialRank?.slice(5)??baseRank):0;
+  const toolKind=RESOURCE_TOOL_KINDS[def.activity];
   const timer=drawRandom(snapshot.rng,'action');
   const outcome=drawRandom(timer.rng,'action');
   const result=workResource05A(snapshot.world.runtime.resource05A.nodes,nodeId,snapshot.world.runtime.region,snapshot.clock.elapsedUnits,
-   {toolKind:ownTool?toolKind:null,toolRank,outcomeRoll:outcome.value});
+   {toolKind:chosen?toolKind:null,toolRank,outcomeRoll:outcome.value});
   if(!result.ok)throw Error(result.reason);
   const itemId='gather05a:'+result.resource.id,original=snapshot.itemWorld.items.find(x=>x.id===itemId);
   const itemWorld=result.qty===0?snapshot.itemWorld:{
@@ -296,12 +314,19 @@ export function createMainV2Inventory(uiItems,options={}) {
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
   resources05A(){return state.world.runtime.resource05A?structuredClone(state.world.runtime.resource05A):null;},
-  workUntil05A(nodeId,maxAttempts=50){
+  availableTools05A(activity){
+   const prefix={gather:'tool05a:gloves',logging:'tool05a:axe',mining:'tool05a:pickaxe',fishing:'tool05a:rod'}[activity];
+   if(!prefix)return [];
+   return state.itemWorld.items.filter(x=>x.quantity>0&&(x.definitionId===prefix||x.definitionId.startsWith(prefix+':'))&&
+    state.itemWorld.placements.some(p=>p.itemId===x.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
+    .map(x=>({id:x.definitionId,name:templates.get(x.definitionId)?.name??x.definitionId}));
+  },
+  workUntil05A(nodeId,maxAttempts=50,toolId=null){
    if(!Number.isSafeInteger(maxAttempts)||maxAttempts<1||maxAttempts>50)return {accepted:false,reason:'INVALID_COUNT'};
    let actions=0,qty=0,xp=0,seconds=0,last=null;
    for(;actions<maxAttempts;actions++){
     const before=state.clock.elapsedUnits;
-    const result=this.dispatch('resource.work',{nodeId});
+    const result=this.dispatch('resource.work',{nodeId,...(toolId?{toolId}:{})});
     if(!result.accepted){last=result;break;}
     seconds+=state.clock.elapsedUnits-before;
     for(const event of result.events)if(event.type==='resource.work_done'){
