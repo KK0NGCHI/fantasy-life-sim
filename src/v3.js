@@ -278,7 +278,7 @@ function openOriginCreation(){
 function openAttributeCreation(){
  const current=mainV2.progression04A();
  if(!current)return;
- const canEdit=mainV2.current().turn===0&&current.awards.length===0&&Object.values(current.skills).every(x=>x===0);
+ const canEdit=mainV2.current().turn===0&&current.awards.length===0;
  if(!canEdit){nextLog('안내','게임 진행 이후에는 초기 능력치 배분을 변경할 수 없습니다.');render();return;}
  const previous=document.getElementById('attributeCreationDialog');previous?.remove();
  const dlg=make('dialog',{id:'attributeCreationDialog',class:'large-dialog','aria-label':'초기 능력치 배분'},document.body);
@@ -323,7 +323,7 @@ function character(){
   else if(p&&mainV2.current().turn===0)btn('종족·배경 선택',openOriginCreation,'btn',left);
  }else if(s.tab==='능력치'&&p){
   left.innerHTML='<h2>기본 능력치</h2>'+ATTRIBUTES.map(k=>'<div class="textrow"><strong>'+esc(k)+'</strong><span>'+p.attributes[k]+' · 훈련 '+p.training[k]+'</span></div>').join('');
-  if(mainV2.current().turn===0&&p.awards.length===0&&Object.values(p.skills).every(x=>x===0))btn('초기 능력치 배분',openAttributeCreation,'btn',left);
+  if(mainV2.current().turn===0&&p.awards.length===0)btn('초기 능력치 배분',openAttributeCreation,'btn',left);
   make('p',{class:'muted',text:'시작 배분은 최초 행동 또는 저장 전까지 변경할 수 있습니다. 수치는 현재 시험안입니다.'},left);
  }else if(s.tab==='능력치'){
   make('p',{class:'muted',text:'기존 저장에는 04-A 능력치 데이터가 없습니다. 자동 이전하지 않습니다.'},left);
