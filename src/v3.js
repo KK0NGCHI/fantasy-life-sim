@@ -1,3 +1,5 @@
+import {RESOURCE_SPECIES_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
+import {SOURCE_WORK_RULES_05A} from './resource-sites-05a.js';
 import {RESOURCES_05A,RESOURCE_MAP_05A,resourceAt05A} from './resources-05a.js';
 import {availableOriginInteractions} from './origin-interactions-04c.js';
 import {SPECIES,BACKGROUNDS} from './character-origin-04b.js';
@@ -86,12 +88,29 @@ const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업�
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
-if(['숲','광산','강·호수'].includes(s.region)){
+if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','산맥'].includes(s.region)){
  const snapshot=mainV2.resources05A();
  if(snapshot){
   const panel=make('section',{class:'resource05a-panel','aria-label':'지역 자원 활동'},el);
   make('h3',{text:'자원 활동'},panel);
   make('p',{class:'muted',text:'활동 종류를 선택하고 발견한 지점을 지정합니다. 실제 결과에 따라 시간·재료·숙련이 함께 변합니다.'},panel);
+  const candidates=Object.entries(snapshot.candidateSites??{}).filter(([id,site])=>site.region===s.region&&SOURCE_WORK_RULES_05A[site.sourceId]);
+  if(candidates.length){
+   const candidatePanel=make('div',{class:'resource05a-list'},panel);
+   make('h4',{text:'신규 검증 자원'},candidatePanel);
+   for(const [id,site] of candidates){
+    const species=RESOURCE_SPECIES_05A.find(x=>x.id===site.sourceId),rule=SOURCE_WORK_RULES_05A[site.sourceId];
+    const row=make('div',{class:'resource05a-row'},candidatePanel);
+    make('strong',{text:species?.name??site.sourceId},row);
+    make('span',{text:site.discovered?'남은 수량 '+site.remaining:'미발견 지점'},row);
+    if(!site.discovered)btn('지점 발견',()=>{if(executeV2('resource.candidate.discover',{nodeId:id}))render();},'btn',row);
+    else {
+     const tool=mainV2.availableTools05A(rule.activity)[0];
+     const b=btn('1회 채취',()=>{if(executeV2('resource.candidate.work',{nodeId:id,...(tool?{toolId:tool.id}:{})}))render();},'btn',row);
+     b.disabled=site.remaining===0;
+    }
+   }
+  }
   const groups=RESOURCES_05A.filter(r=>r.region===s.region).map(r=>r.activity);
   const kinds=[...new Set(groups)],titles={gather:'채집',logging:'벌목',mining:'채광',fishing:'낚시'};
   const tabs=make('div',{class:'resource05a-tabs'},panel);
