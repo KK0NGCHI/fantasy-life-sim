@@ -1,3 +1,4 @@
+import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel} from './progression-system.js';
 import {createInitialWorldRuntime03A} from '../dist/engine/world/world-integrity.js';
 import {createWorldSnapshot03E,withGeneratedMap,recordWorldSight,recordWorldLocation,restoreWorldSnapshot03E} from '../dist/engine/world/world-persistence-03e.js';
 import {activityPreview} from './region-activities.js';
@@ -63,7 +64,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{})}},progression:{skillExperience:{}},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:uiItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:uiItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -145,7 +146,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  }],
  ['region.activity',(snapshot,command)=>{
    if(snapshot.world.runtime.dungeon)throw Error('Cannot start a regional activity during dungeon exploration');
-   const result=activityPreview(snapshot.world.runtime.region,command.payload.activityId,snapshot.progression?.skillExperience??{});
+   const result=activityPreview(snapshot.world.runtime.region,command.payload.activityId,snapshot.progression?.system04A?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(snapshot.progression.system04A.skills[def.id])])):snapshot.progression?.skillExperience??{});
    if(!result.ok)throw Error(result.reason);
    return {outcome:'success',nextState:snapshot,events:[{type:'region.activity_performed',payload:{activityId:command.payload.activityId,activityKind:result.kind,encounterEligible:result.encounterEligible,combatStarted:false}}]};
  }],
@@ -197,6 +198,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(travel!==undefined&&travel!==null&&!validateTravelState(travel,worldRegistry))throw new Error('Invalid 03-B travel state');
   if(candidate?.saveVersion!==3)throw Error('v2는 승인형 이전 후에만 적용 가능합니다.');
   // Stage validation before touching live state or map registry.
+  const newProgress=loaded.progression?.system04A;
+  if(newProgress!==undefined&&!validateProgression(newProgress))throw Error('Invalid 04-A progression payload');
   const candidateWorld=loaded.world?.runtime?.world03E;
   if(options.generatedWorld===true&&persistedWorld&&!candidateWorld&&loaded.world.runtime.dungeon)
    throw Error('이전 생성형 던전 저장에는 지형 스냅샷이 없습니다. 원본 슬롯을 유지하고 별도 이전 절차가 필요합니다.');
@@ -223,6 +226,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  };
  return {
   registry,projected,current,
+  skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
+  progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
   localSite(){return localSite(state);},
   rememberedCells(){const snapshot=state.world.runtime.world03E;const map=[...localRegistry.maps.values()].find(m=>m.siteId===localSite(state)&&m.floor===(state.world.runtime.localFloor??0));return snapshot?.world?.seenCells?.[map?.id]??[];},
   localMap(){return structuredClone([...localRegistry.maps.values()].find(m=>m.siteId===localSite(state)&&m.floor===(state.world.runtime.localFloor??0)));},
