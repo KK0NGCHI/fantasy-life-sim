@@ -69,7 +69,7 @@ const candidateCaps05A:Readonly<Record<string,number>>={
  'source05a:mussel':4,'source05a:marsh-bell':2,'source05a:sacred-oak':1
 };
 function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
- if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed']))return false;
+ if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed','ecologySubstrates']))return false;
  if(Object.hasOwn(x,'candidateSites')){
   if(!obj(x.candidateSites)||Object.keys(x.candidateSites).length>100)return false;
   if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered','lastSecond','recoveryProgress'])&&
@@ -80,6 +80,16 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
    (!Object.hasOwn(v,'recoveryProgress')||(typeof v.recoveryProgress==='number'&&Number.isFinite(v.recoveryProgress)&&v.recoveryProgress>=0&&v.recoveryProgress<=3*86400))))return false;
  }
  if(Object.hasOwn(x,'ecologyClimateSeed')&&(typeof x.ecologyClimateSeed!=='string'||x.ecologyClimateSeed.length<1||x.ecologyClimateSeed.length>200))return false;
+ if(Object.hasOwn(x,'ecologySubstrates')){
+  if(!obj(x.ecologySubstrates)||Object.keys(x.ecologySubstrates).length>100)return false;
+  if(!Object.entries(x.ecologySubstrates).every(([id,v])=>
+   obj(v)&&keys(v,['id','region','type','remaining','updatedAt'])&&
+   typeof v.id==='string'&&v.id===id&&typeof v.region==='string'&&v.region.length>0&&v.region.length<80&&
+   typeof v.type==='string'&&['deadwood','hardwood','living-tree-roots','grassland-soil','leaf-litter','rich-soil'].includes(v.type)&&
+   id==='substrate05b:'+encodeURIComponent(v.region)+':'+v.type&&
+   uint(v.remaining)&&Number(v.remaining)<=1000&&uint(v.updatedAt)&&Number(v.updatedAt)<=now
+  ))return false;
+ }
  if(Object.hasOwn(x,'ecologySites')){
   if(!obj(x.ecologySites)||Object.keys(x.ecologySites).length>250)return false;
   if(!Object.entries(x.ecologySites).every(([id,v])=>
