@@ -93,7 +93,7 @@ for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+
 const actions=make('div',{class:'v3-actions'},el);
 const ecologySites=Object.values(mainV2.current().world.runtime.resource05A?.ecologySites??{}).filter(x=>x.region===s.region&&x.discovered);
 if(ecologySites.length){
- const ecologicalPanel=make('div',{class:'resource05a-panel','aria-label':'발견한 식물 군락'},el);
+ const ecologicalPanel=make('div',{class:'resource05a-panel','aria-label':'발견한 생태 군락'},el);
  make('h3',{text:'발견한 식물 군락'},ecologicalPanel);
  for(const site of ecologySites){
   const profile=BOTANICAL_PROFILE_BY_ID_05A.get(site.speciesId)??FUNGAL_BY_ID_05B.get(site.speciesId);
@@ -103,7 +103,7 @@ if(ecologySites.length){
   make('span',{text:'기록된 잔량 '+site.remaining},row);
   if(profile.dropEnabled!==false)btn('군락에서 채집 (1분)',()=>{
    if(!executeV2('botanical.patch.harvest',{siteId:site.id}))return render();
-   nextLog('식물 채집',profile.name+' 채집을 마쳤습니다.');
+   nextLog('생태 채집',profile.name+' 채집을 마쳤습니다.');
    render();
   },'btn',row);
  }
