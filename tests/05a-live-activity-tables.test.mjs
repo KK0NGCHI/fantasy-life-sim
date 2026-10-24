@@ -2,7 +2,7 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
 import {validateIncidentalTable05A} from '../src/incidental-resources-05a.js';
-import {BOTANICAL_ITEMS_05A,BOTANICAL_SPECIES_05A} from '../src/botanical-species-05a.js';
+import {BOTANICAL_ITEMS_05A,BOTANICAL_SPECIES_05A,BOTANICAL_ALL_05A} from '../src/botanical-species-05a.js';
 import {CATALOG_ITEMS_05A} from '../src/resource-catalog-05a.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
@@ -51,9 +51,10 @@ test('existing region investigation remains usable with configured side finds',(
 
 test('curated plant entries are taxonomically distinct, source-linked and season-filtered',()=>{
  assert.equal(BOTANICAL_SPECIES_05A.length,6);
+ assert.equal(BOTANICAL_ALL_05A.length,80);
  assert.equal(new Set(BOTANICAL_SPECIES_05A.map(s=>s.scientificName)).size,6);
- for(const sp of BOTANICAL_SPECIES_05A){
-  assert.match(sp.source,/^https:\/\//);
+ for(const sp of BOTANICAL_ALL_05A.filter(x=>x.harvestMode!=='observe')){
+  assert.ok(sp.source||sp.researchSource);
   assert.ok(sp.seasons.length>0);
   for(const reg of sp.regions){
    const table=ACTIVITY_TABLES_05A[reg+':explore'];
