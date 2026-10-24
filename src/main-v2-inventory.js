@@ -1,5 +1,5 @@
 import {ecologyClimate05A} from './ecology-climate-05a.js';
-import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_MAP_05A} from './botanical-ecology-adapter-05a.js';
+import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_MAP_05A,BOTANICAL_SEED_ITEMS_05A} from './botanical-ecology-adapter-05a.js';
 import {ecologySiteId,ecologyInteract,ecologyReconcile} from './ecology-core-05a.js';
 import {eligibleBotanicalObservations05A,botanicalCanHarvest05A,botanicalMarkHarvest05A} from './botanical-lifecycle-05a.js';
 import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
@@ -26,7 +26,7 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
  */
 export function createMainV2Inventory(uiItems,options={}) {
- const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A];
+ const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A];
  const poolOverrides=options.resourcePools05A??{};
  if(!poolOverrides||typeof poolOverrides!=='object'||Array.isArray(poolOverrides)||Object.entries(poolOverrides).some(([source,pool])=>!SOURCE_WORK_RULES_05A[source]||!validateResourcePool05A(pool)||pool.tiers.some(t=>t.outputs.some(o=>!knownResourceItems05A.some(i=>i.id===o.itemId)))))throw Error('INVALID_RESOURCE_POOL_CONFIG');
  const incidentalTables05A=options.incidentalTables05A??{};
