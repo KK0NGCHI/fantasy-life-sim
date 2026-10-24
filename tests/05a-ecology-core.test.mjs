@@ -1,3 +1,4 @@
+import {ecologyClimate05A} from '../src/ecology-climate-05a.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createEcologySite,ecologyInteract,ecologyReconcile,ecologyAdvance,validateEcologyDefinition} from '../src/ecology-core-05a.js';
@@ -58,4 +59,36 @@ test('real world patch depletes on incidental collection and survives save-v3',(
  assert.equal(decodeSaveV3(save,g.registry).ok,true);
  const restored=make();restored.applyApprovedSave(save);
  assert.deepEqual(restored.current().world.runtime.resource05A.ecologySites,g.current().world.runtime.resource05A.ecologySites);
+});
+
+test('provisional climate is deterministic across repeats and differs between region/day',()=>{
+ const a=ecologyClimate05A('world-seed','사막',14*86400);
+ assert.deepEqual(a,ecologyClimate05A('world-seed','사막',14*86400));
+ assert.notDeepEqual(a,ecologyClimate05A('world-seed','설원',14*86400));
+ assert.ok(['rain','snow','fog','clear'].includes(a.weather));
+ const samples=Array.from({length:112},(_,day)=>ecologyClimate05A('world-seed','사막',day*86400).weather);
+ assert.ok(samples.includes('rain'),'there must be some plausible seasonal desert rainfall');
+});
+test('common species can occupy multiple independent regional patches',()=>{
+ const sites=createBotanicalEcology05A();
+ const plant='item05a:plantago-major';
+ const patches=Object.values(sites).filter(s=>s.region==='초원·농경지'&&s.speciesId===plant);
+ assert.equal(patches.length,2);
+ const def=BOTANICAL_ECOLOGY_MAP_05A.get(plant);
+ const updated=ecologyInteract(patches[0],def,{region:'초원·농경지',season:'spring',mature:true,bloom:true},{second:0,roll:0});
+ assert.equal(updated.ok,true);
+ assert.equal(updated.site.remaining,patches[0].remaining-1);
+ assert.equal(patches[1].remaining,def.capacity);
+});
+test('game-created ecological climate seed stays unchanged over approved-save roundtrip',()=>{
+ const g=make();
+ const initial=g.current().world.runtime.resource05A.ecologyClimateSeed;
+ assert.ok(initial);
+ const v2=createSaveV2(g.current(),meta,'test',g.registry);
+ const converted=prepareSecondsV2ToV3(v2,g.registry);assert.equal(converted.ok,true);
+ const save=createSaveV3(converted.state,meta,'test',g.registry);
+ assert.equal(decodeSaveV3(save,g.registry).ok,true);
+ const restored=make();restored.applyApprovedSave(save);
+ assert.equal(restored.current().world.runtime.resource05A.ecologyClimateSeed,initial);
+ assert.deepEqual(ecologyClimate05A(initial,'숲',86400),ecologyClimate05A(restored.current().world.runtime.resource05A.ecologyClimateSeed,'숲',86400));
 });
