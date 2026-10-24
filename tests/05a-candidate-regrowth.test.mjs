@@ -26,6 +26,11 @@ test('new quartz vein is gated by exploration conditions not lifetime count',()=
  sites=discoverCandidateSite05A(sites,id,'광산').nodes;
  assert.equal(prospectCandidateQuartz05A(sites,'광산',0).reason,'VEIN_REMAINS');
  for(let n=0;n<3;n++)sites=harvestCandidateSite05A(sites,id,'광산','mining',{toolRank:1,seconds:n*60}).nodes;
+ const reveal=prospectCandidateQuartz05A(sites,'광산',DAY-1);
+ assert.equal(reveal.ok,true);assert.equal(reveal.newSite,false);
+ sites=reveal.nodes;
+ const second=reveal.nodeId;
+ for(let n=0;n<3;n++)sites=harvestCandidateSite05A(sites,second,'광산','mining',{toolRank:1,seconds:1000+n*60}).nodes;
  assert.equal(prospectCandidateQuartz05A(sites,'광산',DAY-1).reason,'PROSPECT_COOLDOWN');
  const newSite=prospectCandidateQuartz05A(sites,'광산',DAY);
  assert.equal(newSite.ok,true);assert.equal(newSite.newSite,true);assert.notEqual(newSite.nodeId,id);
@@ -61,7 +66,7 @@ test('28/112/224 game-day recurring supply, zero respawn exploits',()=>{
    for(let d=1;d<=days;d++){
     n=reconcileCandidateSite05A(n,d*DAY);
     total+=n.remaining;
-    n={...n,remaining:0,recoveryProgress:0};
+    n={...n,remaining:0};
    }
    results[key]=total;
   }
