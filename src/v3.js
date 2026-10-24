@@ -1,3 +1,4 @@
+import {ACTIVITY_TABLES_05A} from './activity-tables-05a.js';
 import {RESOURCE_SPECIES_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 import {SOURCE_WORK_RULES_05A} from './resource-sites-05a.js';
 import {RESOURCES_05A,RESOURCE_MAP_05A,resourceAt05A} from './resources-05a.js';
@@ -46,7 +47,7 @@ function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 let localRemembered=[];
 let autoTarget=0;
-const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true});
+const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,incidentalTables05A:ACTIVITY_TABLES_05A});
 function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
@@ -87,6 +88,18 @@ const places=make('div',{class:'scene-spots'},hero);
 const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업장','workshop'],['waves','강변','water']]:hue==='forest'?[['trees','숲길','growing'],['leaf','채집지','workshop'],['tent-tree','야영지','water']]:hue==='river'?[['fish','어장','water'],['waves','강변','growing'],['leaf','수풀','workshop']]:[['compass','탐색지','growing'],['pickaxe','자원지','workshop'],['map-pin','지형','water']];
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
+const incidental=ACTIVITY_TABLES_05A[s.region+':explore'];
+if(incidental){
+ const discoverPanel=make('div',{class:'resource05a-panel'},el);
+ make('h3',{text:'지역 탐색 · 부수 발견'},discoverPanel);
+ make('p',{class:'muted',text:'10분간 지역을 탐색합니다. 발견 확률 및 산출물은 시험용 값이며, 아무것도 찾지 못할 수 있습니다.'},discoverPanel);
+ btn('주변 탐색 (10분)',()=>{
+  if(!executeV2('resource.incidental.search',{activity:'explore'}))return render();
+  nextLog('탐색','지역을 탐색했습니다.','부수 발견 결과는 게임 기록 및 인벤토리에 반영됩니다.');
+  render();
+ },'btn',discoverPanel);
+}
+
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
 if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','산맥'].includes(s.region)){
  const snapshot=mainV2.resources05A();
