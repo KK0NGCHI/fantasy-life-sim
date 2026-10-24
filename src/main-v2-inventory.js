@@ -223,6 +223,39 @@ export function createMainV2Inventory(uiItems,options={}) {
     ...snapshot.world.runtime.resource05A,nodes:result.nodes
   }}}},events:[{type:'resource.site_discovered',payload:{nodeId:result.nodeId,name:def.name,newSite:result.newSite}}]};
  }],
+ ['botanical.patch.harvest',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,resources=runtime.resource05A;
+  if(runtime.dungeon||!resources?.ecologySites)throw Error('ECOLOGY_UNAVAILABLE');
+  const id=command.payload?.siteId,site=resources.ecologySites[id];
+  if(!site||!site.discovered||site.region!==runtime.region)throw Error('ECOLOGY_SITE_UNKNOWN');
+  const def=BOTANICAL_ECOLOGY_MAP_05A.get(site.speciesId);
+  if(!def||def.mode!=='gather')throw Error('ECOLOGY_NOT_HARVESTABLE');
+  const second=snapshot.clock.elapsedUnits,day=Math.floor((second+28800)/86400);
+  const hour=Math.floor(((second+28800)%86400)/3600);
+  const season=['spring','summer','autumn','winter'][Math.floor(day%112/28)];
+  const daypart=hour<6?'dawn':hour<18?'day':hour<21?'dusk':'night';
+  const weather=runtime.weather05A??(typeof resources.ecologyClimateSeed==='string'?
+   ecologyClimate05A(resources.ecologyClimateSeed,runtime.region,second).weather:undefined);
+  const draw=drawRandom(snapshot.rng,'action');
+  const outcome=ecologyInteract(site,def,{region:runtime.region,season,daypart,weather,
+   mature:true,bloom:def.outputs.some(o=>o.stage==='bloom')},
+   {second,roll:draw.value,action:'gather'});
+  if(!outcome.ok)throw Error(outcome.reason);
+  const item=outcome.outputs[0];
+  const inventoryId='ecology05a:'+site.speciesId;
+  const original=snapshot.itemWorld.items.find(x=>x.id===inventoryId);
+  const itemWorld={...snapshot.itemWorld,
+   items:original?snapshot.itemWorld.items.map(x=>x.id===inventoryId?{...x,quantity:x.quantity+item.quantity}:x):
+    [...snapshot.itemWorld.items,{id:inventoryId,definitionId:item.itemId,quantity:item.quantity}],
+   placements:original?snapshot.itemWorld.placements:
+    [...snapshot.itemWorld.placements,{itemId:inventoryId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
+  const resource05A={...resources,
+   ecologySites:{...resources.ecologySites,[site.id]:outcome.site},
+   compendium:acquiredCompendium05A(resources.compendium,[{itemId:item.itemId,quantity:item.quantity}])};
+  return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld,
+   world:{...snapshot.world,runtime:{...runtime,resource05A}}},
+   events:[{type:'botanical.patch_harvested',payload:{siteId:site.id,itemId:item.itemId,part:item.part,quantity:item.quantity}}]};
+ }],
  ['botanical.observe',(snapshot,command)=>{
   const runtime=snapshot.world.runtime;
   if(runtime.dungeon||!runtime.resource05A)throw Error('BOTANICAL_UNAVAILABLE');
@@ -432,6 +465,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='botanical.patch.harvest')return {turns:1,worldUnits:60};
     if(action.type==='botanical.observe')return {turns:1,worldUnits:600};
     if(action.type==='resource.incidental.search')return {turns:1,worldUnits:INCIDENTAL_ACTIVITY_SECONDS_05A};
     if(action.type==='resource.candidate.prospect')return {turns:1,worldUnits:600};
