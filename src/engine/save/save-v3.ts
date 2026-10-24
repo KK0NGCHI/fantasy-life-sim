@@ -83,13 +83,15 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
  if(Object.hasOwn(x,'ecologySites')){
   if(!obj(x.ecologySites)||Object.keys(x.ecologySites).length>250)return false;
   if(!Object.entries(x.ecologySites).every(([id,v])=>
-   obj(v)&&keys(v,['id','speciesId','region','patch','remaining','updatedAt','discovered','wetCredit'])&&
+   obj(v)&&keys(v,['id','speciesId','region','patch','remaining','updatedAt','discovered','wetCredit','substrate','substrateHealth'])&&
    id.startsWith('eco05a:')&&id.length<=220&&v.id===id&&
    typeof v.speciesId==='string'&&(v.speciesId.startsWith('item05a:')||v.speciesId.startsWith('item05b:'))&&v.speciesId.length<=150&&
    typeof v.region==='string'&&v.region.length<80&&uint(v.patch)&&Number(v.patch)<=10&&
    uint(v.remaining)&&Number(v.remaining)<=10&&uint(v.updatedAt)&&Number(v.updatedAt)<=now&&
    typeof v.discovered==='boolean'&&
    (!Object.hasOwn(v,'wetCredit')||(uint(v.wetCredit)&&Number(v.wetCredit)<=10))&&
+   (!Object.hasOwn(v,'substrate')||(typeof v.substrate==='string'&&v.substrate.length<=50))&&
+   (!Object.hasOwn(v,'substrateHealth')||(uint(v.substrateHealth)&&Number(v.substrateHealth)<=100))&&
    id==='eco05a:'+encodeURIComponent(String(v.region))+':'+encodeURIComponent(String(v.speciesId))+':'+String(v.patch)
   ))return false;
  }
