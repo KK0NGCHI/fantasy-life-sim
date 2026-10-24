@@ -1,3 +1,4 @@
+import {SKILL_DEFINITIONS,skillLevel,skillThreshold,ATTRIBUTES} from './progression-system.js';
 import {activityAt,accessDeepField,DEEP_FIELDS,DANGEROUS_REGIONS} from './region-activities.js';
 import {createMainV2Inventory} from './main-v2-inventory.js';
 
@@ -40,7 +41,7 @@ function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 let localRemembered=[];
 let autoTarget=0;
-const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true});
+const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true});
 function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
@@ -254,7 +255,26 @@ else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="
 else left.innerHTML='<h2>'+esc(s.tab)+'</h2>';
 right.innerHTML='<h3>'+esc(s.tab)+'</h3>';
 }
-function skills(){const el=head('숙련','');tabs(el,['생활','전투','마법','기타'],changeTab);const rows=s.tab==='생활'?SKILLS.filter(([n])=>!['학문'].includes(n)):s.tab==='기타'?SKILLS.filter(([n])=>n==='학문'):[];const skillTable=make('div',{class:'tablewrap'},el);skillTable.innerHTML='<table><thead><tr><th>숙련</th><th class="right">레벨</th><th>EXP</th></tr></thead><tbody>'+rows.map(([n,l])=>'<tr><td>'+esc(n)+'</td><td class="right">'+l+'</td><td>—</td></tr>').join('')+'</tbody></table>';if(!rows.length)make('p',{class:'empty',text:'항목 없음'},el)}
+function skills(){
+ const p=mainV2.progression04A();
+ const el=head('숙련',p?'54개 숙련 · 캐릭터 전체 레벨 없음':'기존 저장의 숙련 정보');
+ if(!p){
+  make('p',{class:'muted',text:'이 저장은 구형 성장 데이터입니다. 자동으로 새로운 성장 데이터로 변환하지 않습니다.'},el);
+  return;
+ }
+ const attr=make('div',{class:'tablewrap'},el);
+ attr.innerHTML='<table><thead><tr><th>기본 능력치</th><th class="right">수치</th><th class="right">훈련점</th></tr></thead><tbody>'+
+ ATTRIBUTES.map(k=>'<tr><td>'+esc(k)+'</td><td class="right">'+p.attributes[k]+'</td><td class="right">'+p.training[k]+'</td></tr>').join('')+'</tbody></table>';
+ const groups=['탐험·이동','채취·생활','제작·기술','전투·무술','마법·신앙','지식·사회'];
+ const group=s.tab&&groups.includes(s.tab)?s.tab:groups[0];
+ tabs(el,groups,changeTab);
+ const rows=SKILL_DEFINITIONS.filter(d=>d.group===group);
+ const table=make('div',{class:'tablewrap'},el);
+ table.innerHTML='<table><thead><tr><th>숙련</th><th class="right">레벨</th><th>다음 레벨까지</th></tr></thead><tbody>'+
+ rows.map(d=>{const xp=p.skills[d.id],level=skillLevel(xp),next=skillThreshold(level+1);
+ return '<tr><td>'+esc(d.name)+'</td><td class="right">'+level+'</td><td>'+Math.max(0,next-xp)+' XP</td></tr>'}).join('')+'</tbody></table>';
+ make('p',{class:'muted',text:'성장 수치는 시험 규칙입니다. 실제 성과 XP와 캐릭터 생성 UI는 후속 연결 대상입니다.'},el);
+}
 function crafts(){
 const el=head('제작 · 가공','');
 const groups=['제작법','작업대'];if(!groups.includes(s.tab))s.tab='제작법';tabs(el,groups,changeTab);
