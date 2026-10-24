@@ -104,6 +104,15 @@ if(['숲','광산','강·호수'].includes(s.region)){
     const b=btn(titles[kind],()=>{state.kind=kind;populate()},'btn',tabs);
     b.setAttribute('aria-pressed',String(state.kind===kind));
    }
+   const discovery=make('div',{class:'resource05a-discovery'},results);
+   make('p',{class:'muted',text:'새 자원 지점 탐사 · 유효한 발견에 게임 내 10분이 소요됩니다. 이미 찾은 지점이나 아직 재공급되지 않은 광맥은 다시 생성되지 않습니다.'},discovery);
+   for(const resource of RESOURCES_05A.filter(x=>x.region===s.region&&x.activity===state.kind)){
+    btn(resource.name+' 찾기',()=>{
+     if(!executeV2('resource.search',{resourceId:resource.id}))return render();
+     nextLog('자원 발견',resource.name+'의 새 지점을 발견했습니다.');
+     render();
+    },'btn',discovery);
+   }
    const elapsed=mainV2.current().clock.elapsedUnits;
    for(const [nodeId,node] of Object.entries(mainV2.resources05A().nodes)){
     const def=RESOURCE_MAP_05A.get(node.resourceId);
