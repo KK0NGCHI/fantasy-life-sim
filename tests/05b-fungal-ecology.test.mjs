@@ -92,3 +92,18 @@ test('fungal fruit bodies progress fresh to mature, aging, then decomposed while
  const patch=Object.values(createFungalEcology05B()).find(x=>x.speciesId===sp.id&&x.region==='숲');
  assert.equal(fungalHarvest05B(patch,def,(suitable+2)*day,seed,0).reason,'AGING');
 });
+
+test('finite substrate reserves persist and eventually prevent new fruit body harvests',()=>{
+ const sp=FUNGAL_SPECIES_05B.find(x=>x.key==='oyster'),def=FUNGAL_ECOLOGY_MAP_05B.get(sp.id);
+ const sites=createFungalEcology05B();
+ const patch=Object.values(sites).find(x=>x.speciesId===sp.id&&x.region==='숲');
+ assert.equal(patch.substrate,sp.substrate);
+ assert.equal(patch.substrateHealth,100);
+ const wet=Array.from({length:28},(_,d)=>d).find(d=>ecologyClimate05A(seed,'숲',d*day).weather==='rain');
+ const done=fungalHarvest05B(patch,def,wet*day,seed,0);
+ assert.equal(done.ok,true);
+ assert.equal(done.site.substrateHealth,95);
+ const exhausted={...patch,substrateHealth:4};
+ assert.equal(fungalHarvest05B(exhausted,def,wet*day,seed).reason,'SUBSTRATE_EXHAUSTED');
+ assert.equal(fungalHarvest05B({...patch,substrate:'sand'},def,wet*day,seed).reason,'WRONG_SUBSTRATE');
+});
