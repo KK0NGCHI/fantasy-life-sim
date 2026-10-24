@@ -69,7 +69,7 @@ const candidateCaps05A:Readonly<Record<string,number>>={
  'source05a:mussel':4,'source05a:marsh-bell':2,'source05a:sacred-oak':1
 };
 function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
- if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed','ecologySubstrates']))return false;
+ if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed','ecologySubstrates','woodland05C']))return false;
  if(Object.hasOwn(x,'candidateSites')){
   if(!obj(x.candidateSites)||Object.keys(x.candidateSites).length>100)return false;
   if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered','lastSecond','recoveryProgress'])&&
@@ -80,6 +80,18 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
    (!Object.hasOwn(v,'recoveryProgress')||(typeof v.recoveryProgress==='number'&&Number.isFinite(v.recoveryProgress)&&v.recoveryProgress>=0&&v.recoveryProgress<=3*86400))))return false;
  }
  if(Object.hasOwn(x,'ecologyClimateSeed')&&(typeof x.ecologyClimateSeed!=='string'||x.ecologyClimateSeed.length<1||x.ecologyClimateSeed.length>200))return false;
+ if(Object.hasOwn(x,'woodland05C')){
+  const forest=x.woodland05C;
+  if(!obj(forest)||!keys(forest,['trees','day'])||!uint(forest.day)||Number(forest.day)>Math.floor((now+28800)/86400)||
+   !obj(forest.trees)||Object.keys(forest.trees).length>40)return false;
+  if(!Object.entries(forest.trees).every(([id,t])=>obj(t)&&
+   keys(t,['id','region','speciesId','ageDays','health','alive','deadwood'])&&
+   typeof t.region==='string'&&t.region.length>0&&t.region.length<80&&
+   ['oak','pine'].includes(t.speciesId)&&id===t.id&&
+   id==='tree05c:'+encodeURIComponent(t.region)+':'+t.speciesId+':0'&&
+   uint(t.ageDays)&&Number(t.ageDays)<=100000&&uint(t.health)&&Number(t.health)<=100&&
+   typeof t.alive==='boolean'&&uint(t.deadwood)&&Number(t.deadwood)<=1000))return false;
+ }
  if(Object.hasOwn(x,'ecologySubstrates')){
   if(!obj(x.ecologySubstrates)||Object.keys(x.ecologySubstrates).length>100)return false;
   if(!Object.entries(x.ecologySubstrates).every(([id,v])=>
