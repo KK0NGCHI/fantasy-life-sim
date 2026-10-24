@@ -107,3 +107,22 @@ test('short work actions do not award extra discovery rolls per click',()=>{
  }
  assert.ok(found>0);
 });
+
+test('a seasonal/weather-gated incidental result cannot be obtained without authoritative weather',()=>{
+ const weatherPool={...pool,tiers:[{id:'rain-only',weight:1,outputs:[{itemId:'item05a:blueberry',weight:1,conditions:{weather:['rain']}}]}]};
+ const table={...makeTable(),pool:weatherPool};
+ const g=make(table);
+ assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
+ const result=g.dispatch('resource.incidental.search',{activity:'explore'});
+ assert.equal(result.accepted,true,JSON.stringify(result));
+ assert.equal(g.current().itemWorld.items.some(x=>x.id==='incidental05a:item05a:blueberry'),false);
+});
+test('no incidental config preserves the legacy inventory and actions',()=>{
+ const g=createMainV2Inventory([{id:'test:initial',name:'기본',group:'재료',qty:1,tags:[]}],
+  {...options(makeTable()),incidentalTables05A:{}});
+ g.dispatch('world.travel',{region:'숲'});
+ const before=g.current().itemWorld;
+ for(let i=0;i<30;i++)assert.equal(g.dispatch('resource.work',{nodeId:'resource05a:wild-herb:01'}).accepted,true);
+ assert.equal(g.current().itemWorld.items.some(x=>x.id?.startsWith('incidental05a:')),false);
+ assert.ok(g.current().itemWorld.items.length>=before.items.length);
+});
