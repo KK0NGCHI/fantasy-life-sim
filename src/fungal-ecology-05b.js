@@ -34,7 +34,7 @@ export const FUNGAL_ECOLOGY_MAP_05B=new Map(FUNGAL_ECOLOGY_DEFS_05B.map(x=>[x.id
 export function createFungalEcology05B(startSecond=0){
  return Object.fromEntries(FUNGAL_ECOLOGY_DEFS_05B.flatMap(def=>def.habitats.map(region=>{
   const site=createEcologySite(def,region,0,startSecond);
-  return [site.id,site];
+  return [site.id,{...site,wetCredit:0}];
  })));
 }
 /** Pure wet-day count. Time is from the authoritative game clock, weather comes
@@ -54,11 +54,12 @@ export function fungalReconcile05B(site,def,second,worldSeed){
   const w=ecologyClimate05A(worldSeed,site.region,d*86400).weather;
   if(w==='rain')wetDays++;
  }
- const grown=Math.floor(wetDays/sp.regrowRainDays);
+ const credit=(site.wetCredit??0)+wetDays;
+ const grown=Math.floor(credit/sp.regrowRainDays);
  // Consume all processed days in the clock; remainder can only be carried if
  // encoded separately. For the first iteration, fruiting is pulse-based per window.
  return {...site,remaining:Math.min(def.capacity,site.remaining+grown),
-  updatedAt:toDay*86400-28800};
+  wetCredit:credit%sp.regrowRainDays,updatedAt:second};
 }
 /** Fruiting requires rain recently, adequate season and correct substrate.
  * A species can survive the season without a fruiting body.
