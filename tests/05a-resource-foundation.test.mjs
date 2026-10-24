@@ -109,3 +109,58 @@ test('05-A resource search respects region/time and cannot re-discover identical
  assert.equal(noExtra.accepted,false);
  assert.equal(g.current().clock.elapsedUnits-oldClock,600);
 });
+
+test('05-A 28/112/224 days: supply quotas and finite veins never duplicate',()=>{
+ for(const days of [28,112,224]){
+  let n=createResourceNodes05A();
+  const initialIron=Object.values(n).filter(v=>v.resourceId==='resource05a:iron-ore').length;
+  for(let day=0;day<=days;day++){
+   const at=day*86400;
+   for(const id of ['resource05a:iron-ore','resource05a:copper-ore','resource05a:coal','resource05a:stone']){
+    for(let guard=0;guard<10;guard++){
+     const next=discoverResource05A(n,id,'광산',at);
+     if(!next.ok)break;
+     n=next.nodes;
+    }
+   }
+  }
+  const counts=Object.values(n).reduce((acc,node)=>(acc[node.resourceId]=(acc[node.resourceId]??0)+1,acc),{});
+  assert.equal(counts['resource05a:iron-ore'],3+Math.floor(days/7));
+  assert.equal(counts['resource05a:copper-ore'],4+2*Math.floor(days/7));
+  assert.equal(counts['resource05a:coal'],3+2*Math.floor(days/7));
+  assert.equal(counts['resource05a:stone'],6+2*days);
+  assert.equal(initialIron,3);
+  assert.equal(new Set(Object.keys(n)).size,Object.keys(n).length);
+  // All newly generated veins are finite records, never replacing old records.
+  assert.equal(n['resource05a:iron-ore:01'].remaining,10);
+ }
+});
+test('05-A partial tree and partial stone work cannot auto-refill before exhaustion',()=>{
+ const nodes=createResourceNodes05A();
+ for(const id of ['resource05a:oak-log:01','resource05a:stone:01']){
+  const def=RESOURCES_05A.find(r=>r.id===nodes[id].resourceId);
+  const partial={...nodes[id],remaining:1,progress:7,recoveryProgress:0,lastSecond:0};
+  const after=resourceAt05A(partial,def,224*86400);
+  assert.equal(after.remaining,1,id);
+  assert.equal(after.progress,7,id);
+ }
+});
+test('05-A 224-day lazy recovery has same result across save-style interval splits',()=>{
+ const def=RESOURCES_05A.find(r=>r.id==='resource05a:wild-herb');
+ const node={...createResourceNodes05A()['resource05a:wild-herb:01'],remaining:0};
+ const atOnce=resourceAt05A(node,def,224*86400);
+ let stepped=node;
+ for(let day=1;day<=224;day++)stepped=resourceAt05A(stepped,def,day*86400);
+ assert.deepEqual(stepped,atOnce);
+});
+test('05-A tool rank gates and output capacity remain bounded',()=>{
+ const nodes=createResourceNodes05A();
+ const id='resource05a:iron-ore:01';
+ assert.equal(workResource05A(nodes,id,'광산',0,{toolKind:'pickaxe',toolRank:1}).ok,false);
+ const first=workResource05A(nodes,id,'광산',0,{toolKind:'pickaxe',toolRank:2});
+ const second=workResource05A(nodes,id,'광산',0,{toolKind:'pickaxe',toolRank:4});
+ assert.equal(first.node.progress,2);
+ assert.equal(second.node.progress,4);
+ assert.equal(first.xp,0);
+ assert.equal(second.xp,0);
+});
