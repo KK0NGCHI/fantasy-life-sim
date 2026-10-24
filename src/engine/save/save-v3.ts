@@ -75,7 +75,7 @@ function validCandidates05A(x:Record<string,unknown>):boolean{
   if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered'])&&
    id.startsWith('site05a:')&&id.length<=140&&typeof v.sourceId==='string'&&
    Object.hasOwn(candidateCaps05A,v.sourceId)&&typeof v.region==='string'&&v.region.length<=50&&
-   uint(v.remaining)&&Number(v.remaining)<=candidateCaps05A[v.sourceId]&&typeof v.discovered==='boolean'))return false;
+   uint(v.remaining)&&Number(v.remaining)<=(candidateCaps05A[v.sourceId]??-1)&&typeof v.discovered==='boolean'))return false;
  }
  if(Object.hasOwn(x,'compendium')){
   if(!obj(x.compendium)||!keys(x.compendium,['sourceIds','itemIds'])||
