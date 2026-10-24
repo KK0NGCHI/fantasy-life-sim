@@ -329,7 +329,13 @@ export function createMainV2Inventory(uiItems,options={}) {
    if(snapshot.world.runtime.dungeon)throw Error('Cannot start a regional activity during dungeon exploration');
    const result=activityPreview(snapshot.world.runtime.region,command.payload.activityId,snapshot.progression?.system04A?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(snapshot.progression.system04A.skills[def.id])])):snapshot.progression?.skillExperience??{});
    if(!result.ok)throw Error(result.reason);
-   return {outcome:'success',nextState:snapshot,events:[{type:'region.activity_performed',payload:{activityId:command.payload.activityId,activityKind:result.kind,encounterEligible:result.encounterEligible,combatStarted:false}}]};
+   const event={type:'region.activity_performed',payload:{activityId:command.payload.activityId,activityKind:result.kind,encounterEligible:result.encounterEligible,combatStarted:false}};
+   const table=incidentalTables05A[snapshot.world.runtime.region+':'+result.kind];
+   if(!table)return {outcome:'success',nextState:snapshot,events:[event]};
+   // Reuse only the pure handler transition, not dispatcher.dispatch:
+   // the region activity has already accounted for time and its original gate.
+   const extra=handlers.get('resource.incidental.search')(snapshot,{payload:{activity:result.kind}});
+   return {outcome:'success',nextState:extra.nextState,events:[event,...extra.events]};
  }],
  ['dungeon.enter',(snapshot,command)=>{const target=command.payload.siteId??'core:site/labyrinth';if(!['core:site/labyrinth','core:site/forest'].includes(target))throw Error('Invalid local site');if(target==='core:site/forest'&&snapshot.world.runtime.region!=='숲')throw Error('Forest region required');const entry=localArrival(localRegistry,target);return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:true,localSiteId:entry.siteId,localFloor:entry.floor,pos:[entry.x,entry.y]}}},events:[{type:'dungeon.entered',payload:{}}]};}],
  ['dungeon.leave',(snapshot)=>({outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,dungeon:false,localFloor:0}}},events:[{type:'dungeon.left',payload:{}}]})],
