@@ -1,3 +1,4 @@
+import {BOTANICAL_ITEMS_05A} from './botanical-species-05a.js';
 import {RESOURCE_SPECIES_05A,RESOURCE_DEPTHS_05A,RESOURCE_REGIONS_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 
 /** Experimental B-slice. Standalone source-node rules; NOT wired into v3 saves/UI. */
@@ -41,7 +42,7 @@ export function reconcileCandidateSite05A(site,seconds){
 }
 
 const species=new Map(RESOURCE_SPECIES_05A.map(x=>[x.id,x]));
-const items=new Set(CATALOG_ITEMS_05A.map(x=>x.id));
+const items=new Set([...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A].map(x=>x.id));
 export function createCandidateSites05A(){
  const result={};
  for(const [sourceId,rule] of Object.entries(TEST_SOURCES)){
