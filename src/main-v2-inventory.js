@@ -1,3 +1,4 @@
+import {FUNGAL_ITEMS_05B,FUNGAL_BY_ID_05B,FUNGAL_ECOLOGY_MAP_05B,createFungalEcology05B,fungalReconcile05B,fungalHarvest05B} from './fungal-ecology-05b.js';
 import {ecologyClimate05A} from './ecology-climate-05a.js';
 import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_MAP_05A,BOTANICAL_SEED_ITEMS_05A} from './botanical-ecology-adapter-05a.js';
 import {ecologySiteId,ecologyInteract,ecologyReconcile} from './ecology-core-05a.js';
@@ -26,7 +27,7 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
  */
 export function createMainV2Inventory(uiItems,options={}) {
- const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A];
+ const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A,...FUNGAL_ITEMS_05B];
  const poolOverrides=options.resourcePools05A??{};
  if(!poolOverrides||typeof poolOverrides!=='object'||Array.isArray(poolOverrides)||Object.entries(poolOverrides).some(([source,pool])=>!SOURCE_WORK_RULES_05A[source]||!validateResourcePool05A(pool)||pool.tiers.some(t=>t.outputs.some(o=>!knownResourceItems05A.some(i=>i.id===o.itemId)))))throw Error('INVALID_RESOURCE_POOL_CONFIG');
  const incidentalTables05A=options.incidentalTables05A??{};
@@ -100,7 +101,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:createBotanicalEcology05A(),ecologyClimateSeed:freshSeed}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:{...createBotanicalEcology05A(),...(options.fungi05B===true?createFungalEcology05B():{})},ecologyClimateSeed:freshSeed}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -228,7 +229,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(runtime.dungeon||!resources?.ecologySites)throw Error('ECOLOGY_UNAVAILABLE');
   const id=command.payload?.siteId,site=resources.ecologySites[id];
   if(!site||!site.discovered||site.region!==runtime.region)throw Error('ECOLOGY_SITE_UNKNOWN');
-  const def=BOTANICAL_ECOLOGY_MAP_05A.get(site.speciesId);
+  const isFungus=FUNGAL_BY_ID_05B.has(site.speciesId);
+  const def=isFungus?FUNGAL_ECOLOGY_MAP_05B.get(site.speciesId):BOTANICAL_ECOLOGY_MAP_05A.get(site.speciesId);
   if(!def||def.mode!=='gather')throw Error('ECOLOGY_NOT_HARVESTABLE');
   const second=snapshot.clock.elapsedUnits,day=Math.floor((second+28800)/86400);
   const hour=Math.floor(((second+28800)%86400)/3600);
@@ -237,9 +239,10 @@ export function createMainV2Inventory(uiItems,options={}) {
   const weather=runtime.weather05A??(typeof resources.ecologyClimateSeed==='string'?
    ecologyClimate05A(resources.ecologyClimateSeed,runtime.region,second).weather:undefined);
   const draw=drawRandom(snapshot.rng,'action');
-  const outcome=ecologyInteract(site,def,{region:runtime.region,season,daypart,weather,
-   mature:true,bloom:def.outputs.some(o=>o.stage==='bloom')},
-   {second,roll:draw.value,action:'gather'});
+  const outcome=isFungus?fungalHarvest05B(site,def,second,resources.ecologyClimateSeed,draw.value):
+   ecologyInteract(site,def,{region:runtime.region,season,daypart,weather,
+    mature:true,bloom:def.outputs.some(o=>o.stage==='bloom')},
+    {second,roll:draw.value,action:'gather'});
   if(!outcome.ok)throw Error(outcome.reason);
   const item=outcome.outputs[0];
   const inventoryId='ecology05a:'+site.speciesId;
@@ -284,6 +287,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(!result.ok)throw Error(result.reason);
   let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found,flags=snapshot.flags;
   const botanical=BOTANICAL_PROFILE_BY_ID_05A.get(result.itemId);
+  const fungus=FUNGAL_BY_ID_05B.get(result.itemId);
   let updatedEcoSite=null;
   if(found&&botanical){
    if(resource05A.ecologySites){
@@ -305,6 +309,21 @@ export function createMainV2Inventory(uiItems,options={}) {
     if(!allowed.ok)found=false;
    }
   }
+  if(found&&fungus){
+   if(!resource05A.ecologySites||!resource05A.ecologyClimateSeed)found=false;
+   else{
+    const def=FUNGAL_ECOLOGY_MAP_05B.get(fungus.id);
+    const sites=Object.values(resource05A.ecologySites).filter(site=>site.speciesId===fungus.id&&site.region===runtime.region).sort((a,b)=>a.patch-b.patch);
+    const available=sites.map(site=>fungalReconcile05B(site,def,snapshot.clock.elapsedUnits,resource05A.ecologyClimateSeed)).filter(site=>site.remaining>0);
+    if(!available.length)found=false;
+    else{
+     const selected=available[Math.floor(b.value*available.length)];
+     const outcome=fungalHarvest05B(selected,def,snapshot.clock.elapsedUnits,resource05A.ecologyClimateSeed,c.value);
+     if(!outcome.ok)found=false;
+     else updatedEcoSite=outcome.site;
+    }
+   }
+  }
   let event={type:'resource.incidental_empty',payload:{activity:kind}};
   if(found&&result.rewardMode==='discover-site'){
    const entry=Object.entries(resource05A.candidateSites??{}).sort(([a],[b])=>a.localeCompare(b))
@@ -316,9 +335,9 @@ export function createMainV2Inventory(uiItems,options={}) {
     event={type:'resource.incidental_discovered',payload:{activity:kind,nodeId,itemId:result.itemId}};
    }else found=false;
   }else if(found){
-   if(botanical){
+   if(botanical||fungus){
     if(updatedEcoSite)resource05A={...resource05A,ecologySites:{...resource05A.ecologySites,[updatedEcoSite.id]:updatedEcoSite}};
-    else flags=botanicalMarkHarvest05A(flags,botanical,snapshot.clock.elapsedUnits);
+    else if(botanical)flags=botanicalMarkHarvest05A(flags,botanical,snapshot.clock.elapsedUnits);
    }
    const itemId='incidental05a:'+result.itemId;
    const original=itemWorld.items.find(x=>x.id===itemId);
