@@ -21,18 +21,40 @@ export function createResourceNodes05A(){
  const counts={'wild-herb':18,mushroom:12,grass:20,'oak-log':18,'pine-log':14,stone:6,coal:3,'copper-ore':4,'iron-ore':3,'small-fish':3,carp:3,trout:3};
  return Object.fromEntries(RESOURCES_05A.flatMap(r=>Array.from({length:counts[r.id.split(':')[1]]},(_,i)=>{
   const id=r.id+':'+String(i+1).padStart(2,'0');
-  return [id,{resourceId:r.id,remaining:r.capacity,progress:0,lastSecond:0,discovered:i<2,cycle:0}];
+  return [id,{resourceId:r.id,remaining:r.capacity,progress:0,lastSecond:0,recoveryProgress:0,discovered:i<2,cycle:0}];
  })));
 }
-const DAY=86400;
+const DAY=86400,SEASON_SECONDS=28*DAY,YEAR_SECONDS=4*SEASON_SECONDS;
+export const RESOURCE_CALENDAR_05A=Object.freeze({schema:1,daysPerSeason:28,seasons:['spring','summer','autumn','winter']});
+const activeSeasons=(def)=>def.activity==='fishing'||def.activity==='mining'?[0,1,2,3]:
+ def.id==='resource05a:mushroom'?[0,1,2]:[0,1,2];
+/** Active seconds between two elapsed-second instants, including season boundaries.
+ * Uses closed-form years; no loops over skipped days or real wall-clock time. */
+export function activeResourceSeconds05A(def,from,to){
+ if(!Number.isSafeInteger(from)||!Number.isSafeInteger(to)||from<0||to<from)throw Error('INVALID_SEASON_TIME');
+ const seasons=activeSeasons(def);
+ const until=t=>{
+  const absolute=t+28800; // Day 1 starts at 08:00:00
+  const years=Math.floor(absolute/YEAR_SECONDS),partial=absolute%YEAR_SECONDS;
+  return years*seasons.length*SEASON_SECONDS+
+   seasons.reduce((sum,i)=>sum+Math.max(0,Math.min(SEASON_SECONDS,partial-i*SEASON_SECONDS)),0);
+ };
+ return until(to)-until(from);
+}
 export function resourceAt05A(node,definition,seconds){
  if(!node||!definition||!Number.isSafeInteger(seconds)||seconds<node.lastSecond)throw Error('INVALID_RESOURCE_TIME');
- const next={...node};
- if(definition.regenDays>0&&next.remaining<definition.capacity){
-  const step=definition.regenDays*DAY;
-  const increments=Math.floor((seconds-next.lastSecond)/step);
-  if(increments>0){next.remaining=Math.min(definition.capacity,next.remaining+increments);next.lastSecond+=increments*step;}
- }else if(next.remaining>=definition.capacity)next.lastSecond=seconds;
+ const next={...node},elapsed=activeResourceSeconds05A(definition,next.lastSecond,seconds);
+ const step=definition.regenDays*DAY;
+ if(step>0&&next.remaining<definition.capacity){
+  const total=(next.recoveryProgress??0)+elapsed;
+  const units=Math.floor(total/step);
+  next.recoveryProgress=total%step;
+  if(definition.activity==='logging'||definition.id==='resource05a:stone'){
+   if(units>0){next.remaining=definition.capacity;next.progress=0;next.cycle=(next.cycle??0)+1;
+    next.recoveryProgress=0;}
+  }else if(units>0)next.remaining=Math.min(definition.capacity,next.remaining+units);
+ }else if(next.remaining>=definition.capacity)next.recoveryProgress=0;
+ next.lastSecond=seconds;
  return next;
 }
 /** Only the manually valid short gather cycle is live in this first slice.
@@ -44,7 +66,7 @@ export function gatherResource05A(nodes,nodeId,region,seconds){
  if(!node.discovered)return {ok:false,reason:'UNDISCOVERED'};
  const current=resourceAt05A(node,resource,seconds);
  if(current.remaining<1)return {ok:false,reason:'DEPLETED'};
- return {ok:true,resource,node:{...current,remaining:current.remaining-1,lastSecond:seconds}};
+ return {ok:true,resource,node:{...current,remaining:current.remaining-1,lastSecond:seconds,recoveryProgress:0}};
 }
 
 /** 05-A engine work contract. An action advances one bounded piece of real work.
@@ -97,6 +119,6 @@ export function workResource05A(nodes,nodeId,region,seconds,{toolKind=null,toolR
  changes.progress=progress;
  // A successful harvest resets the per-node recovery timer. Work progress on
  // non-harvest attempts is retained, but does not reset recovery.
- if(qty>0)changes.lastSecond=seconds;
+ if(qty>0){changes.lastSecond=seconds;changes.recoveryProgress=0;}
  return {ok:true,resource:def,node:changes,qty,xp:earned,activity:def.activity};
 }
