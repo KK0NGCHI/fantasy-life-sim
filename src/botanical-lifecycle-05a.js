@@ -30,3 +30,31 @@ export function eligibleBotanicalObservations05A(region,seconds,flags){
  return BOTANICAL_PROFILES_05A.filter(p=>p.interaction==='observe'&&p.regions.includes(region)&&p.seasons.includes(season)&&
   !botanicalObserved05A(flags,p.id)&&(p.purpose!=='night-bloom'||daypart==='night'));
 }
+
+/** Global per-species harvest cooldown, persisted as ONE boolean game-state flag
+ * per species. Old flag is replaced atomically so saves do not grow per harvest.
+ * This is a conservative species-level cooldown, not individual patch ecology.
+ */
+const harvestPrefix=id=>'botany05a:last:'+id+':';
+export function botanicalLastHarvest05A(flags,id){
+ const keys=Object.keys(flags??{}).filter(x=>x.startsWith(harvestPrefix(id)));
+ if(!keys.length)return null;
+ const raw=keys[0].slice(harvestPrefix(id).length);
+ const day=Number(raw);
+ return Number.isSafeInteger(day)&&day>=0?day:null;
+}
+export function botanicalCanHarvest05A(flags,profile,seconds,weather){
+ const calendar=botanicalCalendar05A(seconds);
+ const phenology=botanicalPhenology05A(profile,{...calendar,weather});
+ if(!phenology.harvestable)return {ok:false,reason:phenology.reason};
+ const last=botanicalLastHarvest05A(flags,profile.id);
+ const interval=Math.ceil(botanicalRenewalSeconds05A(profile)/BOTANICAL_DAY_SECONDS_05A);
+ return last===null||calendar.day-last>=interval?{ok:true}:{ok:false,reason:'REPLENISHING'};
+}
+export function botanicalMarkHarvest05A(flags,profile,seconds){
+ const day=botanicalCalendar05A(seconds).day;
+ const prefix=harvestPrefix(profile.id);
+ const next=Object.fromEntries(Object.entries(flags??{}).filter(([k])=>!k.startsWith(prefix)));
+ next[prefix+day]=true;
+ return next;
+}
