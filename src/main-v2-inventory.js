@@ -1,3 +1,5 @@
+import {CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
+import {createCandidateSites05A,discoverCandidateSite05A,harvestCandidateSite05A,acquiredCompendium05A,SOURCE_WORK_RULES_05A} from './resource-sites-05a.js';
 import {RESOURCES_05A,createResourceNodes05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS,discoverResource05A} from './resources-05a.js';
 import {resolveOriginInteraction} from './origin-interactions-04c.js';
 import {createOrigin,validateOrigin,applyOriginToProgression} from './character-origin-04b.js';
@@ -17,7 +19,7 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  */
 export function createMainV2Inventory(uiItems,options={}) {
  const preferences=options.preferences??(typeof localStorage==='undefined'?null:localStorage);
- const resourceItems=RESOURCES_05A.map(r=>({id:r.itemId,name:r.name,group:'채취 재료',qty:0,tags:[]}));
+ const resourceItems=CATALOG_ITEMS_05A.map(r=>({id:r.id,name:r.name,group:'채취 재료',qty:0,tags:[]}));
  const starterTools=[{id:'tool05a:gloves',name:'천 채집 장갑',group:'도구',qty:1,tags:['tool:gather']},{id:'tool05a:axe',name:'석재 벌목 도끼',group:'도구',qty:1,tags:['tool:logging']},{id:'tool05a:pickaxe',name:'석재 곡괭이',group:'도구',qty:1,tags:['tool:mining']},{id:'tool05a:rod',name:'목재 낚싯대',group:'도구',qty:1,tags:['tool:fishing']}];
  const materialTools05A=[
   ...[['copper',2,'구리'],['iron',3,'철'],['steel',4,'강철']].flatMap(([material,rank,name])=>
@@ -82,7 +84,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A()}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]}}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -179,6 +181,38 @@ export function createMainV2Inventory(uiItems,options={}) {
     ...snapshot.world.runtime.resource05A,nodes:result.nodes
   }}}},events:[{type:'resource.site_discovered',payload:{nodeId:result.nodeId,name:def.name,newSite:result.newSite}}]};
  }],
+ ['resource.candidate.discover',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,resources=runtime.resource05A;
+  if(runtime.dungeon||!resources?.candidateSites)throw Error('CANDIDATE_UNAVAILABLE');
+  const result=discoverCandidateSite05A(resources.candidateSites,command.payload?.nodeId,runtime.region);
+  if(!result.ok)throw Error(result.reason);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:result.nodes}}}},
+   events:[{type:'resource.site_discovered',payload:{nodeId:command.payload.nodeId,name:'신규 자원 지점',newSite:false}}]};
+ }],
+ ['resource.candidate.work',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,resources=runtime.resource05A;
+  if(runtime.dungeon||!resources?.candidateSites)throw Error('CANDIDATE_UNAVAILABLE');
+  const nodeId=command.payload?.nodeId,site=resources.candidateSites[nodeId];
+  const rule=SOURCE_WORK_RULES_05A[site?.sourceId];
+  if(!rule)throw Error('UNKNOWN_CANDIDATE');
+  const requested=command.payload?.toolId;
+  const prefix={mining:'tool05a:pickaxe',logging:'tool05a:axe',gather:'tool05a:gloves'}[rule.activity];
+  const owned=snapshot.itemWorld.items.filter(x=>x.quantity>0&&(x.definitionId===prefix||x.definitionId.startsWith(prefix+':'))&&snapshot.itemWorld.placements.some(p=>p.itemId===x.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
+  const selected=requested?owned.find(x=>x.definitionId===requested):owned[0];
+  if(requested&&!selected)throw Error('TOOL_NOT_OWNED');
+  const rank=selected?(Number(materialTools05A.find(x=>x.id===selected.definitionId)?.tags.find(t=>t.startsWith('rank:'))?.slice(5)??1)):0;
+  const outcome=harvestCandidateSite05A(resources.candidateSites,nodeId,runtime.region,rule.activity,{toolRank:rank});
+  if(!outcome.ok)throw Error(outcome.reason);
+  let itemWorld=snapshot.itemWorld;
+  for(const reward of outcome.rewards){
+   const itemId='candidate05a:'+reward.itemId,old=itemWorld.items.find(x=>x.id===itemId);
+   itemWorld={...itemWorld,items:old?itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+reward.quantity}:x):[...itemWorld.items,{id:itemId,definitionId:reward.itemId,quantity:reward.quantity}],
+    placements:old?itemWorld.placements:[...itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
+  }
+  const compendium=acquiredCompendium05A(resources.compendium,outcome.rewards);
+  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:outcome.nodes,compendium}}}},
+   events:[{type:'resource.candidate_acquired',payload:{nodeId,rewards:outcome.rewards}}]};
+ }],
  ['resource.work',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon||!snapshot.world.runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
   const nodeId=command.payload?.nodeId;
@@ -251,6 +285,8 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='resource.candidate.discover')return {turns:1,worldUnits:600};
+    if(action.type==='resource.candidate.work')return {turns:1,worldUnits:60};
     if(action.type==='resource.search')return {turns:1,worldUnits:600};
     if(action.type==='resource.work'){
      const node=current.world.runtime.resource05A?.nodes?.[action.payload?.nodeId];
