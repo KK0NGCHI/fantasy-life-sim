@@ -1,3 +1,4 @@
+import {FUNGAL_BY_ID_05B} from './fungal-ecology-05b.js';
 import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
 import {ACTIVITY_TABLES_05A} from './activity-tables-05a.js';
@@ -49,7 +50,7 @@ function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 let localRemembered=[];
 let autoTarget=0;
-const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,ecology05A:true,incidentalTables05A:ACTIVITY_TABLES_05A});
+const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,ecology05A:true,fungi05B:true,incidentalTables05A:ACTIVITY_TABLES_05A});
 function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
@@ -95,14 +96,14 @@ if(ecologySites.length){
  const ecologicalPanel=make('div',{class:'resource05a-panel','aria-label':'발견한 식물 군락'},el);
  make('h3',{text:'발견한 식물 군락'},ecologicalPanel);
  for(const site of ecologySites){
-  const profile=BOTANICAL_PROFILE_BY_ID_05A.get(site.speciesId);
+  const profile=BOTANICAL_PROFILE_BY_ID_05A.get(site.speciesId)??FUNGAL_BY_ID_05B.get(site.speciesId);
   if(!profile)continue;
   const row=make('div',{class:'resource05a-row'},ecologicalPanel);
   make('strong',{text:profile.name+' · 군락 '+(site.patch+1)},row);
   make('span',{text:'기록된 잔량 '+site.remaining},row);
-  if(profile.dropEnabled)btn('군락에서 채집 (1분)',()=>{
+  if(profile.dropEnabled!==false)btn('군락에서 채집 (1분)',()=>{
    if(!executeV2('botanical.patch.harvest',{siteId:site.id}))return render();
-   nextLog('식물 채집',profile.name+'의 '+profile.part+' 재료를 획득했습니다.');
+   nextLog('식물 채집',profile.name+' 채집을 마쳤습니다.');
    render();
   },'btn',row);
  }
