@@ -21,6 +21,41 @@ const obj=(x:unknown):x is Record<string,unknown>=>x!==null&&typeof x==='object'
 const seconds=(x:unknown):x is number=>typeof x==='number'&&Number.isSafeInteger(x)&&x>=0&&x<=Number.MAX_SAFE_INTEGER-28800;
 const keys=(x:Record<string,unknown>,allowed:readonly string[])=>Object.keys(x).every(k=>allowed.includes(k));
 
+/** 04-D: validate optional progression/origin BEFORE v3 decode accepts a save.
+ * Legacy saves without these extensions remain valid and unmodified. */
+const attrKeys=['근력','민첩','체력','지각','지능','의지','매력'] as const;
+const skillKeys=Array.from({length:54},(_,i)=>'skill-'+String(i+1).padStart(2,'0'));
+const speciesSizes:Readonly<Record<string,string>>={
+ human:'medium',elf:'medium',dwarf:'medium',halfling:'small',
+ beastfolk:'medium',orc:'medium',gnome:'small',fairy:'tiny'
+};
+const backgrounds=new Set(['farmer','fisher','miner','woodcutter','hunter','cook','artisan','alchemist',
+ 'scholar','archaeologist','merchant','traveler','mercenary','healer','acolyte','musician']);
+const uint=(v:unknown):v is number=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0;
+const exact=(value:Record<string,unknown>,names:readonly string[])=>
+ Object.keys(value).length===names.length&&names.every(k=>Object.hasOwn(value,k));
+function validProgressionExtension(progression:unknown):boolean{
+ if(!obj(progression))return false;
+ if(Object.hasOwn(progression,'system04A')){
+  const x=progression.system04A;
+  if(!obj(x)||!exact(x,['schema','ruleVersion','attributes','training','skills','awards'])||
+   x.schema!==1||x.ruleVersion!==1||!obj(x.attributes)||!obj(x.training)||!obj(x.skills)||
+   !exact(x.attributes,attrKeys)||!exact(x.training,attrKeys)||!exact(x.skills,skillKeys)||
+   !attrKeys.every(k=>uint(x.attributes[k])&&Number(x.attributes[k])>=10&&uint(x.training[k]))||
+   !skillKeys.every(k=>uint(x.skills[k]))||!Array.isArray(x.awards)||x.awards.length>10000||
+   !x.awards.every(a=>typeof a==='string'&&a.length>0&&a.length<=160)||
+   new Set(x.awards).size!==x.awards.length)return false;
+ }
+ if(Object.hasOwn(progression,'origin04B')){
+  const o=progression.origin04B;
+  if(!obj(o)||!exact(o,['schema','speciesId','backgroundId','bodySize','exclusiveAbilityId'])||
+   o.schema!==1||typeof o.speciesId!=='string'||typeof o.backgroundId!=='string'||
+   !backgrounds.has(o.backgroundId)||speciesSizes[o.speciesId]!==o.bodySize||
+   o.exclusiveAbilityId!=='origin:'+o.backgroundId||!Object.hasOwn(progression,'system04A'))return false;
+ }
+ return true;
+}
+
 export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
  if(!obj(raw)||raw.format!=='somnium-save'||raw.saveVersion!==3||!obj(raw.state)||raw.state.schemaVersion!==3)return {ok:false,reason:'INCOMPATIBLE_VERSION'};
  const clock=raw.state.clock;
@@ -34,6 +69,7 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
   if(!built.ok||validateWorldSnapshot03E(raw.state.world.runtime.world03E,built.registry).length)
    return {ok:false,reason:'INVALID_DATA'};
  }
+ if(!validProgressionExtension(raw.state.progression))return {ok:false,reason:'INVALID_DATA'};
  const source=structuredClone(raw.state) as unknown as Record<string,unknown>;
  source.schemaVersion=2;source.clock={elapsedUnits:clock.elapsedSeconds};
  // Reuse every existing item, RNG, world-root, progress and envelope validation.
