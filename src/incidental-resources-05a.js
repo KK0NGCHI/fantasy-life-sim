@@ -4,7 +4,7 @@ import {validateResourcePool05A,rollAvailableResourcePool05A} from './resource-p
  * A secondary resource event is independent of action success. No real-world time.
  * All three rolls are supplied by the authoritative RNG caller, never user payload.
  */
-export const INCIDENTAL_ACTIVITY_KINDS_05A=Object.freeze(['explore','scavenge','survey','sail','investigate','salvage','gather','mine','fish']);
+export const INCIDENTAL_ACTIVITY_KINDS_05A=Object.freeze(['explore','scavenge','survey','sail','investigate','salvage','gather','mine','fish','logging','mining','fishing']);
 export const INCIDENTAL_ACTIVITY_SECONDS_05A=600;
 const validRoll=n=>typeof n==='number'&&Number.isFinite(n)&&n>=0&&n<1;
 export function validateIncidentalTable05A(table){
