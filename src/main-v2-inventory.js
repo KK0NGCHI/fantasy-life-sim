@@ -1,5 +1,6 @@
 import {validateIncidentalTable05A,resolveIncidentalActivity05A,INCIDENTAL_ACTIVITY_SECONDS_05A} from './incidental-resources-05a.js';
 import {rollAvailableResourcePool05A,validateResourcePool05A} from './resource-pools-05a.js';
+import {BOTANICAL_ITEMS_05A} from './botanical-species-05a.js';
 import {CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 import {createCandidateSites05A,discoverCandidateSite05A,harvestCandidateSite05A,acquiredCompendium05A,SOURCE_WORK_RULES_05A,prospectCandidateQuartz05A,reconcileCandidateSite05A} from './resource-sites-05a.js';
 import {RESOURCES_05A,createResourceNodes05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS,discoverResource05A} from './resources-05a.js';
@@ -20,15 +21,16 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
  */
 export function createMainV2Inventory(uiItems,options={}) {
+ const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A];
  const poolOverrides=options.resourcePools05A??{};
- if(!poolOverrides||typeof poolOverrides!=='object'||Array.isArray(poolOverrides)||Object.entries(poolOverrides).some(([source,pool])=>!SOURCE_WORK_RULES_05A[source]||!validateResourcePool05A(pool)||pool.tiers.some(t=>t.outputs.some(o=>!CATALOG_ITEMS_05A.some(i=>i.id===o.itemId)))))throw Error('INVALID_RESOURCE_POOL_CONFIG');
+ if(!poolOverrides||typeof poolOverrides!=='object'||Array.isArray(poolOverrides)||Object.entries(poolOverrides).some(([source,pool])=>!SOURCE_WORK_RULES_05A[source]||!validateResourcePool05A(pool)||pool.tiers.some(t=>t.outputs.some(o=>!knownResourceItems05A.some(i=>i.id===o.itemId)))))throw Error('INVALID_RESOURCE_POOL_CONFIG');
  const incidentalTables05A=options.incidentalTables05A??{};
  if(!incidentalTables05A||typeof incidentalTables05A!=='object'||Array.isArray(incidentalTables05A)||
  Object.entries(incidentalTables05A).some(([key,t])=>key!==t.region+':'+t.activity||
- !validateIncidentalTable05A(t)||t.pool.tiers.some(tier=>tier.outputs.some(o=>!CATALOG_ITEMS_05A.some(item=>item.id===o.itemId)))))
+ !validateIncidentalTable05A(t)||t.pool.tiers.some(tier=>tier.outputs.some(o=>!knownResourceItems05A.some(item=>item.id===o.itemId)))))
  throw Error('INVALID_INCIDENTAL_CONFIG');
  const preferences=options.preferences??(typeof localStorage==='undefined'?null:localStorage);
- const resourceItems=CATALOG_ITEMS_05A.map(r=>({id:r.id,name:r.name,group:'채취 재료',qty:0,tags:[]}));
+ const resourceItems=knownResourceItems05A.map(r=>({id:r.id,name:r.name,group:'채취 재료',qty:0,tags:[]}));
  const starterTools=[{id:'tool05a:gloves',name:'천 채집 장갑',group:'도구',qty:1,tags:['tool:gather']},{id:'tool05a:axe',name:'석재 벌목 도끼',group:'도구',qty:1,tags:['tool:logging']},{id:'tool05a:pickaxe',name:'석재 곡괭이',group:'도구',qty:1,tags:['tool:mining']},{id:'tool05a:rod',name:'목재 낚싯대',group:'도구',qty:1,tags:['tool:fishing']}];
  const materialTools05A=[
   ...[['copper',2,'구리'],['iron',3,'철'],['steel',4,'강철']].flatMap(([material,rank,name])=>
