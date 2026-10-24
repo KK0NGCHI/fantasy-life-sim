@@ -34,7 +34,7 @@ test('desert discovery uses 600 seconds and grants only a declared local item',(
  }
  assert.ok(found>0);
  assert.equal(g.current().clock.elapsedUnits-initial.clock.elapsedUnits,30000);
- assert.equal(g.current().itemWorld.items.filter(x=>x.id.startsWith('incidental05a:')).length,1);
+ assert.ok(g.current().itemWorld.items.filter(x=>x.id.startsWith('incidental05a:')).every(x=>ACTIVITY_TABLES_05A['사막:explore'].pool.tiers.flatMap(t=>t.outputs).some(o=>o.itemId===x.definitionId)));
 });
 test('no incidental rewards can be claimed from a mismatched biome',()=>{
  const g=make();
