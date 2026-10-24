@@ -59,5 +59,5 @@ test('04-D upgrade requires approval and never mutates original v3 slot',()=>{
  assert.deepEqual(res.save.state.world,old.state.world);
  assert.deepEqual(res.save.state.clock,old.state.clock);
  assert.equal(decodeSaveV3(res.save,legacy.registry).ok,true);
- assert.equal(prepareGrowthUpgrade04D(res.save,legacy.registry,{...args,approved:true}).reason,'GROWTH_ALREADY_PRESENT');
+ assert.equal(prepareGrowthUpgrade04D(res.save,legacy.registry,{...args,approved:true,newSlotId:'04d-other-copy'}).reason,'GROWTH_ALREADY_PRESENT');
 });
