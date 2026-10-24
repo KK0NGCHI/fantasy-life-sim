@@ -1,3 +1,4 @@
+import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
 import {ACTIVITY_TABLES_05A} from './activity-tables-05a.js';
 import {RESOURCE_SPECIES_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 import {SOURCE_WORK_RULES_05A} from './resource-sites-05a.js';
@@ -88,6 +89,18 @@ const places=make('div',{class:'scene-spots'},hero);
 const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업장','workshop'],['waves','강변','water']]:hue==='forest'?[['trees','숲길','growing'],['leaf','채집지','workshop'],['tent-tree','야영지','water']]:hue==='river'?[['fish','어장','water'],['waves','강변','growing'],['leaf','수풀','workshop']]:[['compass','탐색지','growing'],['pickaxe','자원지','workshop'],['map-pin','지형','water']];
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
 const actions=make('div',{class:'v3-actions'},el);
+const botanicalObservers=eligibleBotanicalObservations05A(s.region,mainV2.current().clock.elapsedUnits,mainV2.current().flags);
+if(botanicalObservers.length){
+ const observationPanel=make('div',{class:'resource05a-panel'},el);
+ make('h3',{text:'식물 관찰 · 도감'},observationPanel);
+ for(const species of botanicalObservers){
+  btn(species.name+' 관찰 (10분)',()=>{
+   if(!executeV2('botanical.observe',{itemId:species.id}))return render();
+   nextLog('도감',species.name+' 관찰 완료','식물을 훼손하거나 아이템을 획득하지 않습니다.');
+   render();
+  },'btn',observationPanel);
+ }
+}
 const incidental=ACTIVITY_TABLES_05A[s.region+':explore'];
 if(incidental){
  const discoverPanel=make('div',{class:'resource05a-panel'},el);
