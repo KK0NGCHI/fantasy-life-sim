@@ -96,3 +96,14 @@ test('a newly obtained botanical persists in a version-3 save',()=>{
  g2.applyApprovedSave(save);
  assert.ok(g2.current().itemWorld.items.some(x=>x.definitionId===item.definitionId&&x.quantity===item.quantity));
 });
+
+test('observe-only protected candidates never appear as harvest loot',()=>{
+ for(const species of BOTANICAL_ALL_05A.filter(x=>x.harvestMode==='observe')){
+  for(const table of Object.values(ACTIVITY_TABLES_05A))
+   assert.equal(table.pool.tiers.some(t=>t.outputs.some(o=>o.itemId===species.id)),false);
+ }
+});
+test('all 80 species are represented as known inventory definitions',()=>{
+ const g=make();
+ for(const plant of BOTANICAL_ALL_05A)assert.ok(g.registry.items.has(plant.id),plant.id);
+});
