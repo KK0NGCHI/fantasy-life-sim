@@ -1,5 +1,4 @@
-import {createResourceNodes05A,RESOURCE_MAP_05A,workDuration05A,workResource05A,discoverResource05A} from '../src/resources-05a.js';
-import {levelForXp} from '../src/progression-system.js';
+import {createResourceNodes05A,RESOURCE_MAP_05A,workDuration05A,workResource05A,discoverResource05A,resourceAt05A} from '../src/resources-05a.js';
 const DAY=86400;
 const scenarios={
  casual:{hours:2,daysPerWeek:3,sequence:['gather','logging','mining','fishing'],materialRank:1},
@@ -25,6 +24,10 @@ export function simulate05A(days,kind){
   let remaining=settings.hours*3600;
   const activity=settings.sequence[Math.floor(day/7)%settings.sequence.length];
   const candidates=byActivity[activity];
+  for(const [nodeId,node] of Object.entries(nodes)){
+   const def=RESOURCE_MAP_05A.get(node.resourceId);
+   if(candidates.includes(def.id)&&def.regenDays>0)nodes[nodeId]=resourceAt05A(node,def,elapsed);
+  }
   while(remaining>=80){
    const viable=Object.entries(nodes).filter(([id,node])=>{
     const def=RESOURCE_MAP_05A.get(node.resourceId);
@@ -62,7 +65,6 @@ export function simulate05A(days,kind){
 }
 if(process.argv[1]?.endsWith('05a-long-horizon.mjs')){
  for(const days of [28,112,224])for(const kind of Object.keys(scenarios)){
-  const {nodes,...result}=simulate05A(days,kind);
-  console.log('SIM05A '+JSON.stringify(result));
+  console.log('SIM05A '+JSON.stringify(simulate05A(days,kind)));
  }
 }
