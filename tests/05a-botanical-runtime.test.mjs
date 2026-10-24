@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {BOTANICAL_PROFILES_05A} from '../src/botanical-profiles-05a.js';
-import {botanicalCalendar05A,botanicalPhenology05A,botanicalRenewalSeconds05A,eligibleBotanicalObservations05A} from '../src/botanical-lifecycle-05a.js';
+import {botanicalCalendar05A,botanicalPhenology05A,botanicalRenewalSeconds05A,eligibleBotanicalObservations05A,botanicalCanHarvest05A,botanicalMarkHarvest05A,botanicalLastHarvest05A} from '../src/botanical-lifecycle-05a.js';
 import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
@@ -53,4 +53,33 @@ test('phenology retains dormant plants and blocks out-of-season collection',()=>
  assert.equal(botanicalPhenology05A(p,{season:'winter'}).harvestable,false);
  assert.equal(botanicalPhenology05A(p,{season:'spring',daypart:'day'}).harvestable,true);
  assert.equal(botanicalCalendar05A(0).season,'spring');
+});
+
+test('species cooldown obeys saved last harvest day and constant-size flags',()=>{
+ const p=BOTANICAL_PROFILES_05A.find(x=>x.id==='item05a:plantago-major');
+ const first=botanicalMarkHarvest05A({},p,600);
+ assert.equal(botanicalLastHarvest05A(first,p.id),0);
+ assert.equal(botanicalCanHarvest05A(first,p,600).ok,false);
+ assert.equal(botanicalCanHarvest05A(first,p,2*86400).ok,true);
+ const second=botanicalMarkHarvest05A(first,p,2*86400);
+ assert.equal(Object.keys(second).length,1);
+ assert.equal(botanicalLastHarvest05A(second,p.id),2);
+});
+test('harvest markers survive save-v3 while invalid observations do not yield items',()=>{
+ const g=make();
+ g.dispatch('world.travel',{region:'초원·농경지'});
+ let found;
+ for(let i=0;i<150;i++){
+  assert.equal(g.dispatch('resource.incidental.search',{activity:'explore'}).accepted,true);
+  found=Object.keys(g.current().flags).find(x=>x.startsWith('botany05a:last:'));
+  if(found)break;
+ }
+ assert.ok(found,'at least one botanical should be gathered');
+ const v2=createSaveV2(g.current(),meta,'test',g.registry);
+ const converted=prepareSecondsV2ToV3(v2,g.registry);
+ assert.equal(converted.ok,true);
+ const saved=createSaveV3(converted.state,meta,'test',g.registry);
+ assert.equal(decodeSaveV3(saved,g.registry).ok,true);
+ const restored=make();restored.applyApprovedSave(saved);
+ assert.equal(restored.current().flags[found],true);
 });
