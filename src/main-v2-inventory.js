@@ -1,4 +1,4 @@
-import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS} from './resources-05a.js';
+import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS,discoverResource05A} from './resources-05a.js';
 import {resolveOriginInteraction} from './origin-interactions-04c.js';
 import {createOrigin,validateOrigin,applyOriginToProgression} from './character-origin-04b.js';
 import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel,awardProgression} from './progression-system.js';
@@ -157,6 +157,16 @@ export function createMainV2Inventory(uiItems,options={}) {
    return {outcome:'success',nextState:{...snapshot,flags:{...snapshot.flags,[result.flagKey]:true}},
      events:[{type:'origin.insight_discovered',payload:{id:result.interaction.id,description:result.interaction.description}}]};
  }],
+ ['resource.search',(snapshot,command)=>{
+  if(snapshot.world.runtime.dungeon||!snapshot.world.runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
+  const result=discoverResource05A(snapshot.world.runtime.resource05A.nodes,command.payload?.resourceId,
+   snapshot.world.runtime.region,snapshot.clock.elapsedUnits);
+  if(!result.ok)throw Error(result.reason);
+  const def=RESOURCE_MAP_05A.get(command.payload.resourceId);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,resource05A:{
+    ...snapshot.world.runtime.resource05A,nodes:result.nodes
+  }}}},events:[{type:'resource.site_discovered',payload:{nodeId:result.nodeId,name:def.name,newSite:result.newSite}}]};
+ }],
  ['resource.work',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon||!snapshot.world.runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
   const nodeId=command.payload?.nodeId;
@@ -248,6 +258,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='resource.search')return {turns:1,worldUnits:600};
     if(action.type==='resource.work'){
      const node=current.world.runtime.resource05A?.nodes?.[action.payload?.nodeId];
      const def=RESOURCE_MAP_05A.get(node?.resourceId);
