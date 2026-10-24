@@ -1,3 +1,4 @@
+import {prepareGrowthUpgrade04D} from '../src/growth-upgrade-04d.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
@@ -40,4 +41,23 @@ test('04-D good opt-in save restores background, point-buy, and single-discovery
  assert.deepEqual(target.current().progression,source.current().progression);
  assert.deepEqual(target.current().flags,source.current().flags);
  assert.equal(target.current().clock.elapsedUnits,source.current().clock.elapsedUnits);
+});
+
+test('04-D upgrade requires approval and never mutates original v3 slot',()=>{
+ const legacy=game({progression04A:false});const old=save(legacy);
+ const before=structuredClone(old);
+ const args={newSlotId:'04d-growth-copy',speciesId:'elf',backgroundId:'scholar',attributeAllocation:{지능:5,지각:5}};
+ assert.equal(prepareGrowthUpgrade04D(old,legacy.registry,args).reason,'APPROVAL_REQUIRED');
+ assert.equal(prepareGrowthUpgrade04D(old,legacy.registry,{...args,approved:true,newSlotId:old.slot.slotId}).reason,'SOURCE_SLOT_PROTECTED');
+ const res=prepareGrowthUpgrade04D(old,legacy.registry,{...args,approved:true});
+ assert.equal(res.ok,true);
+ assert.equal(res.save.slot.slotId,'04d-growth-copy');
+ assert.equal(res.save.slot.revision,0);
+ assert.equal(res.save.state.progression.system04A.attributes.지능,15);
+ assert.equal(res.save.state.progression.origin04B.speciesId,'elf');
+ assert.deepEqual(old,before);
+ assert.deepEqual(res.save.state.world,old.state.world);
+ assert.deepEqual(res.save.state.clock,old.state.clock);
+ assert.equal(decodeSaveV3(res.save,legacy.registry).ok,true);
+ assert.equal(prepareGrowthUpgrade04D(res.save,legacy.registry,{...args,approved:true}).reason,'GROWTH_ALREADY_PRESENT');
 });
