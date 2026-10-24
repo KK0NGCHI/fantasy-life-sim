@@ -150,7 +150,7 @@ try{
  const panel=gatherPage.getByRole('region',{name:'지역 자원 활동'});
  assert.match(await panel.innerText(),/야생 약초/);
  await panel.getByRole('button',{name:'1회 작업'}).first().click();
- assert.match(await gatherPage.locator('#main').innerText(),/가용 4\\/5/);
+ assert.ok((await gatherPage.locator('#main').innerText()).includes('가용 4/5'));
  await gatherPage.keyboard.press('F5');
  await gatherPage.getByText(/IndexedDB에 저장했습니다/).first().waitFor({timeout:15000});
  await gatherPage.reload({waitUntil:'domcontentloaded'});
@@ -159,7 +159,7 @@ try{
  await restoredGather.waitFor();
  await restoredGather.getByRole('button',{name:'불러오기'}).click();
  await gatherPage.locator('#bottomNav button[aria-label="생활"]').click();
- assert.match(await gatherPage.getByRole('region',{name:'지역 자원 활동'}).innerText(),/가용 4\\/5/);
+ assert.ok((await gatherPage.getByRole('region',{name:'지역 자원 활동'}).innerText()).includes('가용 4/5'));
  await gatherPage.close();
  assert.deepEqual(errors,[]);
  console.log('03-F Chromium browser smoke: render, F5 commit, reload, F9 approval, 16 regions PASS');
