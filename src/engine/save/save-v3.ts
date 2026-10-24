@@ -56,6 +56,29 @@ function validProgressionExtension(progression:unknown):boolean{
  return true;
 }
 
+/** 05-A opt-in resource state. Validate before a save is accepted or applied.
+ * No resource data is synthesized for legacy slots. */
+const resourceCaps05A:Readonly<Record<string,number>>={
+ 'resource05a:wild-herb':5,'resource05a:mushroom':4,'resource05a:grass':8,
+ 'resource05a:oak-log':5,'resource05a:pine-log':4,'resource05a:stone':12,
+ 'resource05a:coal':10,'resource05a:copper-ore':12,'resource05a:iron-ore':10,
+ 'resource05a:small-fish':12,'resource05a:carp':8,'resource05a:trout':6
+};
+function validResource05A(runtime:Record<string,unknown>,now:number):boolean{
+ if(!Object.hasOwn(runtime,'resource05A'))return true;
+ const x=runtime.resource05A;
+ if(!obj(x)||!keys(x,['schema','nodes'])||x.schema!==1||!obj(x.nodes)||Object.keys(x.nodes).length>6000)return false;
+ return Object.entries(x.nodes).every(([key,value])=>{
+  if(!obj(value)||!keys(value,['resourceId','remaining','progress','lastSecond','recoveryProgress','discovered','cycle']))return false;
+  const cap=resourceCaps05A[String(value.resourceId)];
+  return Number.isSafeInteger(cap)&&key.startsWith(String(value.resourceId)+':')&&key.length<=140&&
+   uint(value.remaining)&&Number(value.remaining)<=cap&&uint(value.progress)&&Number(value.progress)<=200&&
+   uint(value.lastSecond)&&Number(value.lastSecond)<=now&&
+   uint(value.recoveryProgress)&&Number(value.recoveryProgress)<60*86400&&
+   typeof value.discovered==='boolean'&&uint(value.cycle);
+ });
+}
+
 export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
  if(!obj(raw)||raw.format!=='somnium-save'||raw.saveVersion!==3||!obj(raw.state)||raw.state.schemaVersion!==3)return {ok:false,reason:'INCOMPATIBLE_VERSION'};
  const clock=raw.state.clock;
@@ -69,6 +92,7 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
   if(!built.ok||validateWorldSnapshot03E(raw.state.world.runtime.world03E,built.registry).length)
    return {ok:false,reason:'INVALID_DATA'};
  }
+ if(!validResource05A(raw.state.world.runtime,clock.elapsedSeconds as number))return {ok:false,reason:'INVALID_DATA'};
  if(!validProgressionExtension(raw.state.progression))return {ok:false,reason:'INVALID_DATA'};
  const source=structuredClone(raw.state) as unknown as Record<string,unknown>;
  source.schemaVersion=2;source.clock={elapsedUnits:clock.elapsedSeconds};
