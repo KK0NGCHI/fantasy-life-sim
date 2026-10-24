@@ -98,6 +98,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
   if(candidates.length){
    const candidatePanel=make('div',{class:'resource05a-list'},panel);
    make('h4',{text:'신규 검증 자원'},candidatePanel);
+   if(s.region==='광산'||s.region==='산맥')btn('수정 광맥 탐사 (10분)',()=>{if(executeV2('resource.candidate.prospect',{}))render();},'btn',candidatePanel);
    for(const [id,site] of candidates){
     const species=RESOURCE_SPECIES_05A.find(x=>x.id===site.sourceId),rule=SOURCE_WORK_RULES_05A[site.sourceId];
     const row=make('div',{class:'resource05a-row'},candidatePanel);
