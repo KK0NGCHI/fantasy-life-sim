@@ -129,6 +129,38 @@ try{
  assert.equal(dungeonRuntime.sameMap,true);
  assert.ok(dungeonRuntime.cells>0);
  assert.equal(dungeonRuntime.stairs,true,JSON.stringify(dungeonRuntime.stairDebug));
+ // 05-A: actual UI forest gathering, not just an in-page engine instantiation.
+ const gatherPage=await context.newPage();gatherPage.on('pageerror',e=>errors.push(e.message));
+ gatherPage.setDefaultTimeout(7000);
+ await gatherPage.goto('/',{waitUntil:'domcontentloaded'});
+ await gatherPage.getByRole('button',{name:'세계 지도'}).first().click();
+ await gatherPage.getByRole('button',{name:'숲',exact:true}).click();
+ await gatherPage.getByRole('button',{name:'이동하기'}).click();
+ let forestReached=false;
+ for(let tries=0;tries<60;tries++){
+  const encounter=gatherPage.getByRole('dialog',{name:'여행 중 인카운터'});
+  if(await encounter.isVisible()){await encounter.getByRole('button',{name:'확인 후 계속'}).click();continue;}
+  const progress=gatherPage.getByRole('button',{name:'남은 여행 진행'});
+  if(await progress.isVisible()){await progress.click();continue;}
+  await gatherPage.locator('#bottomNav button[aria-label="생활"]').click();
+  if(await gatherPage.getByRole('region',{name:'지역 자원 활동'}).isVisible()){forestReached=true;break;}
+  await gatherPage.getByRole('button',{name:'세계 지도',exact:true}).first().click();
+ }
+ assert.equal(forestReached,true,'05-A forest resource panel unavailable');
+ const panel=gatherPage.getByRole('region',{name:'지역 자원 활동'});
+ assert.match(await panel.innerText(),/야생 약초/);
+ await panel.getByRole('button',{name:'1회 작업'}).first().click();
+ assert.match(await gatherPage.locator('#main').innerText(),/가용 4\\/5/);
+ await gatherPage.keyboard.press('F5');
+ await gatherPage.getByText(/IndexedDB에 저장했습니다/).first().waitFor({timeout:15000});
+ await gatherPage.reload({waitUntil:'domcontentloaded'});
+ await gatherPage.keyboard.press('F9');
+ const restoredGather=gatherPage.getByRole('dialog',{name:'저장 상태 불러오기 확인'});
+ await restoredGather.waitFor();
+ await restoredGather.getByRole('button',{name:'불러오기'}).click();
+ await gatherPage.locator('#bottomNav button[aria-label="생활"]').click();
+ assert.match(await gatherPage.getByRole('region',{name:'지역 자원 활동'}).innerText(),/가용 4\\/5/);
+ await gatherPage.close();
  assert.deepEqual(errors,[]);
  console.log('03-F Chromium browser smoke: render, F5 commit, reload, F9 approval, 16 regions PASS');
 }finally{await browser.close();}
