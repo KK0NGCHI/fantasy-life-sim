@@ -1,3 +1,4 @@
+import {FUNGAL_ITEMS_05B} from '../src/fungal-ecology-05b.js';
 import {BOTANICAL_PROFILES_05A} from '../src/botanical-profiles-05a.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
@@ -7,7 +8,7 @@ import {BOTANICAL_ITEMS_05A,BOTANICAL_SPECIES_05A,BOTANICAL_ALL_05A} from '../sr
 import {CATALOG_ITEMS_05A} from '../src/resource-catalog-05a.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
-const items=new Set([...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A].map(x=>x.id));
+const items=new Set([...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...FUNGAL_ITEMS_05B].map(x=>x.id));
 const make=()=>createMainV2Inventory([{id:'test:base',name:'기본',group:'재료',qty:1,tags:[]}],{
  worldSeed:'live-provisional-tables',generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,
  preferences:{getItem:()=>null,setItem:()=>{}},incidentalTables05A:ACTIVITY_TABLES_05A
