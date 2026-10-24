@@ -76,3 +76,19 @@ test('fungal sites and their rain progress survive save-v3 roundtrip',()=>{
  const g2=make();g2.applyApprovedSave(save);
  assert.deepEqual(g2.current().world.runtime.resource05A.ecologySites,sites);
 });
+
+test('fungal fruit bodies progress fresh to mature, aging, then decomposed while mycelium persists',()=>{
+ const sp=FUNGAL_SPECIES_05B.find(x=>x.key==='oyster');
+ const days=Array.from({length:112},(_,d)=>d);
+ const suitable=days.find(d=>d<108&&sp.seasons.includes(['spring','summer','autumn','winter'][Math.floor(d/28)])&&
+  ecologyClimate05A(seed,'숲',d*day).weather==='rain'&&
+  [1,2,3].every(k=>ecologyClimate05A(seed,'숲',(d+k)*day).weather!=='rain'));
+ assert.ok(suitable!==undefined,'fixture requires an isolated rainy day');
+ const stages=[0,1,2,3].map(n=>fungalFruiting05B(sp,'숲',(suitable+n)*day,seed,sp.substrate));
+ assert.deepEqual(stages.map(x=>x.stage),['fresh','mature','aging','decomposed']);
+ assert.deepEqual(stages.map(x=>x.fruiting),[true,true,false,false]);
+ assert.ok(stages.every(x=>x.present));
+ const def=FUNGAL_ECOLOGY_MAP_05B.get(sp.id);
+ const patch=Object.values(createFungalEcology05B()).find(x=>x.speciesId===sp.id&&x.region==='숲');
+ assert.equal(fungalHarvest05B(patch,def,(suitable+2)*day,seed,0).reason,'AGING');
+});
