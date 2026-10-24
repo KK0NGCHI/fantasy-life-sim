@@ -1,5 +1,5 @@
 import {CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
-import {createCandidateSites05A,discoverCandidateSite05A,harvestCandidateSite05A,acquiredCompendium05A,SOURCE_WORK_RULES_05A} from './resource-sites-05a.js';
+import {createCandidateSites05A,discoverCandidateSite05A,harvestCandidateSite05A,acquiredCompendium05A,SOURCE_WORK_RULES_05A,prospectCandidateQuartz05A,reconcileCandidateSite05A} from './resource-sites-05a.js';
 import {RESOURCES_05A,createResourceNodes05A,RESOURCE_MAP_05A,workResource05A,workDuration05A,RESOURCE_TOOL_RANK,RESOURCE_TOOL_KINDS,discoverResource05A} from './resources-05a.js';
 import {resolveOriginInteraction} from './origin-interactions-04c.js';
 import {createOrigin,validateOrigin,applyOriginToProgression} from './character-origin-04b.js';
@@ -189,6 +189,14 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:result.nodes}}}},
    events:[{type:'resource.site_discovered',payload:{nodeId:command.payload.nodeId,name:'신규 자원 지점',newSite:false}}]};
  }],
+ ['resource.candidate.prospect',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,resources=runtime.resource05A;
+  if(runtime.dungeon||!resources?.candidateSites)throw Error('CANDIDATE_UNAVAILABLE');
+  const found=prospectCandidateQuartz05A(resources.candidateSites,runtime.region,snapshot.clock.elapsedUnits);
+  if(!found.ok)throw Error(found.reason);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:found.nodes}}}},
+    events:[{type:'resource.site_discovered',payload:{nodeId:found.nodeId,name:'수정 광맥',newSite:found.newSite}}]};
+ }],
  ['resource.candidate.work',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
   if(runtime.dungeon||!resources?.candidateSites)throw Error('CANDIDATE_UNAVAILABLE');
@@ -201,7 +209,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const selected=requested?owned.find(x=>x.definitionId===requested):owned[0];
   if(requested&&!selected)throw Error('TOOL_NOT_OWNED');
   const rank=selected?(Number(materialTools05A.find(x=>x.id===selected.definitionId)?.tags.find(t=>t.startsWith('rank:'))?.slice(5)??1)):0;
-  const outcome=harvestCandidateSite05A(resources.candidateSites,nodeId,runtime.region,rule.activity,{toolRank:rank});
+  const outcome=harvestCandidateSite05A(resources.candidateSites,nodeId,runtime.region,rule.activity,{toolRank:rank,seconds:snapshot.clock.elapsedUnits});
   if(!outcome.ok)throw Error(outcome.reason);
   let itemWorld=snapshot.itemWorld;
   for(const reward of outcome.rewards){
@@ -285,6 +293,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='resource.candidate.prospect')return {turns:1,worldUnits:600};
     if(action.type==='resource.candidate.discover')return {turns:1,worldUnits:600};
     if(action.type==='resource.candidate.work')return {turns:1,worldUnits:60};
     if(action.type==='resource.search')return {turns:1,worldUnits:600};
@@ -349,7 +358,11 @@ export function createMainV2Inventory(uiItems,options={}) {
   registry,projected,current,
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
-  resources05A(){return state.world.runtime.resource05A?structuredClone(state.world.runtime.resource05A):null;},
+  resources05A(){if(!state.world.runtime.resource05A)return null;
+   const r=structuredClone(state.world.runtime.resource05A);
+   if(r.candidateSites)for(const [id,site] of Object.entries(r.candidateSites))r.candidateSites[id]=reconcileCandidateSite05A(site,state.clock.elapsedUnits);
+   return r;
+  },
   availableTools05A(activity){
    const prefix={gather:'tool05a:gloves',logging:'tool05a:axe',mining:'tool05a:pickaxe',fishing:'tool05a:rod'}[activity];
    if(!prefix)return [];
