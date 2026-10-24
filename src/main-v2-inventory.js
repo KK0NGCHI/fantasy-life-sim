@@ -1,3 +1,4 @@
+import {ecologyClimate05A} from './ecology-climate-05a.js';
 import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_MAP_05A} from './botanical-ecology-adapter-05a.js';
 import {ecologySiteId,ecologyInteract} from './ecology-core-05a.js';
 import {eligibleBotanicalObservations05A,botanicalCanHarvest05A,botanicalMarkHarvest05A} from './botanical-lifecycle-05a.js';
@@ -99,7 +100,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:createBotanicalEcology05A()}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:createBotanicalEcology05A(),ecologyClimateSeed:freshSeed}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -243,8 +244,9 @@ export function createMainV2Inventory(uiItems,options={}) {
   const season=['spring','summer','autumn','winter'][Math.floor((Math.floor((snapshot.clock.elapsedUnits+28800)/86400)%112)/28)];
   const hour=Math.floor(((snapshot.clock.elapsedUnits+28800)%86400)/3600);
   const daypart=hour<6?'dawn':hour<18?'day':hour<21?'dusk':'night';
+  const ecoWeather=runtime.weather05A??(typeof runtime.resource05A.ecologyClimateSeed==='string'?ecologyClimate05A(runtime.resource05A.ecologyClimateSeed,runtime.region,snapshot.clock.elapsedUnits).weather:undefined);
   const result=resolveIncidentalActivity05A(table,{
-    region:runtime.region,activity:kind,season,daypart,weather:runtime.weather05A
+    region:runtime.region,activity:kind,season,daypart,weather:ecoWeather
    },{trigger:a.value,tier:b.value,output:c.value});
   if(!result.ok)throw Error(result.reason);
   let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found,flags=snapshot.flags;
@@ -257,14 +259,14 @@ export function createMainV2Inventory(uiItems,options={}) {
     if(!site||!def)found=false;
     else{
      const attempt=ecologyInteract(site,def,{
-      region:runtime.region,season,daypart,weather:runtime.weather05A,
+      region:runtime.region,season,daypart,weather:ecoWeather,
       mature:true,bloom:botanical.part==='flower'
      },{second:snapshot.clock.elapsedUnits,roll:b.value,action:'gather'});
      if(!attempt.ok)found=false;
      else updatedEcoSite=attempt.site;
     }
    }else{
-    const allowed=botanicalCanHarvest05A(flags,botanical,snapshot.clock.elapsedUnits,runtime.weather05A);
+    const allowed=botanicalCanHarvest05A(flags,botanical,snapshot.clock.elapsedUnits,ecoWeather);
     if(!allowed.ok)found=false;
    }
   }
