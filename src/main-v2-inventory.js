@@ -1,4 +1,4 @@
-import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel} from './progression-system.js';
+import {createProgression,validateProgression,SKILL_DEFINITIONS,skillLevel,awardProgression} from './progression-system.js';
 import {createInitialWorldRuntime03A} from '../dist/engine/world/world-integrity.js';
 import {createWorldSnapshot03E,withGeneratedMap,recordWorldSight,recordWorldLocation,restoreWorldSnapshot03E} from '../dist/engine/world/world-persistence-03e.js';
 import {activityPreview} from './region-activities.js';
@@ -247,7 +247,14 @@ export function createMainV2Inventory(uiItems,options={}) {
       const previous=located.world.seenCells[map.id]??[];
       const visible=localVisibility(localRegistry,position,previous).visible;
       const recorded=recordWorldSight(located,map.id,visible,worldRegistry);
+      const discoveries=(recorded.world.seenCells[map.id]??[]).length-(old.world.seenCells[map.id]??[]).length;
       state={...state,world:{...state.world,runtime:{...state.world.runtime,world03E:recorded}}};
+      if(discoveries>0&&state.progression?.system04A){
+       // Only newly revealed, verified world tiles award exploration XP.
+       // Prototype ratio: 1 XP/new cell; repeated visits and wall bumps grant none.
+       const next=awardProgression(state.progression.system04A,{actionId:'discovery:'+map.id+':'+state.turn,skillId:SKILL_DEFINITIONS.find(d=>d.name==='탐색').id,xp:discoveries});
+       state={...state,progression:{...state.progression,system04A:next}};
+      }
      }
      actionsSinceAuto++;
      if(shouldAutoSave(actionsSinceAuto,result.events,autoPolicy)){actionsSinceAuto=0;enqueueAuto()}
