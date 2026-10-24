@@ -1,3 +1,31 @@
+# Somnium — 판타지 생활 시뮬레이션
+
+> **2026-10-24 현재 작업 기준**: 아래에 보존된 v0.3~v0.x UI 변경 기록은 당시의 개발 일지입니다. 최신 작업 상태와 설치·기획·개발 순서는 다음 문서가 우선합니다. `main`이 아닌 **Draft PR 기반 작업**이며 아직 통합 병합하지 않았습니다.
+
+- **[현재 구현 현황 · PR 및 브랜치 의존 관계](docs/project-status-current.md)**
+- **[확정 게임 규칙과 시험용 밸런스 구분](docs/project-decisions-current.md)**
+- **[05-A 이후 개발 로드맵 및 완료 기준](docs/roadmap-next.md)**
+- **[04-D 저장 호환성 검증 기록](docs/04d-growth-save-acceptance.md)**
+
+현재 핵심: 16개 고정 광역 지역(전 지역 타일화 아님), 타일 미궁, v3 저장/세계 스냅샷, 54개 숙련·7개 능력치, 8종 종족/16종 배경 **후보**, 보통·소형·초소형 **각 1타일**, 배경별 정보 해석 16종. 아직 채집·제작·전투·경제 전체 루프가 완성된 것은 아닙니다. 다음 핵심 작업은 **05-A 실제 자원 채취·세계 변경·아이템·XP 연결**입니다.
+
+최신 개발 브랜치 실행 예시 (Windows PowerShell):
+
+```powershell
+git fetch origin
+git switch docs/roadmap-status-20261024
+git pull --ff-only
+npm install
+npm run check
+py -m http.server 8000
+```
+
+`py`가 없으면 `python -m http.server 8000`; 브라우저 주소: http://localhost:8000/. **이 저장소에는 잠금 파일이 없으므로 `npm ci`가 아닌 `npm install`**을 사용합니다. 테스트 통과와 사용자 PC의 실제 Windows Chrome/Edge 수동 검수는 다릅니다. **사용자 승인 없이 `main` 병합 금지.**
+
+---
+
+## 이전 UI 시제품 개발 기록 (역사 자료)
+
 # 판타지 생활 시뮬레이션 — UI 시제품 v0.3
 
 브라우저 기반 싱글플레이 판타지 생활 시뮬레이션의 UI 설계 단계입니다. 실제 성장·전투·경제·제작 시스템은 아직 연결하지 않았습니다.
