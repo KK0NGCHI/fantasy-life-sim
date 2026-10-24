@@ -156,19 +156,28 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(!turns)throw Error('No travel progress');
   return {travel,rng,turns,units,encounter,arrival};
  }
- // A side discovery can occur at most once per 600 seconds of real game-clock progress.
- // Crossing a single fixed clock boundary avoids extra rolls from subdividing work.
- // The action's original dispatcher owns its time cost; no nested dispatch/time billing.
- const sideOpportunity=(before,seconds)=>Number.isSafeInteger(seconds)&&seconds>0&&
-   Math.floor((before.clock.elapsedUnits+seconds)/INCIDENTAL_ACTIVITY_SECONDS_05A)>
-   Math.floor(before.clock.elapsedUnits/INCIDENTAL_ACTIVITY_SECONDS_05A);
+ // Deterministic full-clock buckets: one opportunity per complete 600 seconds of
+ // qualifying activity, including every crossed boundary in long actions.
+ // The same time windows are processed whether actions are split or batched.
  const sideResult=(before,base,kind,elapsed,region)=>{
-  if(!sideOpportunity(before,elapsed)||!incidentalTables05A[region+':'+kind])return base;
-  // Evaluate with authoritative RNG after the primary action. Ignore user-supplied outcomes.
-  const withRegion={...base.nextState,world:{...base.nextState.world,runtime:{
-    ...base.nextState.world.runtime,region}}};
-  const extra=handlers.get('resource.incidental.search')(withRegion,{payload:{activity:kind}});
-  return {...base,nextState:extra.nextState,events:[...base.events,...extra.events]};
+  if(!Number.isSafeInteger(elapsed)||elapsed<0)throw Error('INVALID_ACTIVITY_TIME');
+  if(!incidentalTables05A[region+':'+kind]||elapsed===0)return base;
+  const start=before.clock.elapsedUnits,end=start+elapsed;
+  if(!Number.isSafeInteger(end))throw Error('INVALID_ACTIVITY_TIME');
+  const first=Math.floor(start/INCIDENTAL_ACTIVITY_SECONDS_05A)+1;
+  const last=Math.floor(end/INCIDENTAL_ACTIVITY_SECONDS_05A);
+  if(last-first+1>100000)throw Error('INCIDENTAL_ACTION_TOO_LONG');
+  let next=base.nextState,events=[...base.events];
+  for(let bucket=first;bucket<=last;bucket++){
+   const at=bucket*INCIDENTAL_ACTIVITY_SECONDS_05A;
+   const virtual={...next,clock:{...next.clock,elapsedUnits:at},
+    world:{...next.world,runtime:{...next.world.runtime,region}}};
+   const extra=handlers.get('resource.incidental.search')(virtual,{payload:{activity:kind}});
+   // Restore original action clock; dispatcher is the only clock owner.
+   next={...extra.nextState,clock:next.clock};
+   events.push(...extra.events);
+  }
+  return {...base,nextState:next,events};
  };
  const handlers=new Map([
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
@@ -219,7 +228,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const hour=Math.floor(((snapshot.clock.elapsedUnits+28800)%86400)/3600);
   const daypart=hour<6?'dawn':hour<18?'day':hour<21?'dusk':'night';
   const result=resolveIncidentalActivity05A(table,{
-    region:runtime.region,activity:kind,season,daypart,weather:'clear'
+    region:runtime.region,activity:kind,season,daypart,weather:runtime.weather05A
    },{trigger:a.value,tier:b.value,output:c.value});
   if(!result.ok)throw Error(result.reason);
   let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found;
@@ -287,7 +296,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const season=['spring','summer','autumn','winter'][Math.floor((Math.floor((snapshot.clock.elapsedUnits+28800)/86400)%112)/28)];
    const hour=Math.floor(((snapshot.clock.elapsedUnits+28800)%86400)/3600);
    const daypart=hour<6?'dawn':hour<18?'day':hour<21?'dusk':'night';
-   const pick=rollAvailableResourcePool05A(pool,{region:runtime.region,season,daypart,weather:'clear'},
+   const pick=rollAvailableResourcePool05A(pool,{region:runtime.region,season,daypart,weather:runtime.weather05A},
     {tierRoll:first.value,outputRoll:second.value,mode:command.payload?.poolMode??'eligible-only'});
    if(!pick.ok)throw Error(pick.reason);
    rewards=pick.itemId?[{itemId:pick.itemId,quantity:1,sourceId:site.sourceId,region:runtime.region,traits:[]}]:[];
