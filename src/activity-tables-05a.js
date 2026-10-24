@@ -1,3 +1,4 @@
+import {botanicalPhenology05A} from './botanical-lifecycle-05a.js';
 /** Provisional activity tables using ONLY existing catalogued items.
  * These are playable starter values, not approved final ecology or rarity.
  * No speculative 80-species botanical entries are shipped.
@@ -24,8 +25,8 @@ export const ACTIVITY_TABLES_05A=Object.freeze(Object.fromEntries(entries.map(([
  region+':'+activity,Object.freeze({region,activity,triggerChance,rewardMode:'item',
  pool:{id:'activity05a:'+region+':'+activity,spawnConditions:{regions:[region]},regenerationPolicy:noRegrowth,
  disappearancePolicy:'persist',tiers:[
- {id:'common',weight:70,outputs:[{itemId,weight:4},...BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='common'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons}}))]},
- {id:'uncommon',weight:25,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='uncommon'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons}}))},
- {id:'rare',weight:5,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='rare'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons}}))}
+ {id:'common',weight:70,outputs:[{itemId,weight:4},...BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='common'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons,...(s.renewalClass==='rain-pulse'?{weather:['rain']}:{}),...(s.purpose==='night-bloom'?{dayparts:['night']}: {})}}))]},
+ {id:'uncommon',weight:25,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='uncommon'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons,...(s.renewalClass==='rain-pulse'?{weather:['rain']}:{}),...(s.purpose==='night-bloom'?{dayparts:['night']}: {})}}))},
+ {id:'rare',weight:5,outputs:BOTANICAL_PROFILES_05A.filter(s=>s.dropEnabled&&s.encounterClass==='rare'&&s.regions.includes(region)&&activity==='explore').map(s=>({itemId:s.id,weight:1,conditions:{seasons:s.seasons,...(s.renewalClass==='rain-pulse'?{weather:['rain']}:{}),...(s.purpose==='night-bloom'?{dayparts:['night']}: {})}}))}
  ].filter(t=>t.outputs.length)}})
 ])));
