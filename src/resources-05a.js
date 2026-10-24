@@ -46,3 +46,57 @@ export function gatherResource05A(nodes,nodeId,region,seconds){
  if(current.remaining<1)return {ok:false,reason:'DEPLETED'};
  return {ok:true,resource,node:{...current,remaining:current.remaining-1,lastSecond:seconds}};
 }
+
+/** 05-A engine work contract. An action advances one bounded piece of real work.
+ * Outputs are only granted after completion/catch. No cosmetic fake rewards. */
+export const RESOURCE_TOOL_KINDS=Object.freeze({
+ gather:null,logging:'axe',mining:'pickaxe',fishing:'rod'
+});
+export const RESOURCE_TOOL_RANK=Object.freeze({
+ stone:1,copper:2,iron:3,steel:4,wood:1,processedWood:2,reinforcedWood:3
+});
+export function workDuration05A(activity,roll){
+ const bases={gather:50,logging:65,mining:70,fishing:60};
+ const spreads={gather:5,logging:10,mining:10,fishing:10};
+ if(!Object.hasOwn(bases,activity)||typeof roll!=='number'||roll<0||roll>=1)throw Error('INVALID_WORK_DURATION');
+ // Triangular centered duration, driven by the authoritative action RNG value.
+ // Deterministic and rounded, with no real-time waiting.
+ const shape=roll<0.5?Math.sqrt(2*roll)-1:1-Math.sqrt(2-2*roll);
+ return bases[activity]+Math.round(spreads[activity]*shape);
+}
+export function minimumToolRank05A(definition){
+ if(definition.activity==='mining'&&definition.id==='resource05a:iron-ore')return 2;
+ return definition.activity==='gather'?0:1;
+}
+export function workResource05A(nodes,nodeId,region,seconds,{toolKind=null,toolRank=0,outcomeRoll=0.5}={}){
+ const node=nodes?.[nodeId],def=RESOURCE_MAP_05A.get(node?.resourceId);
+ if(!def||def.region!==region)return {ok:false,reason:'WRONG_RESOURCE_REGION'};
+ if(!node.discovered)return {ok:false,reason:'UNDISCOVERED'};
+ const needKind=RESOURCE_TOOL_KINDS[def.activity];
+ if(needKind!==null&&(toolKind!==needKind||toolRank<minimumToolRank05A(def)))return {ok:false,reason:'TOOL_REQUIRED'};
+ if(typeof outcomeRoll!=='number'||outcomeRoll<0||outcomeRoll>=1)return {ok:false,reason:'INVALID_RANDOM_DRAW'};
+ const current=resourceAt05A(node,def,seconds);
+ if(current.remaining===0)return {ok:false,reason:'DEPLETED'};
+ const changes={...current};
+ let qty=0,earned=0,progress=changes.progress??0;
+ if(def.activity==='gather'){
+  qty=1;earned=def.xp;changes.remaining--;
+ }else if(def.activity==='logging'){
+  // Wood is recovered only upon completion of a tree, then the site is a stump.
+  const threshold=def.id==='resource05a:oak-log'?42:36;
+  progress+=Math.max(1,toolRank);
+  if(progress>=threshold){qty=changes.remaining;earned=def.xp;progress=0;changes.remaining=0;}
+ }else if(def.activity==='mining'){
+  const perOre={'resource05a:stone':9,'resource05a:coal':14,'resource05a:copper-ore':16,'resource05a:iron-ore':20};
+  progress+=Math.max(1,toolRank);
+  if(progress>=perOre[def.id]){progress-=perOre[def.id];qty=1;earned=def.xp;changes.remaining--;}
+ }else if(def.activity==='fishing'){
+  const catchChance={'resource05a:small-fish':0.08,'resource05a:carp':0.065,'resource05a:trout':0.05};
+  if(outcomeRoll<catchChance[def.id]){qty=1;earned=def.xp;changes.remaining--;}
+ }
+ changes.progress=progress;
+ // A successful harvest resets the per-node recovery timer. Work progress on
+ // non-harvest attempts is retained, but does not reset recovery.
+ if(qty>0)changes.lastSecond=seconds;
+ return {ok:true,resource:def,node:changes,qty,xp:earned,activity:def.activity};
+}
