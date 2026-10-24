@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,resourceAt05A,activeResourceSeconds05A,workDuration05A,workResource05A} from '../src/resources-05a.js';
+import {RESOURCES_05A,createResourceNodes05A,gatherResource05A,resourceAt05A,activeResourceSeconds05A,workDuration05A,workResource05A,discoverResource05A} from '../src/resources-05a.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
 const item=[{id:'test:stone',name:'돌',group:'재료',qty:1,tags:[]}];
@@ -77,4 +77,35 @@ test('05-A bounded work to log completion and save file rejects corrupted resour
  altered.state.world.runtime.resource05A.nodes['resource05a:oak-log:01'].remaining=-2;
  assert.equal(decodeSaveV3(altered,g.registry).ok,false);
  assert.equal(decodeSaveV3(save,g.registry).ok,true);
+});
+
+test('05-A first-year and second-year mine supply uses fresh bounded sites, never resets old veins',()=>{
+ const nodes=createResourceNodes05A(),id='resource05a:iron-ore';
+ const found=discoverResource05A(nodes,id,'광산',0);
+ assert.equal(found.ok,true);assert.equal(found.newSite,false);
+ assert.equal(discoverResource05A(found.nodes,id,'광산',0).reason,'SUPPLY_NOT_READY');
+ const week=discoverResource05A(found.nodes,id,'광산',7*86400);
+ assert.equal(week.ok,true);assert.equal(week.newSite,true);
+ assert.equal(week.nodes[week.nodeId].remaining,10);
+ assert.equal(discoverResource05A(week.nodes,id,'광산',7*86400).reason,'SUPPLY_NOT_READY');
+ const secondYear=discoverResource05A(week.nodes,id,'광산',224*86400);
+ assert.equal(secondYear.ok,true);
+ assert.equal(week.nodes[week.nodeId].remaining,10);
+ assert.equal(Object.keys(secondYear.nodes).length,Object.keys(week.nodes).length+1);
+});
+test('05-A resource search respects region/time and cannot re-discover identical sites',()=>{
+ const g=make();
+ const rejected=g.dispatch('resource.search',{resourceId:'resource05a:iron-ore'});
+ assert.equal(rejected.accepted,false);
+ assert.equal(g.current().clock.elapsedUnits,0);
+ assert.equal(g.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const oldClock=g.current().clock.elapsedUnits;
+ const discovered=g.dispatch('resource.search',{resourceId:'resource05a:iron-ore'});
+ assert.equal(discovered.accepted,true);
+ assert.equal(g.current().clock.elapsedUnits-oldClock,600);
+ const unhidden=Object.values(g.resources05A().nodes).filter(n=>n.resourceId==='resource05a:iron-ore'&&n.discovered);
+ assert.equal(unhidden.length,3);
+ const noExtra=g.dispatch('resource.search',{resourceId:'resource05a:iron-ore'});
+ assert.equal(noExtra.accepted,false);
+ assert.equal(g.current().clock.elapsedUnits-oldClock,600);
 });
