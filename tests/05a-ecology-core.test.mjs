@@ -92,3 +92,25 @@ test('game-created ecological climate seed stays unchanged over approved-save ro
  assert.equal(restored.current().world.runtime.resource05A.ecologyClimateSeed,initial);
  assert.deepEqual(ecologyClimate05A(initial,'숲',86400),ecologyClimate05A(restored.current().world.runtime.resource05A.ecologyClimateSeed,'숲',86400));
 });
+
+test('discovered patch supports direct harvest, stock cap, rejection, and game time',()=>{
+ const g=make();g.dispatch('world.travel',{region:'초원·농경지'});
+ let selected;
+ for(let i=0;i<500;i++){
+  const r=g.dispatch('resource.incidental.search',{activity:'explore'});
+  assert.equal(r.accepted,true);
+  selected=Object.values(g.current().world.runtime.resource05A.ecologySites).find(x=>x.discovered&&x.remaining>0&&x.region==='초원·농경지');
+  if(selected)break;
+ }
+ assert.ok(selected);
+ const original=g.current(),before=original.itemWorld.items.reduce((v,x)=>v+(x.definitionId===selected.speciesId?x.quantity:0),0);
+ const result=g.dispatch('botanical.patch.harvest',{siteId:selected.id});
+ assert.equal(result.accepted,true,JSON.stringify(result));
+ const now=g.current();
+ assert.equal(now.clock.elapsedUnits-original.clock.elapsedUnits,60);
+ const after=now.itemWorld.items.reduce((v,x)=>v+(x.definitionId===selected.speciesId?x.quantity:0),0);
+ assert.equal(after,before+1);
+ assert.equal(now.world.runtime.resource05A.ecologySites[selected.id].remaining,selected.remaining-1);
+ const attempt=g.dispatch('botanical.patch.harvest',{siteId:'eco05a:unknown'});
+ assert.equal(attempt.accepted,false);
+});
