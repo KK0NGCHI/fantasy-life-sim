@@ -7,7 +7,7 @@ import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
 const DAY=86400;
-const initial=()=>({trees:createTreeWorld05C(),substrates:createSubstrateWorld05B(),sites:createFungalEcology05B(),day:0});
+const initial=()=>({trees:createTreeWorld05C(),substrates:createWoodlandSubstrates05C(createSubstrateWorld05B()),sites:createFungalEcology05B(),day:0});
 const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'재료',qty:1,tags:[]}],{
  worldSeed:'woodland-cycle',generatedWorld:true,worldPersistence03E:true,progression04A:true,
  resources05A:true,ecology05A:true,fungi05B:true,woodland05C:true,incidentalTables05A:ACTIVITY_TABLES_05A,
@@ -26,7 +26,7 @@ test('full-day woodland transitions generate litter, soil and eventual deadwood'
  const one=advanceWoodland05C(w,DAY,'cycle-seed');
  assert.equal(one.day,1);
  assert.ok(one.substrates[leaf].remaining>w.substrates[leaf].remaining);
- assert.ok(one.substrates[soil]===undefined||one.substrates[soil].remaining>=w.substrates[soil].remaining);
+ assert.ok(one.substrates[soil].remaining>w.substrates[soil].remaining);
  const long=advanceWoodland05C(w,520*DAY,'cycle-seed');
  assert.equal(long.day,520);
  assert.ok(Object.values(long.trees).every(t=>!t.alive));
