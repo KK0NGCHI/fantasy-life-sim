@@ -394,8 +394,7 @@ export function skillThreshold(level,rules=PROGRESSION_RULES){
  if(!safe(level)||level<1)throw RangeError('Invalid skill level');
  const n=level-1;
  const sum=n*rules.skillBaseXp+rules.skillLinearXp*n*(n-1)/2+
- rules.skillQuadraticXp*n*(n-1)*(2*n-1)/6-
- rules.skillQuadraticXp*n*(n-1)/2;
+ rules.skillQuadraticXp*n*(n-1)*(2*n-1)/6;
  if(!Number.isSafeInteger(sum)||sum<0)throw RangeError('Skill XP overflow');
  return sum;
 }
