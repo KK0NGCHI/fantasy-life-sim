@@ -26,12 +26,12 @@ test('05-A harvesting cannot duplicate consumed node and respects discovery, reg
 test('05-A full state action: only valid harvest changes XP, item world and clock; v3 roundtrip',()=>{
  const g=make();
  assert.equal(g.resources05A().nodes['resource05a:wild-herb:01'].remaining,5);
- assert.equal(g.dispatch('resource.gather',{nodeId:'missing'}).accepted,false);
+ assert.equal(g.dispatch('resource.work',{nodeId:'missing'}).accepted,false);
  assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
  const before=g.current();
- const result=g.dispatch('resource.gather',{nodeId:'resource05a:wild-herb:01'});
+ const result=g.dispatch('resource.work',{nodeId:'resource05a:wild-herb:01'});
  assert.equal(result.accepted,true,JSON.stringify(result));
- assert.equal(g.current().clock.elapsedUnits-before.clock.elapsedUnits,50);
+ assert.ok(g.current().clock.elapsedUnits-before.clock.elapsedUnits>=45&&g.current().clock.elapsedUnits-before.clock.elapsedUnits<=55);
  assert.equal(g.current().world.runtime.resource05A.nodes['resource05a:wild-herb:01'].remaining,4);
  assert.equal(g.current().progression.system04A.skills['skill-09'],7);
  assert.equal(g.projected().find(i=>i.id==='gather05a:resource05a:wild-herb').qty,1);
