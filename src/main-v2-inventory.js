@@ -1,3 +1,4 @@
+import {createTreeWorld05C,advanceWoodland05C} from './woodland-cycle-05c.js';
 import {createSubstrateWorld05B,consumeFungalSubstrate05B,addLoggingDeadwood05B} from './fungal-substrates-05b.js';
 import {FUNGAL_ITEMS_05B,FUNGAL_BY_ID_05B,FUNGAL_ECOLOGY_MAP_05B,createFungalEcology05B,fungalReconcile05B,fungalHarvest05B} from './fungal-ecology-05b.js';
 import {ecologyClimate05A} from './ecology-climate-05a.js';
@@ -102,7 +103,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:{...createBotanicalEcology05A(),...(options.fungi05B===true?createFungalEcology05B():{})},ecologyClimateSeed:freshSeed,...(options.fungi05B===true?{ecologySubstrates:createSubstrateWorld05B()}: {})}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:{...createBotanicalEcology05A(),...(options.fungi05B===true?createFungalEcology05B():{})},ecologyClimateSeed:freshSeed,...(options.fungi05B===true?{ecologySubstrates:createSubstrateWorld05B(),...(options.woodland05C===true?{woodland05C:{trees:createTreeWorld05C(),day:0}}:{})}: {})}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -621,6 +622,16 @@ export function createMainV2Inventory(uiItems,options={}) {
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
      state=result.nextState;
+     const eco=state.world.runtime.resource05A;
+     if(eco?.woodland05C&&eco.ecologySubstrates&&eco.ecologySites){
+      const cycle=advanceWoodland05C({trees:eco.woodland05C.trees,day:eco.woodland05C.day,
+       substrates:eco.ecologySubstrates,sites:eco.ecologySites},state.clock.elapsedUnits,eco.ecologyClimateSeed);
+      if(cycle.day!==eco.woodland05C.day){
+       state={...state,world:{...state.world,runtime:{...state.world.runtime,
+        resource05A:{...eco,woodland05C:{trees:cycle.trees,day:cycle.day},
+         ecologySubstrates:cycle.substrates,ecologySites:cycle.sites}}}};
+      }
+     }
      if(state.world.runtime.dungeon&&state.world.runtime.world03E&&['dungeon.enter','dungeon.move','dungeon.portal'].includes(type)){
       const position=localPosition(state);
       const old=state.world.runtime.world03E;
