@@ -1,3 +1,4 @@
+import {availableOriginInteractions} from './origin-interactions-04c.js';
 import {SPECIES,BACKGROUNDS} from './character-origin-04b.js';
 import {SKILL_DEFINITIONS,skillLevel,skillThreshold,ATTRIBUTES} from './progression-system.js';
 import {activityAt,accessDeepField,DEEP_FIELDS,DANGEROUS_REGIONS} from './region-activities.js';
@@ -94,6 +95,17 @@ for(const activity of activityAt(s.region)){
  },'v3-action',actions);
  button.disabled=!gate.ok;
  if(!gate.ok)button.title='탐색 + '+activity.profession+' 숙련 필요 (실제 성장 데이터 기준)';
+}
+const origin=mainV2.origin04B();
+for(const insight of availableOriginInteractions(origin,s.region,mainV2.current().flags)){
+ const button=btn(insight.title+(insight.completed?' · 확인함':''),()=>{
+  if(insight.completed)return;
+  if(!executeV2('origin.insight',{interactionId:insight.id}))return render();
+  nextLog('발견',insight.title,insight.description);
+  render();
+ },'v3-action',actions);
+ button.disabled=insight.completed;
+ button.title=insight.completed?'이미 확인한 배경 고유 기록':'현재 배경에서만 수행 가능한 해석 활동';
 }
 if(DANGEROUS_REGIONS.has(s.region))make('p',{class:'muted',text:'주의: 이 지역은 이후 환경·전투 인카운터가 발생할 수 있는 위험 필드입니다. 현재 전투 시스템은 아직 연결되지 않았습니다.'},el);
 
