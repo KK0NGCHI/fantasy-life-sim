@@ -34,7 +34,7 @@ export const FUNGAL_ECOLOGY_MAP_05B=new Map(FUNGAL_ECOLOGY_DEFS_05B.map(x=>[x.id
 export function createFungalEcology05B(startSecond=0){
  return Object.fromEntries(FUNGAL_ECOLOGY_DEFS_05B.flatMap(def=>def.habitats.map(region=>{
   const site=createEcologySite(def,region,0,startSecond);
-  return [site.id,{...site,wetCredit:0}];
+  return [site.id,{...site,wetCredit:0,substrate:FUNGAL_BY_ID_05B.get(def.id).substrate,substrateHealth:100}];
  })));
 }
 /** Pure wet-day count. Time is from the authoritative game clock, weather comes
