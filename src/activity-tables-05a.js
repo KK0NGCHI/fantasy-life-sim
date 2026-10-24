@@ -10,7 +10,7 @@ const entries=[
  ['습지','explore','item05a:reed',0.16],
  ['강·호수','fishing','item05a:reed',0.08],
  ['해안·항구','explore','item05a:mussel',0.12],
- ['설원','explore','item05a:trout',0.03],
+ ['설원','explore','item05a:stone',0.03],
  ['사막','explore','item05a:stone',0.06],
  ['산맥','explore','item05a:stone',0.10],
  ['광산','mining','item05a:stone',0.08],
