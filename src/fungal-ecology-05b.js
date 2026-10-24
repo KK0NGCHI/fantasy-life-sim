@@ -88,10 +88,16 @@ export function fungalHarvest05B(site,def,second,seed,roll=0){
  const p=FUNGAL_BY_ID_05B.get(site?.speciesId);
  if(!p)throw Error('UNKNOWN_FUNGUS');
  const siteNow=fungalReconcile05B(site,def,second,seed);
+ if(siteNow.substrate!==undefined&&siteNow.substrate!==p.substrate)return {ok:false,reason:'WRONG_SUBSTRATE',site:siteNow};
+ if(siteNow.substrateHealth!==undefined&&siteNow.substrateHealth<5)return {ok:false,reason:'SUBSTRATE_EXHAUSTED',site:siteNow};
  const fruiting=fungalFruiting05B(p,site.region,second,seed,p.substrate);
  if(!fruiting.fruiting)return {ok:false,reason:fruiting.reason,site:siteNow};
  const day=Math.floor((second+28800)/86400);
  const season=['spring','summer','autumn','winter'][Math.floor(day%112/28)];
- return ecologyInteract(siteNow,def,{region:site.region,season,bloom:true,mature:true},
+ const outcome=ecologyInteract(siteNow,def,{region:site.region,season,bloom:true,mature:true},
   {second,roll,action:'gather'});
+ if(!outcome.ok)return outcome;
+ return {...outcome,site:{...outcome.site,
+  substrateHealth:Math.max(0,(siteNow.substrateHealth??100)-5)}};
+
 }
