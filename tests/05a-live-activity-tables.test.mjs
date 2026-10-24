@@ -5,6 +5,7 @@ import {validateIncidentalTable05A} from '../src/incidental-resources-05a.js';
 import {BOTANICAL_ITEMS_05A,BOTANICAL_SPECIES_05A} from '../src/botanical-species-05a.js';
 import {CATALOG_ITEMS_05A} from '../src/resource-catalog-05a.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
+import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
 const items=new Set([...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A].map(x=>x.id));
 const make=()=>createMainV2Inventory([{id:'test:base',name:'기본',group:'재료',qty:1,tags:[]}],{
  worldSeed:'live-provisional-tables',generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,
@@ -71,4 +72,26 @@ test('curated botanical item can be earned by a season-eligible world exploratio
   if(g.current().itemWorld.items.some(x=>BOTANICAL_ITEMS_05A.some(b=>b.id===x.definitionId))){found=true;break}
  }
  assert.equal(found,true);
+});
+
+test('a newly obtained botanical persists in a version-3 save',()=>{
+ const g=make();
+ g.dispatch('world.travel',{region:'초원·농경지'});
+ let item;
+ for(let i=0;i<700;i++){
+  const r=g.dispatch('resource.incidental.search',{activity:'explore'});
+  assert.equal(r.accepted,true);
+  item=g.current().itemWorld.items.find(x=>BOTANICAL_ITEMS_05A.some(b=>b.id===x.definitionId));
+  if(item)break;
+ }
+ assert.ok(item);
+ const meta={slotId:'botanical-test',worldId:'world',kind:'manual',label:'test',savedAt:'2026-10-24T00:00:00Z',revision:0};
+ const saveV2=createSaveV2(g.current(),meta,'test',g.registry);
+ const converted=prepareSecondsV2ToV3(saveV2,g.registry);
+ assert.equal(converted.ok,true);
+ const save=createSaveV3(converted.state,meta,'test',g.registry);
+ assert.equal(decodeSaveV3(save,g.registry).ok,true);
+ const g2=make();
+ g2.applyApprovedSave(save);
+ assert.ok(g2.current().itemWorld.items.some(x=>x.definitionId===item.definitionId&&x.quantity===item.quantity));
 });
