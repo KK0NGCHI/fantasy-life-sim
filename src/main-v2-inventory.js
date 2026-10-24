@@ -1,3 +1,4 @@
+import {createSubstrateWorld05B,consumeFungalSubstrate05B,addLoggingDeadwood05B} from './fungal-substrates-05b.js';
 import {FUNGAL_ITEMS_05B,FUNGAL_BY_ID_05B,FUNGAL_ECOLOGY_MAP_05B,createFungalEcology05B,fungalReconcile05B,fungalHarvest05B} from './fungal-ecology-05b.js';
 import {ecologyClimate05A} from './ecology-climate-05a.js';
 import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_MAP_05A,BOTANICAL_SEED_ITEMS_05A} from './botanical-ecology-adapter-05a.js';
@@ -101,7 +102,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:{...createBotanicalEcology05A(),...(options.fungi05B===true?createFungalEcology05B():{})},ecologyClimateSeed:freshSeed}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:{...createBotanicalEcology05A(),...(options.fungi05B===true?createFungalEcology05B():{})},ecologyClimateSeed:freshSeed,...(options.fungi05B===true?{ecologySubstrates:createSubstrateWorld05B()}: {})}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -239,6 +240,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   const weather=runtime.weather05A??(typeof resources.ecologyClimateSeed==='string'?
    ecologyClimate05A(resources.ecologyClimateSeed,runtime.region,second).weather:undefined);
   const draw=drawRandom(snapshot.rng,'action');
+  const sharedSubstrate=isFungus&&resources.ecologySubstrates?consumeFungalSubstrate05B(resources.ecologySubstrates,site,second):null;
+  if(isFungus&&resources.ecologySubstrates&&!sharedSubstrate.ok)throw Error(sharedSubstrate.reason);
   const outcome=isFungus?fungalHarvest05B(site,def,second,resources.ecologyClimateSeed,draw.value):
    ecologyInteract(site,def,{region:runtime.region,season,daypart,weather,
     mature:true,bloom:def.outputs.some(o=>o.stage==='bloom')},
@@ -253,6 +256,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    placements:original?snapshot.itemWorld.placements:
     [...snapshot.itemWorld.placements,{itemId:inventoryId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
   const resource05A={...resources,
+   ...(sharedSubstrate?.ok?{ecologySubstrates:sharedSubstrate.world}:{}),
    ecologySites:{...resources.ecologySites,[site.id]:outcome.site},
    compendium:acquiredCompendium05A(resources.compendium,[{itemId:item.itemId,quantity:item.quantity}])};
   return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld,
@@ -288,7 +292,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found,flags=snapshot.flags;
   const botanical=BOTANICAL_PROFILE_BY_ID_05A.get(result.itemId);
   const fungus=FUNGAL_BY_ID_05B.get(result.itemId);
-  let updatedEcoSite=null;
+  let updatedEcoSite=null,updatedSharedSubstrate=null;
   if(found&&botanical){
    if(resource05A.ecologySites){
     const def=BOTANICAL_ECOLOGY_MAP_05A.get(botanical.id);
@@ -318,9 +322,13 @@ export function createMainV2Inventory(uiItems,options={}) {
     if(!available.length)found=false;
     else{
      const selected=available[Math.floor(b.value*available.length)];
-     const outcome=fungalHarvest05B(selected,def,snapshot.clock.elapsedUnits,resource05A.ecologyClimateSeed,c.value);
-     if(!outcome.ok)found=false;
-     else updatedEcoSite=outcome.site;
+     const substrate=resource05A.ecologySubstrates?consumeFungalSubstrate05B(resource05A.ecologySubstrates,selected,snapshot.clock.elapsedUnits):null;
+     if(substrate&&!substrate.ok)found=false;
+     else{
+      const outcome=fungalHarvest05B(selected,def,snapshot.clock.elapsedUnits,resource05A.ecologyClimateSeed,c.value);
+      if(!outcome.ok)found=false;
+      else{updatedEcoSite=outcome.site;updatedSharedSubstrate=substrate?.world??null;}
+     }
     }
    }
   }
@@ -336,7 +344,9 @@ export function createMainV2Inventory(uiItems,options={}) {
    }else found=false;
   }else if(found){
    if(botanical||fungus){
-    if(updatedEcoSite)resource05A={...resource05A,ecologySites:{...resource05A.ecologySites,[updatedEcoSite.id]:updatedEcoSite}};
+    if(updatedEcoSite)resource05A={...resource05A,
+     ...(updatedSharedSubstrate?{ecologySubstrates:updatedSharedSubstrate}:{}),
+     ecologySites:{...resource05A.ecologySites,[updatedEcoSite.id]:updatedEcoSite}};
     else if(botanical)flags=botanicalMarkHarvest05A(flags,botanical,snapshot.clock.elapsedUnits);
    }
    const itemId='incidental05a:'+result.itemId;
@@ -442,7 +452,11 @@ export function createMainV2Inventory(uiItems,options={}) {
    })}:snapshot.progression;
   const base={outcome:result.qty>0?'success':'failed',nextState:{...snapshot,rng:outcome.rng,itemWorld,progression,
    world:{...snapshot.world,runtime:{...snapshot.world.runtime,resource05A:{
-    ...snapshot.world.runtime.resource05A,nodes:{...snapshot.world.runtime.resource05A.nodes,[nodeId]:result.node}
+    ...snapshot.world.runtime.resource05A,
+    ...(snapshot.world.runtime.resource05A.ecologySubstrates&&result.qty>0?{
+     ecologySubstrates:addLoggingDeadwood05B(snapshot.world.runtime.resource05A.ecologySubstrates,
+      snapshot.world.runtime.region,result.resource.itemId,result.qty,snapshot.clock.elapsedUnits)}:{}),
+    nodes:{...snapshot.world.runtime.resource05A.nodes,[nodeId]:result.node}
    }}}},
    events:[{type:'resource.work_done',payload:{resourceId:result.resource.id,name:result.resource.name,
     activity:result.activity,qty:result.qty,xp:result.xp,progress:result.node.progress}}]};
