@@ -1,3 +1,4 @@
+import {validateIncidentalTable05A,resolveIncidentalActivity05A,INCIDENTAL_ACTIVITY_SECONDS_05A} from './incidental-resources-05a.js';
 import {rollAvailableResourcePool05A,validateResourcePool05A} from './resource-pools-05a.js';
 import {CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 import {createCandidateSites05A,discoverCandidateSite05A,harvestCandidateSite05A,acquiredCompendium05A,SOURCE_WORK_RULES_05A,prospectCandidateQuartz05A,reconcileCandidateSite05A} from './resource-sites-05a.js';
@@ -21,6 +22,11 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
 export function createMainV2Inventory(uiItems,options={}) {
  const poolOverrides=options.resourcePools05A??{};
  if(!poolOverrides||typeof poolOverrides!=='object'||Array.isArray(poolOverrides)||Object.entries(poolOverrides).some(([source,pool])=>!SOURCE_WORK_RULES_05A[source]||!validateResourcePool05A(pool)||pool.tiers.some(t=>t.outputs.some(o=>!CATALOG_ITEMS_05A.some(i=>i.id===o.itemId)))))throw Error('INVALID_RESOURCE_POOL_CONFIG');
+ const incidentalTables05A=options.incidentalTables05A??{};
+ if(!incidentalTables05A||typeof incidentalTables05A!=='object'||Array.isArray(incidentalTables05A)||
+ Object.entries(incidentalTables05A).some(([key,t])=>key!==t.region+':'+t.activity||
+ !validateIncidentalTable05A(t)||t.pool.tiers.some(tier=>tier.outputs.some(o=>!CATALOG_ITEMS_05A.some(item=>item.id===o.itemId)))))
+ throw Error('INVALID_INCIDENTAL_CONFIG');
  const preferences=options.preferences??(typeof localStorage==='undefined'?null:localStorage);
  const resourceItems=CATALOG_ITEMS_05A.map(r=>({id:r.id,name:r.name,group:'채취 재료',qty:0,tags:[]}));
  const starterTools=[{id:'tool05a:gloves',name:'천 채집 장갑',group:'도구',qty:1,tags:['tool:gather']},{id:'tool05a:axe',name:'석재 벌목 도끼',group:'도구',qty:1,tags:['tool:logging']},{id:'tool05a:pickaxe',name:'석재 곡괭이',group:'도구',qty:1,tags:['tool:mining']},{id:'tool05a:rod',name:'목재 낚싯대',group:'도구',qty:1,tags:['tool:fishing']}];
@@ -184,6 +190,48 @@ export function createMainV2Inventory(uiItems,options={}) {
     ...snapshot.world.runtime.resource05A,nodes:result.nodes
   }}}},events:[{type:'resource.site_discovered',payload:{nodeId:result.nodeId,name:def.name,newSite:result.newSite}}]};
  }],
+ ['resource.incidental.search',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime;
+  if(runtime.dungeon||!runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
+  const kind=command.payload?.activity;
+  if(typeof kind!=='string')throw Error('INVALID_ACTIVITY');
+  const table=incidentalTables05A[runtime.region+':'+kind];
+  if(!table)throw Error('ACTIVITY_NOT_CONFIGURED');
+  const a=drawRandom(snapshot.rng,'action'),b=drawRandom(a.rng,'action'),c=drawRandom(b.rng,'action');
+  const season=['spring','summer','autumn','winter'][Math.floor((Math.floor((snapshot.clock.elapsedUnits+28800)/86400)%112)/28)];
+  const hour=Math.floor(((snapshot.clock.elapsedUnits+28800)%86400)/3600);
+  const daypart=hour<6?'dawn':hour<18?'day':hour<21?'dusk':'night';
+  const result=resolveIncidentalActivity05A(table,{
+    region:runtime.region,activity:kind,season,daypart,weather:'clear'
+   },{trigger:a.value,tier:b.value,output:c.value});
+  if(!result.ok)throw Error(result.reason);
+  let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found;
+  let event={type:'resource.incidental_empty',payload:{activity:kind}};
+  if(found&&result.rewardMode==='discover-site'){
+   const entry=Object.entries(resource05A.candidateSites??{}).sort(([a],[b])=>a.localeCompare(b))
+    .find(([,site])=>site.region===runtime.region&&!site.discovered&&
+      SOURCE_WORK_RULES_05A[site.sourceId]?.outputs.includes(result.itemId));
+   if(entry){
+    const [nodeId,site]=entry;
+    resource05A={...resource05A,candidateSites:{...resource05A.candidateSites,[nodeId]:{...site,discovered:true}}};
+    event={type:'resource.incidental_discovered',payload:{activity:kind,nodeId,itemId:result.itemId}};
+   }else found=false;
+  }else if(found){
+   const itemId='incidental05a:'+result.itemId;
+   const original=itemWorld.items.find(x=>x.id===itemId);
+   itemWorld={...itemWorld,
+    items:original?itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+1}:x):
+    [...itemWorld.items,{id:itemId,definitionId:result.itemId,quantity:1}],
+    placements:original?itemWorld.placements:
+     [...itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
+   resource05A={...resource05A,compendium:acquiredCompendium05A(resource05A.compendium,
+    [{itemId:result.itemId,quantity:1}])};
+   event={type:'resource.incidental_acquired',payload:{activity:kind,itemId:result.itemId,quantity:1}};
+  }
+  return {outcome:'success',nextState:{...snapshot,rng:c.rng,itemWorld,
+   world:{...snapshot.world,runtime:{...runtime,resource05A}}},
+   events:[event]};
+ }],
  ['resource.candidate.discover',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
   if(runtime.dungeon||!resources?.candidateSites)throw Error('CANDIDATE_UNAVAILABLE');
@@ -309,6 +357,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='resource.incidental.search')return {turns:1,worldUnits:INCIDENTAL_ACTIVITY_SECONDS_05A};
     if(action.type==='resource.candidate.prospect')return {turns:1,worldUnits:600};
     if(action.type==='resource.candidate.discover')return {turns:1,worldUnits:600};
     if(action.type==='resource.candidate.work')return {turns:1,worldUnits:60};
