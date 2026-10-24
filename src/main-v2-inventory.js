@@ -1,3 +1,5 @@
+import {createBotanicalEcology05A,BOTANICAL_ECOLOGY_MAP_05A} from './botanical-ecology-adapter-05a.js';
+import {ecologySiteId,ecologyInteract} from './ecology-core-05a.js';
 import {eligibleBotanicalObservations05A,botanicalCanHarvest05A,botanicalMarkHarvest05A} from './botanical-lifecycle-05a.js';
 import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 import {validateIncidentalTable05A,resolveIncidentalActivity05A,INCIDENTAL_ACTIVITY_SECONDS_05A} from './incidental-resources-05a.js';
@@ -97,7 +99,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]}}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:createBotanicalEcology05A()}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -247,9 +249,24 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(!result.ok)throw Error(result.reason);
   let resource05A=runtime.resource05A,itemWorld=snapshot.itemWorld,found=result.found,flags=snapshot.flags;
   const botanical=BOTANICAL_PROFILE_BY_ID_05A.get(result.itemId);
+  let updatedEcoSite=null;
   if(found&&botanical){
-   const allowed=botanicalCanHarvest05A(flags,botanical,snapshot.clock.elapsedUnits,runtime.weather05A);
-   if(!allowed.ok)found=false;
+   if(resource05A.ecologySites){
+    const id=ecologySiteId(runtime.region,botanical.id);
+    const site=resource05A.ecologySites[id],def=BOTANICAL_ECOLOGY_MAP_05A.get(botanical.id);
+    if(!site||!def)found=false;
+    else{
+     const attempt=ecologyInteract(site,def,{
+      region:runtime.region,season,daypart,weather:runtime.weather05A,
+      mature:true,bloom:botanical.part==='flower'
+     },{second:snapshot.clock.elapsedUnits,roll:b.value,action:'gather'});
+     if(!attempt.ok)found=false;
+     else updatedEcoSite=attempt.site;
+    }
+   }else{
+    const allowed=botanicalCanHarvest05A(flags,botanical,snapshot.clock.elapsedUnits,runtime.weather05A);
+    if(!allowed.ok)found=false;
+   }
   }
   let event={type:'resource.incidental_empty',payload:{activity:kind}};
   if(found&&result.rewardMode==='discover-site'){
@@ -262,7 +279,10 @@ export function createMainV2Inventory(uiItems,options={}) {
     event={type:'resource.incidental_discovered',payload:{activity:kind,nodeId,itemId:result.itemId}};
    }else found=false;
   }else if(found){
-   if(botanical)flags=botanicalMarkHarvest05A(flags,botanical,snapshot.clock.elapsedUnits);
+   if(botanical){
+    if(updatedEcoSite)resource05A={...resource05A,ecologySites:{...resource05A.ecologySites,[updatedEcoSite.id]:updatedEcoSite}};
+    else flags=botanicalMarkHarvest05A(flags,botanical,snapshot.clock.elapsedUnits);
+   }
    const itemId='incidental05a:'+result.itemId;
    const original=itemWorld.items.find(x=>x.id===itemId);
    itemWorld={...itemWorld,
