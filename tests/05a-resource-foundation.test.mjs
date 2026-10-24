@@ -27,10 +27,11 @@ test('05-A full state action: only valid harvest changes XP, item world and cloc
  const g=make();
  assert.equal(g.resources05A().nodes['resource05a:wild-herb:01'].remaining,5);
  assert.equal(g.dispatch('resource.gather',{nodeId:'missing'}).accepted,false);
- const before=g.current();assert.equal(before.clock.elapsedUnits,0);
+ assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
+ const before=g.current();
  const result=g.dispatch('resource.gather',{nodeId:'resource05a:wild-herb:01'});
  assert.equal(result.accepted,true,JSON.stringify(result));
- assert.equal(g.current().clock.elapsedUnits,50);
+ assert.equal(g.current().clock.elapsedUnits-before.clock.elapsedUnits,50);
  assert.equal(g.current().world.runtime.resource05A.nodes['resource05a:wild-herb:01'].remaining,4);
  assert.equal(g.current().progression.system04A.skills['skill-09'],7);
  assert.equal(g.projected().find(i=>i.id==='gather05a:resource05a:wild-herb').qty,1);
