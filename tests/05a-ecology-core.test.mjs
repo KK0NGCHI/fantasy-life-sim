@@ -127,3 +127,11 @@ test('seed outputs are distinct, valid species stage rewards registered in the i
  const immature=ecologyInteract(site,d,{region:'초원·농경지',season:'spring',mature:true,bloom:false},{second:0,roll:0.95});
  assert.equal(immature.outputs[0].itemId,'item05a:plantago-major');
 });
+
+test('ecological definitions reject invalid conditions, duplicate outputs and malformed weights',()=>{
+ assert.equal(validateEcologyDefinition({...base,weather:['hail']}),false);
+ assert.equal(validateEcologyDefinition({...base,seasons:['spring','spring']}),false);
+ assert.equal(validateEcologyDefinition({...base,minElevation:Infinity}),false);
+ assert.equal(validateEcologyDefinition({...base,outputs:[base.outputs[0],base.outputs[0]]}),false);
+ assert.equal(validateEcologyDefinition({...base,outputs:[{...base.outputs[0],weight:0}]}),false);
+});
