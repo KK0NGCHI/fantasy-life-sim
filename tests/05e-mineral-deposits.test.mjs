@@ -12,7 +12,7 @@ const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'�
 const meta={slotId:'mineral-test',worldId:'world',kind:'manual',label:'test',savedAt:'2026-10-25T00:00:00Z',revision:0};
 test('five base mineral definitions create bounded never-regenerating deposits',()=>{
  const sites=createMineralDeposits05E();
- assert.equal(MINERAL_DEFINITIONS_05E.length,5);
+ assert.equal(MINERAL_DEFINITIONS_05E.length,13);
  assert.equal(validateMineralDeposits05E(sites),true);
  const d=prospectMineral05E(sites,'광산','item05a:iron-ore');
  assert.equal(d.ok,true);
@@ -89,4 +89,24 @@ test('actual legacy mining through dispatcher debits the same 05-E regional depo
  assert.equal(updated.discovered,true);
  const later=g.dispatch('mineral.prospect',{itemId:'item05a:stone'});
  assert.equal(later.accepted,false,'legacy discovery already marks the shared deposit known');
+});
+
+test('eight new mineral definitions are finite and yield valid discovered ores',()=>{
+ const additions=['tin-ore','silver-ore','gold-ore','limestone','clay','silica-sand','gypsum','sulfur'];
+ let deposits=createMineralDeposits05E();
+ for(const name of additions){
+  const id='item05a:'+name;
+  const def=MINERAL_DEFINITIONS_05E.find(x=>x.id===id);
+  assert.ok(def,'mineral '+id+' registered');
+  const found=prospectMineral05E(deposits,'광산',id);
+  assert.equal(found.ok,true,id);
+  const denied=mineMineral05E(found.deposits,'광산',found.siteId,{toolPower:def.hardness-1,roll:0});
+  assert.equal(denied.reason,'TOOL_TOO_WEAK');
+  const mined=mineMineral05E(found.deposits,'광산',found.siteId,{toolPower:def.hardness,roll:0});
+  assert.equal(mined.ok,true,id);
+  assert.equal(mined.outputs[0].itemId,id);
+  assert.equal(mined.remaining,def.stock-1);
+  deposits=mined.deposits;
+ }
+ assert.equal(validateMineralDeposits05E(deposits),true);
 });
