@@ -78,3 +78,15 @@ test('rejected commands do not update woodland or advance world clock',()=>{
  assert.equal(rejected.accepted,false);
  assert.deepEqual(g.current(),before);
 });
+
+test('forest exploration integration remains accepted with plants, fungi, woodland and substrate enabled',()=>{
+ const g=make();
+ assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
+ for(let i=0;i<150;i++){
+  const before=g.current();
+  const result=g.dispatch('resource.incidental.search',{activity:'explore'});
+  assert.equal(result.accepted,true,JSON.stringify({i,result,time:before.clock.elapsedUnits,
+   siteCount:Object.keys(before.world.runtime.resource05A.ecologySites).length,
+   woodlandDay:before.world.runtime.resource05A.woodland05C.day}));
+ }
+});
