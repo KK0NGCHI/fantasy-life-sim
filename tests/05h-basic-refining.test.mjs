@@ -11,8 +11,8 @@ const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'�
 });
 const meta={slotId:'refining-test',worldId:'world',kind:'manual',label:'refining',savedAt:'2026-10-25T00:00:00Z',revision:0};
 test('refining recipe definitions have unique input/output and bounded costs',()=>{
- assert.equal(REFINING_RECIPES_05H.length,16);
- assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,16);
+ assert.equal(REFINING_RECIPES_05H.length,17);
+ assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,17);
  for(const r of REFINING_RECIPES_05H)assert.ok((r.inputs?.every(x=>x.quantity>0)??r.inputQty>0)&&r.outputQty>0&&r.seconds>0);
 });
 test('insufficient material and invalid recipe fail without state mutation',()=>{
@@ -176,4 +176,22 @@ test('refining cannot deposit into another owner fixed output stack',()=>{
  assert.equal(result.ok,false);
  assert.equal(result.reason,'OUTPUT_NOT_OWNED');
  assert.deepEqual(world,before);
+});
+
+test('harvested wood-ear fungus and grass can produce owner-bound gathering gloves',()=>{
+ const world={items:[
+  {id:'fungus',definitionId:'item05b:wood-ear',quantity:2},
+  {id:'grass',definitionId:'item05a:grass',quantity:2}
+ ],placements:[
+  {itemId:'fungus',location:{kind:'inventory',ownerId:'owner'}},
+  {itemId:'grass',location:{kind:'inventory',ownerId:'owner'}}
+ ],containers:[]};
+ const snapshot=structuredClone(world);
+ const made=refineMineral05H(world,'owner','craft05i:mycelium-gloves');
+ assert.equal(made.ok,true,JSON.stringify(made));
+ assert.deepEqual(world,snapshot,'crafting does not mutate its input');
+ assert.deepEqual(made.itemWorld.items.map(x=>[x.definitionId,x.quantity]),[['tool05a:gloves:mycelium',1]]);
+ assert.equal(refineMineral05H(world,'stranger','craft05i:mycelium-gloves').reason,'INSUFFICIENT_MATERIAL');
+ const insufficient=structuredClone(world);insufficient.items[0].quantity=1;
+ assert.equal(refineMineral05H(insufficient,'owner','craft05i:mycelium-gloves').reason,'INSUFFICIENT_MATERIAL');
 });
