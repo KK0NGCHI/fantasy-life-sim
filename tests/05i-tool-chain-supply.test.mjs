@@ -17,7 +17,7 @@ function rawCost(itemId,quantity,seen=new Set()){
  }
  return result;
 }
-const tools=REFINING_RECIPES_05H.filter(recipe=>recipe.id.startsWith('craft05i:'));
+const tools=REFINING_RECIPES_05H.filter(recipe=>recipe.id.startsWith('craft05i:')&&/-(pickaxe|axe)$/.test(recipe.id));
 test('six tool recipes resolve through real 05-H production chains with no circular dependencies',()=>{
  assert.equal(tools.length,6);
  const expected={
