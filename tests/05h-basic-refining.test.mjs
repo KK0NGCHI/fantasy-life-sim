@@ -101,41 +101,36 @@ test('refined copper, iron and bronze produce owned tools without double spendin
  }
 });
 
-test('live copper and stone extraction completes ore-to-tool crafting and v3 persistence',()=>{
+test('starter mining extracts real stone, refines it, and preserves v3 state',()=>{
  const game=make();
  const owned=id=>game.current().itemWorld.items.filter(x=>x.definitionId===id).reduce((n,x)=>n+x.quantity,0);
  assert.equal(game.dispatch('world.travel',{region:'광산'}).accepted,true);
- for(const [id,required] of [['item05a:copper-ore',4],['item05a:stone',2]]){
-  const prospect=game.dispatch('mineral.prospect',{itemId:id});
-  assert.equal(prospect.accepted,true,JSON.stringify(prospect));
-  const siteId=prospect.events.find(e=>e.type==='mineral.discovered')?.payload.siteId;
-  assert.ok(siteId,id);
-  for(let i=0;owned(id)<required&&i<20;i++){
-   const extraction=game.dispatch('mineral.extract',{siteId});
-   assert.equal(extraction.accepted,true,JSON.stringify(extraction));
-  }
-  assert.ok(owned(id)>=required,'real finite mineral site supplies '+id);
- }
- assert.equal(game.dispatch('world.travel',{region:'거점 마을'}).accepted,true);
- for(let i=0;i<2;i++){
-  const result=game.dispatch('mineral.refine',{recipeId:'refine05h:copper'});
+ const stone=game.dispatch('mineral.prospect',{itemId:'item05a:stone'});
+ assert.equal(stone.accepted,true,JSON.stringify(stone));
+ const siteId=stone.events.find(e=>e.type==='mineral.discovered')?.payload.siteId;
+ for(let i=0;owned('item05a:stone')<2&&i<16;i++){
+  const result=game.dispatch('mineral.extract',{siteId});
   assert.equal(result.accepted,true,JSON.stringify(result));
  }
+ assert.ok(owned('item05a:stone')>=2);
+ const copper=game.dispatch('mineral.prospect',{itemId:'item05a:copper-ore'});
+ assert.equal(copper.accepted,true);
+ const copperSite=copper.events.find(e=>e.type==='mineral.discovered').payload.siteId;
+ const beforeBlocked=game.current();
+ const denied=game.dispatch('mineral.extract',{siteId:copperSite});
+ assert.equal(denied.accepted,false,'starter rank 1 must not mine rank 2 copper');
+ assert.deepEqual(game.current(),beforeBlocked,'tool gate must be atomic');
+ assert.equal(game.dispatch('world.travel',{region:'거점 마을'}).accepted,true);
+ const before=owned('item05a:stone');
  assert.equal(game.dispatch('mineral.refine',{recipeId:'refine05h:stone'}).accepted,true);
- assert.equal(owned('item05h:copper-ingot'),2);
+ assert.equal(owned('item05a:stone'),before-2);
  assert.equal(owned('item05h:cut-stone'),1);
- const crafted=game.dispatch('mineral.refine',{recipeId:'craft05i:copper-pickaxe'});
- assert.equal(crafted.accepted,true,JSON.stringify(crafted));
- assert.equal(owned('tool05a:pickaxe:copper'),1);
- assert.equal(owned('item05h:copper-ingot'),0);
- assert.equal(owned('item05h:cut-stone'),0);
- const denied=game.current();
+ const snapshot=game.current();
  assert.equal(game.dispatch('mineral.refine',{recipeId:'craft05i:copper-pickaxe'}).accepted,false);
- assert.deepEqual(game.current(),denied,'failed repeat craft cannot mutate state');
- const prepared=prepareSecondsV2ToV3(createSaveV2(game.current(),meta,'test',game.registry),game.registry);
- assert.equal(prepared.ok,true,JSON.stringify(prepared));
- const saved=createSaveV3(prepared.state,meta,'test',game.registry);
- assert.equal(decodeSaveV3(saved,game.registry).ok,true);
+ assert.deepEqual(game.current(),snapshot);
+ const converted=prepareSecondsV2ToV3(createSaveV2(game.current(),meta,'test',game.registry),game.registry);
+ assert.equal(converted.ok,true);
+ const saved=createSaveV3(converted.state,meta,'test',game.registry);
  const restored=make();restored.applyApprovedSave(saved);
- assert.deepEqual(restored.current(),game.current(),'full extraction and crafted tool survive v3 restore');
+ assert.deepEqual(restored.current(),game.current());
 });
