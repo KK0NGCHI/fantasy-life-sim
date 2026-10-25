@@ -333,7 +333,8 @@ export function createMainV2Inventory(uiItems,options={}) {
     {second,roll:draw.value,action:'gather'});
   if(!outcome.ok)throw Error(outcome.reason);
   const item=outcome.outputs[0];
-  const inventoryId='ecology05a:'+site.speciesId;
+  // Credit by actual output definition: one species may yield different plant parts.
+   const inventoryId='ecology05a:'+item.itemId;
   const original=snapshot.itemWorld.items.find(x=>x.id===inventoryId);
   const itemWorld={...snapshot.itemWorld,
    items:original?snapshot.itemWorld.items.map(x=>x.id===inventoryId?{...x,quantity:x.quantity+item.quantity}:x):
