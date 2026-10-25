@@ -1,4 +1,4 @@
-import {createMineralDeposits05E,prospectMineral05E,mineMineral05E,MINERAL_BY_ID_05E} from './mineral-deposits-05e.js';
+import {createMineralDeposits05E,prospectMineral05E,mineMineral05E,consumeLegacyMineral05E,MINERAL_BY_ID_05E} from './mineral-deposits-05e.js';
 import {createTreeWorld05C,createWoodlandSubstrates05C,advanceWoodland05C} from './woodland-cycle-05c.js';
 import {createSubstrateWorld05B,consumeFungalSubstrate05B,addLoggingDeadwood05B} from './fungal-substrates-05b.js';
 import {FUNGAL_ITEMS_05B,FUNGAL_BY_ID_05B,FUNGAL_ECOLOGY_MAP_05B,createFungalEcology05B,fungalReconcile05B,fungalHarvest05B} from './fungal-ecology-05b.js';
@@ -486,6 +486,12 @@ export function createMainV2Inventory(uiItems,options={}) {
   const result=workResource05A(snapshot.world.runtime.resource05A.nodes,nodeId,snapshot.world.runtime.region,snapshot.clock.elapsedUnits,
    {toolKind:chosen?toolKind:null,toolRank,outcomeRoll:outcome.value});
   if(!result.ok)throw Error(result.reason);
+  // With 05-E enabled, old mining nodes and new deposit commands share one
+  // finite regional reserve. No double-yield from parallel stock systems.
+  const legacyVein=def.activity==='mining'&&snapshot.world.runtime.resource05A.mineralDeposits05E?
+   consumeLegacyMineral05E(snapshot.world.runtime.resource05A.mineralDeposits05E,
+    snapshot.world.runtime.region,result.resource.itemId,result.qty):null;
+  if(legacyVein&&!legacyVein.ok)throw Error(legacyVein.reason);
   const itemId='gather05a:'+result.resource.id,original=snapshot.itemWorld.items.find(x=>x.id===itemId);
   const itemWorld=result.qty===0?snapshot.itemWorld:{
    ...snapshot.itemWorld,
@@ -502,6 +508,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const base={outcome:result.qty>0?'success':'failed',nextState:{...snapshot,rng:outcome.rng,itemWorld,progression,
    world:{...snapshot.world,runtime:{...snapshot.world.runtime,resource05A:{
     ...snapshot.world.runtime.resource05A,
+    ...(legacyVein?{mineralDeposits05E:legacyVein.deposits}:{}),
     ...(snapshot.world.runtime.resource05A.ecologySubstrates&&result.qty>0?{
      ecologySubstrates:addLoggingDeadwood05B(snapshot.world.runtime.resource05A.ecologySubstrates,
       snapshot.world.runtime.region,result.resource.itemId,result.qty,snapshot.clock.elapsedUnits)}:{}),
