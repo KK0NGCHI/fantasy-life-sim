@@ -177,7 +177,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     const mineralPanel=make('section',{class:'resource05a-list','aria-label':'통합 채광'},results);
     make('h4',{text:'광맥 탐사 · 채굴'},mineralPanel);
     make('p',{class:'muted',text:'광맥을 발견한 뒤 채굴합니다. 기존 채광 지점과 같은 지역 매장량을 사용합니다. 광맥은 자연 재생하지 않습니다.'},mineralPanel);
-    const refiningPanel=make('section',{class:'resource05a-list','aria-label':'광물 가공'},mineralPanel);
+    const refiningPanel=make('section',{class:'resource05a-list','aria-label':'광물 가공'},results);
     make('h4',{text:'광물 정련 · 제련 · 합금'},refiningPanel);
     make('p',{class:'muted',text:s.region==='거점 마을'?'마을의 공용 용광로와 작업대 이용 가능':'가공 시설은 거점 마을에서 이용할 수 있습니다.'},refiningPanel);
     const allItems=mainV2.current().itemWorld;
