@@ -2,6 +2,14 @@
  * Provisional grades and yields; all randomness is injected by the caller.
  */
 export const MINERAL_DEFINITIONS_05E=Object.freeze([
+ {id:'item05a:tin-ore',name:'주석광석',regions:['광산','산맥'],stock:6,grade:2,hardness:2},
+ {id:'item05a:silver-ore',name:'은광석',regions:['광산','산맥'],stock:5,grade:2,hardness:2},
+ {id:'item05a:gold-ore',name:'금광석',regions:['광산','산맥'],stock:4,grade:3,hardness:2},
+ {id:'item05a:limestone',name:'석회암',regions:['광산','산맥'],stock:10,grade:1,hardness:1},
+ {id:'item05a:clay',name:'점토',regions:['광산','산맥'],stock:12,grade:1,hardness:1},
+ {id:'item05a:silica-sand',name:'석영사',regions:['광산','산맥'],stock:9,grade:1,hardness:1},
+ {id:'item05a:gypsum',name:'석고',regions:['광산','산맥'],stock:8,grade:1,hardness:1},
+ {id:'item05a:sulfur',name:'황',regions:['광산','산맥'],stock:6,grade:2,hardness:2},
  {id:'item05a:stone',name:'일반 돌',regions:['광산','산맥'],stock:16,grade:1,hardness:1},
  {id:'item05a:coal',name:'석탄',regions:['광산','산맥'],stock:10,grade:1,hardness:2},
  {id:'item05a:copper-ore',name:'구리광석',regions:['광산','산맥'],stock:8,grade:2,hardness:2},
