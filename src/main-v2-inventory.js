@@ -1,3 +1,4 @@
+import {extractAssemblage05G} from './mineral-extraction-05g.js';
 import {createMineralDeposits05E,prospectMineral05E,mineMineral05E,consumeLegacyMineral05E,MINERAL_BY_ID_05E} from './mineral-deposits-05e.js';
 import {createTreeWorld05C,createWoodlandSubstrates05C,advanceWoodland05C} from './woodland-cycle-05c.js';
 import {createSubstrateWorld05B,consumeFungalSubstrate05B,addLoggingDeadwood05B} from './fungal-substrates-05b.js';
@@ -273,6 +274,29 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld:{...snapshot.itemWorld,items,placements},
    world:{...snapshot.world,runtime:{...runtime,resource05A}}},
    events:[{type:'mineral.extracted',payload:{siteId:command.payload.siteId,outputs:attempt.outputs,remaining:attempt.remaining}}]};
+ }],
+ ['mineral.assemblage.extract',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,deposits=runtime.resource05A?.mineralDeposits05E;
+  if(runtime.dungeon||!deposits)throw Error('MINERAL_UNAVAILABLE');
+  const owned=snapshot.itemWorld.items.filter(item=>item.quantity>0&&
+   (item.definitionId==='tool05a:pickaxe'||item.definitionId.startsWith('tool05a:pickaxe:'))&&
+   snapshot.itemWorld.placements.some(place=>place.itemId===item.id&&place.location.kind==='inventory'&&place.location.ownerId===snapshot.player.id));
+  if(!owned.length)throw Error('MINING_TOOL_REQUIRED');
+  const toolPower=Math.max(...owned.map(item=>item.definitionId==='tool05a:pickaxe'?1:
+   Number(materialTools05A.find(tool=>tool.id===item.definitionId)?.tags.find(tag=>tag.startsWith('rank:'))?.slice(5)??0)));
+  const draw=drawRandom(snapshot.rng,'action');
+  const attempt=extractAssemblage05G(deposits,runtime.region,command.payload?.siteIds,{toolPower,roll:draw.value});
+  if(!attempt.ok)throw Error(attempt.reason);
+  let items=snapshot.itemWorld.items,placements=snapshot.itemWorld.placements;
+  for(const out of attempt.outputs){
+   const id='mineral05e:'+out.itemId,found=items.find(x=>x.id===id);
+   if(found)items=items.map(x=>x.id===id?{...x,quantity:x.quantity+out.quantity}:x);
+   else{items=[...items,{id,definitionId:out.itemId,quantity:out.quantity}];
+    placements=[...placements,{itemId:id,location:{kind:'inventory',ownerId:snapshot.player.id}}];}
+  }
+  return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld:{...snapshot.itemWorld,items,placements},
+   world:{...snapshot.world,runtime:{...runtime,resource05A:{...runtime.resource05A,mineralDeposits05E:attempt.deposits}}}},
+   events:[{type:'mineral.assemblage.extracted',payload:{siteIds:command.payload.siteIds,outputs:attempt.outputs,remainingBySite:attempt.remainingBySite}}]};
  }],
  ['botanical.patch.harvest',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
@@ -556,6 +580,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   }
     if(action.type==='mineral.prospect')return {turns:1,worldUnits:600};
     if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
+    if(action.type==='mineral.assemblage.extract')return {turns:1,worldUnits:180};
     if(action.type==='botanical.patch.harvest')return {turns:1,worldUnits:60};
     if(action.type==='botanical.observe')return {turns:1,worldUnits:600};
     if(action.type==='resource.incidental.search')return {turns:1,worldUnits:INCIDENTAL_ACTIVITY_SECONDS_05A};
