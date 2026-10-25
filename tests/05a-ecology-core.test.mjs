@@ -138,3 +138,20 @@ test('ecological definitions reject invalid conditions, duplicate outputs and ma
  assert.equal(validateEcologyDefinition({...base,outputs:[base.outputs[0],base.outputs[0]]}),false);
  assert.equal(validateEcologyDefinition({...base,outputs:[{...base.outputs[0],weight:0}]}),false);
 });
+
+test('discover-site incidental rewards reveal candidate nodes without harvesting ecological stock',()=>{
+ const region='초원·농경지',activity='explore',key=region+':'+activity;
+ const table={...ACTIVITY_TABLES_05A[key],triggerChance:1,rewardMode:'discover-site',
+  pool:{...ACTIVITY_TABLES_05A[key].pool,tiers:[{id:'common',weight:1,outputs:[{itemId:'item05a:blueberry',weight:1}]}]}};
+ const game=createMainV2Inventory([{id:'test:starter',name:'기본',group:'재료',qty:1,tags:[]}],
+  {...options,incidentalTables05A:{[key]:table}});
+ assert.equal(game.dispatch('world.travel',{region}).accepted,true);
+ const before=game.current(),initial=before.world.runtime.resource05A;
+ const r=game.dispatch('resource.incidental.search',{activity});
+ assert.equal(r.accepted,true,JSON.stringify(r));
+ assert.ok(r.events.some(e=>e.type==='resource.incidental_discovered'),JSON.stringify(r.events));
+ const after=game.current(),current=after.world.runtime.resource05A;
+ assert.deepEqual(current.ecologySites,initial.ecologySites,'discovery is not a biological harvest');
+ assert.deepEqual(current.ecologySubstrates,initial.ecologySubstrates,'discovery cannot spend fungal substrates');
+ assert.deepEqual(after.itemWorld,before.itemWorld,'discovery never grants an item');
+});
