@@ -57,6 +57,7 @@ test('new game tree worlds coexist with fungi and round-trip with save-v3',()=>{
 
 test('dispatcher returns same authoritative ecology snapshot as current() across a day transition',()=>{
  const g=make();
+ assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
  const initial=g.current().world.runtime.resource05A.woodland05C.day;
  let advanced;
  for(let i=0;i<150;i++){
