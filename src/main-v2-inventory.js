@@ -30,9 +30,10 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  */
 export function createMainV2Inventory(uiItems,options={}) {
  const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A,...FUNGAL_ITEMS_05B];
+ const extendedLootIds05D=new Set([...FUNGAL_ITEMS_05B,...BOTANICAL_SEED_ITEMS_05A].map(x=>x.id));
  const recordAcquired05D=(existing,rewards)=>{
   if(!Array.isArray(rewards)||rewards.length===0)throw Error('INVALID_REWARDS');
-  if(rewards.every(r=>FUNGAL_BY_ID_05B.has(r.itemId)&&Number.isSafeInteger(r.quantity)&&r.quantity>0)){
+  if(rewards.every(r=>extendedLootIds05D.has(r.itemId)&&Number.isSafeInteger(r.quantity)&&r.quantity>0)){
    const obtained=new Set(existing?.itemIds??[]);
    for(const r of rewards)obtained.add(r.itemId);
    return {sourceIds:[...new Set(existing?.sourceIds??[])].sort(),itemIds:[...obtained].sort()};
