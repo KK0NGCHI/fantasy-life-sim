@@ -1,3 +1,4 @@
+import {ATLAS_MATERIALS_05E} from './mineral-atlas-05e.js';
 /** 05-A approved taxonomy + proposed biome catalogue (additive, not live spawns).
  * No runtime/save changes. Species, sources and obtained items remain distinct.
  * Candidate fantasy species must not silently become canonical worldbuilding.
@@ -16,6 +17,7 @@ export const RESOURCE_FAMILIES_05A=Object.freeze([
 ]);
 const item=(id,name,family)=>Object.freeze({id:'item05a:'+id,name,family});
 export const CATALOG_ITEMS_05A=Object.freeze([
+ ...ATLAS_MATERIALS_05E.map(entry=>Object.freeze({id:entry.id,name:entry.name,family:entry.category==='보석·세공용 원석'?'gem':entry.category==='암석·골재·건축재'?'stone':entry.category==='금속 광석·금속 자원'?'metal_ore':'nonmetal_mineral'})),
 item('wild-herb','야생 약초','herb'),
 item('tin-ore','주석광석','metal_ore'),
 item('silver-ore','은광석','metal_ore'),
