@@ -111,6 +111,9 @@ test('discovered patch supports direct harvest, stock cap, rejection, and game t
  const after=now.itemWorld.items.reduce((v,x)=>v+(x.definitionId===selected.speciesId||x.definitionId===selected.speciesId+':seed'?x.quantity:0),0);
  assert.equal(after,before+1);
  assert.equal(now.world.runtime.resource05A.ecologySites[selected.id].remaining,selected.remaining-1);
+ const credited=result.events.find(e=>e.type==='botanical.patch_harvested').payload.itemId;
+ assert.ok(now.itemWorld.items.some(i=>i.id==='ecology05a:'+credited&&i.definitionId===credited),
+  'direct harvest stack ID must match its actual output, not the source species');
  const attempt=g.dispatch('botanical.patch.harvest',{siteId:'eco05a:unknown'});
  assert.equal(attempt.accepted,false);
 });
