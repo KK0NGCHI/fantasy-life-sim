@@ -38,3 +38,39 @@ export function validateDepositMigrationPreview05F(deposits,preview){
  const flatten=p=>p.groups.flatMap(g=>g.sites.map(s=>[g.id,s.siteId,s.itemId,s.remaining,s.capacity,s.discovered].join('|'))).sort();
  return JSON.stringify(flatten(actual))===JSON.stringify(flatten(preview));
 }
+
+/** A consciously approved, detached sidecar projection. Not a game save migration.
+ * The original finite ledgers remain the only spendable reserves.
+ * The preview must match the exact current ledger, preventing stale approvals.
+ */
+export const DEPOSIT_VIEW_APPROVAL_05F='APPROVE_READ_ONLY_DEPOSIT_VIEW_05F';
+export function approveDepositView05F(deposits,preview,{approval}={}){
+ if(approval!==DEPOSIT_VIEW_APPROVAL_05F)return {ok:false,reason:'APPROVAL_REQUIRED'};
+ if(!validateDepositMigrationPreview05F(deposits,preview))return {ok:false,reason:'STALE_OR_INVALID_PREVIEW'};
+ const current=previewDepositMigration05F(deposits);
+ const sidecar={
+  schema:'somnium-deposit-view-05f',
+  version:1,
+  mode:'READ_ONLY_NO_SHARED_STOCK',
+  sourceSiteCount:current.sourceSiteCount,
+  totalRemaining:current.totalRemaining,
+  groups:current.groups.map(group=>({
+   id:group.id,region:group.region,formation:group.formation,
+   remaining:group.remaining,capacity:group.capacity,
+   sites:group.sites.map(site=>({...site}))
+  }))
+ };
+ return {ok:true,sidecar};
+}
+/** Import only as validated read-only presentation data. Never overwrite stocks. */
+export function restoreDepositView05F(deposits,sidecar){
+ const preview=previewDepositMigration05F(deposits);
+ if(!preview.ok||!sidecar||sidecar.schema!=='somnium-deposit-view-05f'||
+    sidecar.version!==1||sidecar.mode!=='READ_ONLY_NO_SHARED_STOCK')return {ok:false,reason:'INVALID_VIEW'};
+ if(!Array.isArray(sidecar.groups)||sidecar.sourceSiteCount!==preview.sourceSiteCount||
+    sidecar.totalRemaining!==preview.totalRemaining)return {ok:false,reason:'STALE_OR_INVALID_VIEW'};
+ // Re-derive canonical content, including exact nested keys and group totals.
+ const expected=approveDepositView05F(deposits,preview,{approval:DEPOSIT_VIEW_APPROVAL_05F});
+ if(JSON.stringify(sidecar)!==JSON.stringify(expected.sidecar))return {ok:false,reason:'STALE_OR_INVALID_VIEW'};
+ return {ok:true,sidecar:expected.sidecar};
+}
