@@ -1,3 +1,4 @@
+import {createMineralDeposits05E,prospectMineral05E,mineMineral05E,MINERAL_BY_ID_05E} from './mineral-deposits-05e.js';
 import {createTreeWorld05C,createWoodlandSubstrates05C,advanceWoodland05C} from './woodland-cycle-05c.js';
 import {createSubstrateWorld05B,consumeFungalSubstrate05B,addLoggingDeadwood05B} from './fungal-substrates-05b.js';
 import {FUNGAL_ITEMS_05B,FUNGAL_BY_ID_05B,FUNGAL_ECOLOGY_MAP_05B,createFungalEcology05B,fungalReconcile05B,fungalHarvest05B} from './fungal-ecology-05b.js';
@@ -114,7 +115,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  let state={
   schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('somnium-main-v2'),
   player:{id:'main-player',regionId:'거점 마을',currentHp:100,currentMp:80,hunger:85,statusEffects:[]},
-  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:{...createBotanicalEcology05A(),...(options.fungi05B===true?createFungalEcology05B():{})},ecologyClimateSeed:freshSeed,...(options.fungi05B===true?{ecologySubstrates:options.woodland05C===true?createWoodlandSubstrates05C(createSubstrateWorld05B()):createSubstrateWorld05B(),...(options.woodland05C===true?{woodland05C:{trees:createTreeWorld05C(),day:0}}:{})}: {})}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
+  world:{activeRegionId:'거점 마을',runtime:{region:'거점 마을',pos:[2,2],dungeon:false,localSiteId:null,localFloor:0,day:1,hour:8,travel03B:null,timeBasis:'seconds-v1',...(initialWorld03E?{world03E:initialWorld03E}:{}) ,...(options.resources05A===true?{resource05A:{schema:1,nodes:createResourceNodes05A(),candidateSites:createCandidateSites05A(),compendium:{sourceIds:[],itemIds:[]},...(options.ecology05A===true?{ecologySites:{...createBotanicalEcology05A(),...(options.fungi05B===true?createFungalEcology05B():{})},ecologyClimateSeed:freshSeed,...(options.minerals05E===true?{mineralDeposits05E:createMineralDeposits05E()}: {}),...(options.fungi05B===true?{ecologySubstrates:options.woodland05C===true?createWoodlandSubstrates05C(createSubstrateWorld05B()):createSubstrateWorld05B(),...(options.woodland05C===true?{woodland05C:{trees:createTreeWorld05C(),day:0}}:{})}: {})}: {})}}:{})}},progression:{skillExperience:{},...(options.progression04A===true?{system04A:createProgression(options.attributeAllocation??{})}:{})},flags:{},
   itemWorld:{
    items:initialItems.map(i=>({id:i.id,definitionId:i.id,quantity:i.qty})),
    placements:initialItems.map(i=>({itemId:i.id,location:{kind:'inventory',ownerId:'main-player'}})),
@@ -236,6 +237,34 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,resource05A:{
     ...snapshot.world.runtime.resource05A,nodes:result.nodes
   }}}},events:[{type:'resource.site_discovered',payload:{nodeId:result.nodeId,name:def.name,newSite:result.newSite}}]};
+ }],
+ ['mineral.prospect',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,deposits=runtime.resource05A?.mineralDeposits05E;
+  if(runtime.dungeon||!deposits)throw Error('MINERAL_UNAVAILABLE');
+  const attempt=prospectMineral05E(deposits,runtime.region,command.payload?.itemId);
+  if(!attempt.ok)throw Error(attempt.reason);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,
+   resource05A:{...runtime.resource05A,mineralDeposits05E:attempt.deposits}}}},
+   events:[{type:'mineral.discovered',payload:{siteId:attempt.siteId,itemId:command.payload.itemId}}]};
+ }],
+ ['mineral.extract',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,deposits=runtime.resource05A?.mineralDeposits05E;
+  if(runtime.dungeon||!deposits)throw Error('MINERAL_UNAVAILABLE');
+  const draw=drawRandom(snapshot.rng,'action');
+  const attempt=mineMineral05E(deposits,runtime.region,command.payload?.siteId,{toolPower:command.payload?.toolPower??1,roll:draw.value});
+  if(!attempt.ok)throw Error(attempt.reason);
+  let items=snapshot.itemWorld.items,placements=snapshot.itemWorld.placements;
+  for(const out of attempt.outputs){
+   const id='mineral05e:'+out.itemId;
+   const found=items.find(x=>x.id===id);
+   if(found)items=items.map(x=>x.id===id?{...x,quantity:x.quantity+out.quantity}:x);
+   else{items=[...items,{id,definitionId:out.itemId,quantity:out.quantity}];
+    placements=[...placements,{itemId:id,location:{kind:'inventory',ownerId:snapshot.player.id}}];}
+  }
+  const resource05A={...runtime.resource05A,mineralDeposits05E:attempt.deposits};
+  return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld:{...snapshot.itemWorld,items,placements},
+   world:{...snapshot.world,runtime:{...runtime,resource05A}}},
+   events:[{type:'mineral.extracted',payload:{siteId:command.payload.siteId,outputs:attempt.outputs,remaining:attempt.remaining}}]};
  }],
  ['botanical.patch.harvest',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
@@ -510,6 +539,8 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='mineral.prospect')return {turns:1,worldUnits:600};
+    if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
     if(action.type==='botanical.patch.harvest')return {turns:1,worldUnits:60};
     if(action.type==='botanical.observe')return {turns:1,worldUnits:600};
     if(action.type==='resource.incidental.search')return {turns:1,worldUnits:INCIDENTAL_ACTIVITY_SECONDS_05A};
