@@ -479,9 +479,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   }
   let itemWorld=snapshot.itemWorld;
   for(const reward of rewards){
-   const itemId='candidate05a:'+reward.itemId,old=itemWorld.items.find(x=>x.id===itemId);
-   itemWorld={...itemWorld,items:old?itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+reward.quantity}:x):[...itemWorld.items,{id:itemId,definitionId:reward.itemId,quantity:reward.quantity}],
-    placements:old?itemWorld.placements:[...itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
+   itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,'candidate05a:'+reward.itemId,reward.itemId,reward.quantity);
   }
   const compendium=acquiredCompendium05A(resources.compendium,rewards);
   return {outcome:'success',nextState:{...snapshot,rng,itemWorld,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:outcome.nodes,compendium}}}},
@@ -513,14 +511,8 @@ export function createMainV2Inventory(uiItems,options={}) {
    consumeLegacyMineral05E(snapshot.world.runtime.resource05A.mineralDeposits05E,
     snapshot.world.runtime.region,result.resource.itemId,result.qty):null;
   if(legacyVein&&!legacyVein.ok)throw Error(legacyVein.reason);
-  const itemId='gather05a:'+result.resource.id,original=snapshot.itemWorld.items.find(x=>x.id===itemId);
-  const itemWorld=result.qty===0?snapshot.itemWorld:{
-   ...snapshot.itemWorld,
-   items:original?snapshot.itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+result.qty}:x):
-    [...snapshot.itemWorld.items,{id:itemId,definitionId:result.resource.itemId,quantity:result.qty}],
-   placements:original?snapshot.itemWorld.placements:
-    [...snapshot.itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]
-  };
+  const itemId='gather05a:'+result.resource.id;
+  const itemWorld=result.qty===0?snapshot.itemWorld:creditOwnedResource05A(snapshot.itemWorld,snapshot.player.id,itemId,result.resource.itemId,result.qty);
   const prior=snapshot.progression?.system04A;
   const xpSkill={gather:'채집',logging:'벌목',mining:'채광',fishing:'낚시'}[result.activity];
   const progression=prior&&result.xp>0?{...snapshot.progression,system04A:awardProgression(prior,{
