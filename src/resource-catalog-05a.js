@@ -16,7 +16,15 @@ export const RESOURCE_FAMILIES_05A=Object.freeze([
 ]);
 const item=(id,name,family)=>Object.freeze({id:'item05a:'+id,name,family});
 export const CATALOG_ITEMS_05A=Object.freeze([
-item('wild-herb','야생 약초','herb'),item('mushroom','일반 버섯','fungus'),
+item('wild-herb','야생 약초','herb'),
+item('tin-ore','주석광석','metal_ore'),
+item('silver-ore','은광석','metal_ore'),
+item('gold-ore','금광석','metal_ore'),
+item('limestone','석회암','stone'),
+item('clay','점토','soil'),
+item('silica-sand','석영사','nonmetal_mineral'),
+item('gypsum','석고','nonmetal_mineral'),
+item('sulfur','황','nonmetal_mineral'),item('mushroom','일반 버섯','fungus'),
 item('grass','들풀','herb'),item('oak-log','참나무 통나무','wood'),
 item('pine-log','소나무 통나무','wood'),item('stone','일반 돌','stone'),
 item('coal','석탄','nonmetal_mineral'),item('copper-ore','구리광석','metal_ore'),
