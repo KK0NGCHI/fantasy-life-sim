@@ -74,3 +74,19 @@ test('legacy mineral and new deposit share stock without regrowth or double yiel
  assert.equal(consumeLegacyMineral05E(legacy.deposits,'광산','item05a:stone',13).reason,'DEPOSIT_EXHAUSTED');
  assert.deepEqual(consumeLegacyMineral05E(legacy.deposits,'광산','item05a:wood',1).deposits,legacy.deposits);
 });
+
+test('actual legacy mining through dispatcher debits the same 05-E regional deposit',()=>{
+ const g=make();assert.equal(g.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const deposits=g.current().world.runtime.resource05A.mineralDeposits05E;
+ const id=Object.keys(deposits).find(id=>deposits[id].itemId==='item05a:stone'&&deposits[id].region==='광산');
+ assert.ok(id);
+ const before=deposits[id].remaining;
+ const work=g.workUntil05A('resource05a:stone:01',50);
+ assert.equal(work.accepted,true,JSON.stringify(work));
+ assert.ok(work.qty>0);
+ const updated=g.current().world.runtime.resource05A.mineralDeposits05E[id];
+ assert.equal(updated.remaining,before-work.qty);
+ assert.equal(updated.discovered,true);
+ const later=g.dispatch('mineral.prospect',{itemId:'item05a:stone'});
+ assert.equal(later.accepted,false,'legacy discovery already marks the shared deposit known');
+});
