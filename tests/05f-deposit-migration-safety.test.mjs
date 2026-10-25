@@ -1,0 +1,40 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createMineralDeposits05E,prospectMineral05E,mineMineral05E} from '../src/mineral-deposits-05e.js';
+import {previewDepositMigration05F,validateDepositMigrationPreview05F} from '../src/deposit-migration-05f.js';
+test('preview is pure, deterministic and conserves exact site balances',()=>{
+ const source=createMineralDeposits05E(),before=JSON.stringify(source);
+ const a=previewDepositMigration05F(source);
+ assert.equal(a.ok,true);
+ assert.equal(a.sourceSiteCount,214);
+ assert.equal(a.groupedSiteCount,214);
+ assert.equal(a.totalRemaining,a.totalCapacity);
+ assert.equal(validateDepositMigrationPreview05F(source,a),true);
+ assert.deepEqual(previewDepositMigration05F(source),a);
+ assert.equal(JSON.stringify(source),before);
+});
+test('grouped view tracks extraction without minting a second spendable reserve',()=>{
+ let source=createMineralDeposits05E();
+ const found=prospectMineral05E(source,'광산','item05a:stone');
+ assert.equal(found.ok,true);
+ source=found.deposits;
+ const mine=mineMineral05E(source,'광산',found.siteId,{toolPower:1,roll:0});
+ assert.equal(mine.ok,true);
+ const preview=previewDepositMigration05F(mine.deposits);
+ assert.equal(preview.ok,true);
+ assert.equal(preview.totalRemaining,preview.totalCapacity-1);
+ assert.equal(validateDepositMigrationPreview05F(mine.deposits,preview),true);
+ const forged=structuredClone(preview);
+ forged.groups[0].sites[0].remaining+=1;
+ assert.equal(validateDepositMigrationPreview05F(mine.deposits,forged),false);
+ const missing=structuredClone(preview);
+ missing.groups[0].sites.pop();
+ assert.equal(validateDepositMigrationPreview05F(mine.deposits,missing),false);
+});
+test('bad source is rejected instead of being silently reset',()=>{
+ const empty=previewDepositMigration05F(null);
+ assert.equal(empty.ok,false);
+ const source=createMineralDeposits05E();
+ const key=Object.keys(source)[0];source[key].remaining=-1;
+ assert.equal(previewDepositMigration05F(source).ok,false);
+});
