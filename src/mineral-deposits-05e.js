@@ -1,27 +1,25 @@
+import {ATLAS_MINERAL_BALANCE_05E,NAMED_MINERAL_BALANCE_05E} from './balance-minerals-05e.js';
 import {REAL_ATLAS_05E} from './mineral-atlas-05e.js';
 /** 05-E geological resources: non-renewable deposits, never biological regrowth.
  * Provisional grades and yields; all randomness is injected by the caller.
  */
 // Atlas additions use conservative placeholder resource rules until geology is modeled.
+const NAMED_MINERAL_NAMES_05E=Object.freeze({
+ 'item05a:tin-ore':'주석광석','item05a:silver-ore':'은광석','item05a:gold-ore':'금광석',
+ 'item05a:limestone':'석회암','item05a:clay':'점토','item05a:silica-sand':'석영사',
+ 'item05a:gypsum':'석고','item05a:sulfur':'황','item05a:stone':'일반 돌',
+ 'item05a:coal':'석탄','item05a:copper-ore':'구리광석','item05a:iron-ore':'철광석',
+ 'item05a:quartz':'수정 원석'
+});
 export const ATLAS_DEPOSIT_DEFINITIONS_05E=Object.freeze(REAL_ATLAS_05E.map(entry=>({
- id:entry.id,name:entry.name,regions:['광산','산맥'],stock:4,grade:1,hardness:1,
+ id:entry.id,name:entry.name,regions:['광산','산맥'],...ATLAS_MINERAL_BALANCE_05E,
  atlasCategory:entry.category
 })));
 export const MINERAL_DEFINITIONS_05E=Object.freeze([
  ...ATLAS_DEPOSIT_DEFINITIONS_05E,
- {id:'item05a:tin-ore',name:'주석광석',regions:['광산','산맥'],stock:6,grade:2,hardness:2},
- {id:'item05a:silver-ore',name:'은광석',regions:['광산','산맥'],stock:5,grade:2,hardness:2},
- {id:'item05a:gold-ore',name:'금광석',regions:['광산','산맥'],stock:4,grade:3,hardness:2},
- {id:'item05a:limestone',name:'석회암',regions:['광산','산맥'],stock:10,grade:1,hardness:1},
- {id:'item05a:clay',name:'점토',regions:['광산','산맥'],stock:12,grade:1,hardness:1},
- {id:'item05a:silica-sand',name:'석영사',regions:['광산','산맥'],stock:9,grade:1,hardness:1},
- {id:'item05a:gypsum',name:'석고',regions:['광산','산맥'],stock:8,grade:1,hardness:1},
- {id:'item05a:sulfur',name:'황',regions:['광산','산맥'],stock:6,grade:2,hardness:2},
- {id:'item05a:stone',name:'일반 돌',regions:['광산','산맥'],stock:16,grade:1,hardness:1},
- {id:'item05a:coal',name:'석탄',regions:['광산','산맥'],stock:10,grade:1,hardness:2},
- {id:'item05a:copper-ore',name:'구리광석',regions:['광산','산맥'],stock:8,grade:2,hardness:2},
- {id:'item05a:iron-ore',name:'철광석',regions:['광산','산맥'],stock:7,grade:2,hardness:3},
- {id:'item05a:quartz',name:'수정 원석',regions:['광산','산맥'],stock:5,grade:3,hardness:2}
+ ...Object.entries(NAMED_MINERAL_BALANCE_05E).map(([id,balance])=>({
+  id,name:NAMED_MINERAL_NAMES_05E[id],regions:['광산','산맥'],...balance
+ }))
 ]);
 export const MINERAL_BY_ID_05E=new Map(MINERAL_DEFINITIONS_05E.map(x=>[x.id,x]));
 export function mineralDepositId05E(region,itemId,index=0){
