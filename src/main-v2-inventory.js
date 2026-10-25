@@ -67,6 +67,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   ...[['processedWood',2,'가공 목재'],['reinforcedWood',3,'강화 목재']].map(([material,rank,name])=>({
    id:'tool05a:rod:'+material,name:name+' 낚싯대',group:'도구',qty:0,tags:['tool:rod','material:'+material,'rank:'+rank]
   })),
+  {id:'tool05a:gloves:mycelium',name:'균사 섬유 채집 장갑',group:'도구',qty:0,tags:['tool:gather','material:mycelium','rank:2']},
   ...[['leather',2,'가죽'],['reinforcedLeather',3,'강화 가죽']].map(([material,rank,name])=>({
    id:'tool05a:gloves:'+material,name:name+' 채집 장갑',group:'도구',qty:0,tags:['tool:gather','material:'+material,'rank:'+rank]
   }))
