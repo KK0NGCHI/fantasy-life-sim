@@ -379,7 +379,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const botanical=BOTANICAL_PROFILE_BY_ID_05A.get(result.itemId);
   const fungus=FUNGAL_BY_ID_05B.get(result.itemId);
   let updatedEcoSite=null,updatedSharedSubstrate=null;
-  if(found&&botanical){
+  if(found&&result.rewardMode!=='discover-site'&&botanical){
    if(resource05A.ecologySites){
     const def=BOTANICAL_ECOLOGY_MAP_05A.get(botanical.id);
     const sites=Object.values(resource05A.ecologySites).filter(site=>site.region===runtime.region&&site.speciesId===botanical.id).sort((a,b)=>a.patch-b.patch);
@@ -392,14 +392,15 @@ export function createMainV2Inventory(uiItems,options={}) {
       mature:true,bloom:botanical.part==='flower'
      },{second:snapshot.clock.elapsedUnits,roll:c.value,action:'gather'});
      if(!attempt.ok)found=false;
-     else updatedEcoSite=attempt.site;
+     else if(!attempt.outputs.some(output=>output.itemId===result.itemId))found=false;
+      else updatedEcoSite=attempt.site;
     }
    }else{
     const allowed=botanicalCanHarvest05A(flags,botanical,snapshot.clock.elapsedUnits,ecoWeather);
     if(!allowed.ok)found=false;
    }
   }
-  if(found&&fungus){
+  if(found&&result.rewardMode!=='discover-site'&&fungus){
    if(!resource05A.ecologySites||!resource05A.ecologyClimateSeed)found=false;
    else{
     const def=FUNGAL_ECOLOGY_MAP_05B.get(fungus.id);
@@ -413,7 +414,8 @@ export function createMainV2Inventory(uiItems,options={}) {
      else{
       const outcome=fungalHarvest05B(selected,def,snapshot.clock.elapsedUnits,resource05A.ecologyClimateSeed,c.value);
       if(!outcome.ok)found=false;
-      else{updatedEcoSite=outcome.site;updatedSharedSubstrate=substrate?.world??null;}
+      else if(!outcome.outputs.some(output=>output.itemId===result.itemId))found=false;
+       else{updatedEcoSite=outcome.site;updatedSharedSubstrate=substrate?.world??null;}
      }
     }
    }
