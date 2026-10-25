@@ -13,7 +13,9 @@ export const REFINING_RECIPES_05H=Object.freeze([
  {id:'craft05i:iron-pickaxe',name:'철 곡괭이 제작',station:'workbench',inputs:[{itemId:'item05h:iron-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:pickaxe:iron',outputQty:1,seconds:600},
  {id:'craft05i:iron-axe',name:'철 벌목 도끼 제작',station:'workbench',inputs:[{itemId:'item05h:iron-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:axe:iron',outputQty:1,seconds:600},
  {id:'craft05i:bronze-pickaxe',name:'청동 곡괭이 제작',station:'workbench',inputs:[{itemId:'item05h:bronze-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:pickaxe:bronze',outputQty:1,seconds:600},
- {id:'craft05i:bronze-axe',name:'청동 벌목 도끼 제작',station:'workbench',inputs:[{itemId:'item05h:bronze-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:axe:bronze',outputQty:1,seconds:600}
+ {id:'craft05i:bronze-axe',name:'청동 벌목 도끼 제작',station:'workbench',inputs:[{itemId:'item05h:bronze-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:axe:bronze',outputQty:1,seconds:600},
+ {id:'upgrade05i:reinforced-stone-pickaxe',name:'보강 석재 곡괭이 제작 (임시 성장 연결)',station:'workbench',inputs:[{itemId:'item05h:cut-stone',quantity:2},{itemId:'item05h:clay-brick',quantity:1}],output:'tool05a:pickaxe:reinforcedStone',outputQty:1,seconds:600},
+ {id:'upgrade05i:reinforced-bronze-pickaxe',name:'보강 청동 곡괭이 제작 (임시 성장 연결)',station:'workbench',inputs:[{itemId:'item05h:bronze-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:pickaxe:reinforcedBronze',outputQty:1,seconds:600}
 ]);
 export const REFINING_BY_ID_05H=new Map(REFINING_RECIPES_05H.map(r=>[r.id,r]));
 export const REFINED_ITEMS_05H=Object.freeze([

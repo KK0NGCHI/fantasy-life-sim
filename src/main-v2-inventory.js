@@ -61,6 +61,9 @@ export function createMainV2Inventory(uiItems,options={}) {
    [['axe','벌목 도끼'],['pickaxe','곡괭이']].map(([kind,label])=>({
     id:'tool05a:'+kind+':'+material,name:name+' '+label,group:'도구',qty:0,tags:['tool:'+kind,'material:'+material,'rank:'+rank]
    }))),
+  ...[['reinforcedStone',2,'보강 석재'],['reinforcedBronze',3,'보강 청동']].map(([material,rank,name])=>({
+   id:'tool05a:pickaxe:'+material,name:name+' 곡괭이',group:'도구',qty:0,tags:['tool:pickaxe','material:'+material,'rank:'+rank]
+  })),
   ...[['processedWood',2,'가공 목재'],['reinforcedWood',3,'강화 목재']].map(([material,rank,name])=>({
    id:'tool05a:rod:'+material,name:name+' 낚싯대',group:'도구',qty:0,tags:['tool:rod','material:'+material,'rank:'+rank]
   })),
