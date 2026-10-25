@@ -52,3 +52,17 @@ export function mineMineral05E(deposits,region,siteId,{toolPower=1,roll=0}={}){
   outputs:produced?[{itemId:site.itemId,quantity:1,grade:site.grade}]:[],
   consumed:1,remaining:newSite.remaining};
 }
+
+/** Bridge older resource.work mining into the same finite geological stock.
+ * A legacy-discovered site counts as discovering its underlying deposit.
+ */
+export function consumeLegacyMineral05E(deposits,region,itemId,quantity){
+ if(!validateMineralDeposits05E(deposits)||!Number.isSafeInteger(quantity)||quantity<0)throw Error('INVALID_LEGACY_MINERAL');
+ const def=MINERAL_BY_ID_05E.get(itemId);
+ if(!def)return {ok:true,deposits};
+ if(!def.regions.includes(region))return {ok:false,reason:'NO_LOCAL_DEPOSIT'};
+ const id=mineralDepositId05E(region,itemId);
+ const site=deposits[id];
+ if(!site||site.remaining<quantity)return {ok:false,reason:'DEPOSIT_EXHAUSTED'};
+ return {ok:true,deposits:{...deposits,[id]:{...site,remaining:site.remaining-quantity,discovered:true}}};
+}
