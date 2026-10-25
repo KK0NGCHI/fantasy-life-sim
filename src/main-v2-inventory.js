@@ -275,6 +275,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    events:[{type:'botanical.observed',payload:{itemId:species.id,name:species.name,region:runtime.region}}]};
  }],
  ['resource.incidental.search',(snapshot,command)=>{
+  try {
   const runtime=snapshot.world.runtime;
   if(runtime.dungeon||!runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
   const kind=command.payload?.activity;
@@ -364,6 +365,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,rng:c.rng,itemWorld,flags,
    world:{...snapshot.world,runtime:{...runtime,resource05A}}},
    events:[event]};
+  } catch(error){console.error('05D_INCIDENTAL_DIAGNOSTIC',error);throw error;}
  }],
  ['resource.candidate.discover',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
