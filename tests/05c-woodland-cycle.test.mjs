@@ -62,7 +62,7 @@ test('dispatcher returns same authoritative ecology snapshot as current() across
  let advanced;
  for(let i=0;i<150;i++){
   const result=g.dispatch('resource.incidental.search',{activity:'explore'});
-  assert.equal(result.accepted,true);
+  assert.equal(result.accepted,true,JSON.stringify(result));
   if(g.current().world.runtime.resource05A.woodland05C.day>initial){
    advanced=result;
    break;
