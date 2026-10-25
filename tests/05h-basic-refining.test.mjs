@@ -11,9 +11,9 @@ const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'�
 });
 const meta={slotId:'refining-test',worldId:'world',kind:'manual',label:'refining',savedAt:'2026-10-25T00:00:00Z',revision:0};
 test('refining recipe definitions have unique input/output and bounded costs',()=>{
- assert.equal(REFINING_RECIPES_05H.length,5);
+ assert.equal(REFINING_RECIPES_05H.length,6);
  assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,5);
- for(const r of REFINING_RECIPES_05H)assert.ok(r.inputQty>0&&r.outputQty>0&&r.seconds>0);
+ for(const r of REFINING_RECIPES_05H)assert.ok((r.inputs?.every(x=>x.quantity>0)??r.inputQty>0)&&r.outputQty>0&&r.seconds>0);
 });
 test('insufficient material and invalid recipe fail without state mutation',()=>{
  const g=make(),before=g.current();
@@ -36,6 +36,10 @@ test('owned ore is consumed once, yields refined item and survives save-v3 round
  }
  const quantityBefore=g.current().itemWorld.items.find(x=>x.definitionId==='item05a:stone')?.quantity??0;
  assert.ok(quantityBefore>=2,'seeded extraction must yield sufficient ore before refining');
+ const beforeNotVillage=g.current();
+ assert.equal(g.dispatch('mineral.refine',{recipeId:'refine05h:stone'}).accepted,false);
+ assert.deepEqual(g.current(),beforeNotVillage);
+ assert.equal(g.dispatch('world.travel',{region:'거점 마을'}).accepted,true);
  const before=g.current();
  const processed=g.dispatch('mineral.refine',{recipeId:'refine05h:stone'});
  assert.equal(processed.accepted,true,JSON.stringify(processed));
@@ -49,4 +53,24 @@ test('owned ore is consumed once, yields refined item and survives save-v3 round
  const decoded=decodeSaveV3(JSON.parse(JSON.stringify(saved)),g.registry);assert.equal(decoded.ok,true);
  const restored=make();restored.applyApprovedSave(decoded.save);
  assert.deepEqual(restored.current(),g.current());
+});
+
+test('bronze alloy requires both inputs and town facilities, cannot partially consume',()=>{
+ const g=make();
+ const input={
+  items:[{id:'a',definitionId:'item05h:copper-ingot',quantity:2},
+   {id:'b',definitionId:'item05h:tin-ingot',quantity:1}],
+  placements:[{itemId:'a',location:{kind:'inventory',ownerId:'player'}},
+   {itemId:'b',location:{kind:'inventory',ownerId:'player'}}],
+  containers:[]
+ };
+ const before=JSON.stringify(input);
+ const made=refineMineral05H(input,'player','refine05h:bronze');
+ assert.equal(made.ok,true);
+ assert.equal(JSON.stringify(input),before);
+ assert.equal(made.itemWorld.items.find(i=>i.definitionId==='item05h:bronze-ingot').quantity,2);
+ assert.equal(made.itemWorld.items.filter(i=>i.definitionId==='item05h:tin-ingot').length,0);
+ const insufficient=structuredClone(input);insufficient.items[1].quantity=0;
+ assert.equal(refineMineral05H(insufficient,'player','refine05h:bronze').reason,'INSUFFICIENT_MATERIAL');
+ assert.equal(JSON.stringify(input),before);
 });
