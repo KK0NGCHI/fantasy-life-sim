@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {createMineralDeposits05E,validateMineralDeposits05E,prospectMineral05E,mineMineral05E,MINERAL_DEFINITIONS_05E} from '../src/mineral-deposits-05e.js';
+import {createMineralDeposits05E,validateMineralDeposits05E,prospectMineral05E,mineMineral05E,consumeLegacyMineral05E,MINERAL_DEFINITIONS_05E} from '../src/mineral-deposits-05e.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
@@ -37,18 +37,40 @@ test('wrong habitat, missing discovery and insufficient tool cannot extract',()=
 });
 test('real mineral prospect, extraction, finite inventory and save roundtrip',()=>{
  const g=make();assert.equal(g.dispatch('world.travel',{region:'광산'}).accepted,true);
- const p=g.dispatch('mineral.prospect',{itemId:'item05a:iron-ore'});
+ const p=g.dispatch('mineral.prospect',{itemId:'item05a:stone'});
  assert.equal(p.accepted,true,JSON.stringify(p));
  const id=p.events.find(x=>x.type==='mineral.discovered').payload.siteId;
  const pre=g.current().clock.elapsedUnits;
- const m=g.dispatch('mineral.extract',{siteId:id,toolPower:3});
+ const m=g.dispatch('mineral.extract',{siteId:id,toolPower:999});
  assert.equal(m.accepted,true,JSON.stringify(m));
  assert.equal(g.current().clock.elapsedUnits-pre,180);
- assert.equal(g.current().world.runtime.resource05A.mineralDeposits05E[id].remaining,6);
+ assert.equal(g.current().world.runtime.resource05A.mineralDeposits05E[id].remaining,15);
  const v2=createSaveV2(g.current(),meta,'test',g.registry);
  const converted=prepareSecondsV2ToV3(v2,g.registry);assert.equal(converted.ok,true);
  const saved=createSaveV3(converted.state,meta,'test',g.registry);
  assert.equal(decodeSaveV3(saved,g.registry).ok,true);
  const restored=make();restored.applyApprovedSave(saved);
  assert.deepEqual(restored.current(),g.current());
+});
+
+test('forged tool power cannot bypass owned stone pickaxe hardness',()=>{
+ const g=make();assert.equal(g.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const p=g.dispatch('mineral.prospect',{itemId:'item05a:iron-ore'});
+ assert.equal(p.accepted,true);
+ const id=p.events[0].payload.siteId;
+ const original=g.current();
+ const denied=g.dispatch('mineral.extract',{siteId:id,toolPower:999});
+ assert.equal(denied.accepted,false);
+ assert.deepEqual(g.current(),original);
+});
+test('legacy mineral and new deposit share stock without regrowth or double yields',()=>{
+ let world=createMineralDeposits05E();
+ const p=prospectMineral05E(world,'광산','item05a:stone');
+ const mined=mineMineral05E(p.deposits,'광산',p.siteId,{toolPower:1,roll:0});
+ assert.equal(mined.ok,true);
+ const legacy=consumeLegacyMineral05E(mined.deposits,'광산','item05a:stone',3);
+ assert.equal(legacy.ok,true);
+ assert.equal(legacy.deposits[p.siteId].remaining,12);
+ assert.equal(consumeLegacyMineral05E(legacy.deposits,'광산','item05a:stone',13).reason,'DEPOSIT_EXHAUSTED');
+ assert.deepEqual(consumeLegacyMineral05E(legacy.deposits,'광산','item05a:wood',1).deposits,legacy.deposits);
 });
