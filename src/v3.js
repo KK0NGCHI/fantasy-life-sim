@@ -140,46 +140,8 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
   const panel=make('section',{class:'resource05a-panel','aria-label':'지역 자원 활동'},el);
   make('h3',{text:'자원 활동'},panel);
   make('p',{class:'muted',text:'활동 종류를 선택하고 발견한 지점을 지정합니다. 실제 결과에 따라 시간·재료·숙련이 함께 변합니다.'},panel);
-  // The mineral panel reads the same finite regional stock as legacy mining.
-  // All transitions are executed by authoritative engine commands.
-  const mineralDeposits=snapshot.mineralDeposits05E;
-  if(mineralDeposits&&(s.region==='광산'||s.region==='산맥')){
-   const mineralPanel=make('section',{class:'resource05a-list','aria-label':'광물 탐사와 채굴'},panel);
-   make('h4',{text:'광물 탐사 · 유한 매장층'},mineralPanel);
-   make('p',{class:'muted',text:'탐사 10분 · 광맥 채굴 3분. 기존 채광과 매장량을 공유하며, 자연 재생하지 않습니다.'},mineralPanel);
-   const pickaxes=mainV2.availableTools05A('mining');
-   const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
-   const bestRank=Math.max(0,...pickaxes.map(tool=>rankOf(tool.id)));
-   make('p',{class:'muted',text:'현재 곡괭이 능력 '+bestRank+' · 해당 광맥 경도 이상이어야 채굴 가능합니다.'},mineralPanel);
-   for(const def of MINERAL_DEFINITIONS_05E.filter(def=>def.regions.includes(s.region))){
-    const site=mineralDeposits[mineralDepositId05E(s.region,def.id)];
-    if(!site)continue;
-    const row=make('div',{class:'resource05a-row'},mineralPanel);
-    make('strong',{text:def.name+' · 경도 '+def.hardness+' · 품위 '+def.grade},row);
-    make('span',{text:site.discovered?'확인 매장량 '+site.remaining+'/'+def.stock:site.remaining===0?'고갈':'미탐사 광맥'},row);
-    if(!site.discovered){
-     const discover=btn('탐사 (10분)',()=>{
-      if(!executeV2('mineral.prospect',{itemId:def.id}))return render();
-      nextLog('광물 탐사',def.name+' 광맥을 발견했습니다.');render();
-     },'btn',row);
-     discover.disabled=site.remaining===0;
-    }else{
-     const note=site.remaining===0?'매장량이 고갈되었습니다.':
-      bestRank<def.hardness?'곡괭이 능력이 부족합니다.':'광맥 채굴 가능';
-     make('span',{class:'muted',text:note},row);
-     const harvest=btn('채굴 (3분)',()=>{
-      const before=mainV2.current().itemWorld.items.filter(item=>item.definitionId===def.id).reduce((sum,item)=>sum+item.quantity,0);
-      if(!executeV2('mineral.extract',{siteId:site.id}))return render();
-      const after=mainV2.current().itemWorld.items.filter(item=>item.definitionId===def.id).reduce((sum,item)=>sum+item.quantity,0);
-      nextLog('광물 채굴',def.name+' · '+(after>before?'획득 '+(after-before)+'개':'획득 없음'), '잔여 매장량 '+mainV2.resources05A().mineralDeposits05E[site.id].remaining);
-      render();
-     },'btn',row);
-     harvest.disabled=site.remaining===0||bestRank<def.hardness;
-    }
-   }
-  }
   const candidates=Object.entries(snapshot.candidateSites??{}).filter(([id,site])=>site.region===s.region&&SOURCE_WORK_RULES_05A[site.sourceId]);
-  if(candidates.length){
+  if(candidates.length&&!(snapshot.mineralDeposits05E&&(s.region==='광산'||s.region==='산맥'))){
    const candidatePanel=make('div',{class:'resource05a-list'},panel);
    make('h4',{text:'신규 검증 자원'},candidatePanel);
    if(s.region==='광산'||s.region==='산맥')btn('수정 광맥 탐사 (10분)',()=>{if(executeV2('resource.candidate.prospect',{}))render();},'btn',candidatePanel);
@@ -208,9 +170,44 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     const b=btn(titles[kind],()=>{state.kind=kind;populate()},'btn',tabs);
     b.setAttribute('aria-pressed',String(state.kind===kind));
    }
+   if(state.kind==='mining'&&snapshot.mineralDeposits05E){
+    const mineralPanel=make('section',{class:'resource05a-list','aria-label':'통합 채광'},results);
+    make('h4',{text:'광맥 탐사 · 채굴'},mineralPanel);
+    make('p',{class:'muted',text:'광맥을 발견한 뒤 채굴합니다. 기존 채광 지점과 같은 지역 매장량을 사용합니다. 광맥은 자연 재생하지 않습니다.'},mineralPanel);
+    const tools=mainV2.availableTools05A('mining');
+    const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
+    const bestRank=Math.max(0,...tools.map(tool=>rankOf(tool.id)));
+    make('p',{class:'muted',text:'보유 곡괭이 최대 등급 '+bestRank+' · 탐사 10분 / 직접 채굴 3분'},mineralPanel);
+    for(const def of MINERAL_DEFINITIONS_05E.filter(def=>def.regions.includes(s.region))){
+     const site=snapshot.mineralDeposits05E[mineralDepositId05E(s.region,def.id)];
+     if(!site)continue;
+     const row=make('div',{class:'resource05a-row'},mineralPanel);
+     make('strong',{text:def.name+' · 경도 '+def.hardness+' · 품위 '+def.grade},row);
+     make('span',{text:site.discovered?'확인 매장량 '+site.remaining+'/'+def.stock:site.remaining===0?'고갈':'미탐사 광맥'},row);
+     if(!site.discovered){
+      const search=btn('광맥 탐사 (10분)',()=>{
+       if(!executeV2('mineral.prospect',{itemId:def.id}))return render();
+       nextLog('광물 탐사',def.name+' 광맥 발견');render();
+      },'btn',row);
+      search.disabled=site.remaining===0;
+     }else{
+      make('span',{class:'muted',text:site.remaining===0?'광맥 고갈':bestRank<def.hardness?'곡괭이 등급 부족':'채굴 가능'},row);
+      const mine=btn('광맥 채굴 (3분)',()=>{
+       const before=mainV2.current().itemWorld.items.filter(i=>i.definitionId===def.id).reduce((n,i)=>n+i.quantity,0);
+       if(!executeV2('mineral.extract',{siteId:site.id}))return render();
+       const after=mainV2.current().itemWorld.items.filter(i=>i.definitionId===def.id).reduce((n,i)=>n+i.quantity,0);
+       nextLog('광물 채굴',def.name+' · '+(after>before?'획득 '+(after-before)+'개':'획득 없음'),
+        '남은 매장량 '+mainV2.resources05A().mineralDeposits05E[site.id].remaining);render();
+      },'btn',row);
+      mine.disabled=site.remaining===0||bestRank<def.hardness;
+     }
+    }
+    make('h4',{text:'기존 작업 지점 · 공유 매장량'},results);
+    make('p',{class:'muted',text:'아래 작업 지점은 같은 지역의 광맥 잔량을 소모합니다. 작업 진행도는 지점별로 유지됩니다.'},results);
+   }
    const discovery=make('div',{class:'resource05a-discovery'},results);
-   make('p',{class:'muted',text:'새 자원 지점 탐사 · 유효한 발견에 게임 내 10분이 소요됩니다. 이미 찾은 지점이나 아직 재공급되지 않은 광맥은 다시 생성되지 않습니다.'},discovery);
-   for(const resource of RESOURCES_05A.filter(x=>x.region===s.region&&x.activity===state.kind)){
+   if(state.kind!=='mining'||!snapshot.mineralDeposits05E)make('p',{class:'muted',text:'새 자원 지점 탐사 · 유효한 발견에 게임 내 10분이 소요됩니다.'},discovery);
+   for(const resource of RESOURCES_05A.filter(x=>x.region===s.region&&x.activity===state.kind&&!(state.kind==='mining'&&snapshot.mineralDeposits05E))){
     btn(resource.name+' 찾기',()=>{
      if(!executeV2('resource.search',{resourceId:resource.id}))return render();
      nextLog('자원 발견',resource.name+'의 새 지점을 발견했습니다.');
@@ -224,7 +221,8 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     const updated=resourceAt05A(node,def,elapsed);
     const row=make('div',{class:'resource05a-row'},results);
     make('strong',{text:def.name+' · '+nodeId.split(':').at(-1)},row);
-    make('span',{text:'가용 '+updated.remaining+'/'+def.capacity+(updated.progress?' · 작업 진행 '+updated.progress:'')},row);
+    const vein=snapshot.mineralDeposits05E&&def.activity==='mining'?snapshot.mineralDeposits05E[mineralDepositId05E(s.region,def.itemId)]:null;
+    make('span',{text:'지점 가용 '+updated.remaining+'/'+def.capacity+(vein?' · 광맥 잔량 '+vein.remaining:'')+(updated.progress?' · 작업 진행 '+updated.progress:'')},row);
     const ownedTools=mainV2.availableTools05A(def.activity);
     let chosenTool=ownedTools[0]?.id??null;
     if(ownedTools.length>0){
@@ -240,7 +238,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      nextLog('자원 작업',def.name+' 작업 완료','현재 가용 '+current.world.runtime.resource05A.nodes[nodeId].remaining+'/'+def.capacity);
      render();
     },'btn',row);
-    step.disabled=updated.remaining===0;
+    step.disabled=updated.remaining===0||(vein&&vein.remaining===0);
     const bulk=btn('성과까지 (최대 50회)',()=>{
      mainV2.syncVitals(s);
      const summary=mainV2.workUntil05A(nodeId,50,chosenTool);
