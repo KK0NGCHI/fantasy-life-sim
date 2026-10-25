@@ -134,3 +134,46 @@ test('starter mining extracts real stone, refines it, and preserves v3 state',()
  const restored=make();restored.applyApprovedSave(saved);
  assert.deepEqual(restored.current(),game.current());
 });
+
+test('refining refuses an output stack whose fixed ID belongs to the wrong item',()=>{
+ const world={items:[
+  {id:'ore',definitionId:'item05a:stone',quantity:2},
+  {id:'refined05h:item05h:cut-stone',definitionId:'item05h:copper-ingot',quantity:1}
+ ],placements:[
+  {itemId:'ore',location:{kind:'inventory',ownerId:'owner'}},
+  {itemId:'refined05h:item05h:cut-stone',location:{kind:'inventory',ownerId:'owner'}}
+ ],containers:[]};
+ const before=structuredClone(world);
+ const result=refineMineral05H(world,'owner','refine05h:stone');
+ assert.equal(result.ok,false);
+ assert.equal(result.reason,'OUTPUT_NOT_OWNED');
+ assert.deepEqual(world,before,'failed credit cannot consume source material');
+});
+test('refining refuses output quantity overflow without consuming ingredients',()=>{
+ const world={items:[
+  {id:'ore',definitionId:'item05a:stone',quantity:2},
+  {id:'refined05h:item05h:cut-stone',definitionId:'item05h:cut-stone',quantity:Number.MAX_SAFE_INTEGER}
+ ],placements:[
+  {itemId:'ore',location:{kind:'inventory',ownerId:'owner'}},
+  {itemId:'refined05h:item05h:cut-stone',location:{kind:'inventory',ownerId:'owner'}}
+ ],containers:[]};
+ const before=structuredClone(world);
+ const result=refineMineral05H(world,'owner','refine05h:stone');
+ assert.equal(result.ok,false);
+ assert.equal(result.reason,'OUTPUT_OVERFLOW');
+ assert.deepEqual(world,before);
+});
+test('refining cannot deposit into another owner fixed output stack',()=>{
+ const world={items:[
+  {id:'ore',definitionId:'item05a:stone',quantity:2},
+  {id:'refined05h:item05h:cut-stone',definitionId:'item05h:cut-stone',quantity:1}
+ ],placements:[
+  {itemId:'ore',location:{kind:'inventory',ownerId:'owner'}},
+  {itemId:'refined05h:item05h:cut-stone',location:{kind:'inventory',ownerId:'foreign'}}
+ ],containers:[]};
+ const before=structuredClone(world);
+ const result=refineMineral05H(world,'owner','refine05h:stone');
+ assert.equal(result.ok,false);
+ assert.equal(result.reason,'OUTPUT_NOT_OWNED');
+ assert.deepEqual(world,before);
+});

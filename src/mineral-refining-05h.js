@@ -49,7 +49,10 @@ export function refineMineral05H(itemWorld,ownerId,recipeId){
  const outputId='refined05h:'+recipe.output;
  const prev=items.find(item=>item.id===outputId);
  if(prev){
-  if(!retainedPlacements.some(p=>p.itemId===outputId&&p.location.kind==='inventory'&&p.location.ownerId===ownerId))return {ok:false,reason:'OUTPUT_NOT_OWNED'};
+  if(prev.definitionId!==recipe.output||
+   !retainedPlacements.some(p=>p.itemId===outputId&&p.location.kind==='inventory'&&p.location.ownerId===ownerId))
+   return {ok:false,reason:'OUTPUT_NOT_OWNED'};
+  if(!Number.isSafeInteger(prev.quantity+recipe.outputQty))return {ok:false,reason:'OUTPUT_OVERFLOW'};
   items=items.map(item=>item.id===outputId?{...item,quantity:item.quantity+recipe.outputQty}:item);
  }else items=[...items,{id:outputId,definitionId:recipe.output,quantity:recipe.outputQty}];
  const placements=prev?retainedPlacements:[...retainedPlacements,{itemId:outputId,location:{kind:'inventory',ownerId}}];
