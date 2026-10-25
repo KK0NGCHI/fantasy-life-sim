@@ -41,7 +41,7 @@ test('owned ore is consumed once, yields refined item and survives save-v3 round
  assert.equal(processed.accepted,true,JSON.stringify(processed));
  const items=g.current().itemWorld.items;
  assert.equal(items.find(x=>x.definitionId==='item05h:cut-stone').quantity,1);
- assert.equal(items.find(x=>x.definitionId==='item05a:stone').quantity,quantityBefore-2);
+ assert.equal(items.find(x=>x.definitionId==='item05a:stone')?.quantity??0,quantityBefore-2);
  assert.equal(g.current().clock.elapsedUnits-before.clock.elapsedUnits,300);
  const v2=createSaveV2(g.current(),meta,'test',g.registry);
  const prepared=prepareSecondsV2ToV3(v2,g.registry);assert.equal(prepared.ok,true);
