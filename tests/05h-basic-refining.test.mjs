@@ -1,0 +1,48 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createMainV2Inventory} from '../src/main-v2-inventory.js';
+import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
+import {REFINING_RECIPES_05H,refineMineral05H} from '../src/mineral-refining-05h.js';
+import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
+const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'재료',qty:1,tags:[]}],{
+ worldSeed:'refining-05h',generatedWorld:true,worldPersistence03E:true,progression04A:true,
+ resources05A:true,ecology05A:true,fungi05B:true,woodland05C:true,minerals05E:true,
+ incidentalTables05A:ACTIVITY_TABLES_05A,preferences:{getItem:()=>null,setItem:()=>{}}
+});
+const meta={slotId:'refining-test',worldId:'world',kind:'manual',label:'refining',savedAt:'2026-10-25T00:00:00Z',revision:0};
+test('refining recipe definitions have unique input/output and bounded costs',()=>{
+ assert.equal(REFINING_RECIPES_05H.length,5);
+ assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,5);
+ for(const r of REFINING_RECIPES_05H)assert.ok(r.inputQty>0&&r.outputQty>0&&r.seconds>0);
+});
+test('insufficient material and invalid recipe fail without state mutation',()=>{
+ const g=make(),before=g.current();
+ assert.equal(g.dispatch('mineral.refine',{recipeId:'refine05h:copper'}).accepted,false);
+ assert.deepEqual(g.current(),before);
+ assert.equal(g.dispatch('mineral.refine',{recipeId:'invalid'}).accepted,false);
+ assert.deepEqual(g.current(),before);
+});
+test('owned ore is consumed once, yields refined item and survives save-v3 roundtrip',()=>{
+ const g=make();
+ assert.equal(g.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const p=g.dispatch('mineral.prospect',{itemId:'item05a:stone'});
+ assert.equal(p.accepted,true);
+ const siteId=p.events.find(x=>x.type==='mineral.discovered').payload.siteId;
+ for(let i=0;i<2;i++){
+  const r=g.dispatch('mineral.extract',{siteId});
+  assert.equal(r.accepted,true,JSON.stringify(r));
+ }
+ const before=g.current();
+ const processed=g.dispatch('mineral.refine',{recipeId:'refine05h:stone'});
+ assert.equal(processed.accepted,true,JSON.stringify(processed));
+ const items=g.current().itemWorld.items;
+ assert.equal(items.find(x=>x.definitionId==='item05h:cut-stone').quantity,1);
+ assert.equal(items.find(x=>x.definitionId==='item05a:stone').quantity,0);
+ assert.equal(g.current().clock.elapsedUnits-before.clock.elapsedUnits,300);
+ const v2=createSaveV2(g.current(),meta,'test',g.registry);
+ const prepared=prepareSecondsV2ToV3(v2,g.registry);assert.equal(prepared.ok,true);
+ const saved=createSaveV3(prepared.state,meta,'test',g.registry);
+ const decoded=decodeSaveV3(JSON.parse(JSON.stringify(saved)),g.registry);assert.equal(decoded.ok,true);
+ const restored=make();restored.applyApprovedSave(decoded.save);
+ assert.deepEqual(restored.current(),g.current());
+});
