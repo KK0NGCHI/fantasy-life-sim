@@ -1,3 +1,4 @@
+import {CANDIDATE_REGEN_05A} from './balance-candidate-05a.js';
 import {BOTANICAL_ITEMS_05A} from './botanical-species-05a.js';
 import {RESOURCE_SPECIES_05A,RESOURCE_DEPTHS_05A,RESOURCE_REGIONS_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 
@@ -14,12 +15,7 @@ export const SOURCE_WORK_RULES_05A=TEST_SOURCES;
 const DAY=86400, SEASON=28*DAY, YEAR=4*SEASON;
 /** Candidate recovery uses elapsed game seconds only. Each season may have different productivity.
  * Multipliers are prototype values, not published economy balance. */
-export const CANDIDATE_REGEN_05A=Object.freeze({
- 'source05a:blueberry':{seconds:DAY,units:2,seasons:[1,2,1,0]},
- 'source05a:reed':{seconds:DAY,units:2,seasons:[1,2,1,0]},
- 'source05a:mussel':{seconds:2*DAY,units:2,seasons:[1,1,1,1]},
- 'source05a:marsh-bell':{seconds:3*DAY,units:1,seasons:[1,1,2,0.5]}
-});
+export {CANDIDATE_REGEN_05A} from './balance-candidate-05a.js';
 function growthUntil(t,multipliers){
  const absolute=t+28800;
  const years=Math.floor(absolute/YEAR),remainder=absolute%YEAR;
