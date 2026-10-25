@@ -3,10 +3,12 @@ import assert from 'node:assert/strict';
 import {REFINING_RECIPES_05H} from '../src/mineral-refining-05h.js';
 import {MINERAL_DEFINITIONS_05E} from '../src/mineral-deposits-05e.js';
 import {RESOURCES_05A} from '../src/resources-05a.js';
+import {FUNGAL_ITEMS_05B} from '../src/fungal-ecology-05b.js';
 
 const liveSourceItems=new Set([
  ...MINERAL_DEFINITIONS_05E.map(x=>x.id),
- ...RESOURCES_05A.map(x=>x.itemId)
+ ...RESOURCES_05A.map(x=>x.itemId),
+ ...FUNGAL_ITEMS_05B.map(x=>x.id)
 ]);
 const producers=new Map(REFINING_RECIPES_05H.map(r=>[r.output,r]));
 const inputs=recipe=>recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
@@ -29,6 +31,7 @@ test('all implemented production recipes have acyclic dependencies rooted in liv
   assert.ok(source.raw.length>0,recipe.id);
   return {recipe:recipe.id,depth:source.depth,raw:[...new Set(source.raw)].sort()};
  });
+ assert.ok(report.some(x=>x.recipe==='craft05i:mycelium-gloves'&&x.raw.includes('item05b:wood-ear')&&x.raw.includes('item05a:grass')));
  assert.ok(report.some(x=>x.recipe==='craft05i:processed-wood-rod'&&x.raw.includes('item05a:oak-log')&&x.raw.includes('item05a:grass')));
  assert.ok(report.some(x=>x.recipe==='upgrade05i:reinforced-stone-pickaxe'&&x.raw.includes('item05a:clay')));
  console.log('RECIPE_SOURCE_CLOSURE '+JSON.stringify({
