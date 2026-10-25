@@ -26,6 +26,8 @@ try{
  assert.ok(arrived,'mine mineral panel should appear after travel to 광산');
  const mineral=page.getByRole('region',{name:'통합 채광'});
  assert.match(await mineral.innerText(),/일반 돌/);
+ assert.equal(await page.getByRole('region',{name:'통합 채광'}).count(),1);
+ assert.match(await page.locator('#main').innerText(),/기존 작업 지점 · 공유 매장량/);
  assert.match(await mineral.innerText(),/보유 곡괭이 최대 등급 1/);
  const iron=mineral.locator('.resource05a-row').filter({hasText:'철광석'});
  await iron.getByRole('button',{name:'광맥 탐사 (10분)'}).click();
