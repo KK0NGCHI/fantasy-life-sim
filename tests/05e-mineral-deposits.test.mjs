@@ -150,3 +150,33 @@ test('finite mineral worlds reject legacy quartz discovery, prospect and extract
  const valid=g.dispatch('mineral.prospect',{itemId:'item05a:quartz'});
  assert.equal(valid.accepted,true,'official finite quartz exploration remains available');
 });
+
+test('automatic legacy mining matches manual actions, finite mineral stock, and saved state',()=>{
+ const automatic=make(),manual=make(),nodeId='resource05a:stone:01';
+ for(const game of [automatic,manual])assert.equal(game.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const summary=automatic.workUntil05A(nodeId,50);
+ assert.equal(summary.accepted,true,JSON.stringify(summary));
+ let qty=0,xp=0,seconds=0,actions=0;
+ for(;actions<50;actions++){
+  const before=manual.current().clock.elapsedUnits;
+  const result=manual.dispatch('resource.work',{nodeId});
+  assert.equal(result.accepted,true,JSON.stringify(result));
+  seconds+=manual.current().clock.elapsedUnits-before;
+  for(const event of result.events)if(event.type==='resource.work_done'){
+   qty+=event.payload.qty;xp+=event.payload.xp;
+  }
+  if(qty>0){actions++;break;}
+ }
+ assert.deepEqual({actions,qty,xp,seconds},
+  {actions:summary.actions,qty:summary.qty,xp:summary.xp,seconds:summary.seconds});
+ assert.deepEqual(automatic.current(),manual.current(),'auto and manual gameplay have identical ledgers and RNG');
+ const site=Object.values(automatic.current().world.runtime.resource05A.mineralDeposits05E)
+  .find(x=>x.region==='광산'&&x.itemId==='item05a:stone');
+ assert.equal(site.remaining,16-qty,'automatic mining debits only the shared finite deposit');
+ const v2=createSaveV2(automatic.current(),meta,'test',automatic.registry);
+ const converted=prepareSecondsV2ToV3(v2,automatic.registry);
+ assert.equal(converted.ok,true);
+ const save=createSaveV3(converted.state,meta,'test',automatic.registry);
+ const restored=make();restored.applyApprovedSave(save);
+ assert.deepEqual(restored.current(),automatic.current(),'auto mining preserves stock on save/load');
+});
