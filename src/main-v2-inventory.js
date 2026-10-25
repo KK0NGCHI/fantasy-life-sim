@@ -301,6 +301,8 @@ export function createMainV2Inventory(uiItems,options={}) {
  }],
  ['mineral.refine',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon)throw Error('REFINING_UNAVAILABLE');
+  // Prototype town facilities are fixed world services, not craftable inventory items.
+  if(snapshot.world.runtime.region!=='거점 마을')throw Error('WORKSTATION_REQUIRED');
   const recipe=REFINING_BY_ID_05H.get(command.payload?.recipeId);
   if(!recipe)throw Error('UNKNOWN_RECIPE');
   const result=refineMineral05H(snapshot.itemWorld,snapshot.player.id,recipe.id);
