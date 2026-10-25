@@ -1,3 +1,4 @@
+import {FUNGAL_WET_DAY_COST_05B} from './balance-fungi-05b.js';
 import {createEcologySite,ecologyInteract,validateEcologyDefinition} from './ecology-core-05a.js';
 import {ecologyClimate05A} from './ecology-climate-05a.js';
 
@@ -19,7 +20,7 @@ const fungi=[
 ];
 export const FUNGAL_SPECIES_05B=Object.freeze(fungi.map(([key,name,scientificName,regions,substrate,guild,encounterClass,seasons,capacity])=>Object.freeze({
  key,id:'item05b:'+key,name,scientificName,regions:Object.freeze(regions),substrate,guild,encounterClass,seasons:Object.freeze(seasons),
- capacity,regrowRainDays:encounterClass==='rare'?5:encounterClass==='uncommon'?3:2,
+ capacity,regrowRainDays:FUNGAL_WET_DAY_COST_05B[encounterClass],
  reviewStatus:'gameplay-provisional',toxicity:'unverified-not-food-safe'
 })));
 export const FUNGAL_ITEMS_05B=Object.freeze(FUNGAL_SPECIES_05B.map(x=>({id:x.id,name:x.name,family:'fungus'})));
