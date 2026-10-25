@@ -155,3 +155,33 @@ test('discover-site incidental rewards reveal candidate nodes without harvesting
  assert.deepEqual(current.ecologySubstrates,initial.ecologySubstrates,'discovery cannot spend fungal substrates');
  assert.deepEqual(after.itemWorld,before.itemWorld,'discovery never grants an item');
 });
+
+test('incidental botanical awards cannot exceed actual patch stock consumption across save roundtrip',()=>{
+ const region='초원·농경지',activity='explore',key=region+':'+activity,itemId='item05a:plantago-major';
+ const template=ACTIVITY_TABLES_05A[key];
+ const table={...template,triggerChance:1,rewardMode:'item',pool:{...template.pool,
+  tiers:[{id:'common',weight:1,outputs:[{itemId,weight:1}]}]}};
+ const makeFixed=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'재료',qty:1,tags:[]}],
+  {...options,incidentalTables05A:{[key]:table}});
+ const g=makeFixed();assert.equal(g.dispatch('world.travel',{region}).accepted,true);
+ let credited=0;
+ for(let n=0;n<50;n++){
+  const before=g.current(),oldSites=Object.values(before.world.runtime.resource05A.ecologySites)
+   .filter(site=>site.speciesId===itemId&&site.region===region);
+  const prior=before.itemWorld.items.filter(item=>item.definitionId===itemId).reduce((total,item)=>total+item.quantity,0);
+  const r=g.dispatch('resource.incidental.search',{activity});
+  assert.equal(r.accepted,true,JSON.stringify(r));
+  const after=g.current(),nextSites=after.world.runtime.resource05A.ecologySites;
+  const now=after.itemWorld.items.filter(item=>item.definitionId===itemId).reduce((total,item)=>total+item.quantity,0);
+  const consumed=oldSites.reduce((total,site)=>total+Math.max(0,site.remaining-nextSites[site.id].remaining),0);
+  assert.equal(now-prior,consumed,'item award must debit an actual matching ecological patch');
+  assert.ok(now-prior===0||now-prior===1);
+  credited+=now-prior;
+ }
+ assert.ok(credited>0,'deterministic test must exercise at least one successful acquisition');
+ const v2=createSaveV2(g.current(),meta,'test',g.registry);
+ const converted=prepareSecondsV2ToV3(v2,g.registry);assert.equal(converted.ok,true);
+ const saved=createSaveV3(converted.state,meta,'test',g.registry);
+ const restored=makeFixed();restored.applyApprovedSave(saved);
+ assert.deepEqual(restored.current(),g.current(),'reward and stock ledgers survive reload together');
+});
