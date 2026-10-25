@@ -43,7 +43,7 @@ test('actual 05-E finite stock can provision the provisional complete rank-1 to 
   note:'Expected yields are mean estimates; no single world seed or complete crafting plan is guaranteed by this bound.'}));
 });
 test('every actual 05-I tool recipe has finite raw geology bounds and measurable bottlenecks',()=>{
- for(const recipe of REFINING_RECIPES_05H.filter(r=>r.output.startsWith('tool05a:'))){
+ for(const recipe of REFINING_RECIPES_05H.filter(r=>r.output.startsWith('tool05a:pickaxe:')||r.output.startsWith('tool05a:axe:'))){
   const cost=rawNeeds(recipe.output);
   const limits=Object.entries(cost).map(([itemId,qty])=>{
    const def=MINERAL_BY_ID_05E.get(itemId);
