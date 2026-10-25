@@ -178,10 +178,19 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
     const bestRank=Math.max(0,...tools.map(tool=>rankOf(tool.id)));
     make('p',{class:'muted',text:'보유 곡괭이 최대 등급 '+bestRank+' · 탐사 10분 / 직접 채굴 3분'},mineralPanel);
-    for(const def of MINERAL_DEFINITIONS_05E.filter(def=>def.regions.includes(s.region))){
+    const mineralGroups=['기본 자원',...new Set(MINERAL_DEFINITIONS_05E.map(def=>def.atlasCategory).filter(Boolean))];
+    const picker=make('select',{'aria-label':'광물 분류 선택'},mineralPanel);
+    for(const name of mineralGroups){const option=make('option',{text:name},picker);option.value=name;}
+    const selection=make('div',{class:'resource05a-list'},mineralPanel);
+    function showMinerals(){
+     selection.innerHTML='';
+     const visible=MINERAL_DEFINITIONS_05E.filter(def=>def.regions.includes(s.region)&&
+      (picker.value==='기본 자원'?!def.atlasCategory:def.atlasCategory===picker.value));
+     make('p',{class:'muted',text:picker.value+' · '+visible.length+'개 광물 후보'},selection);
+     for(const def of visible){
      const site=snapshot.mineralDeposits05E[mineralDepositId05E(s.region,def.id)];
      if(!site)continue;
-     const row=make('div',{class:'resource05a-row'},mineralPanel);
+     const row=make('div',{class:'resource05a-row'},selection);
      make('strong',{text:def.name+' · 경도 '+def.hardness+' · 품위 '+def.grade},row);
      make('span',{text:site.discovered?'확인 매장량 '+site.remaining+'/'+def.stock:site.remaining===0?'고갈':'미탐사 광맥'},row);
      if(!site.discovered){
@@ -202,6 +211,9 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
       mine.disabled=site.remaining===0||bestRank<def.hardness;
      }
     }
+    }
+    picker.addEventListener('change',showMinerals);
+    showMinerals();
     const mineralCandidates=candidates.filter(([id,site])=>SOURCE_WORK_RULES_05A[site.sourceId]?.activity==='mining');
     if(mineralCandidates.length){
      const supplemental=make('section',{class:'resource05a-list','aria-label':'추가 광물 발견 지점'},results);
