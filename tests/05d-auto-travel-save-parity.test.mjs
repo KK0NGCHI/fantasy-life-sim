@@ -46,6 +46,7 @@ test('pause/resume/cancel do not advance ecological time; skip dispatch reconcil
  assert.equal(game.current().clock.elapsedUnits,start);
  // plan may use named regions; the original validated plan is still safe after cancel.
  assert.equal(game.travelBegin(candidate.plan),true);
+ assert.equal(game.travelResume(),true);
  const travel=game.travelSkip();
  assert.equal(travel.accepted,true,JSON.stringify(travel));
  assert.deepEqual(travel.nextState,game.current());
