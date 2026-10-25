@@ -1,0 +1,35 @@
+/** 02-C is the canonical v2 runtime surface. Legacy index.ts exports remain available
+ * for v1 regression tests and explicit migrations, not for new game sessions.
+ */
+export const ENGINE_STAGE_V2='02-C' as const;
+export const ACTIVE_GAME_STATE_SCHEMA_VERSION=2 as const;
+export {V2ActionDispatcher} from './core/v2-dispatch.js';
+export type {V2Action,V2ActionRegistry,V2ActionHandler,V2DispatchResult,V2DurationPolicy} from './core/v2-dispatch.js';
+export {prepareBulkDiscard,confirmBulkDiscard,pickupWorldItem} from './core/item-transfer-v2.js';
+export {dispatchItemAction} from './core/item-actions-v2.js';
+export {buildItemRegistry,validateItemInstances,canStackItems,mergeItemStacks} from './data/item-registry.js';
+export {validateItemWorld} from './data/item-world.js';
+export {createRandomState,drawRandom,randomInt} from './core/rng.js';
+export {createSaveV2,decodeSaveV2,parseBackupV2,exportBackupV2,migrateV1ToV2} from './save/save-v2.js';
+export {IndexedDbSavesV2} from './save/indexeddb-v2.js';
+export {V2SaveSession,prepareV2Load,prepareLegacyGameState} from './save/v2-session.js';
+export {shouldAutoSave} from './save/autosave.js';
+export type {GameStateV2,SaveEnvelopeV2} from './save/save-v2.js';
+export type {ItemCatalog,ItemRegistry,ValidationIssue} from './data/item-registry.js';
+export type {ItemInstanceDraft,ItemDefinition,MaterialDefinition,EffectDefinition,RecipeDefinition} from './data/item-model.js';
+
+export {buildWorldRegistry,validateWorldDefinition,validatePlayerLocation,deriveSiteSeed} from './world/world-model.js';
+export {createSiteLifecycle,advanceSiteLifecycle} from './world/lifecycle.js';
+export {SOMNIUM_REGION_IDS,SOMNIUM_WORLD_03A} from './world/somnium-world.js';
+export type {WorldDefinition,WorldRegistry,RegionDefinition,SiteDefinition,MapDefinition,RouteDefinition,TerrainDefinition,FieldLifecyclePolicy,SiteLifecycleState,WorldRuntime03A,PlayerLocation,WorldValidationIssue} from './world/world-model.js';
+
+export {validateWorldTopology,validateWorldRuntime03A,prepareWorldRuntime03ALoad,createInitialWorldRuntime03A,siteGenerationSeed} from './world/world-integrity.js';
+
+export {planTravel,beginTravel,advanceTravel,pauseTravel,resumeTravel,cancelTravel,validateTravelState} from './world/travel.js';
+export type {TravelPlan,TravelState,TravelProgress,RoutePolicy,RouteResult,TravelAccess,TravelStep} from './world/travel.js';
+
+export {GAME_DAY_SECONDS,GAME_START_SECONDS,assertGameSeconds,gameClockAt,formatTravelSeconds} from './world/time-seconds.js';
+
+export {decodeSaveV3,createSaveV3,parseBackupV3,exportBackupV3,prepareV2ToV3Migration,prepareSecondsV2ToV3} from './save/save-v3.js';
+export {IndexedDbSavesV3} from './save/indexeddb-v3.js';
+export type {GameStateV3,SaveEnvelopeV3} from './save/save-v3.js';

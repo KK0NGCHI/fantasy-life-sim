@@ -1,0 +1,41 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createMainV2Inventory} from '../src/main-v2-inventory.js';
+import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
+const items=[{id:'test:leaf',name:'잎',group:'재료',qty:1,tags:[]}],preferences={getItem:()=>null,setItem:()=>{}};
+const make=()=>createMainV2Inventory(items,{generatedWorld:true,worldPersistence03E:true,worldSeed:'03e-save-test',preferences});
+const slot={slotId:'world-03e',worldId:'main-world',kind:'manual',label:'World',savedAt:'2026-10-23T00:00:00Z',revision:0};
+const pack=g=>{const v2=createSaveV2(g.current(),slot,'main-prototype',g.registry);const migrated=prepareSecondsV2ToV3(v2,g.registry);assert.equal(migrated.ok,true);return createSaveV3(migrated.state,slot,'main-prototype',g.registry)};
+test('03-E generated world and discovery survive real v3 envelope decode + restore',()=>{
+ const game=make();assert.equal(game.localMap().width,24);
+ assert.equal(game.dispatch('dungeon.enter').accepted,true);
+ assert.equal(game.dispatch('dungeon.move',{direction:'east'}).accepted,true);
+ const original=game.current(),world=original.world.runtime.world03E;
+ assert.equal(world.world.worldSeed,'03e-save-test');
+ assert.equal(world.generatedMaps['core:map/labyrinth'].width,24);
+ assert.ok(world.world.seenCells['core:map/labyrinth'].length>1);
+ const envelope=pack(game),parsed=decodeSaveV3(JSON.parse(JSON.stringify(envelope)),game.registry);
+ assert.equal(parsed.ok,true);
+ const restored=make();restored.applyApprovedSave(parsed.save);
+ assert.deepEqual(restored.current(),original);
+ assert.deepEqual(restored.localMap(),game.localMap());
+ assert.deepEqual(restored.rememberedCells(),world.world.seenCells['core:map/labyrinth']);
+});
+test('03-E damaged world fails before live state replacement',()=>{
+ const game=make();const before=game.current();
+ const envelope=pack(game);
+ const corrupt=structuredClone(envelope);
+ corrupt.state.world.runtime.world03E.generatedMaps['core:map/labyrinth'].tiles[2]='bad';
+ assert.equal(decodeSaveV3(corrupt,game.registry).ok,false);
+ assert.throws(()=>game.applyApprovedSave(corrupt));
+ assert.deepEqual(game.current(),before);
+});
+test('03-E old v3 saves without snapshot remain valid and are not silently migrated',()=>{
+ const game=make(),legacy=structuredClone(game.current());
+ delete legacy.world.runtime.world03E;
+ const v2=createSaveV2(legacy,slot,'main-prototype',game.registry);
+ const proposal=prepareSecondsV2ToV3(v2,game.registry);assert.equal(proposal.ok,true);
+ const old=createSaveV3(proposal.state,slot,'main-prototype',game.registry);
+ const reader=make();reader.applyApprovedSave(old);
+ assert.equal(reader.current().world.runtime.world03E,undefined);
+});

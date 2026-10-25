@@ -1,0 +1,56 @@
+name: Engine 01-A
+on:
+  push:
+    branches: [feat/interactive-ui-prototype]
+  pull_request:
+jobs:
+  engine:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned compiler
+        run: npm install --no-audit --no-fund
+      - name: Typecheck, compile, smoke tests and old UI syntax
+        run: npm run check
+      - name: Ensure engine build does not alter tracked UI
+        run: |
+          git diff --exit-code -- index.html src/v3.js src/v8.css
+          test -f dist/engine/index.js
+
+  windows-smoke:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install pinned dependencies
+        run: npm install --no-audit --no-fund
+      - name: Windows compiler and engine integration regressions
+        run: npm run check
+      - name: Verify generated engine artifact
+        shell: pwsh
+        run: |
+          if (-not (Test-Path 'dist/engine/index.js')) { throw 'Engine artifact missing' }
+
+  browser-chromium:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install engine and browser test dependencies
+        run: npm install --no-audit --no-fund && npm install --no-save --no-audit --no-fund playwright@1.56.1
+      - name: Install headless Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Compile engine
+        run: npm run build:engine
+      - name: Serve local game and check save/reload
+        run: |
+          python3 -m http.server 8000 --bind 127.0.0.1 &
+          node tests/browser-03f-smoke.mjs
+          node tests/browser-05e-mineral.mjs

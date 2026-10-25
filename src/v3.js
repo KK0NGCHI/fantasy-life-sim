@@ -1,0 +1,903 @@
+import {REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
+import {MINERAL_DEFINITIONS_05E,mineralDepositId05E} from './mineral-deposits-05e.js';
+import {geologyProfile05F} from './mineral-geology-05f.js';
+import {mineralAssemblage05F,ASSEMBLAGE_TYPES_05F} from './mineral-assemblages-05f.js';
+import {FUNGAL_BY_ID_05B} from './fungal-ecology-05b.js';
+import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
+import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
+import {ACTIVITY_TABLES_05A} from './activity-tables-05a.js';
+import {RESOURCE_SPECIES_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
+import {SOURCE_WORK_RULES_05A} from './resource-sites-05a.js';
+import {RESOURCES_05A,RESOURCE_MAP_05A,resourceAt05A} from './resources-05a.js';
+import {availableOriginInteractions} from './origin-interactions-04c.js';
+import {SPECIES,BACKGROUNDS} from './character-origin-04b.js';
+import {SKILL_DEFINITIONS,skillLevel,skillThreshold,ATTRIBUTES} from './progression-system.js';
+import {activityAt,accessDeepField,DEEP_FIELDS,DANGEROUS_REGIONS} from './region-activities.js';
+import {createMainV2Inventory} from './main-v2-inventory.js';
+
+import {REGIONS,ACTIONS,START_ITEMS,SKILLS,TILES} from './data.js';
+const $=x=>document.querySelector(x);
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const safeCopy=x=>JSON.parse(JSON.stringify(x));
+const pageNames=['생활','세계 지도','인벤토리','캐릭터','숙련','제작','도감','신앙','설정'];
+const icon={생활:'⌂','세계 지도':'◇',인벤토리:'▤',캐릭터:'♙',숙련:'✦',제작:'⚒',도감:'▣',신앙:'✧',설정:'⚙'};
+const actionIcon={'밭을 돌본다':'♧','작물을 수확한다':'❀','작업대를 사용한다':'⚒','휴식한다':'☕','약초를 채집한다':'♣','풀을 벤다':'✂','농지를 살핀다':'◉','나무를 조사한다':'♧','나뭇가지를 줍는다':'♣','버섯을 채집한다':'◍','낚시한다':'♒','강변을 조사한다':'◉','광석을 채굴한다':'◆','지층을 조사한다':'◎','던전에 진입한다':'⚔','주변을 살핀다':'◎'};
+const actionLabel=a=>({'밭을 돌본다':'밭 돌보기','작물을 수확한다':'작물 수확','작업대를 사용한다':'작업대','휴식한다':'휴식','약초를 채집한다':'약초 채집','풀을 벤다':'풀 베기','농지를 살핀다':'농지 조사','나무를 조사한다':'나무 조사','나뭇가지를 줍는다':'나뭇가지 줍기','버섯을 채집한다':'버섯 채집','낚시한다':'낚시','강변을 조사한다':'강변 조사','광석을 채굴한다':'채광','지층을 조사한다':'지층 조사','던전에 진입한다':'던전 진입','주변을 살핀다':'주변 조사','던전 나가기':'던전 나가기'}[a]||a);
+const categories=['전체','식재료','재료','광석','약초','장비','도구','기타'];
+const extra=[
+['bronze_sword','청동 장검','장비',1,3.6,'보통','청동',15,6,['weapon:sword','material:bronze']],
+['copper_pick','구리 곡괭이','도구',1,2.2,'보통','구리',0,0,['tool:mining','material:copper']],
+['fur_cap','여우털 모자','장비',1,.5,'고급','모피',0,2,['armor:head','material:fur']],
+['apple','사과','식재료',8,.2,'보통','과일',0,0,['food:fruit']],
+['flower','달맞이꽃','약초',3,.1,'희귀','식물',0,0,['plant:flower','craft:alchemical']],
+['stone','조약돌','재료',28,.8,'보통','석재',0,0,['material:stone']],
+['copper','구리광석','광석',17,1.5,'보통','구리',0,0,['material:copper']],
+['rope','마끈','재료',9,.1,'보통','섬유',0,0,['material:fiber']],
+['bread','밀빵','식재료',6,.3,'보통','곡물',0,0,['food:prepared']],
+['healing','회복 물약','기타',4,.2,'고급','유리병',0,0,['consumable:potion']],
+['oak_bow','참나무 활','장비',1,1.3,'보통','목재',12,0,['weapon:bow']],
+['blue_fish','푸른붕어','식재료',6,.7,'보통','민물',0,0,['origin:freshwater']],
+['salt','소금','재료',18,.1,'보통','광물',0,0,['food:seasoning']],
+['wool','양털','재료',14,.4,'보통','섬유',0,0,['material:fiber']],
+['mushroom','구름버섯','식재료',11,.2,'고급','균류',0,0,['food:mushroom']]
+].map(([id,name,group,qty,weight,quality,material,attack,defense,tags])=>({id:'mock:'+id,name,group,qty,weight,quality,material,attack,defense,tags}));
+const baseItems=[...START_ITEMS.map(i=>({...i,weight:.5,quality:'보통',material:i.group,attack:0,defense:0})),...extra];
+
+const ICON_MAP={"생활":"house","세계 지도":"map","인벤토리":"backpack","캐릭터":"user-round","숙련":"chart-no-axes-column","제작":"hammer","도감":"book-open","신앙":"sparkles","설정":"settings","던전":"footprints"};
+const ACTION_ICONS={'밭을 돌본다':'sprout','작물을 수확한다':'wheat','작업대를 사용한다':'hammer','휴식한다':'bed-double','약초를 채집한다':'leaf','풀을 벤다':'scissors','농지를 살핀다':'scan-eye','나무를 조사한다':'trees','나뭇가지를 줍는다':'logs','버섯을 채집한다':'sprout','낚시한다':'fish','강변을 조사한다':'waves','광석을 채굴한다':'pickaxe','지층을 조사한다':'mountain','던전에 진입한다':'footprints','주변을 살핀다':'scan-eye'};
+const STATUS_MOCK=[{name:'출혈',icon:'droplets',turns:4,desc:'매 턴 피해를 받는 상태. 실제 피해량은 미정입니다.'},{name:'중독',icon:'flask-conical',turns:12,desc:'독의 영향을 받는 상태. 실제 효과는 미정입니다.'},{name:'혼란',icon:'brain',turns:7,desc:'행동에 영향을 주는 상태. 실제 판정은 미정입니다.'},{name:'저주',icon:'shield-alert',turns:null,desc:'해제 조건이 정해지지 않은 지속 상태입니다.'},{name:'화상',icon:'flame',turns:3,desc:'화염 관련 지속 피해 후보. 효과 미정입니다.'},{name:'마력 과부하',icon:'zap',turns:9,desc:'마법 관련 상태 이상 예시입니다.'},{name:'쇠약',icon:'activity',turns:5,desc:'능력 저하 효과 후보입니다.'},{name:'빙결',icon:'snowflake',turns:2,desc:'냉기 관련 상태 이상 예시입니다.'},{name:'공포',icon:'eye',turns:8,desc:'정신 관련 상태 이상 예시입니다.'}];
+let overlayPage=null,overlayReturn=null,overlayReturnTab=null,conditionExpanded=false;
+function svgIcon(name){return '<i data-lucide="'+esc(name)+'" aria-hidden="true"></i>'}
+function iconify(){if(window.lucide?.createIcons){window.lucide.createIcons()}else if(!document.querySelector('#lucide-load-warning')){const note=document.createElement('span');note.id='lucide-load-warning';note.className='sr';note.textContent='아이콘 라이브러리를 불러오지 못했습니다.';document.body.append(note)}}
+
+function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:0,pos:[2,2],dungeon:false,hp:100,mp:80,hunger:85,day:1,hour:8,minute:0,second:0,items:safeCopy(baseItems),logs:[],filter:'전체',search:'',sort:'name',selectedItem:null,selectedIds:[],logFilter:'전체',logSearch:'',pinnedIds:[],expandedLogs:[],collapsed:true,viewFont:100,theme:'aurora',auto:{hp:{on:true,pct:35},mp:{on:false,pct:20},hunger:{on:true,pct:25}}}}
+let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
+let localRemembered=[];
+let autoTarget=0;
+const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,ecology05A:true,fungi05B:true,woodland05C:true,minerals05E:true,incidentalTables05A:ACTIVITY_TABLES_05A});
+function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
+function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
+let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
+
+const THEMES=[{"id":"aurora","name":"오로라","mode":"light","colors":["#9667d9","#75b4f4","#f4a2d1"],"source":"게임 기본"},{"id":"rose-dawn","name":"장미빛 새벽","mode":"light","colors":["#907aa9","#286983","#b4637a"],"source":"로즈 파인"},{"id":"solarized","name":"솔라라이즈드","mode":"light","colors":["#268bd2","#2aa198","#b58900"],"source":"솔라라이즈드"},{"id":"citrus","name":"시트러스","mode":"light","colors":["#65a30d","#f59e0b","#0d9488"],"source":"라임·호박·청록"},{"id":"red","name":"석류빛","mode":"light","colors":["#d94358","#f5a65b","#7697c7"],"source":"붉은색 중심"},{"id":"blue","name":"푸른 항해","mode":"light","colors":["#267bcc","#70c8e5","#f1c17d"],"source":"파란색 중심"},{"id":"lavender","name":"라벤더 들판","mode":"light","colors":["#9273ce","#c09bea","#97c9a7"],"source":"라벤더·세이지"},{"id":"cocoa","name":"살구 코코아","mode":"light","colors":["#b97a58","#f4b98c","#93b1a6"],"source":"따뜻한 브라운"}];
+function useTheme(id,persist=true){if(!THEMES.some(t=>t.id===id))id='aurora';s.theme=id;document.documentElement.dataset.theme=id;document.documentElement.style.colorScheme='light';if(persist){try{localStorage.setItem('fantasy-ui-theme',id)}catch{}}}
+try{const stored=localStorage.getItem('fantasy-ui-theme');if(THEMES.some(t=>t.id===stored))s.theme=stored}catch{}
+
+function nextLog(kind,text,detail=''){const last=s.logs[0];if(last&&last.kind===kind&&last.text===text){last.count=(last.count||1)+1;last.lastTurn=s.turn;}else{const id='log-'+Date.now()+'-'+Math.random().toString(36).slice(2);s.logs.unshift({id,kind,text,detail,turn:s.turn,count:1,pin:false});if(s.logs.length>LOG_LIMIT)s.logs.length=LOG_LIMIT;}mainV2.captureCheckpoint(s)}
+const make=(tag,props={},parent)=>{const e=document.createElement(tag);for(const [k,v]of Object.entries(props)){if(k==='text')e.textContent=v;else if(k==='html')e.innerHTML=v;else if(k==='class')e.className=v;else e.setAttribute(k,v)}if(parent)parent.append(e);return e};
+function btn(text,fn,classes='btn',parent){const b=make('button',{type:'button',text,class:classes},parent);b.addEventListener('click',fn);return b}
+function top(){
+const gameClock=mainV2.gameTime();
+const day=gameClock?.day??s.day;
+const hour=gameClock?.hour??s.hour;
+const minute=gameClock?.minute??(s.minute??0);
+const second=gameClock?.second??(s.second??0);
+$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+day+'일</span><span>'+svgIcon('clock')+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+':'+String(second).padStart(2,'0')+'</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
+const group=$('#top .top-meta');
+const save=make('button',{type:'button',class:'top-settings ui-icon-button',title:'저장 관리자','aria-label':'저장 관리자'},group);
+save.innerHTML=svgIcon('save');save.onclick=()=>openSaveManager();
+const settings=make('button',{type:'button',class:'top-settings ui-icon-button',id:'settingsControl',title:'설정','aria-label':'설정'},group);
+settings.innerHTML=svgIcon('settings');settings.onclick=()=>openPage('설정');
+}
+
+function side(){ /* v0.3: persistent left navigation removed in favor of bottom controls */ }
+function head(name,description){const main=$('#main');main.innerHTML='<h1>'+esc(name)+'</h1>'+(description?'<p class="subhead">'+esc(description)+'</p>':'')+'<div id="view"></div>';return main.querySelector('#view')}
+function tabs(target,names,handler){const e=make('div',{class:'tabs'},target);for(const name of names){const b=btn(name,()=>handler(name),s.tab===name?'active':'',e);b.setAttribute('aria-selected',String(s.tab===name))}return e}
+function section(el,title){const sec=make('section',{class:'section'},el);make('h2',{text:title},sec);return sec}
+function changeTab(t){s.tab=t;if(overlayPage)drawOverlay();else drawMain();iconify()}
+function openPage(name){if(autoTimer)stopAuto();if(['인벤토리','캐릭터','숙련','도감','신앙'].includes(name)){if(!overlayPage)overlayReturnTab=s.tab;overlayReturn=document.activeElement;overlayPage=name;s.tab=name==='인벤토리'?'전체':name==='캐릭터'?'기본 정보':name==='숙련'?'생활':name==='도감'?'발견 목록':'개요';render();return;}overlayPage=null;if(s.page!==name)previousPage=s.page;s.page=name;s.tab=name==='생활'?'개요':name==='제작'?'제작법':'기본';render()}
+function act(name){if(name==='던전에 진입한다'){if(!executeV2('dungeon.enter',{}))return render();s.page='던전';s.tab='탐색';localRemembered=[];autoTarget=0;nextLog('탐험','지하미궁의 생성형 지도에 진입했습니다.');return render()}if(name==='작업대를 사용한다')return openPage('제작');if(!executeV2('life.activity',{name}))return render();nextLog('생활',actionLabel(name)+'을(를) 실행했습니다.','생산·성장 효과는 아직 없는 기본 행동입니다.');render()}
+function regionActions(){return ACTIONS[s.region]||['주변을 살핀다','휴식한다']}
+function lifestyle(){
+const el=head(s.region,'');const hue={'거점 마을':'town','초원·농경지':'pasture','숲':'forest','강·호수':'river','습지':'marsh','산맥':'mountain','광산':'mine','설원':'snow','사막':'desert','해안·항구':'coast','바다':'ocean','화산지대':'volcano','고대 유적':'ruins','폐허·묘지':'grave','만신전':'temple','지하미궁':'dungeon'}[s.region]||'pasture';
+const hero=make('section',{class:'region-scene scene-'+hue},el);hero.innerHTML='<div class="scene-heading"><div><h2>'+esc(s.region)+'</h2></div>'+svgIcon(hue==='forest'?'trees':hue==='river'?'waves':hue==='mine'?'mountain':hue==='volcano'?'flame':hue==='snow'?'snowflake':hue==='desert'?'sun':hue==='ocean'||hue==='coast'?'waves':hue==='temple'?'sparkles':hue==='dungeon'?'footprints':'sun')+'</div>';
+const places=make('div',{class:'scene-spots'},hero);
+const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업장','workshop'],['waves','강변','water']]:hue==='forest'?[['trees','숲길','growing'],['leaf','채집지','workshop'],['tent-tree','야영지','water']]:hue==='river'?[['fish','어장','water'],['waves','강변','growing'],['leaf','수풀','workshop']]:[['compass','탐색지','growing'],['pickaxe','자원지','workshop'],['map-pin','지형','water']];
+for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
+const actions=make('div',{class:'v3-actions'},el);
+const ecologySites=Object.values(mainV2.current().world.runtime.resource05A?.ecologySites??{}).filter(x=>x.region===s.region&&x.discovered);
+if(ecologySites.length){
+ const ecologicalPanel=make('div',{class:'resource05a-panel','aria-label':'발견한 생태 군락'},el);
+ make('h3',{text:'발견한 식물 군락'},ecologicalPanel);
+ for(const site of ecologySites){
+  const profile=BOTANICAL_PROFILE_BY_ID_05A.get(site.speciesId)??FUNGAL_BY_ID_05B.get(site.speciesId);
+  if(!profile)continue;
+  const row=make('div',{class:'resource05a-row'},ecologicalPanel);
+  make('strong',{text:profile.name+' · 군락 '+(site.patch+1)},row);
+  make('span',{text:'기록된 잔량 '+site.remaining},row);
+  if(profile.dropEnabled!==false)btn('군락에서 채집 (1분)',()=>{
+   if(!executeV2('botanical.patch.harvest',{siteId:site.id}))return render();
+   nextLog('생태 채집',profile.name+' 채집을 마쳤습니다.');
+   render();
+  },'btn',row);
+ }
+}
+const botanicalObservers=eligibleBotanicalObservations05A(s.region,mainV2.current().clock.elapsedUnits,mainV2.current().flags);
+if(botanicalObservers.length){
+ const observationPanel=make('div',{class:'resource05a-panel'},el);
+ make('h3',{text:'식물 관찰 · 도감'},observationPanel);
+ for(const species of botanicalObservers){
+  btn(species.name+' 관찰 (10분)',()=>{
+   if(!executeV2('botanical.observe',{itemId:species.id}))return render();
+   nextLog('도감',species.name+' 관찰 완료','식물을 훼손하거나 아이템을 획득하지 않습니다.');
+   render();
+  },'btn',observationPanel);
+ }
+}
+const incidental=ACTIVITY_TABLES_05A[s.region+':explore'];
+if(incidental){
+ const discoverPanel=make('div',{class:'resource05a-panel'},el);
+ make('h3',{text:'지역 탐색 · 부수 발견'},discoverPanel);
+ make('p',{class:'muted',text:'10분간 지역을 탐색합니다. 발견 확률 및 산출물은 시험용 값이며, 아무것도 찾지 못할 수 있습니다.'},discoverPanel);
+ btn('주변 탐색 (10분)',()=>{
+  if(!executeV2('resource.incidental.search',{activity:'explore'}))return render();
+  nextLog('탐색','지역을 탐색했습니다.','부수 발견 결과는 게임 기록 및 인벤토리에 반영됩니다.');
+  render();
+ },'btn',discoverPanel);
+}
+
+for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
+if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','산맥'].includes(s.region)){
+ const snapshot=mainV2.resources05A();
+ if(snapshot){
+  const panel=make('section',{class:'resource05a-panel','aria-label':'지역 자원 활동'},el);
+  make('h3',{text:'자원 활동'},panel);
+  make('p',{class:'muted',text:'활동 종류를 선택하고 발견한 지점을 지정합니다. 실제 결과에 따라 시간·재료·숙련이 함께 변합니다.'},panel);
+  const candidates=Object.entries(snapshot.candidateSites??{}).filter(([id,site])=>site.region===s.region&&SOURCE_WORK_RULES_05A[site.sourceId]);
+  if(candidates.length&&!(snapshot.mineralDeposits05E&&(s.region==='광산'||s.region==='산맥'))){
+   const candidatePanel=make('div',{class:'resource05a-list'},panel);
+   make('h4',{text:'신규 검증 자원'},candidatePanel);
+   if(s.region==='광산'||s.region==='산맥')btn('수정 광맥 탐사 (10분)',()=>{if(executeV2('resource.candidate.prospect',{}))render();},'btn',candidatePanel);
+   for(const [id,site] of candidates){
+    const species=RESOURCE_SPECIES_05A.find(x=>x.id===site.sourceId),rule=SOURCE_WORK_RULES_05A[site.sourceId];
+    const row=make('div',{class:'resource05a-row'},candidatePanel);
+    make('strong',{text:species?.name??site.sourceId},row);
+    make('span',{text:site.discovered?'남은 수량 '+site.remaining:'미발견 지점'},row);
+    if(!site.discovered)btn('지점 발견',()=>{if(executeV2('resource.candidate.discover',{nodeId:id}))render();},'btn',row);
+    else {
+     const tool=mainV2.availableTools05A(rule.activity)[0];
+     const b=btn('1회 채취',()=>{if(executeV2('resource.candidate.work',{nodeId:id,...(tool?{toolId:tool.id}:{})}))render();},'btn',row);
+     b.disabled=site.remaining===0;
+    }
+   }
+  }
+  const groups=RESOURCES_05A.filter(r=>r.region===s.region).map(r=>r.activity);
+  const kinds=[...new Set(groups)],titles={gather:'채집',logging:'벌목',mining:'채광',fishing:'낚시'};
+  const tabs=make('div',{class:'resource05a-tabs'},panel);
+  const results=make('div',{class:'resource05a-list'},panel);
+  const state={kind:kinds[0]};
+  function populate(){
+   results.innerHTML='';
+   tabs.innerHTML='';
+   for(const kind of kinds){
+    const b=btn(titles[kind],()=>{state.kind=kind;populate()},'btn',tabs);
+    b.setAttribute('aria-pressed',String(state.kind===kind));
+   }
+   if(state.kind==='mining'&&snapshot.mineralDeposits05E){
+    const mineralPanel=make('section',{class:'resource05a-list','aria-label':'통합 채광'},results);
+    make('h4',{text:'광맥 탐사 · 채굴'},mineralPanel);
+    make('p',{class:'muted',text:'광맥을 발견한 뒤 채굴합니다. 기존 채광 지점과 같은 지역 매장량을 사용합니다. 광맥은 자연 재생하지 않습니다.'},mineralPanel);
+    const refiningPanel=make('section',{class:'resource05a-list','aria-label':'광물 가공'},results);
+    make('h4',{text:'광물 정련 · 제련 · 합금 · 도구 제작'},refiningPanel);
+    make('p',{class:'muted',text:s.region==='거점 마을'?'마을의 공용 용광로와 작업대 이용 가능':'가공 시설은 거점 마을에서 이용할 수 있습니다.'},refiningPanel);
+    const allItems=mainV2.current().itemWorld;
+    const ownedQty=itemId=>allItems.items.filter(item=>item.definitionId===itemId&&
+     allItems.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===mainV2.current().player.id))
+     .reduce((total,item)=>total+item.quantity,0);
+    for(const recipe of REFINING_RECIPES_05H){
+     const requirements=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
+     const label=requirements.map(req=>{
+      const name=REFINED_ITEMS_05H.find(i=>i.id===req.itemId)?.name??
+       MINERAL_DEFINITIONS_05E.find(i=>i.id===req.itemId)?.name??req.itemId;
+      return name+' '+ownedQty(req.itemId)+'/'+req.quantity;
+     }).join(' · ');
+     const row=make('div',{class:'resource05a-row'},refiningPanel);
+     make('strong',{text:recipe.name},row);
+     make('span',{class:'muted',text:label+' → '+(REFINED_ITEMS_05H.find(i=>i.id===recipe.output)?.name??(recipe.output.startsWith('tool05a:')?recipe.name.replace(/ 제작$/,''):recipe.output))+' ×'+recipe.outputQty},row);
+     const can=s.region==='거점 마을'&&requirements.every(req=>ownedQty(req.itemId)>=req.quantity);
+     const refine=btn('가공 ('+Math.floor(recipe.seconds/60)+'분)',()=>{
+      if(!executeV2('mineral.refine',{recipeId:recipe.id}))return render();
+      nextLog('광물 가공',recipe.name+' 완료');render();
+     },'btn',row);
+     refine.disabled=!can;
+    }
+    const tools=mainV2.availableTools05A('mining');
+    const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'bronze':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
+    const bestRank=Math.max(0,...tools.map(tool=>rankOf(tool.id)));
+    make('p',{class:'muted',text:'보유 곡괭이 최대 등급 '+bestRank+' · 탐사 10분 / 직접 채굴 3분'},mineralPanel);
+    const mineralGroups=['기본 자원',...new Set(MINERAL_DEFINITIONS_05E.map(def=>def.atlasCategory).filter(Boolean))];
+    const picker=make('select',{'aria-label':'광물 분류 선택'},mineralPanel);
+    for(const name of mineralGroups){const option=make('option',{text:name},picker);option.value=name;}
+    const selection=make('div',{class:'resource05a-list'},mineralPanel);
+    function showMinerals(){
+     selection.innerHTML='';
+     const visible=MINERAL_DEFINITIONS_05E.filter(def=>def.regions.includes(s.region)&&
+      (picker.value==='기본 자원'?!def.atlasCategory:def.atlasCategory===picker.value));
+     make('p',{class:'muted',text:picker.value+' · '+visible.length+'개 광물 후보'},selection);
+     for(const def of visible){
+     const site=snapshot.mineralDeposits05E[mineralDepositId05E(s.region,def.id)];
+     if(!site)continue;
+     const row=make('div',{class:'resource05a-row'},selection);
+     make('strong',{text:def.name+' · 경도 '+def.hardness+' · 품위 '+def.grade},row);
+     const geology=geologyProfile05F(def.id);
+     if(geology)make('span',{class:'muted',text:'산출 환경 참고: '+geology.settingLabel+' · 깊이 '+geology.depthBand+' · '+(geology.hostRockExamples.join(', ')||'모암 미정')},row);
+     const assemblage=mineralAssemblage05F(def.id);
+     if(assemblage){const type=ASSEMBLAGE_TYPES_05F[assemblage.assemblageId];make('span',{class:'muted',text:'광상 구성 참고: '+type.name+' · 연관 광물 '+assemblage.associatedMaterialIds.length+'종 (산출·공유 재고 미적용)'},row);}
+     make('span',{text:site.discovered?'확인 매장량 '+site.remaining+'/'+def.stock:site.remaining===0?'고갈':'미탐사 광맥'},row);
+     if(!site.discovered){
+      const search=btn('광맥 탐사 (10분)',()=>{
+       if(!executeV2('mineral.prospect',{itemId:def.id}))return render();
+       nextLog('광물 탐사',def.name+' 광맥 발견');render();
+      },'btn',row);
+      search.disabled=site.remaining===0;
+     }else{
+      make('span',{class:'muted',text:site.remaining===0?'광맥 고갈':bestRank<def.hardness?'곡괭이 등급 부족':'채굴 가능'},row);
+      const mine=btn('광맥 채굴 (3분)',()=>{
+       const before=mainV2.current().itemWorld.items.filter(i=>i.definitionId===def.id).reduce((n,i)=>n+i.quantity,0);
+       if(!executeV2('mineral.extract',{siteId:site.id}))return render();
+       const after=mainV2.current().itemWorld.items.filter(i=>i.definitionId===def.id).reduce((n,i)=>n+i.quantity,0);
+       nextLog('광물 채굴',def.name+' · '+(after>before?'획득 '+(after-before)+'개':'획득 없음'),
+        '남은 매장량 '+mainV2.resources05A().mineralDeposits05E[site.id].remaining);render();
+      },'btn',row);
+      mine.disabled=site.remaining===0||bestRank<def.hardness;
+     }
+    }
+    }
+    picker.addEventListener('change',showMinerals);
+    showMinerals();
+    const mineralCandidates=candidates.filter(([id,site])=>SOURCE_WORK_RULES_05A[site.sourceId]?.activity==='mining');
+    if(mineralCandidates.length){
+     const supplemental=make('section',{class:'resource05a-list','aria-label':'추가 광물 발견 지점'},results);
+     make('h4',{text:'추가 광물 발견 지점'},supplemental);
+     make('p',{class:'muted',text:'기존 검증용 자원 탐사입니다. 유한 광맥과 별도 작업 지점으로 표시됩니다.'},supplemental);
+     btn('수정 탐사 후보 찾기 (10분)',()=>{
+      if(!executeV2('resource.candidate.prospect',{}))return render();render();
+     },'btn',supplemental);
+     for(const [id,site] of mineralCandidates){
+      const item=RESOURCE_SPECIES_05A.find(x=>x.id===site.sourceId);
+      const row=make('div',{class:'resource05a-row'},supplemental);
+      make('strong',{text:item?.name??site.sourceId},row);
+      make('span',{text:site.discovered?'작업 잔량 '+site.remaining:'미발견 지점'},row);
+      if(!site.discovered)btn('지점 발견',()=>{if(executeV2('resource.candidate.discover',{nodeId:id}))render()},'btn',row);
+      else{
+       const tool=mainV2.availableTools05A('mining')[0];
+       const work=btn('후보 지점 작업',()=>{if(executeV2('resource.candidate.work',{nodeId:id,...(tool?{toolId:tool.id}:{})}))render()},'btn',row);
+       work.disabled=site.remaining===0||!tool;
+      }
+     }
+    }
+    make('h4',{text:'기존 작업 지점 · 공유 매장량'},results);
+    make('p',{class:'muted',text:'아래 작업 지점은 같은 지역의 광맥 잔량을 소모합니다. 작업 진행도는 지점별로 유지됩니다.'},results);
+   }
+   const discovery=make('div',{class:'resource05a-discovery'},results);
+   if(state.kind!=='mining'||!snapshot.mineralDeposits05E)make('p',{class:'muted',text:'새 자원 지점 탐사 · 유효한 발견에 게임 내 10분이 소요됩니다.'},discovery);
+   for(const resource of RESOURCES_05A.filter(x=>x.region===s.region&&x.activity===state.kind&&!(state.kind==='mining'&&snapshot.mineralDeposits05E))){
+    btn(resource.name+' 찾기',()=>{
+     if(!executeV2('resource.search',{resourceId:resource.id}))return render();
+     nextLog('자원 발견',resource.name+'의 새 지점을 발견했습니다.');
+     render();
+    },'btn',discovery);
+   }
+   const elapsed=mainV2.current().clock.elapsedUnits;
+   for(const [nodeId,node] of Object.entries(mainV2.resources05A().nodes)){
+    const def=RESOURCE_MAP_05A.get(node.resourceId);
+    if(!node.discovered||!def||def.region!==s.region||def.activity!==state.kind)continue;
+    const updated=resourceAt05A(node,def,elapsed);
+    const row=make('div',{class:'resource05a-row'},results);
+    make('strong',{text:def.name+' · '+nodeId.split(':').at(-1)},row);
+    const vein=snapshot.mineralDeposits05E&&def.activity==='mining'?snapshot.mineralDeposits05E[mineralDepositId05E(s.region,def.itemId)]:null;
+    make('span',{text:'지점 가용 '+updated.remaining+'/'+def.capacity+(vein?' · 광맥 잔량 '+vein.remaining:'')+(updated.progress?' · 작업 진행 '+updated.progress:'')},row);
+    const ownedTools=mainV2.availableTools05A(def.activity);
+    let chosenTool=ownedTools[0]?.id??null;
+    if(ownedTools.length>0){
+     const chooser=make('select',{'aria-label':def.name+' 사용 도구'},row);
+     for(const item of ownedTools){
+      const opt=make('option',{text:item.name},chooser);opt.value=item.id;
+     }
+     chooser.addEventListener('change',()=>{chosenTool=chooser.value;});
+    }
+    const step=btn('1회 작업',()=>{
+     if(!executeV2('resource.work',{nodeId,...(chosenTool?{toolId:chosenTool}:{})}))return render();
+     const current=mainV2.current();
+     nextLog('자원 작업',def.name+' 작업 완료','현재 가용 '+current.world.runtime.resource05A.nodes[nodeId].remaining+'/'+def.capacity);
+     render();
+    },'btn',row);
+    step.disabled=updated.remaining===0||(vein&&vein.remaining===0);
+    const bulk=btn('성과까지 (최대 50회)',()=>{
+     mainV2.syncVitals(s);
+     const summary=mainV2.workUntil05A(nodeId,50,chosenTool);
+     refreshV2Inventory();
+     nextLog('자원 작업',def.name+' · '+summary.actions+'회, '+summary.seconds+'게임초','획득 '+summary.qty+'개 · 숙련 +'+summary.xp+' XP');
+     render();
+    },'btn',row);
+    bulk.disabled=updated.remaining===0;
+   }
+  }
+  populate();
+ }
+}
+const actualSkills=mainV2.current().progression?.skillExperience??{};
+for(const activity of activityAt(s.region)){
+ const gate=DEEP_FIELDS.some(f=>f.id===activity.id)?accessDeepField(activity,actualSkills):{ok:true};
+ const button=btn(activity.name+(gate.ok?'':' · 숙련 필요'),()=>{
+  if(!executeV2('region.activity',{activityId:activity.id}))return render();
+  nextLog('탐험',activity.name+' 활동을 수행했습니다.','활동 처리만 구현되어 있습니다. 보상과 전투 인카운터는 후속 단계에서 연결됩니다.');
+  render();
+ },'v3-action',actions);
+ button.disabled=!gate.ok;
+ if(!gate.ok)button.title='탐색 + '+activity.profession+' 숙련 필요 (실제 성장 데이터 기준)';
+}
+const origin=mainV2.origin04B();
+for(const insight of availableOriginInteractions(origin,s.region,mainV2.current().flags)){
+ const button=btn(insight.title+(insight.completed?' · 확인함':''),()=>{
+  if(insight.completed)return;
+  if(!executeV2('origin.insight',{interactionId:insight.id}))return render();
+  nextLog('발견',insight.title,insight.description);
+  render();
+ },'v3-action',actions);
+ button.disabled=insight.completed;
+ button.title=insight.completed?'이미 확인한 배경 고유 기록':'현재 배경에서만 수행 가능한 해석 활동';
+}
+if(DANGEROUS_REGIONS.has(s.region))make('p',{class:'muted',text:'주의: 이 지역은 이후 환경·전투 인카운터가 발생할 수 있는 위험 필드입니다. 현재 전투 시스템은 아직 연결되지 않았습니다.'},el);
+
+}
+function world(){
+ const el=head('세계 지도','목적지를 선택하면 보이지 않는 교통로를 따라 자동으로 이동합니다.');
+ el.classList.add('world-screen');
+ const grid=make('div',{class:'mapgrid world-v4'},el);
+ const icons=['house','sprout','trees','waves','leaf','mountain','pickaxe','snowflake','sun','anchor','sailboat','flame','landmark','church','sparkles','footprints'];
+ const hues=['town','field','forest','water','forest','mountain','ore','snow','desert','water','water','volcano','mystic','ruin','mystic','dungeon'];
+ const actions=make('section',{class:'travel-actions','aria-label':'광역 여행'},el);
+ const travel=mainV2.travelState();
+ function encounterPopup(){
+  const dlg=make('dialog',{class:'inventory-discard-dialog','aria-label':'여행 중 인카운터'},document.body);
+  make('h2',{text:'여행 중 예상치 못한 사건'},dlg);
+  make('p',{text:'이동 중 우연한 사건을 마주했습니다. 사건 처리는 향후 인카운터 시스템과 연결됩니다.'},dlg);
+  const controls=make('div',{class:'inventory-discard-dialog-actions'},dlg);
+  const close=()=>{dlg.close();dlg.remove()};
+  btn('확인 후 계속',()=>{close();if(mainV2.travelState()?.progress){mainV2.travelResume();runTravel()}else render()},'btn',controls);
+  btn('일시정지',()=>{close();render()},'btn',controls);
+  dlg.addEventListener('close',()=>dlg.remove(),{once:true});dlg.showModal();
+ }
+ function runTravel(){
+  const result=mainV2.travelSkip();
+  if(!result.accepted){nextLog('위험','광역 이동 처리 실패: '+result.reason);render();return}
+  refreshV2Inventory();
+  const event=result.events.find(e=>e.type==='world.travel_encounter');
+  if(event){
+   nextLog('이동','여행 중 인카운터가 발생했습니다.');
+   render();encounterPopup();return;
+  }
+  nextLog('이동',s.region+'에 도착했습니다. 현재 시각 '+String(s.hour).padStart(2,'0')+':'+String(s.minute??0).padStart(2,'0'));
+  render();
+ }
+ if(travel?.progress){
+  make('p',{text:'진행 중인 여행: '+(mainV2.worldRegions().find(r=>r.siteId===travel.progress.plan.destinationSiteId)?.name??'목적지')},actions);
+  const controls=make('div',{class:'travel-controls'},actions);
+  btn('남은 여행 진행',()=>{mainV2.travelResume();runTravel()},'btn',controls);
+  btn('여행 취소',()=>{if(!mainV2.travelCancel())nextLog('위험','구간 도중에는 여행 취소가 불가능합니다.');render()},'btn',controls);
+ }else{
+  make('p',{class:'muted',text:'지역 간 실제 거리는 지도 배치와 무관합니다. 이동은 자동으로 처리되며 우연한 사건이 발생하면 잠시 중단됩니다.'},actions);
+ }
+ const policy=make('select',{class:'input','aria-label':'이동 경로 정책'},actions);
+ policy.innerHTML='<option value="fast">빠른 경로</option><option value="safe">안전 경로</option><option value="fewestTurns">적은 턴 경로</option>';
+ policy.hidden=!!travel?.progress;
+ for(let i=0;i<REGIONS.length;i++){
+  const region=REGIONS[i],button=make('button',{class:'region region-'+hues[i]+(region===s.region?' active':''),type:'button','aria-label':region},grid);
+  button.innerHTML=svgIcon(icons[i])+'<span>'+esc(region)+'</span>';
+  button.disabled=!!travel?.progress;
+  button.onclick=()=>{
+   const result=mainV2.routePreview(region,policy.value);
+   actions.querySelector('.travel-preview')?.remove();
+   const preview=make('div',{class:'travel-preview'},actions);
+   if(!result.ok){make('p',{text:result.reason==='LEGACY_TIME_MIGRATION_REQUIRED'?'이 저장 파일은 이전 추상 시간 규격입니다. 안전한 시간 이전 기능이 구현되기 전에는 새 방식으로 광역 이동할 수 없습니다.':'이동할 수 없습니다: '+result.reason},preview);return}
+   make('strong',{text:s.region+' → '+region},preview);
+   make('p',{text:'예상 이동 '+result.plan.totalTurns+'턴 · 이동 시간 '+mainV2.formatTravelSeconds(result.plan.totalWorldUnits)},preview);
+   btn('이동하기',()=>{if(!mainV2.travelBegin(result.plan)){nextLog('위험','이동 계획을 다시 확인해야 합니다.');render();return}
+    mainV2.travelResume();runTravel()},'btn',preview);
+  };
+ }
+}
+
+function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·전투 공식이 아닙니다.</p>'}
+function inventory(){
+mainV2.syncVitals(s);
+refreshV2Inventory();
+const el=head('인벤토리','');
+tabs(el,['전체','장비','식재료','재료','광석','약초','도구','기타'],changeTab);
+const toolbar=make('div',{class:'toolbar inventory-toolbar'},el);
+const search=make('input',{class:'input',placeholder:'이름·소재·태그 검색','aria-label':'소지품 검색'},toolbar);search.value=s.search;
+make('label',{class:'tiny muted',text:'정렬'},toolbar);
+const sort=make('select',{class:'input','aria-label':'인벤토리 정렬'},toolbar);
+sort.innerHTML='<option value="name">이름순</option><option value="group">분류순</option><option value="qty">수량순</option><option value="quality">품질순</option>';sort.value=s.sort;
+make('label',{class:'tiny muted',text:'필터'},toolbar);
+const filter=make('select',{class:'input','aria-label':'인벤토리 분류 필터'},toolbar);
+filter.innerHTML='<option value="전체">전체 분류</option>'+categories.filter(c=>c!=='전체').map(c=>'<option value="'+esc(c)+'">'+esc(c)+'</option>').join('');filter.value=s.filter||'전체';
+const total=make('span',{class:'tiny muted'},toolbar);
+const discardActionBar=make('div',{class:'inventory-discard-actionbar'},el);
+const pane=make('div',{class:'panegrid inventory-layout'},el);
+const list=make('div',{class:'inventory-list'},pane);
+const detail=make('aside',{class:'inventory-detail','aria-label':'선택한 아이템 상세'},pane);
+const selected=new Set(inventoryDiscardMode?s.selectedIds:[]);
+const discardControls=make('div',{class:'inventory-discard-controls'},discardActionBar);
+const discardButton=btn('버리기',()=>{
+ if(inventoryDiscardMode)return;
+ inventoryDiscardMode=true;selected.clear();s.selectedIds=[];redraw();
+},'btn inventory-discard-trigger',discardControls);
+const confirmButton=btn('확인',()=>requestDiscardConfirmation(),'btn inventory-discard-confirm',discardControls);
+const cancelButton=btn('취소',()=>{inventoryDiscardMode=false;selected.clear();s.selectedIds=[];redraw()},'btn inventory-discard-cancel',discardControls);
+const hint=make('p',{class:'tiny muted inventory-discard-hint',text:'버리기를 누르면 아이템을 여러 개 선택할 수 있습니다.'},el);
+function requestDiscardConfirmation(){
+ const selections=[...selected].map(id=>s.items.find(i=>i.id===id)).filter(Boolean).map(i=>({itemId:i.id,quantity:i.qty}));
+ if(!selections.length)return;
+ mainV2.syncVitals(s);
+ const result=mainV2.prepareDiscard(selections);
+ if(!result.ok){nextLog('위험','아이템 선택 검증 실패: '+result.reason);render();return}
+ const preview=result.preview;
+ const dialog=make('dialog',{class:'inventory-discard-dialog','aria-label':'아이템 버리기 최종 확인'},document.body);
+ const title=make('h2',{text:'선택한 아이템을 영구 삭제할까요?'},dialog);title.id='discard-dialog-title';
+ dialog.setAttribute('aria-labelledby',title.id);
+ make('p',{class:'muted',text:'선택한 아이템은 지면에 떨어지지 않고 소멸합니다. 취소하면 변경되지 않습니다.'},dialog);
+ const ul=make('ul',{},dialog);
+ for(const line of preview.selections){const item=s.items.find(i=>i.id===line.itemId);make('li',{text:(item?.name??line.itemId)+' ×'+line.quantity},ul)}
+ const actions=make('div',{class:'inventory-discard-dialog-actions'},dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ const cancel=btn('취소',close,'btn',actions);cancel.autofocus=true;
+ btn('영구 삭제',()=>{
+  try{
+   const outcome=mainV2.confirmDiscard(preview);
+   if(!outcome.accepted)throw Error('삭제 실패');
+   refreshV2Inventory();s.selectedIds=[];s.selectedItem=null;inventoryDiscardMode=false;selected.clear();
+   close();nextLog('시스템',selections.length+'종의 아이템을 버렸습니다. 아이템은 소멸했습니다.');render();
+  }catch(e){close();nextLog('위험','삭제가 취소됐습니다: '+e.message);render()}
+ },'btn inventory-discard-danger',actions);
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+function redraw(){
+let items=s.items.filter(i=>(s.tab==='전체'||i.group===s.tab)&&(s.filter==='전체'||!s.filter||i.group===s.filter)&&[i.name,i.material,i.id,...i.tags].join(' ').toLowerCase().includes(s.search.toLowerCase()));
+items.sort((a,b)=>s.sort==='qty'?b.qty-a.qty:String(a[s.sort]).localeCompare(String(b[s.sort]),'ko'));
+total.textContent=items.length+'종'+(inventoryDiscardMode?' · 버리기 '+selected.size+'종 선택':'');
+discardButton.hidden=inventoryDiscardMode;confirmButton.hidden=!inventoryDiscardMode;cancelButton.hidden=!inventoryDiscardMode;
+discardControls.setAttribute('data-mode',inventoryDiscardMode?'selecting':'idle');
+confirmButton.disabled=selected.size===0;
+hint.hidden=!inventoryDiscardMode;hint.textContent=inventoryDiscardMode?'버릴 아이템을 선택하세요. 확인을 누르면 최종 삭제 팝업이 열립니다.':'';
+list.classList.toggle('inventory-discard-mode',inventoryDiscardMode);
+list.replaceChildren();
+
+for(const item of items){
+ const row=make('div',{class:'inventory-choice'+(s.selectedItem===item.id?' selected':'')+(selected.has(item.id)&&inventoryDiscardMode?' discard-marked':'')},list);
+ if(inventoryDiscardMode){
+  const label=make('label',{class:'inventory-check-label','aria-label':item.name+' 버리기 선택'},row);
+  const checkbox=make('input',{type:'checkbox','aria-label':item.name+' 버리기 선택'},label);
+  checkbox.checked=selected.has(item.id);
+  checkbox.onchange=()=>{checkbox.checked?selected.add(item.id):selected.delete(item.id);s.selectedIds=[...selected];redraw()};
+ }
+ const button=make('button',{class:'inventory-item-button',type:'button','aria-label':item.name+(inventoryDiscardMode?' 버리기 선택':' 상세 보기')},row);
+ button.innerHTML=svgIcon(item.group==='장비'?'sword':item.group==='식재료'?'wheat':item.group==='광석'?'gem':item.group==='약초'?'leaf':item.group==='도구'?'hammer':'package')+'<span class="inventory-item-name"><strong>'+esc(item.name)+'</strong><small>'+esc(item.group)+' · '+esc(item.material)+' · '+esc(item.quality)+'</small></span><span class="inventory-quantity">×'+item.qty+'</span>';
+ button.onclick=()=>{
+ if(inventoryDiscardMode){selected.has(item.id)?selected.delete(item.id):selected.add(item.id);s.selectedIds=[...selected]}
+ else s.selectedItem=item.id;
+ redraw();iconify()
+ };
+}
+if(!items.length)make('p',{class:'empty',text:'선택한 조건에 해당하는 아이템이 없습니다.'},list);
+const item=s.items.find(i=>i.id===s.selectedItem);
+detail.innerHTML=item?'<div class="inventory-detail-head">'+svgIcon(item.group==='장비'?'sword':item.group==='식재료'?'wheat':item.group==='광석'?'gem':item.group==='약초'?'leaf':'package')+'<div><small>'+esc(item.group)+'</small><h2>'+esc(item.name)+'</h2></div></div>'+mockDetail(item):'<h2>아이템 정보</h2><p class="muted">아이템을 선택하면 이곳에 상세 정보가 나타납니다.</p>';
+iconify();
+}
+search.oninput=()=>{s.search=search.value;redraw()};
+sort.onchange=()=>{s.sort=sort.value;redraw()};
+filter.onchange=()=>{s.filter=filter.value;redraw()};
+redraw();
+}
+
+function openOriginCreation(){
+ const current=mainV2.origin04B();
+ if(current){nextLog('안내','종족과 배경은 이미 확정되어 변경할 수 없습니다.');render();return;}
+ if(mainV2.current().turn!==0){nextLog('안내','종족·배경은 첫 행동 이전에만 선택할 수 있습니다.');render();return;}
+ const existing=document.getElementById('originCreationDialog');existing?.remove();
+ const dlg=make('dialog',{id:'originCreationDialog',class:'large-dialog','aria-label':'종족과 배경 선택'},document.body);
+ const wrap=make('div',{class:'dialog-wrap'},dlg);
+ make('h2',{text:'종족과 배경'},wrap);
+ make('p',{class:'muted',text:'종족은 체형과 고유 특징을, 배경은 첫 숙련과 영구 전용 능력을 결정합니다. 선택 후에는 변경할 수 없습니다.'},wrap);
+ const speciesLabel=make('label',{text:'종족'},wrap);
+ const race=make('select',{'aria-label':'종족 선택'},wrap);
+ for(const value of SPECIES)make('option',{value:value.id,text:value.name},race);
+ const backgroundLabel=make('label',{text:'배경'},wrap);
+ const bg=make('select',{'aria-label':'배경 선택'},wrap);
+ for(const value of BACKGROUNDS)make('option',{value:value.id,text:value.name},bg);
+ const detail=make('div',{class:'origin-choice-detail','aria-live':'polite'},wrap);
+ const update=()=>{
+  const a=SPECIES.find(x=>x.id===race.value),b=BACKGROUNDS.find(x=>x.id===bg.value);
+  const size={medium:'보통',small:'소형',tiny:'초소형'}[a.size];
+  detail.innerHTML='<h3>'+esc(a.name)+' · '+esc(b.name)+'</h3><p>신체 크기: '+size+' (타일 점유는 모두 1칸)</p><p>종족 특성: '+esc(a.trait)+'</p><p>시작 숙련: '+esc(b.primary)+' 3레벨 / '+esc(b.secondary)+' 2레벨</p><p>고유 능력: <strong>'+esc(b.ability)+'</strong> — 해당 배경에서만 보유</p><p class="muted">종족 특성·배경 고유 능력의 특수 행동은 관련 게임 시스템이 구현될 때 활성화됩니다.</p>';
+ };
+ race.onchange=update;bg.onchange=update;update();
+ const footer=make('div',{class:'creation-footer'},wrap);
+ const cancel=btn('취소',()=>dlg.close(),'btn',footer);
+ btn('종족·배경 확정',()=>{try{mainV2.chooseOrigin04B(race.value,bg.value);dlg.close();render()}catch(error){detail.textContent=String(error.message??error);detail.setAttribute('role','alert')}},'btn primary',footer);
+ dlg.addEventListener('close',()=>dlg.remove());dlg.showModal();cancel.focus();
+}
+function openAttributeCreation(){
+ const current=mainV2.progression04A();
+ if(!current)return;
+ const canEdit=mainV2.current().turn===0&&current.awards.length===0;
+ if(!canEdit){nextLog('안내','게임 진행 이후에는 초기 능력치 배분을 변경할 수 없습니다.');render();return;}
+ const previous=document.getElementById('attributeCreationDialog');previous?.remove();
+ const dlg=make('dialog',{id:'attributeCreationDialog',class:'large-dialog','aria-label':'초기 능력치 배분'},document.body);
+ const body=make('div',{class:'dialog-wrap'},dlg);
+ make('h2',{text:'초기 능력치 배분'},body);
+ make('p',{class:'muted',text:'7개 능력치는 모두 10에서 시작합니다. 추가 10점을 배분하며 능력치별 시작 상한은 15입니다. 확정 후 게임을 시작하거나 저장하면 변경할 수 없습니다.'},body);
+ const summary=make('p',{class:'creation-summary','aria-live':'polite'},body);
+ const controls=make('div',{class:'creation-attributes'},body);
+ const alloc=Object.fromEntries(ATTRIBUTES.map(key=>[key,0]));
+ const presets={균형형:{근력:2,민첩:2,체력:2,지각:1,지능:1,의지:1,매력:1},탐사형:{지각:5,민첩:3,지능:2},제작형:{지능:5,민첩:3,지각:2},전투형:{근력:4,체력:4,민첩:2}};
+ const select=make('select',{'aria-label':'능력치 배분 프리셋'},body);
+ for(const name of ['직접 배분',...Object.keys(presets)])make('option',{value:name,text:name},select);
+ const refresh=()=>{
+  const spent=Object.values(alloc).reduce((a,b)=>a+b,0);
+  summary.textContent='사용한 포인트 '+spent+'/10 · 남은 포인트 '+(10-spent);
+  controls.innerHTML='';
+  for(const key of ATTRIBUTES){
+   const row=make('div',{class:'creation-attribute-row'},controls);
+   make('strong',{text:key},row);
+   const minus=btn('−',()=>{if(alloc[key]>0){alloc[key]--;select.value='직접 배분';refresh()}},'btn',row);
+   minus.setAttribute('aria-label',key+' 1 감소');minus.disabled=alloc[key]===0;
+   make('output',{text:String(10+alloc[key]),'aria-label':key+' 현재 수치'},row);
+   const plus=btn('+',()=>{if(alloc[key]<5&&spent<10){alloc[key]++;select.value='직접 배분';refresh()}},'btn',row);
+   plus.setAttribute('aria-label',key+' 1 증가');plus.disabled=alloc[key]===5||spent>=10;
+  }
+ };
+ select.addEventListener('change',()=>{const preset=presets[select.value]??{};for(const key of ATTRIBUTES)alloc[key]=preset[key]??0;refresh()});
+ const footer=make('div',{class:'creation-footer'},body);
+ const cancel=btn('취소',()=>dlg.close(),'btn',footer);
+ const confirm=btn('배분 확정',()=>{try{mainV2.setInitialAttributes(alloc);dlg.close();render()}catch(error){summary.textContent=String(error.message??error);summary.setAttribute('role','alert')}},'btn primary',footer);
+ dlg.addEventListener('close',()=>{dlg.remove()});refresh();dlg.showModal();cancel.focus();
+}
+function character(){
+ const el=head('캐릭터','');
+ tabs(el,['기본 정보','능력치','장비','상태 이상'],changeTab);
+ const pane=make('div',{class:'panegrid'},el),left=make('div',{},pane),right=make('aside',{class:'detail'},pane);
+ const p=mainV2.progression04A();
+ const origin=mainV2.origin04B();
+ if(s.tab==='기본 정보'){
+  left.innerHTML='<h2>기본 정보</h2><div class="textrow"><strong>이름 없는 여행자</strong></div><div class="textrow"><strong>종족 · 배경</strong><span>'+(origin?esc(SPECIES.find(x=>x.id===origin.speciesId).name)+' · '+esc(BACKGROUNDS.find(x=>x.id===origin.backgroundId).name):'선택 전')+'</span></div><div class="textrow"><strong>신체 크기</strong><span>'+(origin?({medium:'보통',small:'소형',tiny:'초소형'}[origin.bodySize]):'선택 전')+'</span></div><div class="textrow"><strong>전체 레벨</strong><span>없음 · 개별 숙련으로 성장</span></div>';
+  if(origin){const background=BACKGROUNDS.find(x=>x.id===origin.backgroundId);make('p',{class:'muted',text:'배경 고유 능력: '+background.ability+' (관련 콘텐츠는 후속 구현)'},left)}
+  else if(p&&mainV2.current().turn===0)btn('종족·배경 선택',openOriginCreation,'btn',left);
+ }else if(s.tab==='능력치'&&p){
+  left.innerHTML='<h2>기본 능력치</h2>'+ATTRIBUTES.map(k=>'<div class="textrow"><strong>'+esc(k)+'</strong><span>'+p.attributes[k]+' · 훈련 '+p.training[k]+'</span></div>').join('');
+  if(mainV2.current().turn===0&&p.awards.length===0)btn('초기 능력치 배분',openAttributeCreation,'btn',left);
+  make('p',{class:'muted',text:'시작 배분은 최초 행동 또는 저장 전까지 변경할 수 있습니다. 수치는 현재 시험안입니다.'},left);
+ }else if(s.tab==='능력치'){
+  make('p',{class:'muted',text:'기존 저장에는 04-A 능력치 데이터가 없습니다. 자동 이전하지 않습니다.'},left);
+ }else if(s.tab==='상태 이상')left.innerHTML='<h2>상태 이상</h2><p class="small">없음</p>';
+ else left.innerHTML='<h2>'+esc(s.tab)+'</h2>';
+ right.innerHTML='<h3>'+esc(s.tab)+'</h3><p class="muted">각 능력치는 개별 숙련의 행동 성능에 보조적으로 기여합니다.</p>';
+}
+function skills(){
+ const p=mainV2.progression04A();
+ const el=head('숙련',p?'54개 숙련 · 캐릭터 전체 레벨 없음':'기존 저장의 숙련 정보');
+ if(!p){
+  make('p',{class:'muted',text:'이 저장은 구형 성장 데이터입니다. 자동으로 새로운 성장 데이터로 변환하지 않습니다.'},el);
+  return;
+ }
+ const attr=make('div',{class:'tablewrap'},el);
+ attr.innerHTML='<table><thead><tr><th>기본 능력치</th><th class="right">수치</th><th class="right">훈련점</th></tr></thead><tbody>'+
+ ATTRIBUTES.map(k=>'<tr><td>'+esc(k)+'</td><td class="right">'+p.attributes[k]+'</td><td class="right">'+p.training[k]+'</td></tr>').join('')+'</tbody></table>';
+ const groups=['탐험·이동','채취·생활','제작·기술','전투·무술','마법·신앙','지식·사회'];
+ const group=s.tab&&groups.includes(s.tab)?s.tab:groups[0];
+ tabs(el,groups,changeTab);
+ const rows=SKILL_DEFINITIONS.filter(d=>d.group===group);
+ const table=make('div',{class:'tablewrap'},el);
+ table.innerHTML='<table><thead><tr><th>숙련</th><th class="right">레벨</th><th>다음 레벨까지</th></tr></thead><tbody>'+
+ rows.map(d=>{const xp=p.skills[d.id],level=skillLevel(xp),next=skillThreshold(level+1);
+ return '<tr><td>'+esc(d.name)+'</td><td class="right">'+level+'</td><td>'+Math.max(0,next-xp)+' XP</td></tr>'}).join('')+'</tbody></table>';
+ make('p',{class:'muted',text:'성장 수치는 시험 규칙입니다. 실제 성과 XP와 캐릭터 생성 UI는 후속 연결 대상입니다.'},el);
+}
+function crafts(){
+const el=head('제작 · 가공','');
+const groups=['제작법','작업대'];if(!groups.includes(s.tab))s.tab='제작법';tabs(el,groups,changeTab);
+const sets={
+'제작법':[{name:'밀빵',type:'요리',icon:'cooking-pot',resources:['밀가루','물'],result:'음식',station:'조리대'},{name:'구운 생선',type:'요리',icon:'fish',resources:['생선','소금'],result:'음식',station:'조리대'},{name:'목제 손잡이',type:'목공',icon:'axe',resources:['목재'],result:'부품',station:'작업대'},{name:'철제 못',type:'대장장이',icon:'anvil',resources:['철괴'],result:'부품',station:'모루'},{name:'간이 붕대',type:'재료',icon:'bandage',resources:['섬유'],result:'소모품',station:'작업대'},{name:'기초 연금 시약',type:'연금술',icon:'flask-conical',resources:['약초','용매'],result:'시약',station:'연금술대'}],
+'작업대':[{name:'조리대',type:'생활',icon:'cooking-pot'},{name:'재봉대',type:'생활',icon:'scissors'},{name:'목공 작업대',type:'생활',icon:'hammer'},{name:'모루',type:'대장장이',icon:'anvil'},{name:'연금술 설비',type:'연금술',icon:'flask-conical'}]
+};
+const items=sets[s.tab];if(!window.__craftUI)window.__craftUI={sort:'default',filter:'전체',selected:'밀빵'};
+const state=window.__craftUI;
+const tools=make('div',{class:'toolbar craft-toolbar'},el);
+const sortLabel=make('label',{class:'tiny muted',text:'정렬'},tools);
+const sort=make('select',{class:'input','aria-label':'제작 목록 정렬'},tools);sort.innerHTML='<option value="default">기본 순서</option><option value="name">이름순</option><option value="type">종류순</option>';sort.value=state.sort;
+const filterLabel=make('label',{class:'tiny muted',text:'필터'},tools);
+const filter=make('select',{class:'input','aria-label':'제작 목록 필터'},tools);
+filter.innerHTML='<option value="전체">전체 종류</option>'+[...new Set(items.map(x=>x.type))].map(v=>'<option value="'+esc(v)+'">'+esc(v)+'</option>').join('');
+if(!items.some(x=>x.type===state.filter))state.filter='전체';filter.value=state.filter;
+const pane=make('div',{class:'panegrid craft-layout'},el),list=make('div',{class:'craft-list'},pane),detail=make('aside',{class:'craft-detail','aria-label':'제작 상세'},pane);
+function repaint(){
+let shown=items.filter(x=>state.filter==='전체'||x.type===state.filter);
+if(state.sort==='name')shown.sort((a,b)=>a.name.localeCompare(b.name,'ko'));else if(state.sort==='type')shown.sort((a,b)=>a.type.localeCompare(b.type,'ko'));
+list.innerHTML='';
+for(const item of shown){const b=make('button',{class:'craft-choice'+(state.selected===item.name?' selected':''),type:'button'},list);b.innerHTML=svgIcon(item.icon)+'<span><strong>'+esc(item.name)+'</strong><small>'+esc(item.type)+'</small></span>';b.onclick=()=>{state.selected=item.name;repaint();iconify()}}
+const selected=shown.find(x=>x.name===state.selected)||shown[0];if(selected)state.selected=selected.name;
+detail.innerHTML=selected?'<div class="craft-detail-title">'+svgIcon(selected.icon)+'<div><span class="tiny muted">'+esc(selected.type)+'</span><h2>'+esc(selected.name)+'</h2></div></div><div class="craft-detail-row"><span>필요 설비: <strong>'+esc(selected.station||'미정')+'</strong></span></div><h3>필요한 재료</h3><div class="craft-materials">'+(selected.resources||['상세 재료 미정']).map(r=>'<div>'+svgIcon('package')+' '+esc(r)+'</div>').join('')+'</div><h3>예상 결과</h3><p>'+esc(selected.result||'설정 전')+'</p>':'<p class="muted">필터에 해당하는 항목이 없습니다.</p>';
+}
+sort.onchange=()=>{state.sort=sort.value;repaint();iconify()};filter.onchange=()=>{state.filter=filter.value;repaint();iconify()};repaint();
+}
+
+function other(){
+const el=head(s.page,'');const sets=s.page==='도감'?['발견 목록','생물','자연물','제작 지식']:['개요','신 목록','금기','축복'];
+if(!sets.includes(s.tab))s.tab=sets[0];tabs(el,sets,changeTab);
+const x=make('div',{class:'panegrid'},el);
+make('div',{html:'<div class="empty">항목 없음</div>'},x);
+make('aside',{class:'detail',html:'<h3>상세</h3>'},x);
+}
+function dungeonMove(dx,dy){
+ if(s.page!=='던전'||!s.dungeon)return;
+ const direction=dx===1&&dy===0?'east':dx===-1&&dy===0?'west':dx===0&&dy===1?'south':dx===0&&dy===-1?'north':null;
+ if(!direction)return;
+ const before=[...s.pos];
+ if(!executeV2('dungeon.move',{direction}))return render();
+ if(before[0]===s.pos[0]&&before[1]===s.pos[1])nextLog('탐험','벽에 막혔습니다.','이동 시도에 1턴과 6초가 소모되었습니다.');
+ else {localRemembered=mainV2.localView(localRemembered).remembered;nextLog('탐험','한 칸 이동','03-C 월드 레지스트리 기반의 이동입니다.');}
+ render();
+}
+function stopAuto(){if(autoTimer){clearInterval(autoTimer);autoTimer=null}}
+function autoStep(){if(!s.dungeon||s.page!=='던전'){stopAuto();return}for(const [key,value]of [['hp',s.hp],['mp',s.mp],['hunger',s.hunger]])if(s.auto[key].on&&value<=s.auto[key].pct){stopAuto();nextLog('위험','자동 탐색 중단','설정된 '+key+' 임계값에 도달했습니다.');return render()}localRemembered=mainV2.localView(localRemembered).remembered;
+const grid=mainV2.localMap(), goals=localRemembered.filter(i=>i!==s.pos[1]*grid.width+s.pos[0]);
+const choices=goals.map(i=>mainV2.localRoute([i%grid.width,Math.floor(i/grid.width)],localRemembered)).filter(route=>route.length);
+if(!choices.length){stopAuto();nextLog('시스템','자동 탐색 경로 없음');return render()}
+const route=choices[autoTarget++%choices.length],direction=route[0];
+dungeonMove(direction==='east'?1:direction==='west'?-1:0,direction==='south'?1:direction==='north'?-1:0)}
+function dungeon(){
+const el=head(mainV2.localSite()==='core:site/forest'?'숲길':'지하미궁',mainV2.localFloor()===0?'지상층':'지하 '+Math.abs(mainV2.localFloor())+'층');
+el.classList.add('dungeon-screen');
+const layout=make('div',{class:'dungeonlayout dungeon-v7'},el);
+const left=make('div',{class:'dungeon-map-pane'},layout);
+const right=make('aside',{class:'dungeon-controls'},layout);
+const map=make('div',{class:'tilemap',role:'img','aria-label':'03-C 지역 레지스트리 시험 지도'},left);
+const portal=mainV2.localPortal();
+const floorMap=mainV2.localMap();
+map.style.gridTemplateColumns='repeat('+floorMap.width+',clamp(13px,1.8vw,24px))';
+map.style.overflow='auto';
+const localTiles=mainV2.localMap().tiles.map(row=>row.split(' ').map(id=>id==='core:terrain/wall'?'#':'.'));
+const view=mainV2.localView(mainV2.rememberedCells().length?mainV2.rememberedCells():localRemembered);localRemembered=view.remembered;const visible=new Set(view.visible),remembered=new Set(view.remembered);
+const mapWidth=localTiles[0].length;
+const stairCells=new Set(floorMap.entrances.filter(e=>e.destinationFloor!==mainV2.localFloor()).map(e=>e.y*mapWidth+e.x));
+for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
+ const idx=y*mapWidth+x,v=localTiles[y][x],player=s.pos[0]===x&&s.pos[1]===y,known=remembered.has(idx),inSight=visible.has(idx);
+ const tile=make('span',{class:'tile '+(!known?'unseen ':!inSight?'remembered ':'')+(player?'player':!known?'':stairCells.has(idx)?'stairs':v==='#'?'wall':''),
+ html:player?svgIcon('user-round'):known&&stairCells.has(idx)?svgIcon('arrow-down'):''},map);
+ tile.title=!known?'미탐색':player?'플레이어':stairCells.has(idx)?'계단':v==='#'?'벽':'바닥';
+}
+make('h2',{text:'탐색 제어'},right);
+const actions=make('div',{class:'dungeon-main-actions'},right);
+btn(autoTimer?'자동 탐색 중지':'자동 탐색 시작',()=>{
+ if(autoTimer){stopAuto();nextLog('시스템','자동 이동 중지');render()}
+ else{autoTimer=setInterval(autoStep,550);nextLog('시스템','자동 이동 시연 시작');render()}
+},'btn primary',actions);
+if(portal)btn('계단 이용',()=>{stopAuto();if(!executeV2('dungeon.portal',{}))return render();localRemembered=[];autoTarget=0;nextLog('탐험','층을 이동했습니다.');render()},'btn',actions);
+btn('던전 나가기',()=>{stopAuto();if(!executeV2('dungeon.leave',{}))return render();s.page='생활';s.tab='개요';nextLog('탐험','던전에서 나왔습니다.');render()},'btn',actions);
+const sec=section(right,'자동 중단 조건');
+for(const [key,name]of [['hp','HP'],['mp','MP'],['hunger','허기']]){
+ const r=make('label',{class:'formrow dungeon-threshold'},sec),c=make('input',{type:'checkbox'},r);
+ c.checked=s.auto[key].on;r.append(document.createTextNode(name+' '));
+ const input=make('input',{type:'number',min:'0',max:'100',class:'input','aria-label':name+' 중단 퍼센트'},r);
+ input.value=s.auto[key].pct;r.append(document.createTextNode('% 이하'));
+ c.onchange=()=>s.auto[key].on=c.checked;
+ input.onchange=()=>s.auto[key].pct=Math.min(100,Math.max(0,Number(input.value)||0));
+}
+const quick=section(right,'빠른 메뉴');const opts=make('div',{class:'dungeon-quick'},quick);
+for(const [label,name]of [['소지품','인벤토리'],['캐릭터','캐릭터']]){
+ const b=btn(label,()=>openPage(name),'btn',opts);b.innerHTML=svgIcon(ICON_MAP[name])+' '+label;
+}
+
+}
+function settings(){
+const el=head('설정','');
+const sec=section(el,'색상 팔레트');
+const gallery=make('div',{class:'theme-gallery'},sec);
+for(const t of THEMES){const b=make('button',{type:'button',class:'theme-choice'+(s.theme===t.id?' chosen':''),'aria-label':t.name+' 테마','aria-pressed':String(s.theme===t.id)},gallery);
+const swatches=t.colors.map(color=>'<span style="background:'+color+'"></span>').join('');
+b.innerHTML='<div class="theme-swatch">'+swatches+'</div><span class="theme-name">'+esc(t.name)+'</span>';
+b.onclick=()=>{useTheme(t.id);settings();iconify()}}
+const font=section(el,'화면 가독성');const label=make('label',{class:'formrow'},font);label.append(document.createTextNode('글자 크기 '));const select=make('select',{class:'input'},label);
+select.innerHTML=[90,100,110,120,130,140].map(n=>'<option value="'+n+'">'+n+'%</option>').join('');select.value=s.viewFont;select.onchange=()=>{s.viewFont=Number(select.value);document.documentElement.style.fontSize=s.viewFont*.15+'px'};
+const save=section(el,'목업 퀵세이브');const actions=make('div',{class:'rows'},save);
+btn('F5 · 퀵세이브',quickSave,'btn primary',actions);btn('F9 · 퀵로드',quickLoad,'btn',actions);
+btn('초기화',()=>{if(!confirm('목업 상태를 초기화할까요?'))return;stopAuto();const selectedTheme=s.theme;s=fresh();useTheme(selectedTheme);nextLog('시스템','목업 초기화');render()},'btn',actions)
+}
+async function quickSave(){try{mainV2.captureCheckpoint(s);mainV2.syncVitals(s);const saved=await mainV2.save('quick');nextLog('시스템','v2 인벤토리와 진행 상태를 IndexedDB에 저장했습니다 (revision '+saved.slot.revision+').');render()}catch(e){nextLog('위험','v2 저장 실패: '+e.message);render()}}
+async function quickLoad(){
+ inventoryDiscardMode=false;
+ try{
+  const saved=await mainV2.loadCandidate();
+  const dialog=make('dialog',{class:'inventory-discard-dialog','aria-label':'저장 상태 불러오기 확인'},document.body);
+  make('h2',{text:'저장된 v2 상태를 불러올까요?'},dialog);
+  make('p',{text:'현재 인벤토리와 턴, HP·MP·허기 정보가 저장된 시점으로 돌아갑니다.'},dialog);
+  const actions=make('div',{class:'inventory-discard-dialog-actions'},dialog);
+  const close=()=>{dialog.close();dialog.remove()};
+  btn('취소',close,'btn',actions);
+  btn('불러오기',()=>{
+   stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();localRemembered=[];s.logs=mainV2.checkpoint().logs;s.page=s.dungeon?'던전':'생활';s.selectedIds=[];s.selectedItem=null;close();
+   nextLog('시스템','승인된 v2 저장 데이터를 불러왔습니다.');render();
+  },'btn inventory-discard-confirm',actions);
+  dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+ }catch(e){
+  nextLog('위험','v2 불러오기 실패: '+e.message+' · 이전 정상 저장은 자동 적용하지 않습니다.');render();
+ }
+}
+
+function requestLegacyMigration(saved,origin='구형 저장'){
+ const isSeconds=saved.state?.world?.runtime?.timeBasis==='seconds-v1';
+ const dialog=make('dialog',{class:'inventory-discard-dialog save-manager-confirm','aria-label':'v2 시간 이전 승인'},document.body);
+ make('h2',{text:'구형 v2 저장을 v3로 이전하시겠습니까?'},dialog);
+ make('p',{text:isSeconds
+  ?'이 저장은 이미 초 단위로 기록되어 경과 시간을 보존합니다. 새 v3 슬롯을 별도로 생성하고 원본은 유지합니다.'
+  :'이 저장의 과거 시간 단위는 정의되지 않았습니다. 세계 시계를 1일차 오전 8시로 초기화하며, 시간에 의존하는 여행·필드 기록이 있으면 이전을 거부합니다. 원본은 그대로 유지합니다.'},dialog);
+ const actions=make('div',{class:'inventory-discard-dialog-actions'},dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ btn('취소',close,'btn',actions);
+ btn('새 슬롯으로 이전 승인',async()=>{try{
+  const migrated=await mainV2.migrateLegacyCandidate(saved,true);
+  close();requestLoadApproval(migrated,origin+' → v3');
+ }catch(e){window.alert('안전한 이전 실패: '+e.message)}},'btn ui-primary',actions);
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+function requestLoadApproval(saved,origin='저장 슬롯'){
+ const dialog=make('dialog',{class:'inventory-discard-dialog save-manager-confirm','aria-label':'게임 불러오기 확인'},document.body);
+ make('h2',{text:origin+'을(를) 불러올까요?'},dialog);
+ make('p',{text:'현재 진행 상태를 교체합니다. 취소하면 기존 상태는 유지됩니다.'},dialog);
+ const buttons=make('div',{class:'inventory-discard-dialog-actions'},dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ btn('취소',close,'btn',buttons);
+ btn('불러오기 승인',()=>{try{
+  stopAuto();mainV2.applyApprovedSave(saved);refreshV2Inventory();s.logs=mainV2.checkpoint().logs;s.page=s.dungeon?'던전':'생활';
+  s.selectedIds=[];s.selectedItem=null;inventoryDiscardMode=false;close();
+  nextLog('시스템','승인한 저장 상태를 복구했습니다.');render();
+ }catch(error){close();nextLog('위험','복구 실패: '+error.message);render()}},'btn inventory-discard-confirm',buttons);
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});dialog.showModal();
+}
+async function openSaveManager(){
+ stopAuto();
+ const old=document.querySelector('#saveManagerDialog');old?.close();old?.remove();
+ const dialog=make('dialog',{id:'saveManagerDialog',class:'inventory-discard-dialog save-manager-dialog','aria-label':'저장 관리자'},document.body);
+ make('h2',{text:'저장 관리자'},dialog);
+ make('p',{class:'muted',text:'수동 슬롯은 개수 제한이 없습니다. 불러오기와 복구에는 별도 승인이 필요합니다.'},dialog);
+ const policyBox=make('section',{class:'save-manager-autosave ui-form-section'},dialog);
+ const saveWarning=mainV2.getAutosaveError();
+ if(saveWarning)make('p',{class:'muted',text:'이전 자동 저장 실패: '+saveWarning+' · 중요한 진행은 수동 백업으로 보관하세요.'},dialog);
+make('h3',{text:'자동 저장'},policyBox);
+const interval=make('div',{class:'save-manager-field'},policyBox);
+const frequencyLabel=make('label',{for:'saveInterval',text:'자동 저장 간격 (행동 수)'},interval);
+const frequency=make('input',{id:'saveInterval',type:'number',min:'1',max:'100000',value:String(mainV2.getAutosavePolicy().everyActions),'aria-label':'자동 저장 간격'},interval);
+const eventToggle=make('label',{class:'save-manager-toggle'},policyBox);
+const eventInput=make('input',{type:'checkbox'},eventToggle);
+eventInput.checked=mainV2.getAutosavePolicy().eventTypes.length>0;
+make('span',{text:'지역 이동·던전 진입/퇴장 시에도 저장'},eventToggle);
+const policyActions=make('div',{class:'save-manager-policy-actions'},policyBox);
+btn('설정 적용',()=>{
+ const everyActions=Number(frequency.value);
+ if(!Number.isSafeInteger(everyActions)||everyActions<1){window.alert('자동 저장 간격은 1 이상의 정수여야 합니다.');return}
+ mainV2.configureAutosave({everyActions,eventTypes:eventInput.checked?['world.travelled','dungeon.entered','dungeon.left']:[]});
+ window.alert('자동 저장 설정을 적용했습니다. 다음 실행에도 유지됩니다.');
+},'btn ui-primary',policyActions);
+const slotHeading=make('div',{class:'save-manager-section-heading'},dialog);
+make('h3',{text:'저장 슬롯'},slotHeading);
+make('span',{class:'muted',text:'수동 · 퀵 · 자동'},slotHeading);
+ const actions=make('div',{class:'save-manager-actions'},dialog);
+ const list=make('section',{class:'save-manager-list','aria-label':'저장된 슬롯 목록'},dialog);
+ const footer=make('div',{class:'save-manager-footer'},dialog);
+ const close=()=>{dialog.close();dialog.remove()};
+ btn('닫기',close,'btn ui-secondary save-manager-close',footer);
+ btn('새 수동 저장',async()=>{try{
+  mainV2.captureCheckpoint(s);mainV2.syncVitals(s);
+  const label=window.prompt('저장 이름을 입력하세요.','수동 저장')??'';
+  if(!label.trim())return;
+  const saved=await mainV2.save('manual','manual-'+crypto.randomUUID(),label.trim());
+  nextLog('시스템','수동 저장 완료: '+saved.slot.label);await refresh();
+ }catch(e){window.alert('저장 실패: '+e.message)}},'btn ui-primary',actions);
+ btn('퀵세이브',async()=>{try{await quickSave();await refresh()}catch(e){window.alert(e.message)}},'btn ui-secondary',actions);
+ btn('JSON 가져오기',()=>{
+  const input=document.createElement('input');input.type='file';input.accept='.json,application/json';
+  input.onchange=async()=>{const file=input.files?.[0];if(!file)return;
+   if(file.size>8000000){window.alert('백업 파일 크기 초과');return}
+   try{
+    const raw=JSON.parse(await file.text());
+    const {decodeSaveV3,decodeSaveV2}=await import('../dist/engine/v2.js');
+    const checked=raw.saveVersion===3?decodeSaveV3(raw,mainV2.registry):decodeSaveV2(raw,mainV2.registry);
+    if(!checked.ok)throw Error(checked.reason);
+    close();
+    if(raw.saveVersion===2)requestLegacyMigration(checked.save,'JSON 백업');
+    else requestLoadApproval(checked.save,'JSON 백업');
+   }catch(e){window.alert('가져오기 실패: '+e.message)}
+  };input.click();
+ },'btn ui-secondary',actions);
+ async function refresh(){
+  list.replaceChildren();
+  const slots=await mainV2.listSlots();
+  if(!slots.length){const empty=make('div',{class:'save-manager-empty'},list);make('strong',{text:'저장 슬롯이 없습니다'},empty);make('p',{class:'muted',text:'새 수동 저장 버튼으로 슬롯을 생성할 수 있습니다.'},empty);}
+  for(const entry of slots){
+   const row=make('div',{class:'save-manager-slot'},list);
+   const kind=entry.save?.slot.kind??'unknown';
+   const info=make('div',{},row);
+   make('strong',{text:(entry.save?.slot.label??entry.slotId)+' · '+entry.source+' · '+(entry.status==='damaged'?'손상됨':kind)},info);
+   make('div',{class:'muted',text:'Revision '+entry.revision+' · '+(entry.save?.slot.savedAt??'최신 저장을 읽을 수 없음')},info);
+   const buttons=make('div',{class:'save-manager-slot-actions'},row);
+   if(entry.status==='valid'){
+    btn(entry.source==='v2'?'v3로 이전':'불러오기',()=>{close();if(entry.source==='v2')requestLegacyMigration(entry.save,entry.slotId);else requestLoadApproval(entry.save,entry.slotId)},'btn ui-primary',buttons);
+    btn('백업',()=>{const blob=new Blob([JSON.stringify(entry.save,null,2)],{type:'application/json'});
+     const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;
+     a.download='somnium-'+entry.slotId+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    },'btn ui-secondary',buttons);
+   }
+   btn('이전 기록',async()=>{
+    const revisions=await mainV2.recoveryCandidates(entry.slotId,entry.source);
+    const area=make('div',{class:'save-manager-revisions'},row);
+    if(!revisions.length)make('span',{text:'정상 복구 후보가 없습니다.'},area);
+    for(const r of revisions){
+     btn('Revision '+r.save.slot.revision+' · '+r.save.slot.savedAt,()=>{close();if(entry.source==='v2')requestLegacyMigration(r.save,'v2 복구 후보');else requestLoadApproval(r.save,'복구 후보')},'btn',area);
+    }
+   },'btn ui-secondary',buttons);
+  }
+ }
+ dialog.addEventListener('close',()=>dialog.remove(),{once:true});
+ dialog.showModal();try{await refresh()}catch(e){make('p',{text:'슬롯 조회 실패: '+e.message},list)}
+}
+function logs(){
+const e=$('#log');e.innerHTML='<div class="loghead"><div class="sectiontitle">사건 기록</div><div class="logtools" id="logFilters"></div></div><div class="logbody" id="logBody" aria-live="polite"></div>';
+const filter=()=>{const target=$('#logBody');const sorted=s.logs.filter(x=>s.logFilter==='전체'||x.kind===s.logFilter);sorted.sort((a,b)=>Number(s.pinnedIds.includes(b.id))-Number(s.pinnedIds.includes(a.id)));
+target.innerHTML=sorted.map(x=>{const pin=s.pinnedIds.includes(x.id),expand=s.expandedLogs.includes(x.id);return '<div class="event"><span class="etype '+(x.kind==='위험'?'danger':x.kind==='탐험'?'blue':x.kind==='시스템'?'purple':'accent')+'">['+esc(x.kind)+']</span>'+esc(x.text)+(x.count>1?'<span class="count">× '+x.count+'</span>':'')+(pin?'<span class="pin">★</span>':'')+'<div class="eventtools"><button type="button" data-detail="'+esc(x.id)+'" aria-label="사건 상세 보기">'+svgIcon('info')+' 상세</button><button type="button" data-pin="'+esc(x.id)+'" aria-label="사건 '+(pin?'고정 해제':'고정')+'">'+svgIcon(pin?'pin-off':'pin')+'</button></div>'+(expand?'<p class="muted tiny">'+esc(x.detail||'추가 상세 정보가 없습니다.')+' · 기록: '+x.turn+'턴</p>':'')+'</div>'}).join('')||'<div class="empty">기록이 없습니다.</div>';
+target.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{const id=b.dataset.detail;s.expandedLogs=s.expandedLogs.includes(id)?s.expandedLogs.filter(x=>x!==id):[...s.expandedLogs,id];filter();iconify()});
+target.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>{const id=b.dataset.pin;s.pinnedIds=s.pinnedIds.includes(id)?s.pinnedIds.filter(x=>x!==id):[...s.pinnedIds,id];filter();iconify()});iconify()};
+for(const kind of ['전체','생활','이동','탐험','위험','시스템'])btn(kind,()=>{s.logFilter=kind;logs()},s.logFilter===kind?'active':'',$('#logFilters'));filter();
+}
+function drawMain(){if(s.page==='생활')lifestyle();else if(s.page==='세계 지도')world();else if(s.page==='인벤토리')inventory();else if(s.page==='캐릭터')character();else if(s.page==='숙련')skills();else if(s.page==='제작')crafts();else if(s.page==='도감'||s.page==='신앙')other();else if(s.page==='던전')dungeon();else settings()}
+
+function playerPanel(){
+const el=$('#player');
+const bar=(name,val,max,cl)=>'<div class="v3-meter"><div><strong>'+name+'</strong><span>'+val+' / '+max+'</span></div><div class="v3-track"><span class="'+cl+'" style="width:'+(val/max*100)+'%"></span></div></div>';
+el.innerHTML='<div class="player-title"><div><strong>이름 없는 여행자</strong><span>모험가 · 캐릭터 생성 미구현</span></div><button class="iconbutton" id="openCharacter" type="button" aria-label="캐릭터 상세">'+svgIcon('square-arrow-out-up-right')+'</button></div>'+bar('HP',s.hp,100,'hit')+bar('MP',s.mp,80,'mana')+'<div class="v3-meter"><div><strong>EXP</strong><span>성장 공식 미정</span></div><div class="v3-track"><span class="experience" style="width:0%"></span></div></div><div class="hungerline">'+svgIcon('utensils')+' 허기 <strong>'+s.hunger+'%</strong></div><div class="status-title"><strong>상태 이상</strong><button id="expandStatus" class="linklike" type="button">'+(conditionExpanded?'접기':'모두 보기')+' ('+STATUS_MOCK.length+' · 예시)</button></div><div class="effects" id="effects"></div>';
+$('#openCharacter').onclick=()=>openPage('캐릭터');$('#expandStatus').onclick=()=>{conditionExpanded=!conditionExpanded;playerPanel();iconify()};
+const displayed=conditionExpanded?STATUS_MOCK:STATUS_MOCK.slice(0,6);const c=$('#effects');for(const v of displayed){const b=make('button',{class:'effect-icon',type:'button','aria-label':v.name+', '+(v.turns===null?'지속 턴수 미정':'남은 '+v.turns+'턴')},c);b.innerHTML=svgIcon(v.icon);
+const show=()=>{let tip=document.querySelector('#floatingEffectTooltip');if(!tip){tip=document.createElement('div');tip.id='floatingEffectTooltip';tip.className='floating-effect-tooltip';tip.setAttribute('role','tooltip');document.body.append(tip)}
+tip.innerHTML='<strong>'+esc(v.name)+'</strong><p>'+esc(v.desc)+'</p><em>'+(v.turns===null?'유지 턴수 미정':'남은 '+v.turns+'턴')+'</em>';tip.hidden=false;
+const box=b.getBoundingClientRect(),width=240;let left=Math.min(window.innerWidth-width-12,Math.max(12,box.left+box.width/2-width/2));
+tip.style.left=left+'px';tip.style.top='12px';const height=tip.getBoundingClientRect().height;
+let top=box.bottom+10;if(top+height>window.innerHeight-12)top=Math.max(12,box.top-height-10);tip.style.top=top+'px';b.setAttribute('aria-describedby','floatingEffectTooltip')};
+const hide=()=>{const tip=document.querySelector('#floatingEffectTooltip');if(tip)tip.hidden=true;b.removeAttribute('aria-describedby')};
+b.addEventListener('pointerenter',show);b.addEventListener('pointerleave',hide);b.addEventListener('focus',show);b.addEventListener('blur',hide)}
+}
+function bottomMenu(){
+const e=$('#bottom');e.innerHTML='<div id="bottomNav" class="bottom-nav"></div><div class="bottom-shortcuts">단축키 <kbd>I</kbd> 소지품 <kbd>C</kbd> 캐릭터 <kbd>M</kbd> 지도 <kbd>F5</kbd> 저장 <kbd>F9</kbd> 불러오기</div>';
+for(const name of ['생활','세계 지도','제작','인벤토리','캐릭터','숙련','도감','신앙',...(s.dungeon?['던전']:[])]){const b=make('button',{class:'bottom-button'+((s.page===name||overlayPage===name)?' current':''),type:'button','aria-label':name},$('#bottomNav'));b.innerHTML=svgIcon(ICON_MAP[name]||'map')+'<span>'+name+'</span>';b.onclick=()=>openPage(name)}
+}
+
+function closeOverlay(){const previousOverlay=overlayPage;overlayPage=null;if(overlayReturnTab!==null){s.tab=overlayReturnTab;overlayReturnTab=null;}const dialog=$('#largeDialog');if(dialog?.open)dialog.close();dialog?.remove();const prior=overlayReturn;overlayReturn=null;render();const restored=prior?.isConnected?prior:[...document.querySelectorAll('.bottom-button')].find(b=>b.getAttribute('aria-label')===previousOverlay);restored?.focus()}
+function drawOverlay(){
+const old=$('#largeDialog');old?.remove();if(!overlayPage)return;
+const dialog=make('dialog',{id:'largeDialog','aria-label':overlayPage,class:'large-dialog'},document.body);
+const wrap=make('div',{class:'dialog-wrap'},dialog);const heading=make('div',{class:'dialog-heading'},wrap);heading.innerHTML='<div>'+svgIcon(ICON_MAP[overlayPage]||'book-open')+' <strong>'+esc(overlayPage)+'</strong></div>';
+const close=btn('닫기',closeOverlay,'dialog-close',heading);close.innerHTML=svgIcon('x')+'<span>닫기</span>';
+const body=make('div',{class:'dialog-body'},wrap);
+const base=$('#main');base.id='base-main';const modalMain=make('div',{id:'main',class:'modal-main'},body),prev=s.page;s.page=overlayPage;drawMain();s.page=prev;modalMain.id='modal-main';base.id='main';
+dialog.addEventListener('cancel',e=>{e.preventDefault();closeOverlay()});dialog.addEventListener('click',e=>{if(e.target===dialog)closeOverlay()});dialog.showModal();close.focus();iconify();
+}
+
+function initPanelSplitter(){
+const panel=document.querySelector('.rightpanel'),handle=document.querySelector('#panelSplitter');
+if(!panel||!handle)return;
+const update=(height,save=false)=>{const bounds=panel.getBoundingClientRect();const allowed=Math.max(165,bounds.height-180-8);logHeight=Math.round(Math.max(165,Math.min(height,allowed)));
+panel.style.setProperty('--log-pane-height',logHeight+'px');
+handle.setAttribute('aria-valuenow',String(logHeight));
+handle.setAttribute('aria-valuemax',String(Math.round(allowed)));
+if(save)try{localStorage.setItem('fantasy-log-panel-height',String(logHeight))}catch{}
+};
+update(logHeight);
+handle.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();handle.setPointerCapture(e.pointerId);handle.classList.add('dragging')});
+handle.addEventListener('pointermove',e=>{if(!handle.hasPointerCapture(e.pointerId))return;const b=panel.getBoundingClientRect();update(b.bottom-e.clientY-4)});
+const finish=e=>{if(handle.hasPointerCapture(e.pointerId)){handle.releasePointerCapture(e.pointerId);handle.classList.remove('dragging');update(logHeight,true)}};
+handle.addEventListener('pointerup',finish);handle.addEventListener('pointercancel',finish);
+handle.addEventListener('keydown',e=>{const delta=e.key==='ArrowUp'?20:e.key==='ArrowDown'?-20:e.key==='Home'?10000:e.key==='End'?-10000:null;if(delta===null)return;e.preventDefault();update(logHeight+delta,true)});
+}
+function render(){useTheme(s.theme||'aurora',false);document.documentElement.style.fontSize=s.viewFont*.15+'px';top();drawMain();playerPanel();logs();bottomMenu();initPanelSplitter();drawOverlay();iconify()}
+
+document.addEventListener('keydown',e=>{if(e.ctrlKey||e.metaKey||e.altKey)return;const active=document.activeElement;if(['INPUT','TEXTAREA','SELECT'].includes(active?.tagName))return;const k=e.key;if(k==='F5'){e.preventDefault();quickSave()}else if(k==='F9'){e.preventDefault();quickLoad()}else if(k==='Escape'&&overlayPage){closeOverlay()}else if(k.toLowerCase()==='i'){e.preventDefault();openPage('인벤토리')}else if(k.toLowerCase()==='c'){e.preventDefault();openPage('캐릭터')}else if(k.toLowerCase()==='m'){e.preventDefault();openPage('세계 지도')}else if(s.dungeon&&s.page==='던전'&&!overlayPage){const directions={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0],w:[0,-1],a:[-1,0],s:[0,1],d:[1,0]};if(directions[k]){e.preventDefault();dungeonMove(...directions[k])}}});
+document.body.innerHTML='<div class="shell v3-shell"><header class="top" id="top"></header><main class="center" id="main"></main><aside class="rightpanel"><section class="playerpanel" id="player" aria-label="플레이어 정보"></section><div id="panelSplitter" class="panel-splitter" role="separator" tabindex="0" aria-label="플레이어와 로그 패널 높이 조절" aria-orientation="horizontal" aria-valuemin="165" aria-valuenow="274" aria-valuemax="800" title="드래그하여 크기 조절 · 위아래 방향키"></div><section class="log" id="log" aria-label="사건 기록"></section></aside><footer class="bottom" id="bottom"></footer></div>';nextLog('시스템','게임 화면을 열었습니다.');render();

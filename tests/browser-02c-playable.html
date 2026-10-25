@@ -1,0 +1,112 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Somnium v2 — 실행형 인벤토리</title>
+<style>
+body{background:#f7f5ef;color:#252c2c;font:16px system-ui,sans-serif;max-width:940px;margin:2rem auto;padding:0 1rem}
+header,nav,.grid,.actions{display:flex;gap:.8rem;align-items:center;flex-wrap:wrap}h1{margin-bottom:.25rem}
+article{background:white;border:1px solid #ddd;border-radius:12px;padding:1rem;margin:1rem 0}button{padding:.55rem .9rem;border:1px solid #8a9993;border-radius:6px;background:#fff;cursor:pointer}
+button:disabled{opacity:.5;cursor:default}input[type=number]{width:58px;padding:.35rem}input[type=text]{padding:.4rem}
+.grid>article{flex:1;min-width:260px}.muted{color:#64706f}.status{white-space:pre-wrap}
+dialog{border:1px solid #999;border-radius:14px;max-width:460px;width:85%;padding:1.5rem}dialog::backdrop{background:#0008}
+li{margin:.5rem 0}.row{display:flex;align-items:center;gap:.8rem;flex-wrap:wrap}
+</style></head><body>
+<header><h1>Somnium · v2 실행형 인벤토리</h1><small class="muted">02-C 검증용 실제 엔진 화면 · 무게 없음</small></header>
+<p class="muted">기존 UI 시제품과 별개입니다. 처음 실행 시 테스트용 월드가 생성됩니다. 데이터는 브라우저 IndexedDB에 수동으로 저장할 수 있습니다.</p>
+<article><div class="row"><strong id="stats"></strong><button id="save">저장</button><button id="load">불러오기</button><button id="export">JSON 백업</button><button id="import">JSON 가져오기</button><input hidden type="file" accept=".json,application/json" id="file"></div></article>
+<div class="grid"><article><h2>인벤토리</h2><div id="inventory"></div><hr><button id="discard">선택한 아이템 일괄 버리기</button></article>
+<article><h2>현재 지역 바닥</h2><div id="ground"></div><h2>행동</h2><button id="rest">휴식하기</button></article></div>
+<article><h2>기록</h2><pre class="status" id="status" role="status" aria-live="polite"></pre></article>
+<dialog id="confirm" aria-labelledby="confirmTitle"><h2 id="confirmTitle">선택한 아이템을 영구 삭제하시겠습니까?</h2><p>버린 아이템은 지면에 남지 않으며 되돌릴 수 없습니다.</p><ul id="preview"></ul><div class="actions"><button id="cancel">취소</button><button id="confirmDiscard">영구 삭제</button></div></dialog>
+<dialog id="loadConfirm" aria-labelledby="loadTitle"><h2 id="loadTitle">현재 진행 상태를 교체할까요?</h2><p id="loadExplanation"></p><div class="actions"><button id="loadCancel">취소</button><button id="loadApprove">불러오기 승인</button></div></dialog>
+<script type="module">
+import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscard,createSaveV2,prepareV2Load,IndexedDbSavesV2,exportBackupV2,parseBackupV2} from '../dist/engine/v2.js';
+const $=q=>document.querySelector(q);
+const catalog={categories:['food','resource','storage'],rarities:[],materials:[],effects:[],items:[
+{id:'core:berry',nameKey:'berry',categoryId:'food',tags:['food'],capabilities:['eat']},
+{id:'core:ore',nameKey:'ore',categoryId:'resource',tags:['ore'],capabilities:[]},
+{id:'core:box',nameKey:'box',categoryId:'storage',tags:[],capabilities:['storage']}]};
+const {registry,issues}=buildItemRegistry(catalog);if(!registry)throw Error('Invalid catalog '+JSON.stringify(issues));
+const store=new IndexedDbSavesV2(registry,'somnium-02c-playable-v2');
+const slot={slotId:'manual-demo',worldId:'demo-world',kind:'manual',label:'02-C 실행형 인벤토리',savedAt:'2026-10-22T00:00:00Z',revision:0};
+const handlers=new Map([['camp.rest',(s)=>({outcome:'success',nextState:{...s,player:{...s.player,currentHp:Math.min(100,s.player.currentHp+1)}},events:[{type:'player.rested',payload:{}}]})]]);
+const dispatcher=new V2ActionDispatcher(registry,handlers);
+let state={schemaVersion:2,turn:0,clock:{elapsedUnits:0},rng:createRandomState('02c-demo'),
+player:{id:'hero',regionId:'camp',currentHp:80,currentMp:60,hunger:0,statusEffects:[]},
+world:{activeRegionId:'camp'},progression:{skillExperience:{}},flags:{},
+itemWorld:{items:[{id:'berry',definitionId:'core:berry',quantity:7},{id:'ore',definitionId:'core:ore',quantity:5},{id:'box',definitionId:'core:box',quantity:1},{id:'ground',definitionId:'core:ore',quantity:3}],
+placements:[{itemId:'berry',location:{kind:'inventory',ownerId:'hero'}},{itemId:'ore',location:{kind:'inventory',ownerId:'hero'}},{itemId:'box',location:{kind:'inventory',ownerId:'hero'}},{itemId:'ground',location:{kind:'world',regionId:'camp',locationId:'starting-field'}}],containers:[]}};
+let revision=null,pendingDiscard=null,pendingLoad=null;
+const label=id=>({'core:berry':'열매','core:ore':'광석','core:box':'상자'})[id]??id;
+const log=text=>{$('#status').textContent=text+'\n'+$('#status').textContent};
+function action(type,payload){
+ const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
+ if(result.accepted){state=result.nextState;log(type+' → '+result.outcome+' (+'+result.turnsSpent+'턴)');render();}
+ else log('행동 거부: '+result.reason);
+}
+function render(){
+ $('#stats').textContent='턴 '+state.turn+' · 세계시간 '+state.clock.elapsedUnits+' · HP '+state.player.currentHp;
+ $('#inventory').replaceChildren();$('#ground').replaceChildren();
+ for(const item of state.itemWorld.items){
+ const loc=state.itemWorld.placements.find(p=>p.itemId===item.id)?.location;
+ if(loc?.kind==='inventory'&&loc.ownerId===state.player.id){
+  const row=document.createElement('div');row.className='row';
+  const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.dataset.select=item.id;
+  checkbox.setAttribute('aria-label',label(item.definitionId)+' 선택');
+  const text=document.createElement('span');text.textContent=label(item.definitionId)+' × '+item.quantity;
+  const number=document.createElement('input');number.type='number';number.min='1';number.max=String(item.quantity);number.value=String(item.quantity);number.dataset.quantity=item.id;
+  const consume=document.createElement('button');consume.textContent='사용';consume.disabled=!registry.items.get(item.definitionId)?.capabilities.includes('eat');consume.onclick=()=>action('item.consume',{itemId:item.id,quantity:1});
+  row.append(checkbox,text,number,consume);$('#inventory').append(row);
+ }else if(loc?.kind==='world'&&loc.regionId===state.player.regionId){
+  const row=document.createElement('div');row.className='row';
+  const title=document.createElement('span');title.textContent=label(item.definitionId)+' × '+item.quantity;
+  const pickup=document.createElement('button');pickup.textContent='줍기';pickup.onclick=()=>action('item.pickup',{itemId:item.id,locationId:loc.locationId});
+  row.append(title,pickup);$('#ground').append(row);
+ }
+ }
+}
+$('#rest').onclick=()=>action('camp.rest',{});
+$('#discard').onclick=()=>{
+ const selections=[...document.querySelectorAll('[data-select]:checked')].map(input=>{
+  const field=document.querySelector('[data-quantity="'+input.dataset.select+'"]');
+  return {itemId:input.dataset.select,quantity:Number(field.value)};
+ });
+ const prepared=prepareBulkDiscard(state,selections,registry);
+ if(!prepared.ok){log('버리기 선택 오류: '+prepared.reason);return;}
+ pendingDiscard=prepared.preview;$('#preview').replaceChildren();
+ for(const line of pendingDiscard.selections){
+  const item=state.itemWorld.items.find(i=>i.id===line.itemId);
+  const li=document.createElement('li');li.textContent=label(item.definitionId)+' × '+line.quantity;$('#preview').append(li);
+ }
+ $('#confirm').showModal();
+};
+$('#cancel').onclick=()=>{$('#confirm').close();pendingDiscard=null};
+$('#confirm').addEventListener('cancel',()=>{pendingDiscard=null});
+$('#confirmDiscard').onclick=()=>{
+ if(!pendingDiscard)return;const preview=pendingDiscard;pendingDiscard=null;$('#confirm').close();
+ action('item.discard.confirm',{preview});
+};
+$('#save').onclick=async()=>{try{
+ const saved=await store.commit(createSaveV2(state,{...slot,savedAt:new Date().toISOString()},'demo',registry),revision);
+ revision=saved.slot.revision;log('저장 완료 · revision '+revision);
+}catch(e){log('저장 실패: '+e.message)}};
+function offerLoad(candidate,why,slotRevision=null){
+ const result=prepareV2Load(candidate,registry);if(!result.ok){log('불러오기 거부: '+result.reason);return;}
+ pendingLoad={...result,slotRevision};$('#loadExplanation').textContent=why+' · '+result.originalVersion+'세대 데이터를 승인하면 현재 상태를 교체합니다.';
+ $('#loadConfirm').showModal();
+}
+$('#load').onclick=async()=>{try{const saved=await store.loadLatest(slot.slotId);if(!saved){log('저장된 데이터가 없습니다');return;}offerLoad(saved,'저장 슬롯 불러오기',saved.slot.revision);}catch(e){
+ log('최신 저장 오류: '+e.message+' · 이전 정상 저장은 자동 적용하지 않습니다');
+ const prior=await store.listRevisions(slot.slotId);
+ if(prior.length)offerLoad(prior[0].save,'이전 정상 저장 복구 후보');}};
+$('#loadCancel').onclick=()=>{pendingLoad=null;$('#loadConfirm').close()};
+$('#loadConfirm').addEventListener('cancel',()=>{pendingLoad=null});
+$('#loadApprove').onclick=()=>{if(!pendingLoad)return;state=structuredClone(pendingLoad.state);revision=pendingLoad.slotRevision;pendingLoad=null;$('#loadConfirm').close();log('불러오기 승인 · 현재 상태 교체');render()};
+$('#export').onclick=()=>{try{const data=exportBackupV2(createSaveV2(state,{...slot,savedAt:new Date().toISOString()},'demo',registry),registry);
+ const blob=new Blob([data],{type:'application/json'}),url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download='somnium-backup-v2.json';a.click();URL.revokeObjectURL(url);
+ log('JSON 백업 생성');}catch(e){log('백업 실패: '+e.message)}};
+$('#import').onclick=()=>$('#file').click();
+$('#file').onchange=async e=>{const file=e.target.files?.[0];if(!file)return;
+ if(file.size>8_000_000){log('백업 크기 제한 초과');return;}
+ const raw=await file.text();try{const candidate=JSON.parse(raw);offerLoad(candidate,'JSON 백업 가져오기 (필요 시 v1→v2 전환)');}catch{log('JSON 백업 형식 오류');}
+ e.target.value='';};
+render();log('02-C 실행형 v2 화면 준비');
+</script></body></html>

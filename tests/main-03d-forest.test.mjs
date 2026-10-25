@@ -1,0 +1,34 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createMainV2Inventory} from '../src/main-v2-inventory.js';
+const items=[{id:'test:leaf',name:'잎',group:'재료',qty:1,tags:[]}];
+const game=()=>createMainV2Inventory(items,{generatedWorld:true,worldSeed:'forest-route-test',preferences:{getItem:()=>null,setItem:()=>{}}});
+test('03-D generated forest is accessible in forest region and uses correct site map',()=>{
+ const g=game(),before=g.current();
+ const rejected=g.dispatch('dungeon.enter',{siteId:'core:site/forest'});
+ assert.equal(rejected.accepted,false);
+ assert.deepEqual(g.current(),before);
+ assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
+ assert.equal(g.dispatch('dungeon.enter',{siteId:'core:site/forest'}).accepted,true);
+ assert.equal(g.localSite(),'core:site/forest');
+ assert.equal(g.localMap().siteId,'core:site/forest');
+ assert.equal(g.localMap().width,24);
+ const t=g.current().turn,seconds=g.current().clock.elapsedUnits;
+ const step=g.dispatch('dungeon.move',{direction:'east'});
+ assert.equal(step.accepted,true);
+ assert.equal(g.current().turn,t+1);
+ assert.equal(g.current().clock.elapsedUnits,seconds+6);
+ assert.equal(g.dispatch('dungeon.leave').accepted,true);
+});
+test('03-D forest and labyrinth maps are different and reproducible',()=>{
+ const a=game(),b=game();
+ a.dispatch('world.travel',{region:'숲'});
+ a.dispatch('dungeon.enter',{siteId:'core:site/forest'});
+ b.dispatch('world.travel',{region:'숲'});
+ b.dispatch('dungeon.enter',{siteId:'core:site/forest'});
+ assert.deepEqual(a.localMap(),b.localMap());
+ const forest=a.localMap();
+ a.dispatch('dungeon.leave');
+ a.dispatch('dungeon.enter');
+ assert.notDeepEqual(a.localMap().tiles,forest.tiles);
+});

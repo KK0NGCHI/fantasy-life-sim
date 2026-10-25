@@ -1,0 +1,192 @@
+@import url("./v7.css");
+/* Final UI cleanup: tighter controls and content-first layout */
+.v3-shell .center .subhead,.dialog-body .subhead{display:none}
+.v3-shell .center h1{margin-bottom:16px}
+.region-scene{margin-bottom:19px}
+.region-scene .scene-heading p,.region-scene .scene-kicker{display:none}
+.v3-actions{margin-top:12px}
+.v3-shell .center .section:first-child{border-top:0}
+.v3-shell .center .v3-actions+.section{display:none}
+.v3-shell .rightpanel .logfoot{display:none!important}
+.v3-shell .weather-data{display:inline-flex;gap:6px;align-items:center;color:var(--theme-muted);font-size:13px}
+.v3-shell .weather-data svg{width:17px;height:17px}
+.craft-detail-row{justify-content:flex-start;gap:6px;padding-bottom:12px}
+.craft-detail-row span{display:inline-flex;gap:6px;align-items:baseline;flex-wrap:wrap}
+.craft-detail-row strong{font-weight:700}
+.theme-choice{min-height:91px;gap:6px}
+.theme-swatch{height:39px;margin:0}
+.theme-name{font-size:13px}
+.theme-choice small{display:none!important}
+.inventory-select-all{gap:7px}
+.inventory-toolbar,.craft-toolbar,.toolbar{gap:7px;row-gap:9px}
+.inventory-toolbar .input,.craft-toolbar .input,.dialog-body .input,.v3-shell .input{font-size:12px;min-height:32px;height:32px;padding:5px 11px;border-radius:8px;line-height:1.3}
+.inventory-toolbar input[type="text"],.inventory-toolbar input:not([type]),.inventory-toolbar input[placeholder]{width:185px;max-width:44vw;flex:0 1 185px}
+.inventory-toolbar select,.craft-toolbar select,.v3-shell select.input,.dialog-body select.input{
+appearance:none;-webkit-appearance:none;
+padding:5px 27px 5px 11px!important;
+height:32px;min-height:32px;min-width:104px;max-width:175px;
+font-size:12px;line-height:1.3;
+background-color:var(--theme-surface)!important;
+background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23736e83' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")!important;
+background-repeat:no-repeat!important;background-position:right 9px center!important;background-size:12px 12px!important;
+border:1px solid var(--theme-line);
+border-radius:8px;
+}
+.v3-shell .center .toolbar .tiny.muted,.dialog-body .toolbar .tiny.muted{font-size:11px}
+.v3-shell .center .toolbar,.dialog-body .toolbar{margin:12px 0 17px}
+.dungeon-v7 .dungeon-pad{display:none!important}
+.dungeon-v7 .dungeon-main-actions{margin-top:13px}
+.dungeon-v7>.dungeon-controls{padding-top:21px}
+@media(max-width:700px){.inventory-toolbar input[placeholder]{width:155px}.inventory-toolbar select,.craft-toolbar select{min-width:90px}}
+
+
+/* Compact after removing helper copy: no empty subtitle space. */
+.v3-shell .center{padding-top:21px}
+.v3-shell .center h1{margin-bottom:10px}
+.v3-shell .center:has(.region-scene)>h1{display:none}
+.v3-shell .center:has(.world-v4)>h1{margin-bottom:13px}
+.dialog-body{padding-top:18px}
+.dialog-body .modal-main>h1{display:none}
+.modal-main .tabs,.dialog-body .tabs{margin-top:0;margin-bottom:15px}
+.v3-shell .center .tabs{margin-top:0;margin-bottom:15px}
+.dialog-body .toolbar,.v3-shell .center .toolbar{margin-top:5px;margin-bottom:12px}
+.dialog-body .panegrid{margin-top:0}
+.region-scene{padding-top:18px;padding-bottom:18px;margin-top:0;margin-bottom:13px}
+.region-scene .scene-heading h2{margin:0}
+.region-scene .scene-spots{margin-top:13px}
+.v3-actions{margin-top:11px;gap:11px}
+.v3-shell .rightpanel .logbody{padding-bottom:6px}
+.v3-shell .rightpanel .loghead{padding-bottom:10px}
+.v3-shell .rightpanel .loghead .sectiontitle{margin-bottom:8px}
+.v3-shell .center .section{margin-top:17px;padding-top:15px}
+.v3-shell .center .section:first-child{margin-top:0;padding-top:0}
+.craft-toolbar+.craft-layout,.inventory-toolbar+.inventory-layout{margin-top:0}
+@media(max-width:800px){
+.v3-shell .center{padding-top:15px}
+.dialog-body{padding-top:13px}
+.region-scene{padding:17px;margin-bottom:10px}
+}
+
+
+/* Contextual discard mode: no selection chrome until requested. */
+.inventory-discard-controls{display:inline-flex;align-items:center;gap:6px;margin-inline-start:auto}
+.inventory-discard-controls [hidden],.inventory-discard-hint[hidden]{display:none!important}
+.inventory-discard-trigger,.inventory-discard-confirm,.inventory-discard-cancel{min-height:34px}
+.inventory-discard-confirm{background:var(--theme-accent,#7e60ad);color:white;border-color:transparent}
+.inventory-discard-confirm:disabled{opacity:.45;cursor:not-allowed}
+.inventory-discard-mode .inventory-choice{transition:background-color .13s ease,border-color .13s ease}
+.inventory-discard-mode .inventory-choice.discard-marked{background:color-mix(in srgb,var(--theme-accent,#785bb6) 12%,transparent);outline:1px solid var(--theme-accent,#785bb6);outline-offset:-1px}
+.inventory-check-label{display:inline-flex;gap:9px;align-items:center;cursor:pointer;min-height:38px;padding-inline:8px}
+.inventory-check-label input[type=checkbox]{appearance:none;-webkit-appearance:none;flex:0 0 auto;width:19px;height:19px;border:1.5px solid var(--theme-border,#89838f);border-radius:6px;background:var(--theme-surface,#fff);display:grid;place-content:center;cursor:pointer}
+.inventory-check-label input[type=checkbox]:checked{background:var(--theme-accent,#785bb6);border-color:var(--theme-accent,#785bb6)}
+.inventory-check-label input[type=checkbox]:checked::after{content:'✓';color:white;font-size:14px;font-weight:800}
+.inventory-check-label input[type=checkbox]:focus-visible{outline:3px solid var(--theme-accent,#785bb6);outline-offset:3px}
+.inventory-select-all.inventory-check-label{padding:5px 9px;margin-bottom:8px;border-radius:9px;background:var(--theme-surface,#f8f8f8)}
+.inventory-discard-hint{margin:8px 0;color:var(--theme-muted,#676472)}
+.inventory-discard-dialog{max-width:480px;width:min(92vw,480px);border:1px solid var(--theme-border,#ccc);border-radius:16px;padding:22px;background:var(--theme-surface,#fff);color:var(--theme-text,#222);box-shadow:0 18px 70px #0003}
+.inventory-discard-dialog::backdrop{background:#16131b99}
+.inventory-discard-dialog li{padding:3px 0}
+.inventory-discard-dialog-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}
+.inventory-discard-danger{background:#a83245;color:white;border-color:#a83245}
+@media(max-width:650px){.inventory-discard-controls{margin-inline-start:0}.inventory-toolbar{flex-wrap:wrap}}
+
+
+/* Visible inventory action row, independent of crowded filter toolbar. */
+.inventory-discard-actionbar{display:flex;justify-content:flex-end;align-items:center;min-height:42px;margin:8px 0 12px}
+.inventory-discard-actionbar .inventory-discard-controls{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-left:auto;visibility:visible;opacity:1}
+.inventory-discard-actionbar .inventory-discard-trigger{display:inline-flex;align-items:center;justify-content:center;min-width:94px;padding:8px 17px;font-weight:700;border:1px solid var(--theme-accent,#785bb6);color:var(--theme-accent,#785bb6);background:var(--theme-surface,#fff)}
+.inventory-discard-actionbar button[hidden]{display:none!important}
+.inventory-list:not(.inventory-discard-mode) .inventory-check-label{display:none!important}
+.inventory-discard-mode .inventory-check-label input[type=checkbox]{display:grid}
+
+
+/* 02-C polish: inset action, consistent destructive hover and unified row hover. */
+.inventory-discard-actionbar .inventory-discard-trigger{
+  background:color-mix(in srgb,var(--theme-accent,#785bb6) 7%,var(--theme-surface,#fff));
+  border:1px solid color-mix(in srgb,var(--theme-accent,#785bb6) 46%,var(--theme-border,#aaa));
+  box-shadow:inset 0 2px 4px #0000001c,inset 0 1px 2px #00000012;
+  transform:none;
+}
+.inventory-discard-actionbar .inventory-discard-trigger:hover,
+.inventory-discard-actionbar .inventory-discard-trigger:focus-visible{
+  background:color-mix(in srgb,var(--theme-accent,#785bb6) 13%,var(--theme-surface,#fff));
+  color:var(--theme-accent,#785bb6);
+  box-shadow:inset 0 2px 5px #00000025;
+  transform:none;
+}
+.inventory-discard-dialog .inventory-discard-danger,
+.inventory-discard-dialog .inventory-discard-danger:hover,
+.inventory-discard-dialog .inventory-discard-danger:focus-visible,
+.inventory-discard-dialog .inventory-discard-danger:active{
+  background:#a83245;
+  border-color:#a83245;
+  color:#fff;
+  background-image:none;
+  transform:none;
+}
+.inventory-discard-dialog .inventory-discard-danger:hover{
+  background:#952b3e;
+  border-color:#952b3e;
+  box-shadow:inset 0 2px 4px #00000026;
+}
+.inventory-discard-mode .inventory-choice:hover,
+.inventory-discard-mode .inventory-choice:focus-within{
+  background:color-mix(in srgb,var(--theme-accent,#785bb6) 10%,var(--theme-surface,#fff));
+}
+.inventory-discard-mode .inventory-choice:hover .inventory-item-button,
+.inventory-discard-mode .inventory-choice:focus-within .inventory-item-button,
+.inventory-discard-mode .inventory-choice:hover .inventory-check-label,
+.inventory-discard-mode .inventory-choice:focus-within .inventory-check-label{
+  background:transparent;
+  box-shadow:none;
+  color:inherit;
+}
+.inventory-discard-mode .inventory-choice:hover .inventory-check-label input[type=checkbox],
+.inventory-discard-mode .inventory-choice:focus-within .inventory-check-label input[type=checkbox]{
+  border-color:var(--theme-accent,#785bb6);
+  box-shadow:0 0 0 3px color-mix(in srgb,var(--theme-accent,#785bb6) 14%,transparent);
+}
+.inventory-discard-mode .inventory-choice:hover .inventory-check-label input[type=checkbox]:checked,
+.inventory-discard-mode .inventory-choice:focus-within .inventory-check-label input[type=checkbox]:checked{
+  background:var(--theme-accent,#785bb6);
+}
+
+.save-manager-dialog{max-width:760px;width:min(94vw,760px);max-height:85vh;overflow:auto}
+.save-manager-actions,.save-manager-slot-actions{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.save-manager-actions{padding:12px 0;border-bottom:1px solid var(--theme-border,#ddd)}
+.save-manager-slot{padding:12px 0;border-bottom:1px solid var(--theme-border,#ddd);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+.save-manager-slot .muted{font-size:12px;margin-top:4px}
+.save-manager-revisions{display:flex;flex-wrap:wrap;gap:6px;width:100%;padding:6px 0}
+
+/* 04-A character creation: compact readable point-buy controls, keyboard accessible. */
+.creation-attributes{display:grid;gap:.45rem;margin:.9rem 0;max-height:52vh;overflow:auto}
+.creation-attribute-row{display:grid;grid-template-columns:minmax(90px,1fr) 40px 48px 40px;align-items:center;gap:.65rem;padding:.45rem .7rem;border:1px solid var(--border, #b8bac0);border-radius:10px}
+.creation-attribute-row output{font-variant-numeric:tabular-nums;text-align:center;font-weight:700}
+.creation-attribute-row .btn{min-width:36px;min-height:36px;padding:0}
+.creation-attribute-row .btn:disabled{opacity:.35;cursor:not-allowed}
+.creation-summary{font-weight:700;font-variant-numeric:tabular-nums}
+.creation-footer{display:flex;justify-content:flex-end;gap:.7rem;padding-top:.75rem}
+#attributeCreationDialog .dialog-wrap{max-width:620px;width:min(90vw,620px);padding:1.25rem}
+#attributeCreationDialog select{padding:.6rem;max-width:100%;border-radius:8px;background:var(--surface,#fff);color:inherit}
+@media(max-width:450px){.creation-attribute-row{grid-template-columns:minmax(72px,1fr) 34px 40px 34px;gap:.3rem;padding:.4rem}}
+
+/* 04-B origin choice: readable staged selection within the existing character dialog. */
+#originCreationDialog .dialog-wrap{max-width:640px;width:min(92vw,640px);padding:1.4rem}
+#originCreationDialog label{display:block;margin-top:.85rem;margin-bottom:.25rem;font-weight:700}
+#originCreationDialog select{width:100%;padding:.65rem;border:1px solid var(--border,#aaa);border-radius:8px;background:var(--surface,#fff);color:inherit}
+.origin-choice-detail{margin-top:1rem;padding:.9rem;border:1px solid var(--border,#aaa);border-radius:10px;line-height:1.55}
+.origin-choice-detail h3{margin-top:0}
+
+/* 05-A: show action -> discovered resource in progressive layers.
+ * Uses existing theme tokens; no competing full-screen interface. */
+.resource05a-panel{margin:1rem 0;padding:1rem;border:1px solid var(--border,#aaa);border-radius:12px}
+.resource05a-panel h3{margin:.15rem 0 .4rem}
+.resource05a-tabs,.resource05a-discovery{display:flex;flex-wrap:wrap;gap:.5rem;margin:.65rem 0}
+.resource05a-tabs .btn[aria-pressed="true"]{outline:2px solid currentColor;outline-offset:1px}
+.resource05a-list{display:grid;gap:.55rem}
+.resource05a-row{display:flex;flex-wrap:wrap;align-items:center;gap:.65rem;padding:.65rem;border:1px solid var(--border,#aaa);border-radius:9px}
+.resource05a-row strong{min-width:9rem}
+.resource05a-row span{flex:1;min-width:10rem;font-variant-numeric:tabular-nums}
+.resource05a-discovery{padding:.7rem;border-radius:9px;background:var(--surface-secondary,#eee)}
+.resource05a-discovery p{flex-basis:100%;margin:0}
+@media(max-width:520px){.resource05a-row .btn{flex:1;min-height:40px}.resource05a-panel{padding:.75rem}}

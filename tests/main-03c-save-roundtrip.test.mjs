@@ -1,0 +1,20 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createMainV2Inventory} from '../src/main-v2-inventory.js';
+import {createSaveV2,createSaveV3,prepareSecondsV2ToV3,decodeSaveV3} from '../dist/engine/v2.js';
+const slot={slotId:'03c-roundtrip',worldId:'main-world',kind:'manual',label:'Local state',savedAt:'2026-10-23T00:00:00Z',revision:0};
+const game=()=>createMainV2Inventory([{id:'test:leaf',name:'잎',group:'재료',qty:1,tags:[]}],{preferences:{getItem:()=>null,setItem:()=>{}}});
+test('03-C basement location survives v3 save round-trip without touching original',()=>{
+ const g=game();g.dispatch('dungeon.enter');
+ g.dispatch('dungeon.move',{direction:'east'});g.dispatch('dungeon.move',{direction:'south'});
+ assert.equal(g.dispatch('dungeon.portal').accepted,true);
+ const state=g.current();assert.equal(state.world.runtime.localFloor,-1);
+ const v2=createSaveV2(state,slot,'main-prototype',g.registry);
+ const proposed=prepareSecondsV2ToV3(v2,g.registry);assert.equal(proposed.ok,true);
+ const save=createSaveV3(proposed.state,slot,'main-prototype',g.registry);
+ const parsed=decodeSaveV3(JSON.parse(JSON.stringify(save)),g.registry);
+ assert.equal(parsed.ok,true);
+ assert.equal(parsed.save.state.world.runtime.localFloor,-1);
+ assert.deepEqual(parsed.save.state.world.runtime.pos,[1,1]);
+ assert.equal(state.world.runtime.localFloor,-1);
+});

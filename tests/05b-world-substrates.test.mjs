@@ -1,0 +1,43 @@
+import {test} from 'node:test';
+import assert from 'node:assert/strict';
+import {createSubstrateWorld05B,validateSubstrateWorld05B,substrateId05B,consumeFungalSubstrate05B,addLoggingDeadwood05B,changeSubstrate05B} from '../src/fungal-substrates-05b.js';
+import {createFungalEcology05B} from '../src/fungal-ecology-05b.js';
+import {createMainV2Inventory} from '../src/main-v2-inventory.js';
+import {ACTIVITY_TABLES_05A} from '../src/activity-tables-05a.js';
+import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
+const settings={worldSeed:'fungal-substrate',generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,ecology05A:true,fungi05B:true,incidentalTables05A:ACTIVITY_TABLES_05A,preferences:{getItem:()=>null,setItem:()=>{}}};
+const make=()=>createMainV2Inventory([{id:'test:starter',name:'시작',group:'재료',qty:1,tags:[]}],settings);
+const meta={slotId:'fungi-substrate',worldId:'world',kind:'manual',label:'test',savedAt:'2026-10-25T00:00:00Z',revision:0};
+test('one world substrate supports multiple mycelia and depletion is shared',()=>{
+ const world=createSubstrateWorld05B(),patches=Object.values(createFungalEcology05B());
+ assert.equal(validateSubstrateWorld05B(world),true);
+ const first=patches.find(p=>p.speciesId==='item05b:oyster');
+ const second=patches.find(p=>p.speciesId==='item05b:turkey-tail');
+ const id=substrateId05B('숲','deadwood');
+ assert.equal(world[id].remaining,100);
+ assert.equal(consumeFungalSubstrate05B(world,first,0).world[id].remaining,95);
+ const depleted=changeSubstrate05B(world,id,-96,0);
+ assert.equal(consumeFungalSubstrate05B(depleted,second,0).reason,'SUBSTRATE_EXHAUSTED');
+});
+test('successful wood logging replenishes deadwood substrate without endless creation',()=>{
+ const initial=createSubstrateWorld05B(),id=substrateId05B('숲','deadwood');
+ const depleted=changeSubstrate05B(initial,id,-100,10);
+ assert.equal(depleted[id].remaining,0);
+ assert.equal(addLoggingDeadwood05B(depleted,'숲','item05a:oak-log',3,20)[id].remaining,15);
+ assert.equal(addLoggingDeadwood05B(depleted,'숲','item05a:stone',5,20)[id].remaining,0);
+ assert.equal(addLoggingDeadwood05B(depleted,'사막','item05a:pine-log',2,20),depleted);
+});
+test('substrate ledger survives save and remains independent of plant and mycelial sites',()=>{
+ const g=make(),resource=g.current().world.runtime.resource05A;
+ const id=substrateId05B('숲','deadwood');
+ assert.ok(resource.ecologySubstrates[id]);
+ const before=g.current();
+ const v2=createSaveV2(before,meta,'test',g.registry);
+ const upgrade=prepareSecondsV2ToV3(v2,g.registry);
+ assert.equal(upgrade.ok,true);
+ const saved=createSaveV3(upgrade.state,meta,'test',g.registry);
+ assert.equal(decodeSaveV3(saved,g.registry).ok,true);
+ const g2=make();g2.applyApprovedSave(saved);
+ assert.deepEqual(g2.current().world.runtime.resource05A.ecologySubstrates,resource.ecologySubstrates);
+ assert.deepEqual(g2.current().world.runtime.resource05A.ecologySites,resource.ecologySites);
+});

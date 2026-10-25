@@ -1,0 +1,130 @@
+@import url("./v8.css");
+@import url("https://cdn.jsdelivr.net/gh/sun-typeface/SUIT@2/fonts/variable/woff2/SUIT-Variable.css");
+/* Somnium UI system v1 — SUIT Variable / Fluent spacing / Spectrum states.
+   Font fallback remains available offline if the upstream CDN is unavailable. */
+:root{
+ --ui-accent:color-mix(in srgb,var(--theme-primary,#8655cb) 88%,#101525);
+ --ui-accent-hover:color-mix(in srgb,var(--theme-primary,#8655cb) 68%,#101525);
+ --ui-accent-soft:color-mix(in srgb,var(--theme-primary,#8655cb) 10%,var(--theme-surface,#fff));
+ --ui-accent-selected:color-mix(in srgb,var(--theme-primary,#8655cb) 17%,var(--theme-surface,#fff));
+ --ui-border:var(--theme-line,#ded8e8);
+ --ui-focus:var(--theme-focus,#6756bd);
+ --ui-danger:#ad334a;--ui-danger-hover:#92283e;
+ --ui-control-height:38px;
+}
+html,body,button,input,select,textarea{font-family:'SUIT Variable','Malgun Gothic','맑은 고딕',sans-serif}
+body{font-weight:400;line-height:1.5}
+button,input,select,textarea{font-size:14px}
+.top-meta .ui-icon-button{width:38px;height:38px;display:inline-flex;align-items:center;justify-content:center;padding:0;border-radius:10px;flex-shrink:0}
+.top-meta .ui-icon-button:hover{background:var(--theme-hover);color:var(--theme-primary);transform:none}
+.top-meta .ui-icon-button:focus-visible{outline:2px solid var(--ui-focus);outline-offset:2px}
+/* Unified controls. Preserve native select keyboard and option behavior. */
+.v3-shell input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),
+.v3-shell select,.v3-shell textarea,
+.dialog-wrap input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),
+.dialog-wrap select,.dialog-wrap textarea,
+.save-manager-dialog input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=range]),
+.save-manager-dialog select{
+ box-sizing:border-box;min-height:var(--ui-control-height);border:1px solid var(--ui-border);
+ border-radius:9px;background:var(--theme-surface,#fff);color:var(--theme-text,#34304f);
+ padding:8px 12px;line-height:1.4;box-shadow:none;
+}
+.v3-shell select,.dialog-wrap select,.save-manager-dialog select{
+ padding-right:32px;appearance:none;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23636a79' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+ background-position:right 9px center;background-repeat:no-repeat;background-size:16px;
+}
+.v3-shell input:focus-visible,.v3-shell select:focus-visible,.v3-shell textarea:focus-visible,
+.dialog-wrap input:focus-visible,.dialog-wrap select:focus-visible,
+.save-manager-dialog input:focus-visible,.save-manager-dialog select:focus-visible{
+ outline:2px solid var(--ui-focus);outline-offset:2px;border-color:var(--ui-focus);
+}
+.v3-shell input:disabled,.v3-shell select:disabled,.v3-shell textarea:disabled,
+.save-manager-dialog input:disabled{background:var(--theme-panel);color:var(--theme-muted);cursor:not-allowed}
+.v3-shell input[type=checkbox],.dialog-wrap input[type=checkbox],.save-manager-dialog input[type=checkbox]{
+ appearance:none;-webkit-appearance:none;width:19px;height:19px;min-width:19px;
+ border:1.5px solid color-mix(in srgb,var(--ui-accent) 45%,var(--ui-border));
+ border-radius:6px;background:var(--theme-surface,#fff);display:inline-grid;place-items:center;
+ vertical-align:middle;cursor:pointer;margin:0;flex-shrink:0;
+}
+.v3-shell input[type=checkbox]:checked,.dialog-wrap input[type=checkbox]:checked,.save-manager-dialog input[type=checkbox]:checked{
+ background:var(--ui-accent);border-color:var(--ui-accent)
+}
+.v3-shell input[type=checkbox]:checked::after,.dialog-wrap input[type=checkbox]:checked::after,.save-manager-dialog input[type=checkbox]:checked::after{
+ content:'✓';font-size:14px;font-weight:800;line-height:1;color:white
+}
+.v3-shell input[type=checkbox]:focus-visible,.dialog-wrap input[type=checkbox]:focus-visible,.save-manager-dialog input[type=checkbox]:focus-visible{
+ outline:2px solid var(--ui-focus);outline-offset:3px
+}
+/* Contextual inventory row: one row, one hover/selection fill, no child color blocks. */
+.inventory-discard-actionbar .inventory-discard-trigger{
+ min-height:38px;padding:8px 18px;border:1px solid transparent;border-radius:9px;
+ background:var(--ui-accent);color:#fff;font-weight:650;box-shadow:none;transform:none
+}
+.inventory-discard-actionbar .inventory-discard-trigger:hover,
+.inventory-discard-actionbar .inventory-discard-trigger:focus-visible{
+ background:var(--ui-accent-hover);color:#fff;box-shadow:none;transform:none
+}
+.inventory-discard-mode .inventory-choice{
+ background:var(--theme-surface,#fff);border-radius:10px;overflow:hidden;
+ transition:background-color .14s ease,border-color .14s ease
+}
+.inventory-discard-mode .inventory-choice:hover,
+.inventory-discard-mode .inventory-choice:focus-within{background:var(--ui-accent-soft)!important}
+.inventory-discard-mode .inventory-choice.discard-marked,
+.inventory-discard-mode .inventory-choice.discard-marked:hover,
+.inventory-discard-mode .inventory-choice.discard-marked:focus-within{
+ background:var(--ui-accent-selected)!important;outline:1px solid var(--ui-accent);outline-offset:-1px
+}
+.inventory-discard-mode .inventory-choice .inventory-check-label,
+.inventory-discard-mode .inventory-choice .inventory-item-button,
+.inventory-discard-mode .inventory-choice .inventory-item-button:hover,
+.inventory-discard-mode .inventory-choice .inventory-item-button:focus-visible{
+ background:transparent!important;background-image:none!important;box-shadow:none!important;
+ border-color:transparent;transform:none;color:inherit;
+}
+.inventory-discard-mode .inventory-choice .inventory-check-label{
+ align-self:stretch;display:inline-flex;align-items:center;justify-content:center;
+ padding:0 13px;margin:0;min-height:100%;
+}
+.inventory-discard-mode .inventory-choice .inventory-check-label input[type=checkbox]{background:var(--theme-surface,#fff)}
+.inventory-discard-mode .inventory-choice .inventory-check-label input[type=checkbox]:checked{background:var(--ui-accent)}
+.inventory-discard-mode .inventory-choice:hover .inventory-check-label input[type=checkbox]{border-color:var(--ui-accent)}
+/* Destructive action stays semantically red in every theme. */
+.inventory-discard-dialog .inventory-discard-danger,
+.inventory-discard-dialog .inventory-discard-danger:active{background:var(--ui-danger);color:white;border-color:var(--ui-danger);box-shadow:none}
+.inventory-discard-dialog .inventory-discard-danger:hover,
+.inventory-discard-dialog .inventory-discard-danger:focus-visible{background:var(--ui-danger-hover);color:white;border-color:var(--ui-danger-hover);box-shadow:none}
+/* Save-manager structure inspired by Windows form labels-above-controls and Fluent spacing. */
+.save-manager-dialog{padding:24px!important;max-width:760px;width:min(94vw,760px);border-radius:16px}
+.save-manager-dialog h2{font-size:22px;line-height:1.35;margin:0 0 8px}
+.save-manager-dialog>p.muted{margin:0 0 24px;line-height:1.6}
+.save-manager-autosave{display:flex;flex-direction:column;align-items:stretch;gap:16px;padding:0 0 24px;border-bottom:1px solid var(--ui-border)}
+.save-manager-autosave h3,.save-manager-section-heading h3{font-size:16px;font-weight:700;margin:0}
+.save-manager-field{display:flex;flex-direction:column;gap:8px;align-items:flex-start}
+.save-manager-field label{font-weight:600;font-size:13px}
+.save-manager-dialog #saveInterval{width:134px;min-height:40px;font-variant-numeric:tabular-nums}
+.save-manager-toggle{display:flex;align-items:center;gap:10px;line-height:1.5;cursor:pointer}
+.save-manager-policy-actions{display:flex;justify-content:flex-end;gap:8px}
+.save-manager-section-heading{margin-top:20px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.save-manager-section-heading .muted{font-size:12px}
+.save-manager-actions{display:flex;align-items:center;flex-wrap:wrap;gap:8px;padding:16px 0 20px;margin:0;border:0}
+.save-manager-actions .save-manager-close{margin-left:auto;order:10}
+.save-manager-dialog .btn{min-height:38px;border-radius:9px;padding:8px 14px;font-size:13px;font-weight:600;box-shadow:none;transform:none;white-space:nowrap}
+.save-manager-dialog .btn:hover{transform:none}
+.save-manager-dialog .ui-primary{background:var(--ui-accent);color:#fff;border:1px solid transparent}
+.save-manager-dialog .ui-primary:hover{background:var(--ui-accent-hover);color:#fff}
+.save-manager-dialog .ui-secondary{background:var(--theme-surface,#fff);color:var(--theme-text);border:1px solid var(--ui-border)}
+.save-manager-dialog .ui-secondary:hover{background:var(--theme-hover);border-color:var(--ui-accent);color:var(--theme-text)}
+.save-manager-list{display:flex;flex-direction:column;gap:10px}
+.save-manager-empty{border:1px dashed var(--ui-border);background:var(--theme-panel,#f7f3ff);border-radius:12px;padding:28px 20px;text-align:center}
+.save-manager-empty strong{display:block;font-size:14px}.save-manager-empty p{margin:6px 0 0}
+.save-manager-slot{border:1px solid var(--ui-border);border-radius:12px;padding:16px;gap:14px}
+.save-manager-slot-actions{gap:8px}
+button:focus-visible{outline:2px solid var(--ui-focus);outline-offset:2px}
+.v3-shell .top-meta,.v3-shell .bottom-shortcuts,.v3-shell .v3-meter{font-variant-numeric:tabular-nums}
+@media(max-width:620px){
+ .save-manager-dialog{padding:18px!important}
+ .save-manager-actions .save-manager-close{order:0;margin-left:0}
+ .save-manager-section-heading{align-items:flex-start;flex-direction:column;gap:4px}
+}

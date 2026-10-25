@@ -1,0 +1,105 @@
+@import url("./v5.css");
+/* UI v0.6: varied palettes and dark-mode surface audit */
+:root{
+--theme-button-text:#38334f;--theme-kbd-bg:#ffffff;--theme-kbd-text:#455069;
+--theme-kbd-border:#d2cde6;--theme-table-head:#efebfb;
+--theme-hero-dim:transparent;
+}
+:root[data-theme="solarized"]{
+--theme-bg:#fdf6e3;--theme-surface:#fffdf5;--theme-side:#eee8d5;--theme-panel:#f6efd9;
+--theme-text:#344c51;--theme-muted:#526a70;--theme-line:#d4cebc;
+--theme-primary:#267ba8;--theme-secondary:#2aa198;--theme-tertiary:#b58900;
+--theme-select:#d9ede7;--theme-hover:#e9f2e2;--theme-focus:#267ba8;
+--theme-kbd-bg:#fffdf5;--theme-kbd-text:#41535a;--theme-kbd-border:#bcb6a6;--theme-table-head:#e9e4d2;
+}
+:root[data-theme="gruvbox"]{
+--theme-bg:#1d2021;--theme-surface:#282828;--theme-side:#262624;--theme-panel:#32302f;
+--theme-text:#dfd6c2;--theme-muted:#bdae93;--theme-line:#504945;
+--theme-primary:#feac58;--theme-secondary:#83a598;--theme-tertiary:#b8bb26;
+--theme-select:#43382f;--theme-hover:#3b3630;--theme-focus:#fabd2f;
+--theme-kbd-bg:#35312b;--theme-kbd-text:#ebdbb2;--theme-kbd-border:#665c54;--theme-table-head:#38332e;
+--theme-hero-dim:rgba(31,25,21,.28)
+}
+:root[data-theme="everforest"]{
+--theme-bg:#1e2326;--theme-surface:#272e30;--theme-side:#242b2d;--theme-panel:#303a39;
+--theme-text:#d3cdbd;--theme-muted:#a7b0a2;--theme-line:#47544d;
+--theme-primary:#a7c080;--theme-secondary:#7fbbb3;--theme-tertiary:#dbbc7f;
+--theme-select:#38493e;--theme-hover:#34433b;--theme-focus:#a7c080;
+--theme-kbd-bg:#35403b;--theme-kbd-text:#d5dfc8;--theme-kbd-border:#5c6a5d;--theme-table-head:#344039;
+--theme-hero-dim:rgba(19,35,28,.28)
+}
+:root[data-theme="citrus"]{
+--theme-bg:#fffef4;--theme-surface:#fffefa;--theme-side:#f1f6e8;--theme-panel:#f4f6e4;
+--theme-text:#38443b;--theme-muted:#58685d;--theme-line:#dce5d0;
+--theme-primary:#4f8124;--theme-secondary:#0f887c;--theme-tertiary:#b87612;
+--theme-select:#ddedc8;--theme-hover:#e7f3d6;--theme-focus:#447a27;
+--theme-kbd-bg:#ffffff;--theme-kbd-text:#475341;--theme-kbd-border:#c8d5ba;--theme-table-head:#e9f1dd;
+}
+/* Preserve meaningful colors but reduce luminance in dark palettes. */
+:root[data-theme="rose-moon"]{--theme-hover:#38334e;--theme-select:#413953;--theme-kbd-bg:#353149;--theme-kbd-text:#ded9f1;--theme-kbd-border:#625b7b;--theme-table-head:#38344d;--theme-hero-dim:rgba(30,23,46,.28)}
+:root[data-theme="tokyo"]{--theme-hover:#303449;--theme-select:#3b3d54;--theme-kbd-bg:#30344a;--theme-kbd-text:#c0caf5;--theme-kbd-border:#4d5471;--theme-table-head:#2d334a;--theme-hero-dim:rgba(20,23,43,.3)}
+:root[data-theme="aurora"]{--theme-hero-dim:transparent}
+:root[data-theme="rose-dawn"]{--theme-hero-dim:transparent}
+/* Dark selectors share a low-glare hover and neutralized inherited surfaces. */
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]){
+--theme-button-text:var(--theme-text);
+}
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .scene-heading h2,
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .scene-heading p,
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .scene-heading .scene-kicker{color:#302f49!important}
+/* Dim scene backgrounds without dimming text and icons. */
+.region-scene{position:relative}
+.region-scene::before{content:"";pointer-events:none;position:absolute;inset:0;background:var(--theme-hero-dim);z-index:0}
+.region-scene>*{position:relative;z-index:1}
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .world-v4 .region{filter:none;position:relative;isolation:isolate;overflow:hidden}
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .world-v4 .region::before{content:"";position:absolute;inset:0;background:var(--theme-hero-dim);pointer-events:none;z-index:1}
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .world-v4 .region svg,
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .world-v4 .region span{position:relative;z-index:2}
+.world-v4 .region svg,.world-v4 .region span{transform:translateY(3px)}
+/* Keyboard hints: previous white defaults did not follow dark themes. */
+.v3-shell .bottom-shortcuts,.bottom-shortcuts{color:var(--theme-muted);background:transparent}
+.v3-shell .bottom-shortcuts kbd,.v3-shell .sidefoot .kbd,kbd,.kbd{
+background:var(--theme-kbd-bg)!important;color:var(--theme-kbd-text)!important;
+border:1px solid var(--theme-kbd-border)!important;border-radius:4px;
+box-shadow:none;font-variant-numeric:tabular-nums
+}
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .v3-shell .bottom-button:hover,
+:root:is([data-theme="rose-moon"],[data-theme="tokyo"],[data-theme="gruvbox"],[data-theme="everforest"]) .v3-shell .bottom-button:focus-visible{
+background:var(--theme-hover)!important;color:var(--theme-text)!important;box-shadow:none
+}
+/* Audit: legacy bright hardcoded controls and metadata */
+.v3-shell .top-settings:hover,.v3-shell .iconbutton:hover,.v3-shell .dialog-close:hover{background:var(--theme-hover)}
+.input,.v3-shell input:not([type="checkbox"]):not([type="radio"]),.v3-shell select,
+.dialog-body input:not([type="checkbox"]):not([type="radio"]),.dialog-body select{
+background:var(--theme-surface)!important;color:var(--theme-text)!important;border-color:var(--theme-line)!important
+}
+input::placeholder{color:var(--theme-muted);opacity:.82}
+input[type="checkbox"],input[type="radio"]{accent-color:var(--theme-primary)}
+.v3-shell table,.dialog-body table{color:var(--theme-text)}
+.v3-shell th,.dialog-body th{background:var(--theme-table-head);color:var(--theme-text);border-color:var(--theme-line)}
+.v3-shell td,.dialog-body td,.v3-shell .textrow,.dialog-body .textrow{border-color:var(--theme-line);color:var(--theme-text)}
+.v3-shell tr:hover td,.dialog-body tr:hover td{background:var(--theme-hover)}
+.v3-shell .metric,.v3-shell .info,.dialog-body .metric,.dialog-body .info{background:var(--theme-panel);color:var(--theme-text)}
+.v3-shell .metric small,.dialog-body .metric small,.v3-shell .textrow span,.dialog-body .textrow span{color:var(--theme-muted)}
+.v3-shell .btn,.dialog-body .btn{background:var(--theme-surface);color:var(--theme-text);border-color:var(--theme-line);border-radius:9px}
+.v3-shell .btn:hover,.dialog-body .btn:hover{background:var(--theme-hover)}
+.v3-shell .btn.primary,.dialog-body .btn.primary{background:var(--theme-primary);border-color:var(--theme-primary);color:var(--theme-bg)}
+.v3-shell .craft-detail,.v3-shell .inventory-detail,.dialog-body .craft-detail,.dialog-body .inventory-detail{background:var(--theme-panel);color:var(--theme-text)}
+.v3-shell .craft-choice small,.v3-shell .inventory-item-name small,.dialog-body .craft-choice small,.dialog-body .inventory-item-name small{color:var(--theme-muted)}
+.v3-shell .craft-choice.selected,.v3-shell .inventory-choice.selected,.dialog-body .craft-choice.selected,.dialog-body .inventory-choice.selected{background:var(--theme-select)}
+.v3-shell .region-facts span,.v3-shell .eventtools button,.v3-shell .hungerline,.v3-shell .linklike{color:var(--theme-muted)}
+.v3-shell .loghead,.v3-shell .rightpanel .logfoot,.v3-shell .bottom,.v3-shell .playerpanel{border-color:var(--theme-line)}
+.v3-shell .loghead .sectiontitle{color:var(--theme-text)}
+.v3-shell .tag,.dialog-body .tag{background:var(--theme-select);color:var(--theme-text)}
+.v3-shell .mark,.dialog-body .mark{background:var(--theme-select);color:var(--theme-text)}
+.v3-shell .effect-icon,.dialog-body .effect-icon{border-color:var(--theme-line);background:var(--theme-surface);color:var(--theme-text)}
+.v3-shell .effect-icon:hover,.v3-shell .effect-icon:focus-visible{background:var(--theme-hover)}
+.dialog-heading,.dialog-body,.dialog-wrap,.large-dialog{color:var(--theme-text)}
+.large-dialog,.dialog-heading{background:var(--theme-surface)}
+.dialog-heading{border-bottom-color:var(--theme-line)}
+.theme-choice,.dialog-body .theme-choice{background:var(--theme-surface);border-color:var(--theme-line);color:var(--theme-text)}
+.theme-choice:hover,.dialog-body .theme-choice:hover{background:var(--theme-hover)}
+.theme-choice small{color:var(--theme-muted)}
+.dialog-body .detail,.v3-shell .detail{background:var(--theme-panel);border-color:var(--theme-line);color:var(--theme-text)}
+/* Ensure visual content does not overflow fixed-height footer */
+.v3-shell .bottom{border-top-color:var(--theme-line)}
