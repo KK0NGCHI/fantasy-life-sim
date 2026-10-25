@@ -29,12 +29,16 @@ export function refineMineral05H(itemWorld,ownerId,recipeId){
   const used=Math.min(needed,item.quantity);needed-=used;
   return {...item,quantity:item.quantity-used};
  });
+ // The canonical item world forbids zero-quantity item instances. Remove exhausted stacks and placements atomically.
+ const exhausted=new Set(items.filter(item=>item.quantity===0).map(item=>item.id));
+ items=items.filter(item=>item.quantity>0);
+ const retainedPlacements=itemWorld.placements.filter(p=>!exhausted.has(p.itemId));
  const outputId='refined05h:'+recipe.output;
  const prev=items.find(item=>item.id===outputId);
  if(prev){
-  if(!itemWorld.placements.some(p=>p.itemId===outputId&&p.location.kind==='inventory'&&p.location.ownerId===ownerId))return {ok:false,reason:'OUTPUT_NOT_OWNED'};
+  if(!retainedPlacements.some(p=>p.itemId===outputId&&p.location.kind==='inventory'&&p.location.ownerId===ownerId))return {ok:false,reason:'OUTPUT_NOT_OWNED'};
   items=items.map(item=>item.id===outputId?{...item,quantity:item.quantity+recipe.outputQty}:item);
  }else items=[...items,{id:outputId,definitionId:recipe.output,quantity:recipe.outputQty}];
- const placements=prev?itemWorld.placements:[...itemWorld.placements,{itemId:outputId,location:{kind:'inventory',ownerId}}];
+ const placements=prev?retainedPlacements:[...retainedPlacements,{itemId:outputId,location:{kind:'inventory',ownerId}}];
  return {ok:true,itemWorld:{...itemWorld,items,placements},recipe};
 }
