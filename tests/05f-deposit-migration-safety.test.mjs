@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {createMineralDeposits05E,prospectMineral05E,mineMineral05E} from '../src/mineral-deposits-05e.js';
-import {previewDepositMigration05F,validateDepositMigrationPreview05F} from '../src/deposit-migration-05f.js';
+import {previewDepositMigration05F,validateDepositMigrationPreview05F,approveDepositView05F,restoreDepositView05F,DEPOSIT_VIEW_APPROVAL_05F} from '../src/deposit-migration-05f.js';
 test('preview is pure, deterministic and conserves exact site balances',()=>{
  const source=createMineralDeposits05E(),before=JSON.stringify(source);
  const a=previewDepositMigration05F(source);
@@ -37,4 +37,34 @@ test('bad source is rejected instead of being silently reset',()=>{
  const source=createMineralDeposits05E();
  const key=Object.keys(source)[0];source[key].remaining=-1;
  assert.equal(previewDepositMigration05F(source).ok,false);
+});
+
+test('explicit approval exports a detached sidecar that survives JSON roundtrip',()=>{
+ const source=createMineralDeposits05E();
+ const before=JSON.stringify(source),preview=previewDepositMigration05F(source);
+ assert.equal(approveDepositView05F(source,preview,{}).reason,'APPROVAL_REQUIRED');
+ const approved=approveDepositView05F(source,preview,{approval:DEPOSIT_VIEW_APPROVAL_05F});
+ assert.equal(approved.ok,true);
+ const json=JSON.stringify(approved.sidecar);
+ const restored=restoreDepositView05F(source,JSON.parse(json));
+ assert.equal(restored.ok,true);
+ assert.equal(JSON.stringify(restored.sidecar),json);
+ restored.sidecar.groups[0].sites[0].remaining=999;
+ assert.equal(JSON.stringify(source),before);
+});
+test('stale preview, modified sidecar and changed reserve are all refused',()=>{
+ const source=createMineralDeposits05E();
+ const preview=previewDepositMigration05F(source);
+ const approved=approveDepositView05F(source,preview,{approval:DEPOSIT_VIEW_APPROVAL_05F});
+ const key=Object.keys(source)[0];
+ source[key].remaining--;
+ assert.equal(approveDepositView05F(source,preview,{approval:DEPOSIT_VIEW_APPROVAL_05F}).reason,'STALE_OR_INVALID_PREVIEW');
+ assert.equal(restoreDepositView05F(source,approved.sidecar).reason,'STALE_OR_INVALID_VIEW');
+ const current=approveDepositView05F(source,previewDepositMigration05F(source),{approval:DEPOSIT_VIEW_APPROVAL_05F});
+ const tamper=structuredClone(current.sidecar);
+ tamper.groups[0].remaining++;
+ assert.equal(restoreDepositView05F(source,tamper).reason,'STALE_OR_INVALID_VIEW');
+ const unexpected=structuredClone(current.sidecar);
+ unexpected.groups[0].unexpected=true;
+ assert.equal(restoreDepositView05F(source,unexpected).reason,'STALE_OR_INVALID_VIEW');
 });
