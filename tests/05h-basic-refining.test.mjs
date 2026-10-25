@@ -12,7 +12,7 @@ const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'�
 const meta={slotId:'refining-test',worldId:'world',kind:'manual',label:'refining',savedAt:'2026-10-25T00:00:00Z',revision:0};
 test('refining recipe definitions have unique input/output and bounded costs',()=>{
  assert.equal(REFINING_RECIPES_05H.length,6);
- assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,5);
+ assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,6);
  for(const r of REFINING_RECIPES_05H)assert.ok((r.inputs?.every(x=>x.quantity>0)??r.inputQty>0)&&r.outputQty>0&&r.seconds>0);
 });
 test('insufficient material and invalid recipe fail without state mutation',()=>{
