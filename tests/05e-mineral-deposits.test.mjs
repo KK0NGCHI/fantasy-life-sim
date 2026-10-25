@@ -1,4 +1,5 @@
 import {test} from 'node:test';
+import {REAL_ATLAS_05E,EXOTIC_ATLAS_05E,ALTERED_TRAITS_05E,SPECIAL_FORMATIONS_05E} from '../src/mineral-atlas-05e.js';
 import assert from 'node:assert/strict';
 import {createMineralDeposits05E,validateMineralDeposits05E,prospectMineral05E,mineMineral05E,consumeLegacyMineral05E,MINERAL_DEFINITIONS_05E} from '../src/mineral-deposits-05e.js';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
@@ -12,7 +13,7 @@ const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'�
 const meta={slotId:'mineral-test',worldId:'world',kind:'manual',label:'test',savedAt:'2026-10-25T00:00:00Z',revision:0};
 test('five base mineral definitions create bounded never-regenerating deposits',()=>{
  const sites=createMineralDeposits05E();
- assert.equal(MINERAL_DEFINITIONS_05E.length,13);
+ assert.equal(MINERAL_DEFINITIONS_05E.length,107);
  assert.equal(validateMineralDeposits05E(sites),true);
  const d=prospectMineral05E(sites,'광산','item05a:iron-ore');
  assert.equal(d.ok,true);
@@ -109,4 +110,24 @@ test('eight new mineral definitions are finite and yield valid discovered ores',
   deposits=mined.deposits;
  }
  assert.equal(validateMineralDeposits05E(deposits),true);
+});
+
+test('complete 05-E candidate atlas retains ontology and finite stock',()=>{
+ assert.equal(REAL_ATLAS_05E.length,94);
+ assert.equal(EXOTIC_ATLAS_05E.length,16);
+ assert.equal(ALTERED_TRAITS_05E.length,6);
+ assert.equal(SPECIAL_FORMATIONS_05E.length,4);
+ assert.equal(new Set([...REAL_ATLAS_05E,...EXOTIC_ATLAS_05E].map(x=>x.id)).size,110);
+ const defs=MINERAL_DEFINITIONS_05E.filter(x=>x.atlasCategory);
+ assert.equal(defs.length,94);
+ const all=createMineralDeposits05E();
+ assert.equal(Object.keys(all).length,214);
+ assert.equal(validateMineralDeposits05E(all),true);
+ const mineral=REAL_ATLAS_05E[0], found=prospectMineral05E(all,'광산',mineral.id);
+ assert.equal(found.ok,true);
+ const extracted=mineMineral05E(found.deposits,'광산',found.siteId,{toolPower:1,roll:0});
+ assert.equal(extracted.ok,true);
+ assert.equal(extracted.outputs[0].itemId,mineral.id);
+ assert.equal(extracted.remaining,3);
+ assert.equal(validateMineralDeposits05E(extracted.deposits),true);
 });
