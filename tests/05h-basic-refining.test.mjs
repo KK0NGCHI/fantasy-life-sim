@@ -11,8 +11,8 @@ const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'�
 });
 const meta={slotId:'refining-test',worldId:'world',kind:'manual',label:'refining',savedAt:'2026-10-25T00:00:00Z',revision:0};
 test('refining recipe definitions have unique input/output and bounded costs',()=>{
- assert.equal(REFINING_RECIPES_05H.length,6);
- assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,6);
+ assert.equal(REFINING_RECIPES_05H.length,12);
+ assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,12);
  for(const r of REFINING_RECIPES_05H)assert.ok((r.inputs?.every(x=>x.quantity>0)??r.inputQty>0)&&r.outputQty>0&&r.seconds>0);
 });
 test('insufficient material and invalid recipe fail without state mutation',()=>{
@@ -73,4 +73,30 @@ test('bronze alloy requires both inputs and town facilities, cannot partially co
  const insufficient=structuredClone(input);insufficient.items[1].quantity=0;
  assert.equal(refineMineral05H(insufficient,'player','refine05h:bronze').reason,'INSUFFICIENT_MATERIAL');
  assert.equal(JSON.stringify(input),before);
+});
+
+test('refined copper, iron and bronze produce owned tools without double spending',()=>{
+ for(const material of ['copper','iron','bronze']){
+  for(const type of ['pickaxe','axe']){
+   const ingotId='item05h:'+material+'-ingot';
+   const world={items:[
+    {id:'metal',definitionId:ingotId,quantity:2},
+    {id:'stone',definitionId:'item05h:cut-stone',quantity:1}
+   ],placements:[
+    {itemId:'metal',location:{kind:'inventory',ownerId:'p'}},
+    {itemId:'stone',location:{kind:'inventory',ownerId:'p'}}
+   ],containers:[]};
+   const before=JSON.stringify(world);
+   const crafted=refineMineral05H(world,'p','craft05i:'+material+'-'+type);
+   assert.equal(crafted.ok,true,material+' '+type);
+   assert.equal(JSON.stringify(world),before);
+   assert.equal(crafted.itemWorld.items.length,1);
+   assert.equal(crafted.itemWorld.items[0].definitionId,'tool05a:'+type+':'+material);
+   assert.equal(crafted.itemWorld.items[0].quantity,1);
+   assert.equal(crafted.itemWorld.placements.length,1);
+   assert.equal(refineMineral05H(world,'intruder','craft05i:'+material+'-'+type).reason,'INSUFFICIENT_MATERIAL');
+   const short=structuredClone(world);short.items[1].quantity=0;
+   assert.equal(refineMineral05H(short,'p','craft05i:'+material+'-'+type).reason,'INSUFFICIENT_MATERIAL');
+  }
+ }
 });
