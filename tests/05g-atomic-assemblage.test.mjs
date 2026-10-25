@@ -28,7 +28,7 @@ test('hydrothermal pilot consumes actual stocks atomically, never creates a seco
  assert.equal(extractAssemblage05G(depleted,'광산',sites,{toolPower:1,roll:0}).reason,'DEPOSIT_EXHAUSTED');
 });
 test('same generic extraction applies to distinct formation families and rejects mixed families',()=>{
- const families=[['hematite','limestone'],['gypsum','halite'],['granite','magnetite'],['basalt','pumice'],['slate','marble']];
+ const families=[['gypsum','halite'],['granite','magnetite'],['basalt','pumice'],['slate','marble']];
  for(const pair of families){
   const actual=ids(pair),settings=actual.map(id=>geologyProfile05F(id).settingId);
   if(settings[0]!==settings[1])continue;
@@ -61,4 +61,17 @@ test('dispatcher multi-ore mining, save-v3 roundtrip, and rejection leave state 
  const saved=createSaveV3(prepared.state,meta,'test',g.registry);
  const decoded=decodeSaveV3(JSON.parse(JSON.stringify(saved)),g.registry);assert.equal(decoded.ok,true);
  const restored=make();restored.applyApprovedSave(decoded.save);assert.deepEqual(restored.current(),g.current());
+});
+
+test('same hydrothermal family cannot join unrelated ore bodies by guessing IDs',()=>{
+ let world=createMineralDeposits05E(),sites=[];
+ for(const itemId of ids(['chalcopyrite','galena'])){
+  const p=prospectMineral05E(world,'광산',itemId);assert.equal(p.ok,true);world=p.deposits;sites.push(p.siteId);
+ }
+ const source=JSON.stringify(world);
+ const denied=extractAssemblage05G(world,'광산',sites,{toolPower:1,roll:0});
+ assert.equal(denied.reason,'UNVERIFIED_ORE_CLUSTER');
+ assert.equal(JSON.stringify(world),source);
+ const fake=sites[0].replace(/:0$/,':1');
+ assert.equal(extractAssemblage05G(world,'광산',[fake,sites[1]],{toolPower:1,roll:0}).ok,false);
 });
