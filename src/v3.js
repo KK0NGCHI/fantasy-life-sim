@@ -1,3 +1,4 @@
+import {MINERAL_DEFINITIONS_05E,mineralDepositId05E} from './mineral-deposits-05e.js';
 import {FUNGAL_BY_ID_05B} from './fungal-ecology-05b.js';
 import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
@@ -50,7 +51,7 @@ function fresh(){return {page:'생활',region:'거점 마을',tab:'개요',turn:
 let s=fresh(),autoTimer=null,previousPage='생활',inventoryDiscardMode=false;
 let localRemembered=[];
 let autoTarget=0;
-const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,ecology05A:true,fungi05B:true,woodland05C:true,incidentalTables05A:ACTIVITY_TABLES_05A});
+const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,ecology05A:true,fungi05B:true,woodland05C:true,minerals05E:true,incidentalTables05A:ACTIVITY_TABLES_05A});
 function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
 function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
@@ -139,6 +140,44 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
   const panel=make('section',{class:'resource05a-panel','aria-label':'지역 자원 활동'},el);
   make('h3',{text:'자원 활동'},panel);
   make('p',{class:'muted',text:'활동 종류를 선택하고 발견한 지점을 지정합니다. 실제 결과에 따라 시간·재료·숙련이 함께 변합니다.'},panel);
+  // The mineral panel reads the same finite regional stock as legacy mining.
+  // All transitions are executed by authoritative engine commands.
+  const mineralDeposits=snapshot.mineralDeposits05E;
+  if(mineralDeposits&&(s.region==='광산'||s.region==='산맥')){
+   const mineralPanel=make('section',{class:'resource05a-list','aria-label':'광물 탐사와 채굴'},panel);
+   make('h4',{text:'광물 탐사 · 유한 매장층'},mineralPanel);
+   make('p',{class:'muted',text:'탐사 10분 · 광맥 채굴 3분. 기존 채광과 매장량을 공유하며, 자연 재생하지 않습니다.'},mineralPanel);
+   const pickaxes=mainV2.availableTools05A('mining');
+   const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
+   const bestRank=Math.max(0,...pickaxes.map(tool=>rankOf(tool.id)));
+   make('p',{class:'muted',text:'현재 곡괭이 능력 '+bestRank+' · 해당 광맥 경도 이상이어야 채굴 가능합니다.'},mineralPanel);
+   for(const def of MINERAL_DEFINITIONS_05E.filter(def=>def.regions.includes(s.region))){
+    const site=mineralDeposits[mineralDepositId05E(s.region,def.id)];
+    if(!site)continue;
+    const row=make('div',{class:'resource05a-row'},mineralPanel);
+    make('strong',{text:def.name+' · 경도 '+def.hardness+' · 품위 '+def.grade},row);
+    make('span',{text:site.discovered?'확인 매장량 '+site.remaining+'/'+def.stock:site.remaining===0?'고갈':'미탐사 광맥'},row);
+    if(!site.discovered){
+     const discover=btn('탐사 (10분)',()=>{
+      if(!executeV2('mineral.prospect',{itemId:def.id}))return render();
+      nextLog('광물 탐사',def.name+' 광맥을 발견했습니다.');render();
+     },'btn',row);
+     discover.disabled=site.remaining===0;
+    }else{
+     const note=site.remaining===0?'매장량이 고갈되었습니다.':
+      bestRank<def.hardness?'곡괭이 능력이 부족합니다.':'광맥 채굴 가능';
+     make('span',{class:'muted',text:note},row);
+     const harvest=btn('채굴 (3분)',()=>{
+      const before=mainV2.current().itemWorld.items.filter(item=>item.definitionId===def.id).reduce((sum,item)=>sum+item.quantity,0);
+      if(!executeV2('mineral.extract',{siteId:site.id}))return render();
+      const after=mainV2.current().itemWorld.items.filter(item=>item.definitionId===def.id).reduce((sum,item)=>sum+item.quantity,0);
+      nextLog('광물 채굴',def.name+' · '+(after>before?'획득 '+(after-before)+'개':'획득 없음'), '잔여 매장량 '+mainV2.resources05A().mineralDeposits05E[site.id].remaining);
+      render();
+     },'btn',row);
+     harvest.disabled=site.remaining===0||bestRank<def.hardness;
+    }
+   }
+  }
   const candidates=Object.entries(snapshot.candidateSites??{}).filter(([id,site])=>site.region===s.region&&SOURCE_WORK_RULES_05A[site.sourceId]);
   if(candidates.length){
    const candidatePanel=make('div',{class:'resource05a-list'},panel);
