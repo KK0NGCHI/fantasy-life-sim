@@ -27,3 +27,8 @@
 - [자동·수동 채광 검증 PR #88](https://github.com/KK0NGCHI/fantasy-life-sim/pull/88)
 - [이전 위험 감사](./stabilization-s01-s03-20261025.md)
 - [확정 결정·시험값](./project-decisions-current.md)
+
+## 2026-10-26 콘텐츠 연결 측정 추가 (PR 분리)
+- `tests/05i-content-recipe-coverage.test.mjs`는 등록된 재료 정의와 05-H/I 실제 레시피의 입력·출력 ID, 원료 출처 후보, 미사용 정의 개수를 자동 집계하고 CI 로그에 `CONTENT_COVERAGE_05H` JSON을 출력한다.
+- ID 등록/레시피 참조 정합성을 테스트하되, 이것이 모든 재료의 실제 획득 가능 여부나 완성된 생활 루프를 입증한다고 주장하지 않는다.
+- **트랙 3 판정은 부분 구현 유지.** 실제 소비 가능 비율은 CI 측정 결과와 후속 UI/경제 경로 검증 전까지 확정하지 않는다. 트랙 4의 생산·소비 밸런스 평가는 별개다.
