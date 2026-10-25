@@ -29,3 +29,19 @@ export function extractionCluster05G(region,siteIds){
   return siteIds.every(id=>allowed.has(id));
  })??null;
 }
+
+/** Stable, derived identity for one explicitly approved prototype cluster.
+ * This is NOT a new saved location or independent reserve.
+ */
+export function depositIdentity05G(region,siteIds){
+ const cluster=extractionCluster05G(region,siteIds);
+ if(!cluster)return null;
+ return Object.freeze({
+  id:'deposit05g:'+encodeURIComponent(region)+':'+cluster.id,
+  region,
+  clusterId:cluster.id,
+  formation:cluster.formation,
+  siteIds:Object.freeze(siteIds.slice().sort()),
+  kind:'DERIVED_PROTOTYPE'
+ });
+}
