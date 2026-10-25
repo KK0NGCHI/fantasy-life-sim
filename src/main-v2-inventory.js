@@ -30,6 +30,16 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  */
 export function createMainV2Inventory(uiItems,options={}) {
  const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A,...FUNGAL_ITEMS_05B];
+ const recordAcquired05D=(existing,rewards)=>{
+  if(!Array.isArray(rewards)||rewards.length===0)throw Error('INVALID_REWARDS');
+  if(rewards.every(r=>FUNGAL_BY_ID_05B.has(r.itemId)&&Number.isSafeInteger(r.quantity)&&r.quantity>0)){
+   const obtained=new Set(existing?.itemIds??[]);
+   for(const r of rewards)obtained.add(r.itemId);
+   return {sourceIds:[...new Set(existing?.sourceIds??[])].sort(),itemIds:[...obtained].sort()};
+  }
+  return acquiredCompendium05A(existing,rewards);
+ };
+
  const poolOverrides=options.resourcePools05A??{};
  if(!poolOverrides||typeof poolOverrides!=='object'||Array.isArray(poolOverrides)||Object.entries(poolOverrides).some(([source,pool])=>!SOURCE_WORK_RULES_05A[source]||!validateResourcePool05A(pool)||pool.tiers.some(t=>t.outputs.some(o=>!knownResourceItems05A.some(i=>i.id===o.itemId)))))throw Error('INVALID_RESOURCE_POOL_CONFIG');
  const incidentalTables05A=options.incidentalTables05A??{};
@@ -259,7 +269,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const resource05A={...resources,
    ...(sharedSubstrate?.ok?{ecologySubstrates:sharedSubstrate.world}:{}),
    ecologySites:{...resources.ecologySites,[site.id]:outcome.site},
-   compendium:acquiredCompendium05A(resources.compendium,[{itemId:item.itemId,quantity:item.quantity}])};
+   compendium:recordAcquired05D(resources.compendium,[{itemId:item.itemId,quantity:item.quantity}])};
   return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld,
    world:{...snapshot.world,runtime:{...runtime,resource05A}}},
    events:[{type:'botanical.patch_harvested',payload:{siteId:site.id,itemId:item.itemId,part:item.part,quantity:item.quantity}}]};
@@ -275,7 +285,6 @@ export function createMainV2Inventory(uiItems,options={}) {
    events:[{type:'botanical.observed',payload:{itemId:species.id,name:species.name,region:runtime.region}}]};
  }],
  ['resource.incidental.search',(snapshot,command)=>{
-  try {
   const runtime=snapshot.world.runtime;
   if(runtime.dungeon||!runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
   const kind=command.payload?.activity;
@@ -358,14 +367,13 @@ export function createMainV2Inventory(uiItems,options={}) {
     [...itemWorld.items,{id:itemId,definitionId:result.itemId,quantity:1}],
     placements:original?itemWorld.placements:
      [...itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
-   resource05A={...resource05A,compendium:acquiredCompendium05A(resource05A.compendium,
+   resource05A={...resource05A,compendium:recordAcquired05D(resource05A.compendium,
     [{itemId:result.itemId,quantity:1}])};
    event={type:'resource.incidental_acquired',payload:{activity:kind,itemId:result.itemId,quantity:1}};
   }
   return {outcome:'success',nextState:{...snapshot,rng:c.rng,itemWorld,flags,
    world:{...snapshot.world,runtime:{...runtime,resource05A}}},
    events:[event]};
-  } catch(error){console.error('05D_INCIDENTAL_DIAGNOSTIC',error);throw error;}
  }],
  ['resource.candidate.discover',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
