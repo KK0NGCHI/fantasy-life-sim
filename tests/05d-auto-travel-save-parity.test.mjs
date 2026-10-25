@@ -27,7 +27,6 @@ test('mid-simulation save/reload produces identical ecology state and time as un
  const uninterrupted=make(),resumed=make();
  doRest(uninterrupted,40);
  doRest(resumed,18);
- transfer(resumed,make());
  const loaded=make();transfer(resumed,loaded);
  doRest(resumed,22);doRest(loaded,22);
  assert.deepEqual(loaded.current(),uninterrupted.current());
@@ -45,7 +44,6 @@ test('pause/resume/cancel do not advance ecological time; skip dispatch reconcil
  assert.equal(game.current().clock.elapsedUnits,start);
  assert.equal(game.travelCancel(),true);
  assert.equal(game.current().clock.elapsedUnits,start);
- const restart=game.routePreview(candidate.plan.destinationSiteId);
  // plan may use named regions; the original validated plan is still safe after cancel.
  assert.equal(game.travelBegin(candidate.plan),true);
  const travel=game.travelSkip();
