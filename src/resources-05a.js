@@ -31,6 +31,8 @@ export function activeResourceSeconds05A(def,from,to){
 }
 export function resourceAt05A(node,definition,seconds){
  if(!node||!definition||!Number.isSafeInteger(seconds)||seconds<node.lastSecond)throw Error('INVALID_RESOURCE_TIME');
+ // Repeated evaluation at one game-clock instant must not rewrite any ledger field.
+ if(seconds===node.lastSecond)return {...node};
  const next={...node},elapsed=activeResourceSeconds05A(definition,next.lastSecond,seconds);
  const step=definition.regenDays*DAY;
  if(step>0&&next.remaining<definition.capacity){
