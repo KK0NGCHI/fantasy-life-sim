@@ -17,7 +17,8 @@ export const REFINING_RECIPES_05H=Object.freeze([
  {id:'upgrade05i:reinforced-stone-pickaxe',name:'보강 석재 곡괭이 제작 (임시 성장 연결)',station:'workbench',inputs:[{itemId:'item05h:cut-stone',quantity:2},{itemId:'item05h:clay-brick',quantity:1}],output:'tool05a:pickaxe:reinforcedStone',outputQty:1,seconds:600},
  {id:'upgrade05i:reinforced-bronze-pickaxe',name:'보강 청동 곡괭이 제작 (임시 성장 연결)',station:'workbench',inputs:[{itemId:'item05h:bronze-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:pickaxe:reinforcedBronze',outputQty:1,seconds:600},
  {id:'refine05h:oak-planks',name:'참나무 판재 가공',station:'workbench',input:'item05a:oak-log',inputQty:2,output:'item05h:oak-planks',outputQty:2,seconds:300},
- {id:'craft05i:processed-wood-rod',name:'가공 목재 낚싯대 제작',station:'workbench',inputs:[{itemId:'item05h:oak-planks',quantity:2},{itemId:'item05a:grass',quantity:2}],output:'tool05a:rod:processedWood',outputQty:1,seconds:600}
+ {id:'craft05i:processed-wood-rod',name:'가공 목재 낚싯대 제작',station:'workbench',inputs:[{itemId:'item05h:oak-planks',quantity:2},{itemId:'item05a:grass',quantity:2}],output:'tool05a:rod:processedWood',outputQty:1,seconds:600},
+ {id:'craft05i:mycelium-gloves',name:'균사 섬유 채집 장갑 제작 (임시 생활 연결)',station:'workbench',inputs:[{itemId:'item05b:wood-ear',quantity:2},{itemId:'item05a:grass',quantity:2}],output:'tool05a:gloves:mycelium',outputQty:1,seconds:600}
 ]);
 export const REFINING_BY_ID_05H=new Map(REFINING_RECIPES_05H.map(r=>[r.id,r]));
 export const REFINED_ITEMS_05H=Object.freeze([
