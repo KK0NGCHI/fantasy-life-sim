@@ -25,10 +25,11 @@ const doRest=(game,count)=>{
 };
 test('mid-simulation save/reload produces identical ecology state and time as uninterrupted run',()=>{
  const uninterrupted=make(),resumed=make();
- doRest(uninterrupted,40);
- doRest(resumed,18);
+ doRest(uninterrupted,1100);
+ doRest(resumed,500);
  const loaded=make();transfer(resumed,loaded);
- doRest(resumed,22);doRest(loaded,22);
+ doRest(resumed,600);doRest(loaded,600);
+ assert.ok(loaded.current().world.runtime.resource05A.woodland05C.day>0,'must cross an ecological day boundary');
  assert.deepEqual(loaded.current(),uninterrupted.current());
  assert.deepEqual(loaded.current(),resumed.current());
 });
