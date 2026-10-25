@@ -60,8 +60,8 @@ test('dispatcher returns same authoritative ecology snapshot as current() across
  assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
  const initial=g.current().world.runtime.resource05A.woodland05C.day;
  let advanced;
- for(let i=0;i<150;i++){
-  const result=g.dispatch('resource.incidental.search',{activity:'explore'});
+ for(let i=0;i<2000;i++){
+  const result=g.dispatch('life.activity',{name:'휴식한다'});
   assert.equal(result.accepted,true,JSON.stringify(result));
   if(g.current().world.runtime.resource05A.woodland05C.day>initial){
    advanced=result;
