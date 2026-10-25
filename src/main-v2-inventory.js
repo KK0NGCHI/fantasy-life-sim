@@ -461,6 +461,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  ['resource.candidate.prospect',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
   if(runtime.dungeon||!resources?.candidateSites)throw Error('CANDIDATE_UNAVAILABLE');
+  if(resources.mineralDeposits05E)throw Error('USE_MINERAL_DEPOSIT');
   const found=prospectCandidateQuartz05A(resources.candidateSites,runtime.region,snapshot.clock.elapsedUnits);
   if(!found.ok)throw Error(found.reason);
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:found.nodes}}}},
@@ -472,6 +473,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const nodeId=command.payload?.nodeId,site=resources.candidateSites[nodeId];
   const rule=SOURCE_WORK_RULES_05A[site?.sourceId];
   if(!rule)throw Error('UNKNOWN_CANDIDATE');
+  if(site.sourceId==='source05a:quartz'&&resources.mineralDeposits05E)throw Error('USE_MINERAL_DEPOSIT');
   const requested=command.payload?.toolId;
   const prefix={mining:'tool05a:pickaxe',logging:'tool05a:axe',gather:'tool05a:gloves'}[rule.activity];
   const owned=snapshot.itemWorld.items.filter(x=>x.quantity>0&&(x.definitionId===prefix||x.definitionId.startsWith(prefix+':'))&&snapshot.itemWorld.placements.some(p=>p.itemId===x.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
