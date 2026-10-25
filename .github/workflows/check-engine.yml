@@ -53,3 +53,4 @@ jobs:
         run: |
           python3 -m http.server 8000 --bind 127.0.0.1 &
           node tests/browser-03f-smoke.mjs
+          node tests/browser-05e-mineral.mjs
