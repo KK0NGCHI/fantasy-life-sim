@@ -202,6 +202,27 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
       mine.disabled=site.remaining===0||bestRank<def.hardness;
      }
     }
+    const mineralCandidates=candidates.filter(([id,site])=>SOURCE_WORK_RULES_05A[site.sourceId]?.activity==='mining');
+    if(mineralCandidates.length){
+     const supplemental=make('section',{class:'resource05a-list','aria-label':'추가 광물 발견 지점'},results);
+     make('h4',{text:'추가 광물 발견 지점'},supplemental);
+     make('p',{class:'muted',text:'기존 검증용 자원 탐사입니다. 유한 광맥과 별도 작업 지점으로 표시됩니다.'},supplemental);
+     btn('수정 탐사 후보 찾기 (10분)',()=>{
+      if(!executeV2('resource.candidate.prospect',{}))return render();render();
+     },'btn',supplemental);
+     for(const [id,site] of mineralCandidates){
+      const item=RESOURCE_SPECIES_05A.find(x=>x.id===site.sourceId);
+      const row=make('div',{class:'resource05a-row'},supplemental);
+      make('strong',{text:item?.name??site.sourceId},row);
+      make('span',{text:site.discovered?'작업 잔량 '+site.remaining:'미발견 지점'},row);
+      if(!site.discovered)btn('지점 발견',()=>{if(executeV2('resource.candidate.discover',{nodeId:id}))render()},'btn',row);
+      else{
+       const tool=mainV2.availableTools05A('mining')[0];
+       const work=btn('후보 지점 작업',()=>{if(executeV2('resource.candidate.work',{nodeId:id,...(tool?{toolId:tool.id}:{})}))render()},'btn',row);
+       work.disabled=site.remaining===0||!tool;
+      }
+     }
+    }
     make('h4',{text:'기존 작업 지점 · 공유 매장량'},results);
     make('p',{class:'muted',text:'아래 작업 지점은 같은 지역의 광맥 잔량을 소모합니다. 작업 진행도는 지점별로 유지됩니다.'},results);
    }
