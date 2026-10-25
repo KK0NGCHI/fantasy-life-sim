@@ -1,19 +1,7 @@
+import {RESOURCE_BALANCE_ROWS_05A} from './balance-resources-05a.js';
 /** 05-A resource catalogue; content candidate values are not final economy balance.
  * Resource origin and properties are independent; do not infer cosmic provenance from region. */
-export const RESOURCES_05A=Object.freeze([
- ['wild-herb','야생 약초','gather','숲',5,3,7],
- ['mushroom','일반 버섯','gather','숲',4,4,9],
- ['grass','들풀','gather','숲',8,2,3],
- ['oak-log','참나무 통나무','logging','숲',5,18,30],
- ['pine-log','소나무 통나무','logging','숲',4,14,24],
- ['stone','일반 돌','mining','광산',12,2,3],
- ['coal','석탄','mining','광산',10,0,8],
- ['copper-ore','구리광석','mining','광산',12,0,8],
- ['iron-ore','철광석','mining','광산',10,0,11],
- ['small-fish','작은 민물고기','fishing','강·호수',12,2,10],
- ['carp','잉어','fishing','강·호수',8,4,13],
- ['trout','송어','fishing','강·호수',6,5,16]
-].map(([key,name,activity,region,capacity,regenDays,xp])=>
+export const RESOURCES_05A=Object.freeze(RESOURCE_BALANCE_ROWS_05A.map(([key,name,activity,region,capacity,regenDays,xp])=>
  Object.freeze({id:'resource05a:'+key,name,activity,region,capacity,regenDays,xp,itemId:'item05a:'+key,
  materialOrigin:'mundane',traits:Object.freeze([])})));
 export const RESOURCE_MAP_05A=new Map(RESOURCES_05A.map(r=>[r.id,r]));
