@@ -1,3 +1,4 @@
+import {creditMineralOutputs05E} from './mineral-credit-05e.js';
 import {REFINING_RECIPES_05H,REFINED_ITEMS_05H,REFINING_BY_ID_05H,refineMineral05H} from './mineral-refining-05h.js';
 import {extractAssemblage05G} from './mineral-extraction-05g.js';
 import {createMineralDeposits05E,prospectMineral05E,mineMineral05E,consumeLegacyMineral05E,MINERAL_BY_ID_05E} from './mineral-deposits-05e.js';
@@ -263,16 +264,9 @@ export function createMainV2Inventory(uiItems,options={}) {
   const draw=drawRandom(snapshot.rng,'action');
   const attempt=mineMineral05E(deposits,runtime.region,command.payload?.siteId,{toolPower,roll:draw.value});
   if(!attempt.ok)throw Error(attempt.reason);
-  let items=snapshot.itemWorld.items,placements=snapshot.itemWorld.placements;
-  for(const out of attempt.outputs){
-   const id='mineral05e:'+out.itemId;
-   const found=items.find(x=>x.id===id);
-   if(found)items=items.map(x=>x.id===id?{...x,quantity:x.quantity+out.quantity}:x);
-   else{items=[...items,{id,definitionId:out.itemId,quantity:out.quantity}];
-    placements=[...placements,{itemId:id,location:{kind:'inventory',ownerId:snapshot.player.id}}];}
-  }
+  const itemWorld=creditMineralOutputs05E(snapshot.itemWorld,snapshot.player.id,attempt.outputs);
   const resource05A={...runtime.resource05A,mineralDeposits05E:attempt.deposits};
-  return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld:{...snapshot.itemWorld,items,placements},
+  return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld,
    world:{...snapshot.world,runtime:{...runtime,resource05A}}},
    events:[{type:'mineral.extracted',payload:{siteId:command.payload.siteId,outputs:attempt.outputs,remaining:attempt.remaining}}]};
  }],
@@ -288,14 +282,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   const draw=drawRandom(snapshot.rng,'action');
   const attempt=extractAssemblage05G(deposits,runtime.region,command.payload?.siteIds,{toolPower,roll:draw.value});
   if(!attempt.ok)throw Error(attempt.reason);
-  let items=snapshot.itemWorld.items,placements=snapshot.itemWorld.placements;
-  for(const out of attempt.outputs){
-   const id='mineral05e:'+out.itemId,found=items.find(x=>x.id===id);
-   if(found)items=items.map(x=>x.id===id?{...x,quantity:x.quantity+out.quantity}:x);
-   else{items=[...items,{id,definitionId:out.itemId,quantity:out.quantity}];
-    placements=[...placements,{itemId:id,location:{kind:'inventory',ownerId:snapshot.player.id}}];}
-  }
-  return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld:{...snapshot.itemWorld,items,placements},
+  const itemWorld=creditMineralOutputs05E(snapshot.itemWorld,snapshot.player.id,attempt.outputs);
+  return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld,
    world:{...snapshot.world,runtime:{...runtime,resource05A:{...runtime.resource05A,mineralDeposits05E:attempt.deposits}}}},
    events:[{type:'mineral.assemblage.extracted',payload:{siteIds:command.payload.siteIds,outputs:attempt.outputs,remainingBySite:attempt.remainingBySite}}]};
  }],
