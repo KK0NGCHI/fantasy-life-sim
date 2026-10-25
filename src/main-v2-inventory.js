@@ -1,3 +1,4 @@
+import {REFINING_RECIPES_05H,REFINED_ITEMS_05H,REFINING_BY_ID_05H,refineMineral05H} from './mineral-refining-05h.js';
 import {extractAssemblage05G} from './mineral-extraction-05g.js';
 import {createMineralDeposits05E,prospectMineral05E,mineMineral05E,consumeLegacyMineral05E,MINERAL_BY_ID_05E} from './mineral-deposits-05e.js';
 import {createTreeWorld05C,createWoodlandSubstrates05C,advanceWoodland05C} from './woodland-cycle-05c.js';
@@ -31,7 +32,7 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
  */
 export function createMainV2Inventory(uiItems,options={}) {
- const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A,...FUNGAL_ITEMS_05B];
+ const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A,...FUNGAL_ITEMS_05B,...REFINED_ITEMS_05H];
  const extendedLootIds05D=new Set([...FUNGAL_ITEMS_05B,...BOTANICAL_SEED_ITEMS_05A].map(x=>x.id));
  const recordAcquired05D=(existing,rewards)=>{
   if(!Array.isArray(rewards)||rewards.length===0)throw Error('INVALID_REWARDS');
@@ -297,6 +298,15 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld:{...snapshot.itemWorld,items,placements},
    world:{...snapshot.world,runtime:{...runtime,resource05A:{...runtime.resource05A,mineralDeposits05E:attempt.deposits}}}},
    events:[{type:'mineral.assemblage.extracted',payload:{siteIds:command.payload.siteIds,outputs:attempt.outputs,remainingBySite:attempt.remainingBySite}}]};
+ }],
+ ['mineral.refine',(snapshot,command)=>{
+  if(snapshot.world.runtime.dungeon)throw Error('REFINING_UNAVAILABLE');
+  const recipe=REFINING_BY_ID_05H.get(command.payload?.recipeId);
+  if(!recipe)throw Error('UNKNOWN_RECIPE');
+  const result=refineMineral05H(snapshot.itemWorld,snapshot.player.id,recipe.id);
+  if(!result.ok)throw Error(result.reason);
+  return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
+   events:[{type:'mineral.refined',payload:{recipeId:recipe.id,outputId:recipe.output,quantity:recipe.outputQty}}]};
  }],
  ['botanical.patch.harvest',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
@@ -580,6 +590,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   }
     if(action.type==='mineral.prospect')return {turns:1,worldUnits:600};
     if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
+    if(action.type==='mineral.refine')return {turns:1,worldUnits:REFINING_BY_ID_05H.get(action.payload?.recipeId)?.seconds??300};
     if(action.type==='mineral.assemblage.extract')return {turns:1,worldUnits:180};
     if(action.type==='botanical.patch.harvest')return {turns:1,worldUnits:60};
     if(action.type==='botanical.observe')return {turns:1,worldUnits:600};
