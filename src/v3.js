@@ -178,7 +178,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     make('h4',{text:'광맥 탐사 · 채굴'},mineralPanel);
     make('p',{class:'muted',text:'광맥을 발견한 뒤 채굴합니다. 기존 채광 지점과 같은 지역 매장량을 사용합니다. 광맥은 자연 재생하지 않습니다.'},mineralPanel);
     const refiningPanel=make('section',{class:'resource05a-list','aria-label':'광물 가공'},results);
-    make('h4',{text:'광물 정련 · 제련 · 합금'},refiningPanel);
+    make('h4',{text:'광물 정련 · 제련 · 합금 · 도구 제작'},refiningPanel);
     make('p',{class:'muted',text:s.region==='거점 마을'?'마을의 공용 용광로와 작업대 이용 가능':'가공 시설은 거점 마을에서 이용할 수 있습니다.'},refiningPanel);
     const allItems=mainV2.current().itemWorld;
     const ownedQty=itemId=>allItems.items.filter(item=>item.definitionId===itemId&&
@@ -193,7 +193,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      }).join(' · ');
      const row=make('div',{class:'resource05a-row'},refiningPanel);
      make('strong',{text:recipe.name},row);
-     make('span',{class:'muted',text:label+' → '+(REFINED_ITEMS_05H.find(i=>i.id===recipe.output)?.name??recipe.output)+' ×'+recipe.outputQty},row);
+     make('span',{class:'muted',text:label+' → '+(REFINED_ITEMS_05H.find(i=>i.id===recipe.output)?.name??(recipe.output.startsWith('tool05a:')?recipe.name.replace(/ 제작$/,''):recipe.output))+' ×'+recipe.outputQty},row);
      const can=s.region==='거점 마을'&&requirements.every(req=>ownedQty(req.itemId)>=req.quantity);
      const refine=btn('가공 ('+Math.floor(recipe.seconds/60)+'분)',()=>{
       if(!executeV2('mineral.refine',{recipeId:recipe.id}))return render();
@@ -202,7 +202,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      refine.disabled=!can;
     }
     const tools=mainV2.availableTools05A('mining');
-    const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
+    const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'bronze':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
     const bestRank=Math.max(0,...tools.map(tool=>rankOf(tool.id)));
     make('p',{class:'muted',text:'보유 곡괭이 최대 등급 '+bestRank+' · 탐사 10분 / 직접 채굴 3분'},mineralPanel);
     const mineralGroups=['기본 자원',...new Set(MINERAL_DEFINITIONS_05E.map(def=>def.atlasCategory).filter(Boolean))];
