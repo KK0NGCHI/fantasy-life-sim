@@ -1,3 +1,4 @@
+import {extractionCluster05G} from './mineral-clusters-05g.js';
 import {validateMineralDeposits05E,MINERAL_BY_ID_05E} from './mineral-deposits-05e.js';
 import {mineralAssemblage05F} from './mineral-assemblages-05f.js';
 
@@ -17,6 +18,9 @@ export function extractAssemblage05G(deposits,region,siteIds,{toolPower=1,roll=0
  if(defs.some(def=>!def||toolPower<def.hardness))return {ok:false,reason:'TOOL_TOO_WEAK'};
  const groups=sites.map(site=>mineralAssemblage05F(site.itemId)?.assemblageId??null);
  if(!groups[0]||groups.some(group=>group!==groups[0]))return {ok:false,reason:'INCOMPATIBLE_ASSEMBLAGE'};
+ // Same geological family and region are not sufficient evidence of co-location.
+ const cluster=extractionCluster05G(region,siteIds);
+ if(!cluster||cluster.formation!==groups[0])return {ok:false,reason:'UNVERIFIED_ORE_CLUSTER'};
  const next={...deposits},outputs=[];
  for(let i=0;i<sites.length;i++){
   const site=sites[i];
@@ -24,5 +28,5 @@ export function extractAssemblage05G(deposits,region,siteIds,{toolPower=1,roll=0
   if(roll<0.5+0.1*site.grade)outputs.push({itemId:site.itemId,quantity:1,grade:site.grade});
  }
  return {ok:true,deposits:next,outputs,consumed:siteIds.length,
-  assemblageId:groups[0],remainingBySite:Object.fromEntries(siteIds.map(id=>[id,next[id].remaining]))};
+  assemblageId:groups[0],clusterId:cluster.id,remainingBySite:Object.fromEntries(siteIds.map(id=>[id,next[id].remaining]))};
 }
