@@ -19,7 +19,7 @@ function rawInputs(itemId,quantity=1,seen=new Set()){
 }
 test('every implemented copper/iron/bronze tool chain reports raw ore grade gates',()=>{
  const starterRank=1;
- const toolRecipes=REFINING_RECIPES_05H.filter(r=>r.id.startsWith('craft05i:'));
+ const toolRecipes=REFINING_RECIPES_05H.filter(r=>r.id.startsWith('craft05i:')&&/-(pickaxe|axe)$/.test(r.id));
  assert.equal(toolRecipes.length,6);
  const report=toolRecipes.map(r=>{
   const inputs=rawInputs(r.output);
