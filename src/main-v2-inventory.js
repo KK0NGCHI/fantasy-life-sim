@@ -453,6 +453,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  ['resource.candidate.discover',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,resources=runtime.resource05A;
   if(runtime.dungeon||!resources?.candidateSites)throw Error('CANDIDATE_UNAVAILABLE');
+  if(resources.mineralDeposits05E&&resources.candidateSites[command.payload?.nodeId]?.sourceId==='source05a:quartz')throw Error('USE_MINERAL_DEPOSIT');
   const result=discoverCandidateSite05A(resources.candidateSites,command.payload?.nodeId,runtime.region);
   if(!result.ok)throw Error(result.reason);
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:result.nodes}}}},
