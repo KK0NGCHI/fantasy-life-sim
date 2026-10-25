@@ -1,3 +1,4 @@
+import {creditOwnedResource05A} from './resource-credit-05a.js';
 import {creditMineralOutputs05E} from './mineral-credit-05e.js';
 import {REFINING_RECIPES_05H,REFINED_ITEMS_05H,REFINING_BY_ID_05H,refineMineral05H} from './mineral-refining-05h.js';
 import {extractAssemblage05G} from './mineral-extraction-05g.js';
@@ -323,12 +324,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const item=outcome.outputs[0];
   // Credit by actual output definition: one species may yield different plant parts.
    const inventoryId='ecology05a:'+item.itemId;
-  const original=snapshot.itemWorld.items.find(x=>x.id===inventoryId);
-  const itemWorld={...snapshot.itemWorld,
-   items:original?snapshot.itemWorld.items.map(x=>x.id===inventoryId?{...x,quantity:x.quantity+item.quantity}:x):
-    [...snapshot.itemWorld.items,{id:inventoryId,definitionId:item.itemId,quantity:item.quantity}],
-   placements:original?snapshot.itemWorld.placements:
-    [...snapshot.itemWorld.placements,{itemId:inventoryId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
+  const itemWorld=creditOwnedResource05A(snapshot.itemWorld,snapshot.player.id,inventoryId,item.itemId,item.quantity);
   const resource05A={...resources,
    ...(sharedSubstrate?.ok?{ecologySubstrates:sharedSubstrate.world}:{}),
    ecologySites:{...resources.ecologySites,[site.id]:outcome.site},
@@ -426,12 +422,7 @@ export function createMainV2Inventory(uiItems,options={}) {
     else if(botanical)flags=botanicalMarkHarvest05A(flags,botanical,snapshot.clock.elapsedUnits);
    }
    const itemId='incidental05a:'+result.itemId;
-   const original=itemWorld.items.find(x=>x.id===itemId);
-   itemWorld={...itemWorld,
-    items:original?itemWorld.items.map(x=>x.id===itemId?{...x,quantity:x.quantity+1}:x):
-    [...itemWorld.items,{id:itemId,definitionId:result.itemId,quantity:1}],
-    placements:original?itemWorld.placements:
-     [...itemWorld.placements,{itemId,location:{kind:'inventory',ownerId:snapshot.player.id}}]};
+   itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,itemId,result.itemId,1);
    resource05A={...resource05A,compendium:recordAcquired05D(resource05A.compendium,
     [{itemId:result.itemId,quantity:1}])};
    event={type:'resource.incidental_acquired',payload:{activity:kind,itemId:result.itemId,quantity:1}};
