@@ -250,12 +250,16 @@ export function createMainV2Inventory(uiItems,options={}) {
  ['mineral.extract',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,deposits=runtime.resource05A?.mineralDeposits05E;
   if(runtime.dungeon||!deposits)throw Error('MINERAL_UNAVAILABLE');
-  // Ignore user-supplied strength. Only actual owned mining tools qualify.
-  const pickaxe=snapshot.itemWorld.items.some(item=>item.quantity>0&&item.definitionId.startsWith('tool05a:pickaxe')&&
+  // Derive strength from a real owned pickaxe (same ranks as resource.work).
+  // Never accept a claimed rank, power, or tool definition from the payload.
+  const owned=snapshot.itemWorld.items.filter(item=>item.quantity>0&&
+   (item.definitionId==='tool05a:pickaxe'||item.definitionId.startsWith('tool05a:pickaxe:'))&&
    snapshot.itemWorld.placements.some(place=>place.itemId===item.id&&place.location.kind==='inventory'&&place.location.ownerId===snapshot.player.id));
-  if(!pickaxe)throw Error('MINING_TOOL_REQUIRED');
+  if(!owned.length)throw Error('MINING_TOOL_REQUIRED');
+  const toolPower=Math.max(...owned.map(item=>item.definitionId==='tool05a:pickaxe'?1:
+   Number(materialTools05A.find(tool=>tool.id===item.definitionId)?.tags.find(tag=>tag.startsWith('rank:'))?.slice(5)??0)));
   const draw=drawRandom(snapshot.rng,'action');
-  const attempt=mineMineral05E(deposits,runtime.region,command.payload?.siteId,{toolPower:3,roll:draw.value});
+  const attempt=mineMineral05E(deposits,runtime.region,command.payload?.siteId,{toolPower,roll:draw.value});
   if(!attempt.ok)throw Error(attempt.reason);
   let items=snapshot.itemWorld.items,placements=snapshot.itemWorld.placements;
   for(const out of attempt.outputs){
