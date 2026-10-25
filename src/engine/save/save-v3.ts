@@ -69,7 +69,7 @@ const candidateCaps05A:Readonly<Record<string,number>>={
  'source05a:mussel':4,'source05a:marsh-bell':2,'source05a:sacred-oak':1
 };
 function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
- if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed','ecologySubstrates','woodland05C']))return false;
+ if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed','ecologySubstrates','woodland05C','mineralDeposits05E']))return false;
  if(Object.hasOwn(x,'candidateSites')){
   if(!obj(x.candidateSites)||Object.keys(x.candidateSites).length>100)return false;
   if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered','lastSecond','recoveryProgress'])&&
@@ -80,6 +80,24 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
    (!Object.hasOwn(v,'recoveryProgress')||(typeof v.recoveryProgress==='number'&&Number.isFinite(v.recoveryProgress)&&v.recoveryProgress>=0&&v.recoveryProgress<=3*86400))))return false;
  }
  if(Object.hasOwn(x,'ecologyClimateSeed')&&(typeof x.ecologyClimateSeed!=='string'||x.ecologyClimateSeed.length<1||x.ecologyClimateSeed.length>200))return false;
+ if(Object.hasOwn(x,'mineralDeposits05E')){
+  if(!obj(x.mineralDeposits05E)||Object.keys(x.mineralDeposits05E).length>100)return false;
+  const known:Record<string,{regions:string[],stock:number,grade:number}>={
+   'item05a:stone':{regions:['광산','산맥'],stock:16,grade:1},
+   'item05a:coal':{regions:['광산','산맥'],stock:10,grade:1},
+   'item05a:copper-ore':{regions:['광산','산맥'],stock:8,grade:2},
+   'item05a:iron-ore':{regions:['광산','산맥'],stock:7,grade:2},
+   'item05a:quartz':{regions:['광산','산맥'],stock:5,grade:3}
+  };
+  if(!Object.entries(x.mineralDeposits05E).every(([id,v])=>{
+   if(!obj(v)||!keys(v,['id','region','itemId','index','remaining','grade','discovered']))return false;
+   if(typeof v.region!=='string'||typeof v.itemId!=='string')return false;
+   const def=known[v.itemId];
+   return !!def&&def.regions.includes(v.region)&&v.id===id&&uint(v.index)&&Number(v.index)<=10&&
+    id==='mineral05e:'+encodeURIComponent(v.region)+':'+encodeURIComponent(v.itemId)+':'+String(v.index)&&
+    uint(v.remaining)&&Number(v.remaining)<=def.stock&&v.grade===def.grade&&typeof v.discovered==='boolean';
+  }))return false;
+ }
  if(Object.hasOwn(x,'woodland05C')){
   const forest=x.woodland05C;
   if(!obj(forest)||!keys(forest,['trees','day'])||!uint(forest.day)||Number(forest.day)>Math.floor((now+28800)/86400)||
