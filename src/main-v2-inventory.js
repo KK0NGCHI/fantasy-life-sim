@@ -250,8 +250,12 @@ export function createMainV2Inventory(uiItems,options={}) {
  ['mineral.extract',(snapshot,command)=>{
   const runtime=snapshot.world.runtime,deposits=runtime.resource05A?.mineralDeposits05E;
   if(runtime.dungeon||!deposits)throw Error('MINERAL_UNAVAILABLE');
+  // Ignore user-supplied strength. Only actual owned mining tools qualify.
+  const pickaxe=snapshot.itemWorld.items.some(item=>item.quantity>0&&item.definitionId.startsWith('tool05a:pickaxe')&&
+   snapshot.itemWorld.placements.some(place=>place.itemId===item.id&&place.location.kind==='inventory'&&place.location.ownerId===snapshot.player.id));
+  if(!pickaxe)throw Error('MINING_TOOL_REQUIRED');
   const draw=drawRandom(snapshot.rng,'action');
-  const attempt=mineMineral05E(deposits,runtime.region,command.payload?.siteId,{toolPower:command.payload?.toolPower??1,roll:draw.value});
+  const attempt=mineMineral05E(deposits,runtime.region,command.payload?.siteId,{toolPower:3,roll:draw.value});
   if(!attempt.ok)throw Error(attempt.reason);
   let items=snapshot.itemWorld.items,placements=snapshot.itemWorld.placements;
   for(const out of attempt.outputs){
