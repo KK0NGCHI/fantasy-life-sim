@@ -87,7 +87,15 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
    'item05a:coal':{regions:['광산','산맥'],stock:10,grade:1},
    'item05a:copper-ore':{regions:['광산','산맥'],stock:8,grade:2},
    'item05a:iron-ore':{regions:['광산','산맥'],stock:7,grade:2},
-   'item05a:quartz':{regions:['광산','산맥'],stock:5,grade:3}
+   'item05a:quartz':{regions:['광산','산맥'],stock:5,grade:3},
+   'item05a:tin-ore':{regions:['광산','산맥'],stock:6,grade:2},
+   'item05a:silver-ore':{regions:['광산','산맥'],stock:5,grade:2},
+   'item05a:gold-ore':{regions:['광산','산맥'],stock:4,grade:3},
+   'item05a:limestone':{regions:['광산','산맥'],stock:10,grade:1},
+   'item05a:clay':{regions:['광산','산맥'],stock:12,grade:1},
+   'item05a:silica-sand':{regions:['광산','산맥'],stock:9,grade:1},
+   'item05a:gypsum':{regions:['광산','산맥'],stock:8,grade:1},
+   'item05a:sulfur':{regions:['광산','산맥'],stock:6,grade:2}
   };
   if(!Object.entries(x.mineralDeposits05E).every(([id,v])=>{
    if(!obj(v)||!keys(v,['id','region','itemId','index','remaining','grade','discovered']))return false;
