@@ -208,7 +208,8 @@ export function createMainV2Inventory(uiItems,options={}) {
    return {outcome:'success',nextState:{...snapshot,player:{...snapshot.player,regionId:region},world:{...snapshot.world,activeRegionId:region,runtime:{...snapshot.world.runtime,region}}},events:[{type:'world.travelled',payload:{region}}]};
  }],
  ['travel.skip',(snapshot)=>{
-   const result=simulateJourney(snapshot);
+   let result;
+   try{result=simulateJourney(snapshot)}catch(error){console.error('05D_TRAVEL_DIAGNOSTIC',error);throw error}
    const region=result.travel.position.kind==='site'?siteToRegion.get(result.travel.position.siteId):null;
    const runtime={...snapshot.world.runtime,travel03B:result.travel,...(region?{region}:{})};
    const base={outcome:'success',nextState:{...snapshot,rng:result.rng,
