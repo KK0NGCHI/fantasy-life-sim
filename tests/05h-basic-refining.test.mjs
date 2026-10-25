@@ -100,3 +100,37 @@ test('refined copper, iron and bronze produce owned tools without double spendin
   }
  }
 });
+
+test('starter mining extracts real stone, refines it, and preserves v3 state',()=>{
+ const game=make();
+ const owned=id=>game.current().itemWorld.items.filter(x=>x.definitionId===id).reduce((n,x)=>n+x.quantity,0);
+ assert.equal(game.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const stone=game.dispatch('mineral.prospect',{itemId:'item05a:stone'});
+ assert.equal(stone.accepted,true,JSON.stringify(stone));
+ const siteId=stone.events.find(e=>e.type==='mineral.discovered')?.payload.siteId;
+ for(let i=0;owned('item05a:stone')<2&&i<16;i++){
+  const result=game.dispatch('mineral.extract',{siteId});
+  assert.equal(result.accepted,true,JSON.stringify(result));
+ }
+ assert.ok(owned('item05a:stone')>=2);
+ const copper=game.dispatch('mineral.prospect',{itemId:'item05a:copper-ore'});
+ assert.equal(copper.accepted,true);
+ const copperSite=copper.events.find(e=>e.type==='mineral.discovered').payload.siteId;
+ const beforeBlocked=game.current();
+ const denied=game.dispatch('mineral.extract',{siteId:copperSite});
+ assert.equal(denied.accepted,false,'starter rank 1 must not mine rank 2 copper');
+ assert.deepEqual(game.current(),beforeBlocked,'tool gate must be atomic');
+ assert.equal(game.dispatch('world.travel',{region:'거점 마을'}).accepted,true);
+ const before=owned('item05a:stone');
+ assert.equal(game.dispatch('mineral.refine',{recipeId:'refine05h:stone'}).accepted,true);
+ assert.equal(owned('item05a:stone'),before-2);
+ assert.equal(owned('item05h:cut-stone'),1);
+ const snapshot=game.current();
+ assert.equal(game.dispatch('mineral.refine',{recipeId:'craft05i:copper-pickaxe'}).accepted,false);
+ assert.deepEqual(game.current(),snapshot);
+ const converted=prepareSecondsV2ToV3(createSaveV2(game.current(),meta,'test',game.registry),game.registry);
+ assert.equal(converted.ok,true);
+ const saved=createSaveV3(converted.state,meta,'test',game.registry);
+ const restored=make();restored.applyApprovedSave(saved);
+ assert.deepEqual(restored.current(),game.current());
+});
