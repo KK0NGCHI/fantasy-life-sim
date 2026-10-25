@@ -54,3 +54,26 @@ test('new game tree worlds coexist with fungi and round-trip with save-v3',()=>{
  const restored=make();restored.applyApprovedSave(save);
  assert.deepEqual(restored.current().world.runtime.resource05A.woodland05C,resource.woodland05C);
 });
+
+test('dispatcher returns same authoritative ecology snapshot as current() across a day transition',()=>{
+ const g=make();
+ const initial=g.current().world.runtime.resource05A.woodland05C.day;
+ let advanced;
+ for(let i=0;i<150;i++){
+  const result=g.dispatch('resource.incidental.search',{activity:'explore'});
+  assert.equal(result.accepted,true);
+  if(g.current().world.runtime.resource05A.woodland05C.day>initial){
+   advanced=result;
+   break;
+  }
+ }
+ assert.ok(advanced,'searches should move authoritative world time across day boundary');
+ assert.deepEqual(advanced.nextState.world.runtime.resource05A.woodland05C,g.current().world.runtime.resource05A.woodland05C);
+ assert.deepEqual(advanced.nextState.world.runtime.resource05A.ecologySubstrates,g.current().world.runtime.resource05A.ecologySubstrates);
+});
+test('rejected commands do not update woodland or advance world clock',()=>{
+ const g=make(),before=g.current();
+ const rejected=g.dispatch('botanical.patch.harvest',{siteId:'bogus'});
+ assert.equal(rejected.accepted,false);
+ assert.deepEqual(g.current(),before);
+});
