@@ -55,7 +55,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  const resourceItems=knownResourceItems05A.map(r=>({id:r.id,name:r.name,group:'채취 재료',qty:0,tags:[]}));
  const starterTools=[{id:'tool05a:gloves',name:'천 채집 장갑',group:'도구',qty:1,tags:['tool:gather']},{id:'tool05a:axe',name:'석재 벌목 도끼',group:'도구',qty:1,tags:['tool:logging']},{id:'tool05a:pickaxe',name:'석재 곡괭이',group:'도구',qty:1,tags:['tool:mining']},{id:'tool05a:rod',name:'목재 낚싯대',group:'도구',qty:1,tags:['tool:fishing']}];
  const materialTools05A=[
-  ...[['copper',2,'구리'],['iron',3,'철'],['steel',4,'강철']].flatMap(([material,rank,name])=>
+  ...[['copper',2,'구리'],['iron',3,'철'],['bronze',2,'청동'],['steel',4,'강철']].flatMap(([material,rank,name])=>
    [['axe','벌목 도끼'],['pickaxe','곡괭이']].map(([kind,label])=>({
     id:'tool05a:'+kind+':'+material,name:name+' '+label,group:'도구',qty:0,tags:['tool:'+kind,'material:'+material,'rank:'+rank]
    }))),
