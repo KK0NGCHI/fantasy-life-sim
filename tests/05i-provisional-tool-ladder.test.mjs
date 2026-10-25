@@ -17,8 +17,11 @@ function mine(g,id,needed){
  for(const region of ['광산','산맥']){
   if(owned(g,id)>=needed)break;
   if(g.current().world.runtime.region!==region)command(g,'world.travel',{region});
-  const p=command(g,'mineral.prospect',{itemId:id});
-  const siteId=p.events.find(e=>e.type==='mineral.discovered').payload.siteId;
+  const sites=g.current().world.runtime.resource05A.mineralDeposits05E;
+  const existing=Object.values(sites).find(site=>site.region===region&&site.itemId===id);
+  assert.ok(existing,id);
+  const siteId=existing.discovered?existing.id:
+   command(g,'mineral.prospect',{itemId:id}).events.find(e=>e.type==='mineral.discovered').payload.siteId;
   for(let n=0;n<24&&owned(g,id)<needed;n++){
    const before=g.current().world.runtime.resource05A.mineralDeposits05E[siteId].remaining;
    if(!before)break;
