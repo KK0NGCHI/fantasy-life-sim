@@ -1,4 +1,5 @@
 import {MINERAL_DEFINITIONS_05E,mineralDepositId05E} from './mineral-deposits-05e.js';
+import {geologyProfile05F} from './mineral-geology-05f.js';
 import {FUNGAL_BY_ID_05B} from './fungal-ecology-05b.js';
 import {BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
@@ -192,6 +193,8 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      if(!site)continue;
      const row=make('div',{class:'resource05a-row'},selection);
      make('strong',{text:def.name+' · 경도 '+def.hardness+' · 품위 '+def.grade},row);
+     const geology=geologyProfile05F(def.id);
+     if(geology)make('span',{class:'muted',text:'산출 환경 참고: '+geology.settingLabel+' · 깊이 '+geology.depthBand+' · '+(geology.hostRockExamples.join(', ')||'모암 미정')},row);
      make('span',{text:site.discovered?'확인 매장량 '+site.remaining+'/'+def.stock:site.remaining===0?'고갈':'미탐사 광맥'},row);
      if(!site.discovered){
       const search=btn('광맥 탐사 (10분)',()=>{
