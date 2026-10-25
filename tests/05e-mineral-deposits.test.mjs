@@ -131,3 +131,22 @@ test('complete 05-E candidate atlas retains ontology and finite stock',()=>{
  assert.equal(extracted.remaining,3);
  assert.equal(validateMineralDeposits05E(extracted.deposits),true);
 });
+
+
+test('finite mineral worlds reject legacy quartz discovery, prospect and extraction without mutation',()=>{
+ const g=make();
+ assert.equal(g.dispatch('world.travel',{region:'광산'}).accepted,true);
+ const before=g.current();
+ const siteId='site05a:quartz:광산';
+ for(const [action,payload] of [
+  ['resource.candidate.discover',{nodeId:siteId}],
+  ['resource.candidate.prospect',{}],
+  ['resource.candidate.work',{nodeId:siteId}]
+ ]){
+  const result=g.dispatch(action,payload);
+  assert.equal(result.accepted,false,action);
+  assert.deepEqual(g.current(),before,action+' mutated game state');
+ }
+ const valid=g.dispatch('mineral.prospect',{itemId:'item05a:quartz'});
+ assert.equal(valid.accepted,true,'official finite quartz exploration remains available');
+});
