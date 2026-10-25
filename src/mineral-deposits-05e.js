@@ -1,7 +1,14 @@
+import {REAL_ATLAS_05E} from './mineral-atlas-05e.js';
 /** 05-E geological resources: non-renewable deposits, never biological regrowth.
  * Provisional grades and yields; all randomness is injected by the caller.
  */
+// Atlas additions use conservative placeholder resource rules until geology is modeled.
+export const ATLAS_DEPOSIT_DEFINITIONS_05E=Object.freeze(REAL_ATLAS_05E.map(entry=>({
+ id:entry.id,name:entry.name,regions:['광산','산맥'],stock:4,grade:1,hardness:1,
+ atlasCategory:entry.category
+})));
 export const MINERAL_DEFINITIONS_05E=Object.freeze([
+ ...ATLAS_DEPOSIT_DEFINITIONS_05E,
  {id:'item05a:tin-ore',name:'주석광석',regions:['광산','산맥'],stock:6,grade:2,hardness:2},
  {id:'item05a:silver-ore',name:'은광석',regions:['광산','산맥'],stock:5,grade:2,hardness:2},
  {id:'item05a:gold-ore',name:'금광석',regions:['광산','산맥'],stock:4,grade:3,hardness:2},
@@ -28,7 +35,7 @@ export function createMineralDeposits05E(){
  })));
 }
 export function validateMineralDeposits05E(deposits){
- if(!deposits||typeof deposits!=='object'||Array.isArray(deposits)||Object.keys(deposits).length>100)return false;
+ if(!deposits||typeof deposits!=='object'||Array.isArray(deposits)||Object.keys(deposits).length>400)return false;
  return Object.entries(deposits).every(([id,site])=>{
   const def=MINERAL_BY_ID_05E.get(site?.itemId);
   return !!def&&site.id===id&&site.id===mineralDepositId05E(site.region,site.itemId,site.index)&&
