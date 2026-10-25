@@ -7,7 +7,13 @@ export const REFINING_RECIPES_05H=Object.freeze([
  {id:'refine05h:tin',name:'주석 제련',station:'furnace',input:'item05a:tin-ore',inputQty:2,output:'item05h:tin-ingot',outputQty:1,seconds:600},
  {id:'refine05h:stone',name:'석재 가공',station:'workbench',input:'item05a:stone',inputQty:2,output:'item05h:cut-stone',outputQty:1,seconds:300},
  {id:'refine05h:clay',name:'점토 성형',station:'workbench',input:'item05a:clay',inputQty:2,output:'item05h:clay-brick',outputQty:1,seconds:300},
- {id:'refine05h:bronze',name:'청동 합금',station:'furnace',inputs:[{itemId:'item05h:copper-ingot',quantity:2},{itemId:'item05h:tin-ingot',quantity:1}],output:'item05h:bronze-ingot',outputQty:2,seconds:900}
+ {id:'refine05h:bronze',name:'청동 합금',station:'furnace',inputs:[{itemId:'item05h:copper-ingot',quantity:2},{itemId:'item05h:tin-ingot',quantity:1}],output:'item05h:bronze-ingot',outputQty:2,seconds:900},
+ {id:'craft05i:copper-pickaxe',name:'구리 곡괭이 제작',station:'workbench',inputs:[{itemId:'item05h:copper-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:pickaxe:copper',outputQty:1,seconds:600},
+ {id:'craft05i:copper-axe',name:'구리 벌목 도끼 제작',station:'workbench',inputs:[{itemId:'item05h:copper-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:axe:copper',outputQty:1,seconds:600},
+ {id:'craft05i:iron-pickaxe',name:'철 곡괭이 제작',station:'workbench',inputs:[{itemId:'item05h:iron-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:pickaxe:iron',outputQty:1,seconds:600},
+ {id:'craft05i:iron-axe',name:'철 벌목 도끼 제작',station:'workbench',inputs:[{itemId:'item05h:iron-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:axe:iron',outputQty:1,seconds:600},
+ {id:'craft05i:bronze-pickaxe',name:'청동 곡괭이 제작',station:'workbench',inputs:[{itemId:'item05h:bronze-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:pickaxe:bronze',outputQty:1,seconds:600},
+ {id:'craft05i:bronze-axe',name:'청동 벌목 도끼 제작',station:'workbench',inputs:[{itemId:'item05h:bronze-ingot',quantity:2},{itemId:'item05h:cut-stone',quantity:1}],output:'tool05a:axe:bronze',outputQty:1,seconds:600}
 ]);
 export const REFINING_BY_ID_05H=new Map(REFINING_RECIPES_05H.map(r=>[r.id,r]));
 export const REFINED_ITEMS_05H=Object.freeze([
