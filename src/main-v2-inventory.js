@@ -621,17 +621,19 @@ export function createMainV2Inventory(uiItems,options={}) {
   dispatch(type,payload={}){
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
-     state=result.nextState;
-     const eco=state.world.runtime.resource05A;
+     // Stage integration changes before committing; consumers must receive the reconciled state.
+     let candidate=result.nextState;
+     const eco=candidate.world.runtime.resource05A;
      if(eco?.woodland05C&&eco.ecologySubstrates&&eco.ecologySites){
       const cycle=advanceWoodland05C({trees:eco.woodland05C.trees,day:eco.woodland05C.day,
-       substrates:eco.ecologySubstrates,sites:eco.ecologySites},state.clock.elapsedUnits,eco.ecologyClimateSeed);
+       substrates:eco.ecologySubstrates,sites:eco.ecologySites},candidate.clock.elapsedUnits,eco.ecologyClimateSeed);
       if(cycle.day!==eco.woodland05C.day){
-       state={...state,world:{...state.world,runtime:{...state.world.runtime,
+       candidate={...candidate,world:{...candidate.world,runtime:{...candidate.world.runtime,
         resource05A:{...eco,woodland05C:{trees:cycle.trees,day:cycle.day},
          ecologySubstrates:cycle.substrates,ecologySites:cycle.sites}}}};
       }
      }
+     state=candidate;
      if(state.world.runtime.dungeon&&state.world.runtime.world03E&&['dungeon.enter','dungeon.move','dungeon.portal'].includes(type)){
       const position=localPosition(state);
       const old=state.world.runtime.world03E;
@@ -652,7 +654,7 @@ export function createMainV2Inventory(uiItems,options={}) {
      actionsSinceAuto++;
      if(shouldAutoSave(actionsSinceAuto,result.events,autoPolicy)){actionsSinceAuto=0;enqueueAuto()}
     }
-    return result;
+    return result.accepted?{...result,nextState:structuredClone(state)}:result;
   },
   gameTime(){return state.world.runtime.timeBasis==='seconds-v1'?gameClockAt(state.clock.elapsedUnits):null},
   formatTravelSeconds(seconds){return formatTravelSeconds(seconds)},
