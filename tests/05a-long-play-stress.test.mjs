@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {simulate05A} from './05a-long-horizon.mjs';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
 import {createSaveV2,prepareSecondsV2ToV3,createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
-import {RESOURCE_MAP_05A} from '../src/resources-05a.js';
+import {RESOURCE_MAP_05A,resourceAt05A} from '../src/resources-05a.js';
 
 const DAY=86400;
 const meta={slotId:'long-play',worldId:'world',kind:'manual',label:'long-play',savedAt:'2026-10-26T00:00:00Z',revision:0};
@@ -72,14 +72,18 @@ test('live dispatcher repeated jobs preserve inventory, finite deposits and save
   ['숲','resource05a:oak-log:01'],
   ['강·호수','resource05a:small-fish:01']
  ];
- let completed=0,failed=0,saved=0,workedSeconds=0;const failureReasons={};let firstFailure=null;
+ let completed=0,failed=0,saved=0,workedSeconds=0;const failureReasons={};const rejectedPreconditions={};let firstFailure=null;
  for(let i=0;i<160;i++){
   const [region,nodeId]=tasks[i%tasks.length];
   const travel=game.dispatch('world.travel',{region});
   assert.equal(travel.accepted,true);
-  const before=game.current().clock.elapsedUnits;
+  const beforeState=game.current(),before=beforeState.clock.elapsedUnits;
+  const node=beforeState.world.runtime.resource05A.nodes[nodeId];
+  const def=RESOURCE_MAP_05A.get(node?.resourceId);
+  const current=node&&def?resourceAt05A(node,def,before):null;
+  const preflight=!def?'UNKNOWN_RESOURCE':def.region!==region?'WRONG_REGION':!current?.discovered?'UNDISCOVERED':current.remaining===0?'DEPLETED':'AVAILABLE';
   const outcome=game.workUntil05A(nodeId,8);
-  if(outcome.accepted)completed++;else {failed++;if(!firstFailure)firstFailure={nodeId,region,outcome};const reason=outcome.last?.events?.find(e=>e.type==='command.rejected')?.payload?.reason??outcome.last?.events?.find(e=>e.type==='command.failed')?.payload?.reason??outcome.last?.error?.message??outcome.last?.error??outcome.last?.reason??'UNKNOWN';failureReasons[reason]=(failureReasons[reason]??0)+1;}
+  if(outcome.accepted)completed++;else {failed++;if(!firstFailure)firstFailure={nodeId,region,outcome};const reason=outcome.last?.events?.find(e=>e.type==='command.rejected')?.payload?.reason??outcome.last?.events?.find(e=>e.type==='command.failed')?.payload?.reason??outcome.last?.error?.message??outcome.last?.error??outcome.last?.reason??'UNKNOWN';failureReasons[reason]=(failureReasons[reason]??0)+1;rejectedPreconditions[preflight]=(rejectedPreconditions[preflight]??0)+1;}
   workedSeconds+=game.current().clock.elapsedUnits-before;
   if(i===0)console.log('LONG_PLAY_FIRST_ACTION '+JSON.stringify({result:outcome,region,nodeId}));
   assertLedger(game,'action '+i);
@@ -87,9 +91,10 @@ test('live dispatcher repeated jobs preserve inventory, finite deposits and save
  }
  assert.ok(completed>0,'no live resource action succeeded');
  assert.ok(workedSeconds>0);
+ assert.ok(failed===Object.values(rejectedPreconditions).reduce((a,b)=>a+b,0),'rejection classification must cover all denied jobs');
  assertLedger(game,'final');
  console.log('LONG_PLAY_DISPATCH '+JSON.stringify({
-  attemptedJobs:160,completed,failed,failureReasons,firstFailure,saveRestores:saved,workedSeconds,
+  attemptedJobs:160,completed,failed,failureReasons,rejectedPreconditions,firstFailure,saveRestores:saved,workedSeconds,
   elapsedGameSeconds:game.current().clock.elapsedUnits,
   inventoryStacks:game.current().itemWorld.items.length
  }));
