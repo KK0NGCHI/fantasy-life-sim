@@ -1,3 +1,4 @@
+import {BOTANICAL_RENEWAL_DAYS_05A} from './balance-botany-05a.js';
 import {BOTANICAL_PROFILES_05A,BOTANICAL_PROFILE_BY_ID_05A} from './botanical-profiles-05a.js';
 export const BOTANICAL_DAY_SECONDS_05A=86400;
 const DAYPART=['dawn','day','dusk','night'];
@@ -20,7 +21,7 @@ export function botanicalPhenology05A(profile,{season,weather,daypart}={}){
  return {present:true,bloom,harvestable:profile.dropEnabled&&bloom,reason:!inSeason?'DORMANT':!weatherValid?'WEATHER_REQUIRED':!bloom?'NOT_BLOOMING':profile.dropEnabled?'AVAILABLE':'OBSERVATION_ONLY'};
 }
 export function botanicalRenewalSeconds05A(profile){
- const days={renewable:2,seasonal:7,slow:21,'rain-pulse':3}[profile?.renewalClass];
+ const days=BOTANICAL_RENEWAL_DAYS_05A[profile?.renewalClass];
  if(!days)throw Error('INVALID_BOTANICAL_RENEWAL');
  return days*BOTANICAL_DAY_SECONDS_05A;
 }

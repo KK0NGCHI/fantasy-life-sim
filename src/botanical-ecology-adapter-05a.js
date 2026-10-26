@@ -1,3 +1,4 @@
+import {BOTANICAL_PATCH_CAPACITY_05A} from './balance-botany-05a.js';
 import {BOTANICAL_PROFILES_05A} from './botanical-profiles-05a.js';
 import {botanicalRenewalSeconds05A} from './botanical-lifecycle-05a.js';
 import {validateEcologyDefinition,createEcologySite,ecologySiteId} from './ecology-core-05a.js';
@@ -7,7 +8,7 @@ import {validateEcologyDefinition,createEcologySite,ecologySiteId} from './ecolo
  */
 export const BOTANICAL_ECOLOGY_DEFS_05A=Object.freeze(BOTANICAL_PROFILES_05A.map(p=>{
  const output={id:p.id,part:p.part,stage:p.part==='flower'?'bloom':'mature',weight:1};
- const def=Object.freeze({id:p.id,habitats:p.regions,capacity:p.renewalClass==='slow'?1:3,
+ const def=Object.freeze({id:p.id,habitats:p.regions,capacity:p.renewalClass==='slow'?BOTANICAL_PATCH_CAPACITY_05A.slow:BOTANICAL_PATCH_CAPACITY_05A.other,
   regrowSeconds:botanicalRenewalSeconds05A(p),mode:p.interaction,
   seasons:p.seasons,...(p.renewalClass==='rain-pulse'?{weather:['rain']}:{}),
   ...(p.purpose==='night-bloom'?{dayparts:['night']}:{}),
