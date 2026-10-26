@@ -10,7 +10,7 @@ export interface V3Duration {readonly turns:number;readonly elapsedSeconds:numbe
 export type V3DurationPolicy=(state:Readonly<GameStateV3>,action:Readonly<GameAction>)=>V3Duration;
 export type V3DispatchResult=
  | {readonly accepted:true;readonly outcome:'success'|'failed';readonly turnsSpent:number;readonly nextState:GameStateV3;readonly events:readonly GameEvent[]}
- | {readonly accepted:false;readonly reason:'INVALID_COMMAND'|'BUSY'|'EXECUTION_ERROR';readonly turnsSpent:0};
+ | {readonly accepted:false;readonly reason:'INVALID_COMMAND'|'BUSY'|'EXECUTION_ERROR';readonly turnsSpent:0;readonly detail?:string};
 const standardDuration:V3DurationPolicy=(_state,action)=>({turns:1,elapsedSeconds:actionSeconds(action.type)});
 const toV2=(state:GameStateV3):GameStateV2=>{
  const {schemaVersion:_s,clock,...rest}=structuredClone(state);
