@@ -92,6 +92,7 @@ test('live dispatcher repeated jobs preserve inventory, finite deposits and save
  assert.ok(completed>0,'no live resource action succeeded');
  assert.ok(workedSeconds>0);
  assert.ok(failed===Object.values(rejectedPreconditions).reduce((a,b)=>a+b,0),'rejection classification must cover all denied jobs');
+ assert.deepEqual(rejectedPreconditions,{DEPLETED:failed},'fixed-seed replay must never hide an unexpected rejection as ordinary depletion');
  assertLedger(game,'final');
  console.log('LONG_PLAY_DISPATCH '+JSON.stringify({
   attemptedJobs:160,completed,failed,failureReasons,rejectedPreconditions,firstFailure,saveRestores:saved,workedSeconds,
