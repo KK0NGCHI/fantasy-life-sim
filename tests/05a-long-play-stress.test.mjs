@@ -83,6 +83,12 @@ test('live dispatcher repeated jobs preserve inventory, finite deposits and save
   const current=node&&def?resourceAt05A(node,def,before):null;
   const preflight=!def?'UNKNOWN_RESOURCE':def.region!==region?'WRONG_REGION':!current?.discovered?'UNDISCOVERED':current.remaining===0?'DEPLETED':'AVAILABLE';
   const outcome=game.workUntil05A(nodeId,8);
+  if(preflight==='DEPLETED'){
+   assert.equal(outcome.last?.reason,'EXECUTION_ERROR');
+   assert.equal(outcome.last?.detail,'DEPLETED','expected resource depletion detail must survive dispatcher boundary');
+   assert.deepEqual(game.current().world.runtime.resource05A.nodes[nodeId],beforeState.world.runtime.resource05A.nodes[nodeId],
+    'depleted work must not mutate resource stock');
+  }
   if(outcome.accepted)completed++;else {failed++;if(!firstFailure)firstFailure={nodeId,region,outcome};const reason=outcome.last?.events?.find(e=>e.type==='command.rejected')?.payload?.reason??outcome.last?.events?.find(e=>e.type==='command.failed')?.payload?.reason??outcome.last?.error?.message??outcome.last?.error??outcome.last?.reason??'UNKNOWN';failureReasons[reason]=(failureReasons[reason]??0)+1;rejectedPreconditions[preflight]=(rejectedPreconditions[preflight]??0)+1;}
   workedSeconds+=game.current().clock.elapsedUnits-before;
   if(i===0)console.log('LONG_PLAY_FIRST_ACTION '+JSON.stringify({result:outcome,region,nodeId}));
