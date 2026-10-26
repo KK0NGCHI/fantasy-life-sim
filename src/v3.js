@@ -321,6 +321,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      const summary=mainV2.workUntil05A(nodeId,50,chosenTool);
      refreshV2Inventory();
      nextLog('자원 작업',def.name+' · '+summary.actions+'회, '+summary.seconds+'게임초','획득 '+summary.qty+'개 · 숙련 +'+summary.xp+' XP');
+     if(summary.last&&!summary.last.accepted)nextLog('위험',def.name+' 자동 작업 중단: '+gameplayFailureText(summary.last.detail??summary.last.reason));
      render();
     },'btn',row);
     bulk.disabled=updated.remaining===0;
