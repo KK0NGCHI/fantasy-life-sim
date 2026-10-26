@@ -100,3 +100,41 @@ test('live dispatcher repeated jobs preserve inventory, finite deposits and save
   inventoryStacks:game.current().itemWorld.items.length
  }));
 });
+
+test('adaptive live-game gatherer completes 200 owned-resource jobs with discoveries and eight continued save loads',()=>{
+ const seed='adaptive-200-jobs',sequence=['grass','wild-herb','grass','mushroom','grass'];
+ let game=newGame(seed),discovered=0,saveLoads=0;
+ assert.equal(game.dispatch('world.travel',{region:'숲'}).accepted,true);
+ for(let i=0;i<200;i++){
+  const type=sequence[i%sequence.length],resourceId='resource05a:'+type;
+  const select=()=>{
+   const state=game.current();
+   return Object.entries(state.world.runtime.resource05A.nodes).find(([,node])=>
+    node.resourceId===resourceId&&node.discovered&&
+    resourceAt05A(node,RESOURCE_MAP_05A.get(resourceId),state.clock.elapsedUnits).remaining>0)?.[0];
+  };
+  let nodeId=select();
+  if(!nodeId){
+   const found=game.dispatch('resource.search',{resourceId});
+   assert.equal(found.accepted,true,JSON.stringify({type,i,found}));
+   discovered++;
+   nodeId=select();
+  }
+  assert.ok(nodeId,'discovery must expose available resource '+type);
+  const before=game.current();
+  const beforeCount=before.itemWorld.items.filter(x=>x.definitionId==='item05a:'+type)
+   .reduce((sum,item)=>sum+item.quantity,0);
+  const result=game.dispatch('resource.work',{nodeId});
+  assert.equal(result.accepted,true,JSON.stringify({i,type,nodeId,result}));
+  const afterCount=game.current().itemWorld.items.filter(x=>x.definitionId==='item05a:'+type)
+   .reduce((sum,item)=>sum+item.quantity,0);
+  assert.equal(afterCount,beforeCount+1,'each successful gather must credit exactly one owned resource');
+  assertLedger(game,'adaptive action '+i);
+  if(i%25===24){game=saveRestore(game,seed);saveLoads++;}
+ }
+ assert.equal(saveLoads,8);
+ console.log('LONG_PLAY_ADAPTIVE '+JSON.stringify({completed:200,failed:0,
+  discoveries:discovered,saveRestores:saveLoads,
+  elapsedGameSeconds:game.current().clock.elapsedUnits,
+  inventoryStacks:game.current().itemWorld.items.length}));
+});
