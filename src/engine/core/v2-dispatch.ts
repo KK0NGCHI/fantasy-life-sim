@@ -17,13 +17,19 @@ export type V2ActionHandler = (state:Readonly<GameStateV2>,action:Readonly<GameA
 export type V2ActionRegistry = ReadonlyMap<string,V2ActionHandler>;
 export type V2DispatchResult =
  | {readonly accepted:true;readonly outcome:'success'|'failed';readonly turnsSpent:number;readonly nextState:GameStateV2;readonly events:readonly GameEvent[]}
- | {readonly accepted:false;readonly reason:'INVALID_COMMAND'|'BUSY'|'EXECUTION_ERROR';readonly turnsSpent:0};
+ | {readonly accepted:false;readonly reason:'INVALID_COMMAND'|'BUSY'|'EXECUTION_ERROR';readonly turnsSpent:0;readonly detail?:string};
 export interface V2Duration {readonly turns:number;readonly worldUnits:number;}
 export type V2DurationPolicy=(state:Readonly<GameStateV2>,action:Readonly<GameAction>)=>V2Duration;
 const record=(x:unknown):x is Record<string,unknown>=>x!==null&&typeof x==='object'&&!Array.isArray(x);
 const positive=(x:unknown):x is number=>typeof x==='number'&&Number.isSafeInteger(x)&&x>=1;
 const nonnegative=(x:unknown):x is number=>typeof x==='number'&&Number.isSafeInteger(x)&&x>=0;
-const reject=(reason:'INVALID_COMMAND'|'BUSY'|'EXECUTION_ERROR'):V2DispatchResult=>({accepted:false,reason,turnsSpent:0});
+const reject=(reason:'INVALID_COMMAND'|'BUSY'|'EXECUTION_ERROR',detail?:string):V2DispatchResult=>({accepted:false,reason,turnsSpent:0,...(detail?{detail}:{})});
+/** Only expose explicit gameplay-domain failure codes, never arbitrary exception messages. */
+const KNOWN_GAMEPLAY_FAILURES=new Set(['DEPLETED','UNDISCOVERED','WRONG_RESOURCE_REGION','TOOL_REQUIRED','NOT_GATHERABLE','WRONG_SITE','WRONG_REGION','WRONG_ACTIVITY','NO_DISCOVERABLE_SITES','SUPPLY_NOT_READY','VEIN_REMAINS','PROSPECT_COOLDOWN','RESOURCE_HISTORY_LIMIT','SITE_STORAGE_LIMIT']);
+const safeFailureDetail=(error:unknown):string|undefined=>{
+ const message=error instanceof Error?error.message:null;
+ return message&&KNOWN_GAMEPLAY_FAILURES.has(message)?message:undefined;
+};
 const validEvents=(events:unknown):events is GameEvent[]=>Array.isArray(events)&&events.every(e=>record(e)&&typeof e.type==='string'&&!!e.type&&record(e.payload));
 const standardDuration:V2DurationPolicy=()=>({turns:1,worldUnits:1});
 
@@ -82,7 +88,7 @@ export class V2ActionDispatcher {
    const committed:GameStateV2={...structuredClone(nextState),turn:state.turn+cost.turns,
      clock:{...nextState.clock,elapsedUnits:state.clock.elapsedUnits+cost.worldUnits}};
    return {accepted:true,outcome,turnsSpent:cost.turns,nextState:committed,events:structuredClone(events)};
-  }catch{return reject('EXECUTION_ERROR');}
+  }catch(error){return reject('EXECUTION_ERROR',safeFailureDetail(error));}
   finally{this.busy=false;}
  }
 }
