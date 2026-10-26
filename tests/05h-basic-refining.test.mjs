@@ -11,8 +11,8 @@ const make=()=>createMainV2Inventory([{id:'test:starter',name:'기본',group:'�
 });
 const meta={slotId:'refining-test',worldId:'world',kind:'manual',label:'refining',savedAt:'2026-10-25T00:00:00Z',revision:0};
 test('refining recipe definitions have unique input/output and bounded costs',()=>{
- assert.equal(REFINING_RECIPES_05H.length,17);
- assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,17);
+ assert.equal(REFINING_RECIPES_05H.length,18);
+ assert.equal(new Set(REFINING_RECIPES_05H.map(r=>r.id)).size,18);
  for(const r of REFINING_RECIPES_05H)assert.ok((r.inputs?.every(x=>x.quantity>0)??r.inputQty>0)&&r.outputQty>0&&r.seconds>0);
 });
 test('insufficient material and invalid recipe fail without state mutation',()=>{
@@ -194,4 +194,14 @@ test('harvested wood-ear fungus and grass can produce owner-bound gathering glov
  assert.equal(refineMineral05H(world,'stranger','craft05i:mycelium-gloves').reason,'INSUFFICIENT_MATERIAL');
  const insufficient=structuredClone(world);insufficient.items[0].quantity=1;
  assert.equal(refineMineral05H(insufficient,'owner','craft05i:mycelium-gloves').reason,'INSUFFICIENT_MATERIAL');
+});
+
+test('plantain and grass produce owner-bound herbal fiber gathering gloves',()=>{
+ const world={items:[{id:'plant',definitionId:'item05a:plantago-major',quantity:2},{id:'grass',definitionId:'item05a:grass',quantity:2}],placements:[{itemId:'plant',location:{kind:'inventory',ownerId:'p'}},{itemId:'grass',location:{kind:'inventory',ownerId:'p'}}],containers:[]};
+ const before=structuredClone(world);
+ const result=refineMineral05H(world,'p','craft05i:herbal-fiber-gloves');
+ assert.equal(result.ok,true);
+ assert.deepEqual(result.itemWorld.items.map(x=>[x.definitionId,x.quantity]),[['tool05a:gloves:herbalFiber',1]]);
+ assert.deepEqual(world,before);
+ assert.equal(refineMineral05H(world,'other','craft05i:herbal-fiber-gloves').reason,'INSUFFICIENT_MATERIAL');
 });
