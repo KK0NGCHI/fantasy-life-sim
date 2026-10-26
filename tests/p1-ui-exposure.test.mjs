@@ -16,3 +16,8 @@ test('P1: crafting page exposes complete live refining catalog with owned materi
   assert.ok(page.includes(term),'craft page missing live path '+term);
  }
 });
+
+test('P1: bulk resource work displays explicit stop reason',()=>{
+ assert.match(ui,/summary\.last\.detail\?\?summary\.last\.reason/);
+ assert.match(ui,/자동 작업 중단:/);
+});
