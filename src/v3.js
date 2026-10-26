@@ -56,7 +56,20 @@ let localRemembered=[];
 let autoTarget=0;
 const mainV2=createMainV2Inventory(s.items,{generatedWorld:true,worldPersistence03E:true,progression04A:true,resources05A:true,ecology05A:true,fungi05B:true,woodland05C:true,minerals05E:true,incidentalTables05A:ACTIVITY_TABLES_05A});
 function refreshV2Inventory(){s.items=mainV2.projected();const current=mainV2.current();s.turn=current.turn;s.hp=current.player.currentHp;s.mp=current.player.currentMp;s.hunger=current.player.hunger;if(current.world.runtime){s.region=current.world.runtime.region;s.pos=[...current.world.runtime.pos];s.dungeon=current.world.runtime.dungeon;const clock=mainV2.gameTime();s.day=clock?.day??current.world.runtime.day;s.hour=clock?.hour??current.world.runtime.hour;s.minute=clock?.minute??0;s.second=clock?.second??0;}}
-function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+result.reason);return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
+const GAMEPLAY_FAILURE_TEXT={
+ DEPLETED:'자원이 고갈되었습니다. 다른 지점으로 이동하거나 회복을 기다리십시오.',
+ UNDISCOVERED:'아직 발견하지 못한 지점입니다.',
+ TOOL_REQUIRED:'필요한 작업 도구가 없거나 등급이 부족합니다.',
+ WRONG_RESOURCE_REGION:'현재 지역에서 작업할 수 없는 자원입니다.',
+ WRONG_REGION:'현재 지역에서 실행할 수 없습니다.',
+ WRONG_SITE:'현재 지역의 유효한 지점이 아닙니다.',
+ WRONG_ACTIVITY:'이 지점에 맞지 않는 활동입니다.',
+ SUPPLY_NOT_READY:'새로운 자원을 발견할 수 있는 시점이 아닙니다.',
+ NO_DISCOVERABLE_SITES:'지금 발견할 수 있는 지점이 없습니다.',
+ INSUFFICIENT_MATERIAL:'제작 재료가 부족합니다.'
+};
+function gameplayFailureText(reason){return GAMEPLAY_FAILURE_TEXT[reason]??reason;}
+function executeV2(type,payload){mainV2.syncVitals(s);const result=mainV2.dispatch(type,payload);if(!result.accepted){nextLog('위험','행동 처리 거부: '+gameplayFailureText(result.detail??result.reason));return false}refreshV2Inventory();return true}const LOG_LIMIT=500;
 let logHeight=274;try{const n=Number(localStorage.getItem('fantasy-log-panel-height'));if(Number.isFinite(n)&&n>=165&&n<=1000)logHeight=n}catch{}
 
 const THEMES=[{"id":"aurora","name":"오로라","mode":"light","colors":["#9667d9","#75b4f4","#f4a2d1"],"source":"게임 기본"},{"id":"rose-dawn","name":"장미빛 새벽","mode":"light","colors":["#907aa9","#286983","#b4637a"],"source":"로즈 파인"},{"id":"solarized","name":"솔라라이즈드","mode":"light","colors":["#268bd2","#2aa198","#b58900"],"source":"솔라라이즈드"},{"id":"citrus","name":"시트러스","mode":"light","colors":["#65a30d","#f59e0b","#0d9488"],"source":"라임·호박·청록"},{"id":"red","name":"석류빛","mode":"light","colors":["#d94358","#f5a65b","#7697c7"],"source":"붉은색 중심"},{"id":"blue","name":"푸른 항해","mode":"light","colors":["#267bcc","#70c8e5","#f1c17d"],"source":"파란색 중심"},{"id":"lavender","name":"라벤더 들판","mode":"light","colors":["#9273ce","#c09bea","#97c9a7"],"source":"라벤더·세이지"},{"id":"cocoa","name":"살구 코코아","mode":"light","colors":["#b97a58","#f4b98c","#93b1a6"],"source":"따뜻한 브라운"}];
@@ -596,6 +609,27 @@ function skills(){
 }
 function crafts(){
 const el=head('제작 · 가공','');
+const realPanel=make('section',{class:'resource05a-list','aria-label':'실제 제작법'},el);
+make('h4',{text:'실제 제작 가능 · 정련 및 도구'},realPanel);
+make('p',{class:'muted',text:'아래는 실제 재료를 소비하고 결과물을 획득하는 제작법입니다. 기존 시연용 제작법은 아래 목록과 구별됩니다.'},realPanel);
+const craftingSnapshot=mainV2.current();
+const ownedQtyForCraft=id=>craftingSnapshot.itemWorld.items.filter(item=>item.definitionId===id&&
+ craftingSnapshot.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===craftingSnapshot.player.id))
+ .reduce((sum,item)=>sum+item.quantity,0);
+for(const recipe of REFINING_RECIPES_05H){
+ const inputs=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
+ const ready=s.region==='거점 마을'&&!craftingSnapshot.world.runtime.dungeon&&inputs.every(x=>ownedQtyForCraft(x.itemId)>=x.quantity);
+ const row=make('div',{class:'resource05a-row'},realPanel);
+ make('strong',{text:recipe.name},row);
+ make('span',{class:'muted',text:inputs.map(x=>x.itemId+' '+ownedQtyForCraft(x.itemId)+'/'+x.quantity).join(' · ')},row);
+ const action=btn('제작 ('+Math.floor(recipe.seconds/60)+'분)',()=>{
+  if(executeV2('mineral.refine',{recipeId:recipe.id})){nextLog('제작',recipe.name+' 완료');}
+  render();
+ },'btn',row);
+ action.disabled=!ready;
+ action.title=!ready?(s.region!=='거점 마을'?'거점 마을의 작업대 또는 용광로에서 이용 가능':'필요한 재료가 부족하거나 탐험 중입니다'):'';
+}
+make('p',{class:'muted',text:'이하 제작법/작업대 목록은 일부 시연 데이터입니다.'},el);
 const groups=['제작법','작업대'];if(!groups.includes(s.tab))s.tab='제작법';tabs(el,groups,changeTab);
 const sets={
 '제작법':[{name:'밀빵',type:'요리',icon:'cooking-pot',resources:['밀가루','물'],result:'음식',station:'조리대'},{name:'구운 생선',type:'요리',icon:'fish',resources:['생선','소금'],result:'음식',station:'조리대'},{name:'목제 손잡이',type:'목공',icon:'axe',resources:['목재'],result:'부품',station:'작업대'},{name:'철제 못',type:'대장장이',icon:'anvil',resources:['철괴'],result:'부품',station:'모루'},{name:'간이 붕대',type:'재료',icon:'bandage',resources:['섬유'],result:'소모품',station:'작업대'},{name:'기초 연금 시약',type:'연금술',icon:'flask-conical',resources:['약초','용매'],result:'시약',station:'연금술대'}],
