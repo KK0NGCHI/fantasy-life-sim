@@ -65,30 +65,30 @@ test('2-year equivalent model: 28/112/224/448/896 days, three behavior profiles,
  console.log('LONG_PLAY_ECONOMY '+JSON.stringify(summary));
 });
 test('live dispatcher repeated jobs preserve inventory, finite deposits and save/reload state',()=>{
- const seed='long-play-reproducible',game=newGame(seed);
+ const seed='long-play-reproducible';let game=newGame(seed);
  const tasks=[
   ['숲','resource05a:grass:01'],
   ['숲','resource05a:wild-herb:01'],
   ['숲','resource05a:oak-log:01'],
   ['강·호수','resource05a:small-fish:01']
  ];
- let completed=0,failed=0,saved=0,workedSeconds=0;
+ let completed=0,failed=0,saved=0,workedSeconds=0;const failureReasons={};
  for(let i=0;i<160;i++){
   const [region,nodeId]=tasks[i%tasks.length];
   const travel=game.dispatch('world.travel',{region});
   assert.equal(travel.accepted,true);
   const before=game.current().clock.elapsedUnits;
   const outcome=game.workUntil05A(nodeId,8);
-  if(outcome.accepted)completed++;else failed++;
+  if(outcome.accepted)completed++;else {failed++;const reason=outcome.last?.reason??'UNKNOWN';failureReasons[reason]=(failureReasons[reason]??0)+1;}
   workedSeconds+=game.current().clock.elapsedUnits-before;
   assertLedger(game,'action '+i);
-  if(i%20===19){saveRestore(game,seed);saved++;}
+  if(i%20===19){game=saveRestore(game,seed);saved++;}
  }
  assert.ok(completed>0,'no live resource action succeeded');
  assert.ok(workedSeconds>0);
  assertLedger(game,'final');
  console.log('LONG_PLAY_DISPATCH '+JSON.stringify({
-  attemptedJobs:160,completed,failed,saveRestores:saved,workedSeconds,
+  attemptedJobs:160,completed,failed,failureReasons,saveRestores:saved,workedSeconds,
   elapsedGameSeconds:game.current().clock.elapsedUnits,
   inventoryStacks:game.current().itemWorld.items.length
  }));
