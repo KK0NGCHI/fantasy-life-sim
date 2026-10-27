@@ -1,0 +1,349 @@
+sourceId	name	regions	fantasyCandidate	listedIn	acquisitionProducts	processing	uses	status
+proposed:source:0001	가리비	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0002	가문비나무	설원	false	v0.3;v0.4	목재·수지	판재·정제 수지	목공	design-candidate
+proposed:source:0003	가재	강·호수	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0004	갈대	강·호수;습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0005	갈철석	광산	false	v0.4	철 함유 광물	철 원료	제철 연구	design-candidate
+proposed:source:0006	감자	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0007	개구리	습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0008	개암나무	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0009	거울선인장	사막	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0010	거울수피나무	숲	true	v0.4	수피·목재	반사 목판	장식·빛 연구	design-candidate
+proposed:source:0011	게	해안·항구	false	v0.3;v0.4	살·갑각	손질 갑각	요리·공예	design-candidate
+proposed:source:0012	겨우살이	숲	false	v0.4	가지·열매	표본	생태 연구	design-candidate
+proposed:source:0013	결정질 이끼	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0014	고대 기록 파편	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0015	고대 목재	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0016	고대 벽돌	고대 유적	false	v0.4	벽돌	복원 벽돌	건축	design-candidate
+proposed:source:0017	고대 유리병	고대 유적	false	v0.4	유리 조각	복원 유리	전시	design-candidate
+proposed:source:0018	고등어	바다	false	v0.3;v0.4	어육·뼈	손질 어육	요리	design-candidate
+proposed:source:0019	고사리	습지;숲	false	v0.3;v0.4	어린 순·잎	표본	생태 연구	design-candidate
+proposed:source:0020	고산 두송	산맥	false	v0.4	열매·가지	향료 기질	장식	design-candidate
+proposed:source:0021	고산석영	설원	false	v0.4	결정	절단 수정	세공	design-candidate
+proposed:source:0022	고산초롱꽃	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0023	고서 조각	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0024	공작석	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0025	공허근목	지하미궁	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0026	공허박편	광산	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0027	광물 안료	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0028	구리광맥	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0029	굴	해안·항구	false	v0.3;v0.4	살·패각	정제 패각	세공	design-candidate
+proposed:source:0030	귀리	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0031	규사	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0032	규산염 암석	화산지대	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0033	규조류 퇴적물	강·호수	false	v0.4	규조토	정제 분말	여과재	design-candidate
+proposed:source:0034	그물버섯	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0035	극지 이끼	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0036	금 광맥	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0037	기도의 결정	만신전	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0038	기록용 먹	만신전	false	v0.4	먹	먹물	기록	design-candidate
+proposed:source:0039	기록용 양피지	만신전	false	v0.4	양피지	정리 문서	기록	design-candidate
+proposed:source:0040	기억 부스러기	고대 유적	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0041	기억먹는 꽃	폐허·묘지	true	v0.4	꽃잎·꽃가루	향료 후보	기억 연구	design-candidate
+proposed:source:0042	기척 없는 향	만신전	true	v0.4	향료 잔재	안정화 향분	의식 연구	design-candidate
+proposed:source:0043	길잃은 암석	산맥	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0044	까마귀 깃털	폐허·묘지	false	v0.4	깃털	정리 깃털	필기구	design-candidate
+proposed:source:0045	꺼지지 않는 잿꽃	화산지대	true	v0.4	꽃잎·씨앗	내열 분말	열 연구	design-candidate
+proposed:source:0046	꽃다발 재료	만신전	false	v0.4	꽃·줄기	꽃다발	봉헌	design-candidate
+proposed:source:0047	꾀꼬리버섯	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0048	꿀벌	초원·농경지	false	v0.4	벌꿀·밀랍	정제 밀랍	음식·양초	design-candidate
+proposed:source:0049	꿈비늘짐승	설원	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0050	꿈콩	거점 마을	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0051	끝나지 않은 모래	사막	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0052	낙엽송	설원	false	v0.4	목재·수피	판재	목공	design-candidate
+proposed:source:0053	난파선 잔해	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0054	납 광맥	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0055	납골장 유리	폐허·묘지	false	v0.4	유리 조각	연마 유리	장식	design-candidate
+proposed:source:0056	납작돌	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0057	내열 관목	화산지대	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0058	녹슨 못	폐허·묘지	false	v0.4	철못	금속 선별	재활용	design-candidate
+proposed:source:0059	녹슨 사슬	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0060	눈얼음	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0061	눈자작나무	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0062	느타리버섯	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0063	늪 진흙	습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0064	늪은방울버섯	습지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0065	늪지 사초	습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0066	다시마	해안·항구	false	v0.3;v0.4	엽체	건조 해조	요리·비료	design-candidate
+proposed:source:0067	단풍나무	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0068	달그림자 해초	해안·항구	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0069	달빛수	숲	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0070	닭	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0071	담쟁이덩굴	숲	false	v0.4	덩굴·잎	엮음재	끈·장식	design-candidate
+proposed:source:0072	당근	거점 마을	false	v0.4	뿌리·잎	손질 채소	요리·사료	design-candidate
+proposed:source:0073	대마	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0074	대추야자	사막	false	v0.3;v0.4	열매·잎	건조 과실·엮음재	식품·바구니	design-candidate
+proposed:source:0075	도마뱀	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0076	도자기 조각	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0077	동굴 민물새우	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0078	동굴 버섯	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0079	동굴 실크나방	지하미궁	false	v0.4	고치·비단	방적 비단	직물	design-candidate
+proposed:source:0080	동굴 점토	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0081	동굴 진주	지하미궁	false	v0.4	탄산염 결정	연마 진주	세공	design-candidate
+proposed:source:0082	동굴석고	지하미궁	false	v0.4	석고	분말	주형	design-candidate
+proposed:source:0083	동전	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0084	되감긴 서판	고대 유적	true	v0.4	문자 파편	복원 기록 후보	시간 연구	design-candidate
+proposed:source:0085	되감긴 유리	고대 유적	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0086	들주름버섯	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0087	들풀	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0088	등불해파리	바다	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0089	라벤더	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0090	마늘	거점 마을	false	v0.4	구근	건조 향신채	요리	design-candidate
+proposed:source:0091	마른하늘꽃	초원·농경지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0092	말불버섯	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0093	말조개	강·호수	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0094	망간 광물	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0095	매몰 씨앗	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0096	먹물버섯	습지;폐허·묘지	false	v0.3;v0.4	자실체·색소	안료 추출	기록·연구	design-candidate
+proposed:source:0097	먼지 덩굴	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0098	메기	강·호수	false	v0.3;v0.4	어육·뼈	손질 어육	요리	design-candidate
+proposed:source:0099	메밀	초원·농경지	false	v0.4	메밀알	메밀가루	면·죽	design-candidate
+proposed:source:0100	모래	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0101	모래백합	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0102	모래종꽃	사막	true	v0.4	꽃·씨앗	건조 꽃가루	기상 연구	design-candidate
+proposed:source:0103	모자이크 타일	고대 유적	false	v0.4	색석 타일	세척 타일	전시	design-candidate
+proposed:source:0104	목이버섯	숲;습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0105	묘비 파편	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0106	무응답의 씨앗	지하미궁	true	v0.4	씨앗·껍질	봉인 표본	기원 연구	design-candidate
+proposed:source:0107	무저광석	지하미궁	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0108	무저의 껍데기	바다	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0109	문어	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0110	문자먹는 이끼	고대 유적	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0111	물거울조개	강·호수	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0112	물미나리	습지	false	v0.4	줄기·잎	식물 표본	생태 연구	design-candidate
+proposed:source:0113	물밤	강·호수	false	v0.4	열매·종자	손질 과실	식재료 검토	design-candidate
+proposed:source:0114	물방울수초	강·호수	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0115	물봉선	습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0116	물이끼	습지	false	v0.4	이끼	건조 기질	원예	design-candidate
+proposed:source:0117	미나리	습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0118	미사용 밀랍	만신전	false	v0.4	밀랍	양초 원료	양초	design-candidate
+proposed:source:0119	미역	해안·항구	false	v0.3;v0.4	엽체	건조 해조	요리	design-candidate
+proposed:source:0120	민들레	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0121	민물가재	강·호수	false	v0.4	살·갑각	정제 갑각	요리·공예	design-candidate
+proposed:source:0122	민물새우	강·호수	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0123	민물조개	강·호수	false	v0.4	살·패각	분쇄 패각	세공·요리	design-candidate
+proposed:source:0124	밀	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0125	바다거북 보호관찰	바다	false	v0.4	관찰 기록	도감 기록	비채취 연구	design-candidate
+proposed:source:0126	바닷모래	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0127	바람철꽃	산맥	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0128	바지락	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0129	박쥐 구아노	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0130	반딧불이 유충 관찰	지하미궁	false	v0.4	관찰 기록	생태 기록	비채취 연구	design-candidate
+proposed:source:0131	밤나무	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0132	방연석	광산	false	v0.4	납 함유 광물	선광 시료	금속 연구	design-candidate
+proposed:source:0133	방해석 결정	지하미궁	false	v0.4	방해석	연마 결정	장식	design-candidate
+proposed:source:0134	배나무	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0135	백야꽃	설원	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0136	백운석	산맥	false	v0.4	광물	내화 분말	세라믹	design-candidate
+proposed:source:0137	버드나무	강·호수;습지	false	v0.3;v0.4	가지·수피	엮음재	직조	design-candidate
+proposed:source:0138	버드나무 공방	거점 마을	false	v0.4	가지	엮음재	바구니	design-candidate
+proposed:source:0139	벌통	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0140	벽돌 잔해	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0141	별껍질호박	초원·농경지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0142	보리	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0143	봄구름풀	초원·농경지	true	v0.4	꽃가루·잎	부유성 섬유	장식 연구	design-candidate
+proposed:source:0144	봉인 사슬	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0145	봉인씨앗	고대 유적	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0146	봉헌 동전	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0147	봉헌용 곡물	만신전	false	v0.4	곡물	제분	봉헌	design-candidate
+proposed:source:0148	봉헌용 꽃	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0149	부들	강·호수;습지	false	v0.3;v0.4	솜털·줄기	엮음재	돗자리	design-candidate
+proposed:source:0150	부서진 도기	폐허·묘지	false	v0.4	도기 조각	도기 복원	전시	design-candidate
+proposed:source:0151	부석	화산지대	false	v0.3;v0.4	암석	연마재	생활	design-candidate
+proposed:source:0152	북극버드나무	설원	false	v0.4	잔가지·잎	섬유 표본	생태	design-candidate
+proposed:source:0153	분향재	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0154	불가사리	바다	false	v0.4	표본	건조 표본	생태	design-candidate
+proposed:source:0155	붕어	강·호수	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0156	블루베리	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0157	빙어	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0158	빙하 얼음	설원	false	v0.4	얼음	절단 얼음	냉각	design-candidate
+proposed:source:0159	빙하 자갈	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0160	빛결실	만신전	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0161	뼈 조각	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0162	사과나무	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0163	사막 딱정벌레	사막	false	v0.4	갑각	건조 갑각	표본	design-candidate
+proposed:source:0164	사막 아카시아	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0165	사막 전갈	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0166	사암	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0167	사초	습지	false	v0.4	줄기·잎	엮음재	바구니	design-candidate
+proposed:source:0168	산딸기	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0169	산양	산맥	false	v0.3;v0.4	우유·고기·가죽	유제품·피혁	생활	design-candidate
+proposed:source:0170	산호	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0171	상징 목판	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0172	새벽기록 잉크	만신전	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0173	새우	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0174	색유리	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0175	서리수정	설원	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0176	서양톱풀	초원·농경지	false	v0.4	꽃·잎	건조 표본	약학 연구	design-candidate
+proposed:source:0177	석고	사막;광산	false	v0.3;v0.4	광물	석고 분말	건축	design-candidate
+proposed:source:0178	석고층	광산;사막	false	v0.3;v0.4	석고	분말	건축	design-candidate
+proposed:source:0179	석석	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0180	석영	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0181	석영 결정	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0182	석영사	사막	false	v0.4	모래	유리 원료	유리	design-candidate
+proposed:source:0183	석재 기둥	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0184	석재 조각상 재료	만신전	false	v0.4	석재	조각용 블록	신상	design-candidate
+proposed:source:0185	석탄층	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0186	석판	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0187	석판 기록	고대 유적	false	v0.4	비문 조각	탁본	언어 연구	design-candidate
+proposed:source:0188	석회동굴 석순	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0189	선인장	사막	false	v0.3;v0.4	줄기·열매	섬유	공예	design-candidate
+proposed:source:0190	설원 송어	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0191	섬아연석	광산	false	v0.4	아연 함유 광물	선광 시료	합금 연구	design-candidate
+proposed:source:0192	성게	해안·항구;바다	false	v0.3;v0.4	가시·표본	정리 표본	연구	design-candidate
+proposed:source:0193	소금습지 식물	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0194	소나무	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0195	속삭이는 항아리 파편	거점 마을	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0196	속삭임균	지하미궁	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0197	솔이끼	숲	false	v0.4	이끼	건조 기질	원예	design-candidate
+proposed:source:0198	송어	강·호수	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0199	수렁등불초	습지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0200	수련	강·호수	false	v0.3;v0.4	잎·꽃	식물 표본	장식·생태	design-candidate
+proposed:source:0201	수면편지병	해안·항구	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0202	수생 달팽이	습지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0203	수수	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0204	수정 공동	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0205	순록	설원	false	v0.3;v0.4	고기·가죽	피혁	생활	design-candidate
+proposed:source:0206	숨결이끼	숲	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0207	심맥유리	광산	true	v0.4	광맥 유리	안정화 판편	장식 연구	design-candidate
+proposed:source:0208	심연수정해파리	바다	true	v0.4	결정질 부산물	발광 핵 후보	해양 연구	design-candidate
+proposed:source:0209	심연유영어	바다	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0210	심장석	화산지대	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0211	심층 철괴석	광산	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0212	싸리버섯	숲	false	v0.4	자실체	균류 표본	균류 연구	design-candidate
+proposed:source:0213	쐐기풀	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0214	쑥류 관목	사막	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0215	아마	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0216	아마란스	초원·농경지	false	v0.4	알곡·잎	가루·건조 잎	요리	design-candidate
+proposed:source:0217	아연 광맥	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0218	아카시아 고무	사막	false	v0.4	수지	정제 수지	접착	design-candidate
+proposed:source:0219	안료 흔적	고대 유적	false	v0.4	안료 시료	복원 안료	그림	design-candidate
+proposed:source:0220	알로에	사막	false	v0.3;v0.4	잎	식물 추출물	연구	design-candidate
+proposed:source:0221	알팔파	초원·농경지	false	v0.4	줄기·잎	건초	초식 사료	design-candidate
+proposed:source:0222	암염	사막;광산	false	v0.3;v0.4	소금 광물	정제 소금	요리	design-candidate
+proposed:source:0223	암염층	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0224	애도의 버섯	폐허·묘지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0225	양	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0226	양배추	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0227	양초	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0228	양파	거점 마을	false	v0.4	구근	건조 향신채	요리	design-candidate
+proposed:source:0229	어둠먹이 광물체	광산	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0230	에델바이스	산맥	false	v0.4	꽃·잎	압화	생태	design-candidate
+proposed:source:0231	열수 미생물막	화산지대	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0232	열수 침전물	화산지대	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0233	염소	거점 마을	false	v0.4	우유·고기·가죽	유제품·피혁	요리·의류	design-candidate
+proposed:source:0234	염전	해안·항구	false	v0.4	소금	정제 소금	요리	design-candidate
+proposed:source:0235	옛 유리병	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0236	오래된 도기	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0237	오래된 목재	폐허·묘지	false	v0.3;v0.4	풍화 목재	판재 복원 후보	보수	design-candidate
+proposed:source:0238	오리	거점 마을	false	v0.4	알·고기	식재료 손질	요리·부화	design-candidate
+proposed:source:0239	오징어	바다	false	v0.3;v0.4	어육·먹물	정제 먹물	요리·안료	design-candidate
+proposed:source:0240	온천 점토	화산지대	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0241	용암울림껍질	화산지대	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0242	운모	산맥	false	v0.4	박편	절연 박편	장식	design-candidate
+proposed:source:0243	운지버섯	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0244	울림수정	산맥	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0245	월귤	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0246	유령실	폐허·묘지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0247	유리 파편	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0248	유리부표	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0249	유리잠복충	사막	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0250	유리조개	해안·항구	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0251	유황 침전물	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0252	은 광맥	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0253	은빛 보리	거점 마을	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0254	은서리열매	설원	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0255	은실잉어	강·호수	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0256	응회암	화산지대	false	v0.3;v0.4	석재	절단 블록	석공	design-candidate
+proposed:source:0257	의례 종	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0258	의식용 천	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0259	이끼 낀 돌	폐허·묘지	false	v0.4	돌·이끼	분리 표본	석공·생태	design-candidate
+proposed:source:0260	이름없는 결정	지하미궁	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0261	이름없는 장미	폐허·묘지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0262	이탄	습지	false	v0.3;v0.4	이탄 덩어리	건조 연료	연료	design-candidate
+proposed:source:0263	잃어버린 나무상자	강·호수	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0264	잉어	강·호수	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0265	자연황	화산지대	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0266	자작나무	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0267	자철석	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0268	잔향수초	강·호수	true	v0.4	잎·섬유	음향 섬유	낚시 도구 연구	design-candidate
+proposed:source:0269	잘피	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0270	잠긴 뼈가지	습지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0271	잠긴별버섯	습지	true	v0.4	자실체·포자	발광 안료	등불 연구	design-candidate
+proposed:source:0272	잣나무	숲	false	v0.4	잣·목재	견과·판재	요리·목공	design-candidate
+proposed:source:0273	장석	산맥	false	v0.4	장석	분쇄 광물	유약	design-candidate
+proposed:source:0274	장어	강·호수	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0275	잿빛 균핵	화산지대	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0276	적열꽃	화산지대	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0277	적철석	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0278	전나무	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0279	점토 채취장	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0280	점판암	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0281	정어리	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0282	정제 향료	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0283	제단 보수 목재	만신전	false	v0.4	목재	판재	개인 제단	design-candidate
+proposed:source:0284	제단용 석재	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0285	종소리콩	거점 마을	true	v0.4	콩·꼬투리	향미 분말	축제 요리	design-candidate
+proposed:source:0286	주니퍼	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0287	주석광맥	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0288	지의류	설원	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0289	지하 민물게	지하미궁	false	v0.4	갑각·살	갑각 표본	생태	design-candidate
+proposed:source:0290	지하 점토층	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0291	지하 퇴적점토	지하미궁	false	v0.4	점토	정제 점토	도기	design-candidate
+proposed:source:0292	지하수	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0293	진주조개	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0294	진흙	습지	false	v0.4	점질 토양	점토 선별	도기	design-candidate
+proposed:source:0295	질경이	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0296	참깨	초원·농경지	false	v0.4	씨앗	식물성 기름	요리	design-candidate
+proposed:source:0297	참나무	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0298	참치	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0299	천연황	화산지대	false	v0.4	황	정제 황	연금 연구	design-candidate
+proposed:source:0300	철 고철	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0301	철 못	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0302	철 함유 암석	지하미궁	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0303	철광맥	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0304	청동 부속	고대 유적	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0305	청동 유물 조각	고대 유적	false	v0.4	청동 파편	분류 유물	복원	design-candidate
+proposed:source:0306	청어	바다	false	v0.4	어육·비늘	손질 어육	요리	design-candidate
+proposed:source:0307	촛농 잔여	만신전	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0308	침묵의 고치	습지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0309	침묵의 금박	만신전	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0310	크랜베리	설원	false	v0.3;v0.4	열매	과실 가공	요리	design-candidate
+proposed:source:0311	클로버	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0312	토끼	초원·농경지	false	v0.4	고기·가죽	피혁	요리·의류	design-candidate
+proposed:source:0313	톳	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0314	파도유리조개	해안·항구	true	v0.4	패각·진주	연마 패각	세공	design-candidate
+proposed:source:0315	팥	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0316	패각 모래	해안·항구	false	v0.4	패각 파편	분쇄 패각	건축	design-candidate
+proposed:source:0317	편마암	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0318	표고버섯	숲	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0319	표류목	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0320	풍명석	산맥	true	v0.4	공명 광편	공명판	탐지 연구	design-candidate
+proposed:source:0321	풍화된 석재	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0322	해면	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0323	해면동물	바다	false	v0.4	해면체	세척 해면	생활용품	design-candidate
+proposed:source:0324	해바라기	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0325	해조류 군락	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0326	해초	해안·항구	false	v0.4	섬유	건조 섬유	그물	design-candidate
+proposed:source:0327	해파리	바다	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0328	향등나무	거점 마을	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0329	현무암	화산지대	false	v0.3;v0.4	암석	절단 석판	건축	design-candidate
+proposed:source:0330	혈맥초	폐허·묘지	true	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0331	형석	산맥;광산	false	v0.3;v0.4	결정	절단 결정	세공	design-candidate
+proposed:source:0332	호두나무	거점 마을	false	v0.4	호두·목재	견과 선별·판재	식품·가구	design-candidate
+proposed:source:0333	호랑가시나무	숲	false	v0.4	가지·잎	목재 장식	장식·도감	design-candidate
+proposed:source:0334	호밀	거점 마을	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0335	호박	초원·농경지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0336	홍합	해안·항구	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0337	화강암	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0338	화산 유리	화산지대	false	v0.3;v0.4	유리질 암석	절단 장식	세공	design-candidate
+proposed:source:0339	화산재	화산지대	false	v0.3;v0.4	재	혼합 건축재	건축	design-candidate
+proposed:source:0340	화석 목재	고대 유적	false	v0.4	규화목	연마 규화목	세공	design-candidate
+proposed:source:0341	황동석	산맥	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0342	황철석	광산	false	v0.4	광물	분쇄 표본	장식·연구	design-candidate
+proposed:source:0343	황폐지 이끼	폐허·묘지	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0344	회색지 지의류	폐허·묘지	false	v0.4	지의류	건조 표본	생태	design-candidate
+proposed:source:0345	흑연	산맥	false	v0.4	흑연	분말·봉	필기·주형	design-candidate
+proposed:source:0346	흑연층	광산	false	v0.3	v03-details-pending-import	v03-details-pending-import	v03-details-pending-import	design-candidate
+proposed:source:0347	흑요석	화산지대	false	v0.3;v0.4	유리질 암석	날붙이	공예	design-candidate
+proposed:source:0348	흰잠이끼	설원	true	v0.4	이끼·포자	몽환성 기질	연구	design-candidate
