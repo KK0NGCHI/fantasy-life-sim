@@ -20,7 +20,7 @@ export const TREE_BYPRODUCTS_05M=Object.freeze({
  ])
 });
 export const TREE_BYPRODUCT_ITEMS_05M=Object.freeze(
- [...new Map(Object.values(TREE_BYPRODUCTS_05M).flat().map(x=>[x.itemId,{id:x.itemId,name:x.name,family:'tree_byproduct'}])).values()]
+ [...new Map(Object.values(TREE_BYPRODUCTS_05M).flat().filter(x=>x.itemId!=='item05a:oak-sap').map(x=>[x.itemId,{id:x.itemId,name:x.name,family:'tree_byproduct'}])).values()]
 );
 export const treeByproductKey05M=(nodeId,itemId)=>nodeId+'|'+itemId;
 export function takeTreeByproduct05M(nodes,stocks,nodeId,itemId,region,now,resourceMap){
