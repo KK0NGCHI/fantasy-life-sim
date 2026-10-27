@@ -1,3 +1,4 @@
+import {TREE_BYPRODUCT_ITEMS_05M,takeTreeByproduct05M} from './tree-byproducts-05m.js';
 import {creditOwnedResource05A} from './resource-credit-05a.js';
 import {creditMineralOutputs05E} from './mineral-credit-05e.js';
 import {REFINING_RECIPES_05H,REFINED_ITEMS_05H,REFINING_BY_ID_05H,refineMineral05H} from './mineral-refining-05h.js';
@@ -34,7 +35,7 @@ import {buildItemRegistry,createRandomState,V2ActionDispatcher,prepareBulkDiscar
  * Legacy UI labels/categories remain presentation-only and are never silently migrated from localStorage.
  */
 export function createMainV2Inventory(uiItems,options={}) {
- const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A,...FUNGAL_ITEMS_05B,...REFINED_ITEMS_05H];
+ const knownResourceItems05A=[...CATALOG_ITEMS_05A,...BOTANICAL_ITEMS_05A,...BOTANICAL_SEED_ITEMS_05A,...FUNGAL_ITEMS_05B,...REFINED_ITEMS_05H,...TREE_BYPRODUCT_ITEMS_05M];
  const extendedLootIds05D=new Set([...FUNGAL_ITEMS_05B,...BOTANICAL_SEED_ITEMS_05A].map(x=>x.id));
  const recordAcquired05D=(existing,rewards)=>{
   if(!Array.isArray(rewards)||rewards.length===0)throw Error('INVALID_REWARDS');
@@ -488,6 +489,20 @@ export function createMainV2Inventory(uiItems,options={}) {
   const compendium=acquiredCompendium05A(resources.compendium,rewards);
   return {outcome:'success',nextState:{...snapshot,rng,itemWorld,world:{...snapshot.world,runtime:{...runtime,resource05A:{...resources,candidateSites:outcome.nodes,compendium}}}},
    events:[{type:'resource.candidate_acquired',payload:{nodeId,rewards}}]};
+ }],
+ ['resource.tree.byproduct',(snapshot,command)=>{
+  const runtime=snapshot.world.runtime,resources=runtime.resource05A;
+  if(runtime.dungeon||!resources)throw Error('RESOURCE_UNAVAILABLE');
+  const result=takeTreeByproduct05M(resources.nodes,resources.treeByproducts05M,
+   command.payload?.nodeId,command.payload?.itemId,runtime.region,snapshot.clock.elapsedUnits,RESOURCE_MAP_05A);
+  if(!result.ok)throw Error(result.reason);
+  const itemWorld=creditOwnedResource05A(snapshot.itemWorld,snapshot.player.id,
+   'byproduct05m:'+result.itemId,result.itemId,result.quantity);
+  const next={...snapshot,itemWorld,world:{...snapshot.world,runtime:{...runtime,
+   resource05A:{...resources,treeByproducts05M:result.stocks}}}};
+  return sideResult(snapshot,{outcome:'success',nextState:next,events:[
+   {type:'resource.tree_byproduct_collected',payload:{nodeId:command.payload.nodeId,itemId:result.itemId,quantity:1}}
+  ]},'gather',actionSeconds('region.activity'),runtime.region);
  }],
  ['resource.work',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon||!snapshot.world.runtime.resource05A)throw Error('RESOURCE_UNAVAILABLE');
