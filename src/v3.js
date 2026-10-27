@@ -3,6 +3,7 @@ import {CRAFTING_MATERIALS_05L} from './resource-crafting-05l.js';
 import {FOREST_MATERIALS_05M} from './forest-resources-05m.js';
 import {FIBER_MATERIALS_05M} from './fiber-crafting-05m.js';
 import {planMaterialAllocation} from './material-compatibility-05j.js';
+import {readCraftMaterials05N} from './material-composition-05n.js';
 import {MINERAL_DEFINITIONS_05E,mineralDepositId05E} from './mineral-deposits-05e.js';
 import {geologyProfile05F} from './mineral-geology-05f.js';
 import {mineralAssemblage05F,ASSEMBLAGE_TYPES_05F} from './mineral-assemblages-05f.js';
@@ -427,7 +428,17 @@ function world(){
  }
 }
 
-function mockDetail(i){if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 속성과 태그가 여기에 표시됩니다.</p>';return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl><h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">표시 값은 테스트용이며 실제 품질·전투 공식이 아닙니다.</p>'}
+function mockDetail(i){
+ if(!i)return '<h3>아이템 상세</h3><p class="muted small">아이템을 선택하면 정보가 표시됩니다.</p>';
+ const used=readCraftMaterials05N(i);
+ const all=mainV2.registry.items;
+ const ingredients=used?'<h3>제작 시 사용한 재료</h3><ul>'+used.map(x=>{
+  const label=all.get(x.definitionId)?.nameKey??x.definitionId;
+  return '<li>'+esc(label)+' ×'+x.quantity+'</li>';
+ }).join('')+'</ul><p class="tiny muted">직전 제작에서 실제 소비한 재료입니다. 채집 장소 등의 전체 이력은 기록하지 않습니다.</p>':
+ '<h3>제작 재료</h3><p class="tiny muted">재료 기록이 없는 기존 아이템이거나 비제작 아이템입니다.</p>';
+ return '<h3>'+esc(i.name)+'</h3><div class="tiny muted">'+esc(i.id)+'</div><dl><dt>분류</dt><dd>'+esc(i.group)+'</dd><dt>소재</dt><dd>'+esc(i.material||'미정')+'</dd><dt>품질</dt><dd>'+esc(i.quality||'미정')+'</dd><dt>공격</dt><dd>'+esc(i.attack||0)+'</dd><dt>방어</dt><dd>'+esc(i.defense||0)+'</dd></dl>'+ingredients+'<h3>속성·태그</h3>'+i.tags.map(t=>'<span class="tag">'+esc(t)+'</span>').join('')+'<p class="tiny muted" style="margin-top:14px">품질·전투 수치는 시험용입니다.</p>'
+}
 function inventory(){
 mainV2.syncVitals(s);
 refreshV2Inventory();
