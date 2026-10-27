@@ -1,4 +1,4 @@
-import {REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
+import {ALL_CRAFTING_RECIPES_05L,REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
 import {CRAFTING_MATERIALS_05L} from './resource-crafting-05l.js';
 import {planMaterialAllocation} from './material-compatibility-05j.js';
 import {MINERAL_DEFINITIONS_05E,mineralDepositId05E} from './mineral-deposits-05e.js';
@@ -199,7 +199,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     const ownedQty=itemId=>allItems.items.filter(item=>item.definitionId===itemId&&
      allItems.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===mainV2.current().player.id))
      .reduce((total,item)=>total+item.quantity,0);
-    for(const recipe of REFINING_RECIPES_05H){
+    for(const recipe of ALL_CRAFTING_RECIPES_05L){
      const requirements=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
      const label=requirements.map(req=>{
       const name=REFINED_ITEMS_05H.find(i=>i.id===req.itemId)?.name??
