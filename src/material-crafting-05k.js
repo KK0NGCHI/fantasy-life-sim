@@ -1,3 +1,4 @@
+import {MATERIALS_CONDITION_05N,craftMaterialReceipt05N,TRACKED_RECIPES_05N} from './material-composition-05n.js';
 import {planMaterialAllocation} from './material-compatibility-05j.js';
 
 /** Pure 05-K inventory craft transaction. No duration, UI, or save mutations.
@@ -29,14 +30,28 @@ export function craftWithAllocatedMaterials(itemWorld,ownerId,recipe,definitions
  let items=remaining.filter(i=>i.quantity>0);
  const placements=itemWorld.placements.filter(p=>!exhausted.has(p.itemId));
  const outputId='refined05h:'+recipe.output;
- const prev=items.find(i=>i.id===outputId);
- if(prev&&(
-  prev.definitionId!==recipe.output||
-  !placements.some(p=>p.itemId===outputId&&p.location?.kind==='inventory'&&p.location.ownerId===ownerId)
- ))return {ok:false,reason:'OUTPUT_NOT_OWNED'};
+ const receipt=TRACKED_RECIPES_05N(recipe)?craftMaterialReceipt05N(itemWorld,plan.allocations):null;
+ if(TRACKED_RECIPES_05N(recipe)&&!receipt)return {ok:false,reason:'INVALID_MATERIAL_PLAN'};
+ const condition=receipt?{[MATERIALS_CONDITION_05N]:receipt}:undefined;
+ // Existing exact-ID 05-H/I outputs keep their legacy fixed stack IDs.
+ // For new recipes, a material-specific stack can only merge with an identical receipt.
+ const matches=items.filter(i=>i.definitionId===recipe.output&&
+  (receipt?i.condition?.[MATERIALS_CONDITION_05N]===receipt:i.id===outputId)&&
+  placements.some(p=>p.itemId===i.id&&p.location?.kind==='inventory'&&p.location.ownerId===ownerId));
+ const prev=matches[0];
  if(prev&&!Number.isSafeInteger(prev.quantity+recipe.outputQty))return {ok:false,reason:'OUTPUT_OVERFLOW'};
- if(prev)items=items.map(i=>i.id===outputId?{...i,quantity:i.quantity+recipe.outputQty}:i);
- else items=[...items,{id:outputId,definitionId:recipe.output,quantity:recipe.outputQty}];
- const nextPlacements=prev?placements:[...placements,{itemId:outputId,location:{kind:'inventory',ownerId}}];
+ if(prev)items=items.map(i=>i.id===prev.id?{...i,quantity:i.quantity+recipe.outputQty}:i);
+ else {
+  let nextId=outputId;
+  if(receipt){
+   let index=1;
+   while(itemWorld.items.some(i=>i.id===outputId+':materials:'+index))index++;
+   nextId=outputId+':materials:'+index;
+  }
+  if(items.some(i=>i.id===nextId)||placements.some(p=>p.itemId===nextId))
+   return {ok:false,reason:'OUTPUT_NOT_OWNED'};
+  items=[...items,{id:nextId,definitionId:recipe.output,quantity:recipe.outputQty,...(condition?{condition}:{})}];
+ }
+ const nextPlacements=prev?placements:[...placements,{itemId:items.at(-1).id,location:{kind:'inventory',ownerId}}];
  return {ok:true,itemWorld:{...itemWorld,items,placements:nextPlacements},recipe,allocations:plan.allocations};
 }
