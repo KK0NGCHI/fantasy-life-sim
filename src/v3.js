@@ -203,6 +203,10 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     make('p',{class:'muted',text:s.region==='거점 마을'?'마을의 공용 용광로와 작업대 이용 가능':'가공 시설은 거점 마을에서 이용할 수 있습니다.'},refiningPanel);
     const snapshotWorld=mainV2.current();
     const allItems=snapshotWorld.itemWorld;
+    const craftingMode=make('select',{'aria-label':'연속 제작 정책'},refiningPanel);
+    for(const [id,title] of [['atomic','전량 확보 후 제작 (전체 취소)'],['until','가능한 만큼 제작 후 부족 시 중단']]){
+     const o=make('option',{text:title},craftingMode);o.value=id;
+    }
     const craftingCount=make('select',{'aria-label':'연속 제작 횟수'},refiningPanel);
     for(const n of [1,2,5,10,20]){const o=make('option',{text:n+'회'},craftingCount);o.value=String(n);}
     make('p',{class:'tiny muted',text:'연속 제작은 모든 횟수가 가능할 때만 일괄 실행하며, 중간에 재료가 부족하면 전체가 취소됩니다.'},refiningPanel);
@@ -231,16 +235,18 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      const msg=make('span',{class:'tiny muted'},row);
      const refine=btn('제작 ('+Math.floor(recipe.seconds/60)+'분/회)',()=>{
       const count=Number(craftingCount.value);
-      if(!executeV2('craft.batch',{recipeId:recipe.id,count,choices}))return render();
-      nextLog('제작',recipe.name+' '+count+'회 완료');render();
+      const type=craftingMode.value==='until'?'craft.until':'craft.batch';
+      if(!executeV2(type,{recipeId:recipe.id,count,choices}))return render();
+      nextLog('제작',recipe.name+' 반복 제작 처리 완료');render();
      },'btn',row);
      const updateAvailability=()=>{
       const preview=craftPreview1(allItems,owner,recipe.id,choices);
-      const trial=preview.ok?craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices):preview;
-      msg.textContent=trial.ok?'제작 가능':'재료 부족/호환 불가: '+trial.reason;
+      const trial=preview.ok?(craftingMode.value==='until'?preview:craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices)):preview;
+      msg.textContent=trial.ok?'제작 가능'+(craftingMode.value==='until'?' · 재료 고갈 시 자동 중단':''):'재료 부족/호환 불가: '+trial.reason;
       refine.disabled=s.region!=='거점 마을'||!trial.ok;
      };
      craftingCount.addEventListener('change',updateAvailability);
+     craftingMode.addEventListener('change',updateAvailability);
      updateAvailability();
     }
     const tools=mainV2.availableTools05A('mining');
