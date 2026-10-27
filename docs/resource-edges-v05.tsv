@@ -1,0 +1,385 @@
+rowId	sourceId	region	stage0Source	stage1Drop	stage2Processed	stage3Use	evidence
+0001	proposed:source:0124	거점 마을	밀	곡물·짚	가공 공정 검토	제분·사료	v0.3
+0002	proposed:source:0142	거점 마을	보리	곡물·짚	가공 공정 검토	제분·사료	v0.3
+0003	proposed:source:0030	거점 마을	귀리	곡물·짚	가공 공정 검토	죽·사료	v0.3
+0004	proposed:source:0334	거점 마을	호밀	곡물·짚	가공 공정 검토	제분·빵	v0.3
+0005	proposed:source:0006	거점 마을	감자	덩이줄기	가공 공정 검토	조리·종서	v0.3
+0006	proposed:source:0226	거점 마을	양배추	잎·씨앗	가공 공정 검토	요리·재배	v0.3
+0007	proposed:source:0215	거점 마을	아마	줄기·씨앗	가공 공정 검토	방적·기름	v0.3
+0008	proposed:source:0073	거점 마을	대마	줄기·씨앗	가공 공정 검토	밧줄·천	v0.3
+0009	proposed:source:0162	거점 마을	사과나무	과실·가지·목재	가공 공정 검토	과수·목공	v0.3
+0010	proposed:source:0134	거점 마을	배나무	과실·가지·목재	가공 공정 검토	과수·목공	v0.3
+0011	proposed:source:0139	거점 마을	벌통	밀랍·벌꿀	가공 공정 검토	양초·음식	v0.3
+0012	proposed:source:0279	거점 마을	점토 채취장	점토	가공 공정 검토	벽돌·도자기	v0.3
+0013	proposed:source:0050	거점 마을	꿈콩	꼬투리·씨앗	가공 공정 검토	이질식 사료 후보·연구	v0.3
+0014	proposed:source:0253	거점 마을	은빛 보리	곡물·짚	가공 공정 검토	의식 음식 후보	v0.3
+0015	proposed:source:0328	거점 마을	향등나무	향목·수액	가공 공정 검토	장식·향료 후보	v0.3
+0016	proposed:source:0195	거점 마을	속삭이는 항아리 파편	도기 조각	가공 공정 검토	수리·고고학	v0.3
+0017	proposed:source:0087	초원·농경지	들풀	풀섬유·풀잎	가공 공정 검토	밧줄·사료	v0.3
+0018	proposed:source:0120	초원·농경지	민들레	꽃·잎·뿌리	가공 공정 검토	염료·조리	v0.3
+0019	proposed:source:0213	초원·농경지	쐐기풀	줄기·잎	가공 공정 검토	방적·약학연구	v0.3
+0020	proposed:source:0295	초원·농경지	질경이	잎·씨앗	가공 공정 검토	채집·연구	v0.3
+0021	proposed:source:0089	초원·농경지	라벤더	꽃·줄기	가공 공정 검토	향료·장식	v0.3
+0022	proposed:source:0311	초원·농경지	클로버	잎·꽃	가공 공정 검토	사료·양봉	v0.3
+0023	proposed:source:0324	초원·농경지	해바라기	씨앗·꽃	가공 공정 검토	기름·염료	v0.3
+0024	proposed:source:0203	초원·농경지	수수	곡물·줄기	가공 공정 검토	조리·사료	v0.3
+0025	proposed:source:0315	초원·농경지	팥	콩·꼬투리	가공 공정 검토	조리·종자	v0.3
+0026	proposed:source:0335	초원·농경지	호박	과육·씨앗	가공 공정 검토	음식·장식	v0.3
+0027	proposed:source:0225	초원·농경지	양	양털·우유·고기·가죽	가공 공정 검토	사육·방적·음식	v0.3
+0028	proposed:source:0070	초원·농경지	닭	알·고기	가공 공정 검토	사육·요리	v0.3
+0029	proposed:source:0086	초원·농경지	들주름버섯	자실체	가공 공정 검토	균류 연구·식재료 검토	v0.3
+0030	proposed:source:0092	초원·농경지	말불버섯	자실체·포자	가공 공정 검토	균류 연구	v0.3
+0031	proposed:source:0141	초원·농경지	별껍질호박	과육·씨앗·껍질	가공 공정 검토	요리·등불 후보	v0.3
+0032	proposed:source:0091	초원·농경지	마른하늘꽃	꽃잎·꽃가루	가공 공정 검토	염료·기상 연구	v0.3
+0033	proposed:source:0297	숲	참나무	통나무·수피·도토리·수액	가공 공정 검토	목공·식품·수지	v0.3
+0034	proposed:source:0194	숲	소나무	통나무·솔방울·송진	가공 공정 검토	목공·연료·수지	v0.3
+0035	proposed:source:0266	숲	자작나무	목재·수피·수액	가공 공정 검토	목공·용기	v0.3
+0036	proposed:source:0067	숲	단풍나무	목재·수액·씨앗	가공 공정 검토	목공·가공	v0.3
+0037	proposed:source:0131	숲	밤나무	밤·목재	가공 공정 검토	식품·목공	v0.3
+0038	proposed:source:0008	숲	개암나무	열매·가지	가공 공정 검토	식품·바구니	v0.3
+0039	proposed:source:0156	숲	블루베리	열매·묘목	가공 공정 검토	가공식품·재배	v0.3
+0040	proposed:source:0168	숲	산딸기	열매·묘목	가공 공정 검토	가공식품	v0.3
+0041	proposed:source:0062	숲	느타리버섯	자실체	가공 공정 검토	요리 후보·균류 연구	v0.3
+0042	proposed:source:0318	숲	표고버섯	자실체	가공 공정 검토	요리 후보·재배	v0.3
+0043	proposed:source:0104	숲	목이버섯	자실체	가공 공정 검토	채집 장갑·요리 후보	v0.3
+0044	proposed:source:0243	숲	운지버섯	자실체	가공 공정 검토	연금술 연구	v0.3
+0045	proposed:source:0047	숲	꾀꼬리버섯	자실체	가공 공정 검토	균근 생태·요리 후보	v0.3
+0046	proposed:source:0034	숲	그물버섯	자실체	가공 공정 검토	균근 생태·요리 후보	v0.3
+0047	proposed:source:0069	숲	달빛수	잎·목재·수액	가공 공정 검토	몽환 소재·목공 후보	v0.3
+0048	proposed:source:0206	숲	숨결이끼	이끼·포자	가공 공정 검토	습도계·마법 연구 후보	v0.3
+0049	proposed:source:0264	강·호수	잉어	어획물·뼈	가공 공정 검토	요리·수생 도감	v0.3
+0050	proposed:source:0198	강·호수	송어	어획물·뼈	가공 공정 검토	요리·수생 도감	v0.3
+0051	proposed:source:0098	강·호수	메기	어획물·뼈	가공 공정 검토	요리	v0.3
+0052	proposed:source:0155	강·호수	붕어	어획물	가공 공정 검토	요리·양어 후보	v0.3
+0053	proposed:source:0274	강·호수	장어	어획물	가공 공정 검토	요리·양어 후보	v0.3
+0054	proposed:source:0122	강·호수	민물새우	새우·껍질	가공 공정 검토	요리·사료	v0.3
+0055	proposed:source:0003	강·호수	가재	가재·껍질	가공 공정 검토	요리·공예	v0.3
+0056	proposed:source:0093	강·호수	말조개	조갯살·껍질	가공 공정 검토	요리·석회 재료	v0.3
+0057	proposed:source:0004	강·호수	갈대	줄기·잎	가공 공정 검토	지붕·바구니	v0.3
+0058	proposed:source:0137	강·호수	버드나무	가지·수피·목재	가공 공정 검토	바구니·목공	v0.3
+0059	proposed:source:0149	강·호수	부들	꽃대·잎	가공 공정 검토	충전재·돗자리	v0.3
+0060	proposed:source:0200	강·호수	수련	꽃·잎	가공 공정 검토	장식·식물 연구	v0.3
+0061	proposed:source:0114	강·호수	물방울수초	잎·수액	가공 공정 검토	투명 가공재 후보	v0.3
+0062	proposed:source:0255	강·호수	은실잉어	어획물·은빛 비늘	가공 공정 검토	장식·양어 후보	v0.3
+0063	proposed:source:0111	강·호수	물거울조개	껍질·진주 유사체	가공 공정 검토	거울장식 후보	v0.3
+0064	proposed:source:0263	강·호수	잃어버린 나무상자	목재 상자·잡화	가공 공정 검토	낚시 인양	v0.3
+0065	proposed:source:0004	습지	갈대	줄기·잎	가공 공정 검토	지붕·직조	v0.3
+0066	proposed:source:0149	습지	부들	잎·솜털	가공 공정 검토	직조·충전재	v0.3
+0067	proposed:source:0262	습지	이탄	이탄 덩어리	가공 공정 검토	연료·토양 연구	v0.3
+0068	proposed:source:0063	습지	늪 진흙	점토질 흙	가공 공정 검토	도기·건축	v0.3
+0069	proposed:source:0115	습지	물봉선	꽃·씨앗	가공 공정 검토	염료·관상	v0.3
+0070	proposed:source:0117	습지	미나리	줄기·잎	가공 공정 검토	식재료 검토·재배	v0.3
+0071	proposed:source:0065	습지	늪지 사초	섬유·뿌리	가공 공정 검토	직조·사료	v0.3
+0072	proposed:source:0019	습지	고사리	새순·잎	가공 공정 검토	관상·연구	v0.3
+0073	proposed:source:0104	습지	목이버섯	자실체	가공 공정 검토	균류 채집	v0.3
+0074	proposed:source:0096	습지	먹물버섯	자실체	가공 공정 검토	안료 연구	v0.3
+0075	proposed:source:0202	습지	수생 달팽이	연체부·껍질	가공 공정 검토	수생 도감·장식	v0.3
+0076	proposed:source:0007	습지	개구리	생체 관찰·분비물 연구	가공 공정 검토	도감·생태 연구	v0.3
+0077	proposed:source:0064	습지	늪은방울버섯	자실체·포자	가공 공정 검토	공명 연구 후보	v0.3
+0078	proposed:source:0199	습지	수렁등불초	발광 잎·씨앗	가공 공정 검토	등불·관상 후보	v0.3
+0079	proposed:source:0270	습지	잠긴 뼈가지	뿌리 유사체	가공 공정 검토	연구·목공 후보	v0.3
+0080	proposed:source:0308	습지	침묵의 고치	고치 섬유	가공 공정 검토	섬유·유물 연구 후보	v0.3
+0081	proposed:source:0337	산맥	화강암	암석 블록	가공 공정 검토	석공·건축	v0.3
+0082	proposed:source:0317	산맥	편마암	암석	가공 공정 검토	석재·장식	v0.3
+0083	proposed:source:0280	산맥	점판암	판석	가공 공정 검토	지붕·건축	v0.3
+0084	proposed:source:0180	산맥	석영	수정 원석	가공 공정 검토	유리·세공	v0.3
+0085	proposed:source:0331	산맥	형석	결정	가공 공정 검토	세공·제련 연구	v0.3
+0086	proposed:source:0277	산맥	적철석	철 함유 광석	가공 공정 검토	철 제련 원료	v0.3
+0087	proposed:source:0267	산맥	자철석	철 함유 광석	가공 공정 검토	철 제련 원료	v0.3
+0088	proposed:source:0341	산맥	황동석	구리 함유 광석	가공 공정 검토	구리 제련 원료	v0.3
+0089	proposed:source:0024	산맥	공작석	구리 함유 광물	가공 공정 검토	구리 원료·안료	v0.3
+0090	proposed:source:0179	산맥	석석	주석 함유 광석	가공 공정 검토	청동 재료	v0.3
+0091	proposed:source:0278	산맥	전나무	목재·수지	가공 공정 검토	건축·방수재	v0.3
+0092	proposed:source:0169	산맥	산양	털·고기·가죽	가공 공정 검토	사육·생활제작	v0.3
+0093	proposed:source:0022	산맥	고산초롱꽃	꽃·씨앗	가공 공정 검토	염료·도감	v0.3
+0094	proposed:source:0244	산맥	울림수정	공명 결정	가공 공정 검토	음향·탐지 연구 후보	v0.3
+0095	proposed:source:0127	산맥	바람철꽃	광물성 꽃잎	가공 공정 검토	경량 합금 연구 후보	v0.3
+0096	proposed:source:0043	산맥	길잃은 암석	움직이는 광물껍질	가공 공정 검토	연구·관찰 후보	v0.3
+0097	proposed:source:0185	광산	석탄층	석탄	가공 공정 검토	연료·제련	v0.3
+0098	proposed:source:0303	광산	철광맥	철광석	가공 공정 검토	제철	v0.3
+0099	proposed:source:0028	광산	구리광맥	구리광석	가공 공정 검토	제련	v0.3
+0100	proposed:source:0287	광산	주석광맥	주석광석	가공 공정 검토	청동	v0.3
+0101	proposed:source:0036	광산	금 광맥	자연금 함유 원료	가공 공정 검토	세공	v0.3
+0102	proposed:source:0252	광산	은 광맥	은 함유 원료	가공 공정 검토	세공	v0.3
+0103	proposed:source:0054	광산	납 광맥	방연석	가공 공정 검토	금속 연구	v0.3
+0104	proposed:source:0217	광산	아연 광맥	섬아연석	가공 공정 검토	합금 연구	v0.3
+0105	proposed:source:0346	광산	흑연층	흑연	가공 공정 검토	필기·내화재	v0.3
+0106	proposed:source:0178	광산	석고층	석고	가공 공정 검토	주형·건축	v0.3
+0107	proposed:source:0223	광산	암염층	암염	가공 공정 검토	식용 정제 후보·산업	v0.3
+0108	proposed:source:0204	광산	수정 공동	석영 결정	가공 공정 검토	세공·유리	v0.3
+0109	proposed:source:0290	광산	지하 점토층	점토	가공 공정 검토	도기	v0.3
+0110	proposed:source:0211	광산	심층 철괴석	특수 철광석	가공 공정 검토	자기적 성질 연구 후보	v0.3
+0111	proposed:source:0026	광산	공허박편	얇은 이질적 결정	가공 공정 검토	특수 연구 후보	v0.3
+0112	proposed:source:0229	광산	어둠먹이 광물체	광물성 생체 잔재	가공 공정 검토	도감·연구 후보	v0.3
+0113	proposed:source:0061	설원	눈자작나무	목재·수피	가공 공정 검토	목공·연료	v0.3
+0114	proposed:source:0002	설원	가문비나무	목재·수지	가공 공정 검토	목공·방수	v0.3
+0115	proposed:source:0286	설원	주니퍼	열매·목재	가공 공정 검토	향료·목공	v0.3
+0116	proposed:source:0205	설원	순록	털·고기·가죽	가공 공정 검토	사육·생활	v0.3
+0117	proposed:source:0035	설원	극지 이끼	이끼	가공 공정 검토	연구·보온재 후보	v0.3
+0118	proposed:source:0288	설원	지의류	지의체	가공 공정 검토	염료·연구	v0.3
+0119	proposed:source:0245	설원	월귤	열매	가공 공정 검토	가공식품	v0.3
+0120	proposed:source:0310	설원	크랜베리	열매	가공 공정 검토	식품·가공	v0.3
+0121	proposed:source:0157	설원	빙어	어획물	가공 공정 검토	요리·도감	v0.3
+0122	proposed:source:0190	설원	설원 송어	어획물	가공 공정 검토	요리·양어	v0.3
+0123	proposed:source:0060	설원	눈얼음	얼음	가공 공정 검토	보관용기·장식	v0.3
+0124	proposed:source:0159	설원	빙하 자갈	자갈·석분	가공 공정 검토	석재·지질 연구	v0.3
+0125	proposed:source:0254	설원	은서리열매	과실·씨앗	가공 공정 검토	냉기 요리 후보	v0.3
+0126	proposed:source:0135	설원	백야꽃	꽃잎	가공 공정 검토	광원 장식 후보	v0.3
+0127	proposed:source:0175	설원	서리수정	얼음성 결정	가공 공정 검토	냉각 연구 후보	v0.3
+0128	proposed:source:0049	설원	꿈비늘짐승	특수 비늘·털	가공 공정 검토	사육·도감 후보	v0.3
+0129	proposed:source:0164	사막	사막 아카시아	목재·수지·씨앗	가공 공정 검토	목공·접착	v0.3
+0130	proposed:source:0074	사막	대추야자	대추·잎·목질	가공 공정 검토	음식·직조	v0.3
+0131	proposed:source:0189	사막	선인장	과실·줄기 섬유	가공 공정 검토	음식·섬유	v0.3
+0132	proposed:source:0220	사막	알로에	잎·수액	가공 공정 검토	연금술 연구	v0.3
+0133	proposed:source:0214	사막	쑥류 관목	잎·줄기	가공 공정 검토	향료·연료	v0.3
+0134	proposed:source:0100	사막	모래	모래	가공 공정 검토	유리·건축	v0.3
+0135	proposed:source:0031	사막	규사	석영사	가공 공정 검토	유리	v0.3
+0136	proposed:source:0166	사막	사암	석재	가공 공정 검토	석공·건축	v0.3
+0137	proposed:source:0177	사막	석고	석고	가공 공정 검토	벽재·주형	v0.3
+0138	proposed:source:0222	사막	암염	소금 원료	가공 공정 검토	정제·식품	v0.3
+0139	proposed:source:0165	사막	사막 전갈	외골격·분비물 연구	가공 공정 검토	생물 도감·연구	v0.3
+0140	proposed:source:0075	사막	도마뱀	비늘·생태 관찰	가공 공정 검토	도감·연구	v0.3
+0141	proposed:source:0101	사막	모래백합	꽃·뿌리	가공 공정 검토	연구·장식	v0.3
+0142	proposed:source:0051	사막	끝나지 않은 모래	시간성 모래	가공 공정 검토	특수 연구 후보	v0.3
+0143	proposed:source:0009	사막	거울선인장	반사 표피·열매	가공 공정 검토	광학·식품 후보	v0.3
+0144	proposed:source:0249	사막	유리잠복충	유리질 껍질	가공 공정 검토	세공·생태 연구 후보	v0.3
+0145	proposed:source:0336	해안·항구	홍합	조갯살·껍질	가공 공정 검토	요리·석회재	v0.3
+0146	proposed:source:0029	해안·항구	굴	조갯살·껍질	가공 공정 검토	요리·세공	v0.3
+0147	proposed:source:0128	해안·항구	바지락	조갯살·껍질	가공 공정 검토	요리	v0.3
+0148	proposed:source:0011	해안·항구	게	고기·갑각	가공 공정 검토	요리·도감	v0.3
+0149	proposed:source:0192	해안·항구	성게	생식소·가시·껍질	가공 공정 검토	요리 검토·장식	v0.3
+0150	proposed:source:0119	해안·항구	미역	잎몸	가공 공정 검토	요리·추출물	v0.3
+0151	proposed:source:0066	해안·항구	다시마	잎몸	가공 공정 검토	요리·추출물	v0.3
+0152	proposed:source:0313	해안·항구	톳	조체	가공 공정 검토	요리 검토·연구	v0.3
+0153	proposed:source:0269	해안·항구	잘피	잎·씨앗	가공 공정 검토	생태 조사	v0.3
+0154	proposed:source:0193	해안·항구	소금습지 식물	잎·씨앗	가공 공정 검토	염생 연구	v0.3
+0155	proposed:source:0126	해안·항구	바닷모래	모래·패각 부스러기	가공 공정 검토	유리·골재	v0.3
+0156	proposed:source:0319	해안·항구	표류목	나무 조각	가공 공정 검토	목공·연료	v0.3
+0157	proposed:source:0248	해안·항구	유리부표	인양품	가공 공정 검토	유리 세공·장식	v0.3
+0158	proposed:source:0250	해안·항구	유리조개	투명 패각	가공 공정 검토	창호·세공 후보	v0.3
+0159	proposed:source:0068	해안·항구	달그림자 해초	발광 잎몸	가공 공정 검토	광원·연구 후보	v0.3
+0160	proposed:source:0201	해안·항구	수면편지병	유리병·기록물	가공 공정 검토	도감·퀘스트 후보	v0.3
+0161	proposed:source:0281	바다	정어리	어획물	가공 공정 검토	조리·사료	v0.3
+0162	proposed:source:0018	바다	고등어	어획물	가공 공정 검토	조리	v0.3
+0163	proposed:source:0298	바다	참치	어획물	가공 공정 검토	조리	v0.3
+0164	proposed:source:0109	바다	문어	고기·먹물	가공 공정 검토	음식·안료	v0.3
+0165	proposed:source:0239	바다	오징어	고기·먹물	가공 공정 검토	음식·안료	v0.3
+0166	proposed:source:0173	바다	새우	새우·껍질	가공 공정 검토	음식·사료	v0.3
+0167	proposed:source:0001	바다	가리비	조갯살·껍질	가공 공정 검토	음식·장식	v0.3
+0168	proposed:source:0293	바다	진주조개	조갯살·진주 후보	가공 공정 검토	양식·세공	v0.3
+0169	proposed:source:0327	바다	해파리	생체 관찰·교질	가공 공정 검토	연구	v0.3
+0170	proposed:source:0170	바다	산호	산호 골격	가공 공정 검토	연구·장식	v0.3
+0171	proposed:source:0322	바다	해면	해면 골격	가공 공정 검토	세척·연구	v0.3
+0172	proposed:source:0325	바다	해조류 군락	해조체	가공 공정 검토	식품·추출	v0.3
+0173	proposed:source:0053	바다	난파선 잔해	금속 조각·목재	가공 공정 검토	인양·재활용	v0.3
+0174	proposed:source:0088	바다	등불해파리	발광 조직	가공 공정 검토	광원 연구 후보	v0.3
+0175	proposed:source:0209	바다	심연유영어	고유 어획물	가공 공정 검토	심해 연구·요리 후보	v0.3
+0176	proposed:source:0108	바다	무저의 껍데기	비정상 패각	가공 공정 검토	연구·장식 후보	v0.3
+0177	proposed:source:0329	화산지대	현무암	현무암 블록	가공 공정 검토	석공·도로	v0.3
+0178	proposed:source:0347	화산지대	흑요석	흑요석 파편	가공 공정 검토	절삭·장식	v0.3
+0179	proposed:source:0151	화산지대	부석	다공성 석재	가공 공정 검토	연마·건축	v0.3
+0180	proposed:source:0256	화산지대	응회암	석재	가공 공정 검토	건축	v0.3
+0181	proposed:source:0265	화산지대	자연황	황	가공 공정 검토	연금술·농업 연구	v0.3
+0182	proposed:source:0339	화산지대	화산재	화산재	가공 공정 검토	도자기·토양 연구	v0.3
+0183	proposed:source:0338	화산지대	화산 유리	유리질 암편	가공 공정 검토	세공	v0.3
+0184	proposed:source:0232	화산지대	열수 침전물	광물 침전물	가공 공정 검토	지질 연구	v0.3
+0185	proposed:source:0032	화산지대	규산염 암석	광물 원료	가공 공정 검토	석공·도기	v0.3
+0186	proposed:source:0057	화산지대	내열 관목	목질·씨앗	가공 공정 검토	연료·생태 연구	v0.3
+0187	proposed:source:0231	화산지대	열수 미생물막	생물막 시료	가공 공정 검토	생태 연구	v0.3
+0188	proposed:source:0240	화산지대	온천 점토	점토	가공 공정 검토	도기	v0.3
+0189	proposed:source:0276	화산지대	적열꽃	고열 꽃잎	가공 공정 검토	온기 매개 연구 후보	v0.3
+0190	proposed:source:0275	화산지대	잿빛 균핵	균핵·포자	가공 공정 검토	내열 균류 연구 후보	v0.3
+0191	proposed:source:0210	화산지대	심장석	주기적 열을 띠는 돌	가공 공정 검토	난방·마력 연구 후보	v0.3
+0192	proposed:source:0241	화산지대	용암울림껍질	공명 광물판	가공 공정 검토	방열판 연구 후보	v0.3
+0193	proposed:source:0140	고대 유적	벽돌 잔해	벽돌·석분	가공 공정 검토	복원·건축	v0.3
+0194	proposed:source:0304	고대 유적	청동 부속	금속 부속	가공 공정 검토	복원·재활용	v0.3
+0195	proposed:source:0301	고대 유적	철 못	철제 부속	가공 공정 검토	재활용·수리	v0.3
+0196	proposed:source:0083	고대 유적	동전	주화	가공 공정 검토	교역·연구	v0.3
+0197	proposed:source:0076	고대 유적	도자기 조각	도기 파편	가공 공정 검토	복원·연구	v0.3
+0198	proposed:source:0247	고대 유적	유리 파편	유리 조각	가공 공정 검토	유리 공예	v0.3
+0199	proposed:source:0186	고대 유적	석판	글자가 새겨진 판	가공 공정 검토	연구·기록	v0.3
+0200	proposed:source:0015	고대 유적	고대 목재	목재 조각	가공 공정 검토	복원·목공	v0.3
+0201	proposed:source:0095	고대 유적	매몰 씨앗	고종자	가공 공정 검토	재배 연구	v0.3
+0202	proposed:source:0027	고대 유적	광물 안료	색소 광물	가공 공정 검토	복원·장식	v0.3
+0203	proposed:source:0183	고대 유적	석재 기둥	석재 조각	가공 공정 검토	건축·복원	v0.3
+0204	proposed:source:0144	고대 유적	봉인 사슬	금속 사슬	가공 공정 검토	연구·재활용	v0.3
+0205	proposed:source:0110	고대 유적	문자먹는 이끼	이끼·기록 흔적	가공 공정 검토	기록·연구 후보	v0.3
+0206	proposed:source:0085	고대 유적	되감긴 유리	유리질 파편	가공 공정 검토	광학 연구 후보	v0.3
+0207	proposed:source:0145	고대 유적	봉인씨앗	씨앗·껍질	가공 공정 검토	재배·유물 연구 후보	v0.3
+0208	proposed:source:0040	고대 유적	기억 부스러기	고유 파편	가공 공정 검토	꿈·기록 연구 후보	v0.3
+0209	proposed:source:0237	폐허·묘지	오래된 목재	목재 조각	가공 공정 검토	재활용	v0.3
+0210	proposed:source:0300	폐허·묘지	철 고철	고철	가공 공정 검토	금속 회수	v0.3
+0211	proposed:source:0235	폐허·묘지	옛 유리병	유리병	가공 공정 검토	수리·보관	v0.3
+0212	proposed:source:0321	폐허·묘지	풍화된 석재	암석	가공 공정 검토	석공	v0.3
+0213	proposed:source:0105	폐허·묘지	묘비 파편	새김돌	가공 공정 검토	기록·복원	v0.3
+0214	proposed:source:0023	폐허·묘지	고서 조각	종이·기록	가공 공정 검토	연구·복구	v0.3
+0215	proposed:source:0343	폐허·묘지	황폐지 이끼	이끼	가공 공정 검토	생태 연구	v0.3
+0216	proposed:source:0096	폐허·묘지	먹물버섯	자실체	가공 공정 검토	안료 연구	v0.3
+0217	proposed:source:0161	폐허·묘지	뼈 조각	유골 관련 유물	가공 공정 검토	연구·윤리 판정	v0.3
+0218	proposed:source:0059	폐허·묘지	녹슨 사슬	철제 사슬	가공 공정 검토	회수·수리	v0.3
+0219	proposed:source:0056	폐허·묘지	납작돌	돌판	가공 공정 검토	묘지 복원	v0.3
+0220	proposed:source:0097	폐허·묘지	먼지 덩굴	덩굴 섬유	가공 공정 검토	직조·생태	v0.3
+0221	proposed:source:0330	폐허·묘지	혈맥초	붉은 잎·뿌리	가공 공정 검토	혈액 마법 연구 후보	v0.3
+0222	proposed:source:0261	폐허·묘지	이름없는 장미	꽃잎·가시	가공 공정 검토	추모·연구 후보	v0.3
+0223	proposed:source:0224	폐허·묘지	애도의 버섯	자실체·포자	가공 공정 검토	추모 의식 연구 후보	v0.3
+0224	proposed:source:0246	폐허·묘지	유령실	비물질성 섬유	가공 공정 검토	공예·연구 후보	v0.3
+0225	proposed:source:0148	만신전	봉헌용 꽃	꽃다발	가공 공정 검토	봉헌·장식	v0.3
+0226	proposed:source:0282	만신전	정제 향료	향료	가공 공정 검토	봉헌·의식	v0.3
+0227	proposed:source:0227	만신전	양초	밀랍·심지	가공 공정 검토	의식·광원	v0.3
+0228	proposed:source:0284	만신전	제단용 석재	석재 블록	가공 공정 검토	개인 제단 제작	v0.3
+0229	proposed:source:0174	만신전	색유리	유리 조각	가공 공정 검토	창호·장식	v0.3
+0230	proposed:source:0258	만신전	의식용 천	직물	가공 공정 검토	의식·장식	v0.3
+0231	proposed:source:0171	만신전	상징 목판	새김 목판	가공 공정 검토	서약·기록	v0.3
+0232	proposed:source:0014	만신전	고대 기록 파편	석판 조각	가공 공정 검토	신앙 연구	v0.3
+0233	proposed:source:0146	만신전	봉헌 동전	주화	가공 공정 검토	봉헌·교역	v0.3
+0234	proposed:source:0257	만신전	의례 종	금속 종	가공 공정 검토	의식·음향	v0.3
+0235	proposed:source:0307	만신전	촛농 잔여	밀랍	가공 공정 검토	재활용·양초	v0.3
+0236	proposed:source:0153	만신전	분향재	목재 재	가공 공정 검토	향 연구	v0.3
+0237	proposed:source:0037	만신전	기도의 결정	의례 부산물	가공 공정 검토	신앙 연구 후보	v0.3
+0238	proposed:source:0160	만신전	빛결실	빛 응집체	가공 공정 검토	광원·연구 후보	v0.3
+0239	proposed:source:0309	만신전	침묵의 금박	금속 박편	가공 공정 검토	장식·금기 연구 후보	v0.3
+0240	proposed:source:0172	만신전	새벽기록 잉크	의식 안료	가공 공정 검토	기록·공예 후보	v0.3
+0241	proposed:source:0078	지하미궁	동굴 버섯	자실체	가공 공정 검토	균류 연구	v0.3
+0242	proposed:source:0129	지하미궁	박쥐 구아노	퇴적물	가공 공정 검토	비료 연구	v0.3
+0243	proposed:source:0188	지하미궁	석회동굴 석순	탄산염 침전물	가공 공정 검토	지질 연구	v0.3
+0244	proposed:source:0181	지하미궁	석영 결정	수정	가공 공정 검토	세공	v0.3
+0245	proposed:source:0080	지하미궁	동굴 점토	점토	가공 공정 검토	도자기	v0.3
+0246	proposed:source:0292	지하미궁	지하수	물	가공 공정 검토	생활·연금술	v0.3
+0247	proposed:source:0302	지하미궁	철 함유 암석	철광석	가공 공정 검토	제련	v0.3
+0248	proposed:source:0251	지하미궁	유황 침전물	황	가공 공정 검토	연금술	v0.3
+0249	proposed:source:0094	지하미궁	망간 광물	망간 함유 원료	가공 공정 검토	합금 연구	v0.3
+0250	proposed:source:0013	지하미궁	결정질 이끼	이끼	가공 공정 검토	광원 연구	v0.3
+0251	proposed:source:0077	지하미궁	동굴 민물새우	새우·껍질	가공 공정 검토	생태·식재료 검토	v0.3
+0252	proposed:source:0236	지하미궁	오래된 도기	토기	가공 공정 검토	유물·연구	v0.3
+0253	proposed:source:0196	지하미궁	속삭임균	자실체·포자	가공 공정 검토	정신계 연구 후보	v0.3
+0254	proposed:source:0025	지하미궁	공허근목	뿌리·목질	가공 공정 검토	목공·금기 연구 후보	v0.3
+0255	proposed:source:0107	지하미궁	무저광석	이질적 광물 원료	가공 공정 검토	장비 제작 금기 연구 후보	v0.3
+0256	proposed:source:0260	지하미궁	이름없는 결정	결정	가공 공정 검토	도감·기억 연구 후보	v0.3
+0257	proposed:source:0332	거점 마을	호두나무	호두·목재	견과 선별·판재	식품·가구	v0.4
+0258	proposed:source:0072	거점 마을	당근	뿌리·잎	손질 채소	요리·사료	v0.4
+0259	proposed:source:0228	거점 마을	양파	구근	건조 향신채	요리	v0.4
+0260	proposed:source:0090	거점 마을	마늘	구근	건조 향신채	요리	v0.4
+0261	proposed:source:0233	거점 마을	염소	우유·고기·가죽	유제품·피혁	요리·의류	v0.4
+0262	proposed:source:0238	거점 마을	오리	알·고기	식재료 손질	요리·부화	v0.4
+0263	proposed:source:0138	거점 마을	버드나무 공방	가지	엮음재	바구니	v0.4
+0264	proposed:source:0285	거점 마을	종소리콩	콩·꼬투리	향미 분말	축제 요리	v0.4
+0265	proposed:source:0221	초원·농경지	알팔파	줄기·잎	건초	초식 사료	v0.4
+0266	proposed:source:0099	초원·농경지	메밀	메밀알	메밀가루	면·죽	v0.4
+0267	proposed:source:0296	초원·농경지	참깨	씨앗	식물성 기름	요리	v0.4
+0268	proposed:source:0216	초원·농경지	아마란스	알곡·잎	가루·건조 잎	요리	v0.4
+0269	proposed:source:0176	초원·농경지	서양톱풀	꽃·잎	건조 표본	약학 연구	v0.4
+0270	proposed:source:0048	초원·농경지	꿀벌	벌꿀·밀랍	정제 밀랍	음식·양초	v0.4
+0271	proposed:source:0312	초원·농경지	토끼	고기·가죽	피혁	요리·의류	v0.4
+0272	proposed:source:0143	초원·농경지	봄구름풀	꽃가루·잎	부유성 섬유	장식 연구	v0.4
+0273	proposed:source:0019	숲	고사리	어린 순·잎	표본	생태 연구	v0.4
+0274	proposed:source:0071	숲	담쟁이덩굴	덩굴·잎	엮음재	끈·장식	v0.4
+0275	proposed:source:0272	숲	잣나무	잣·목재	견과·판재	요리·목공	v0.4
+0276	proposed:source:0333	숲	호랑가시나무	가지·잎	목재 장식	장식·도감	v0.4
+0277	proposed:source:0197	숲	솔이끼	이끼	건조 기질	원예	v0.4
+0278	proposed:source:0012	숲	겨우살이	가지·열매	표본	생태 연구	v0.4
+0279	proposed:source:0212	숲	싸리버섯	자실체	균류 표본	균류 연구	v0.4
+0280	proposed:source:0010	숲	거울수피나무	수피·목재	반사 목판	장식·빛 연구	v0.4
+0281	proposed:source:0200	강·호수	수련	잎·꽃	식물 표본	장식·생태	v0.4
+0282	proposed:source:0149	강·호수	부들	솜털·줄기	엮음재	돗자리	v0.4
+0283	proposed:source:0113	강·호수	물밤	열매·종자	손질 과실	식재료 검토	v0.4
+0284	proposed:source:0098	강·호수	메기	어육·뼈	손질 어육	요리	v0.4
+0285	proposed:source:0121	강·호수	민물가재	살·갑각	정제 갑각	요리·공예	v0.4
+0286	proposed:source:0123	강·호수	민물조개	살·패각	분쇄 패각	세공·요리	v0.4
+0287	proposed:source:0033	강·호수	규조류 퇴적물	규조토	정제 분말	여과재	v0.4
+0288	proposed:source:0268	강·호수	잔향수초	잎·섬유	음향 섬유	낚시 도구 연구	v0.4
+0289	proposed:source:0112	습지	물미나리	줄기·잎	식물 표본	생태 연구	v0.4
+0290	proposed:source:0167	습지	사초	줄기·잎	엮음재	바구니	v0.4
+0291	proposed:source:0294	습지	진흙	점질 토양	점토 선별	도기	v0.4
+0292	proposed:source:0116	습지	물이끼	이끼	건조 기질	원예	v0.4
+0293	proposed:source:0262	습지	이탄	이탄 덩어리	건조 연료	연료	v0.4
+0294	proposed:source:0137	습지	버드나무	가지·수피	엮음재	직조	v0.4
+0295	proposed:source:0096	습지	먹물버섯	자실체·색소	안료 추출	기록·연구	v0.4
+0296	proposed:source:0271	습지	잠긴별버섯	자실체·포자	발광 안료	등불 연구	v0.4
+0297	proposed:source:0136	산맥	백운석	광물	내화 분말	세라믹	v0.4
+0298	proposed:source:0242	산맥	운모	박편	절연 박편	장식	v0.4
+0299	proposed:source:0345	산맥	흑연	흑연	분말·봉	필기·주형	v0.4
+0300	proposed:source:0273	산맥	장석	장석	분쇄 광물	유약	v0.4
+0301	proposed:source:0169	산맥	산양	우유·고기·가죽	유제품·피혁	생활	v0.4
+0302	proposed:source:0230	산맥	에델바이스	꽃·잎	압화	생태	v0.4
+0303	proposed:source:0020	산맥	고산 두송	열매·가지	향료 기질	장식	v0.4
+0304	proposed:source:0320	산맥	풍명석	공명 광편	공명판	탐지 연구	v0.4
+0305	proposed:source:0005	광산	갈철석	철 함유 광물	철 원료	제철 연구	v0.4
+0306	proposed:source:0132	광산	방연석	납 함유 광물	선광 시료	금속 연구	v0.4
+0307	proposed:source:0191	광산	섬아연석	아연 함유 광물	선광 시료	합금 연구	v0.4
+0308	proposed:source:0342	광산	황철석	광물	분쇄 표본	장식·연구	v0.4
+0309	proposed:source:0331	광산	형석	결정	절단 결정	세공	v0.4
+0310	proposed:source:0177	광산	석고	광물	석고 분말	건축	v0.4
+0311	proposed:source:0222	광산	암염	소금 광물	정제 소금	요리	v0.4
+0312	proposed:source:0207	광산	심맥유리	광맥 유리	안정화 판편	장식 연구	v0.4
+0313	proposed:source:0002	설원	가문비나무	목재·수지	판재·정제 수지	목공	v0.4
+0314	proposed:source:0052	설원	낙엽송	목재·수피	판재	목공	v0.4
+0315	proposed:source:0152	설원	북극버드나무	잔가지·잎	섬유 표본	생태	v0.4
+0316	proposed:source:0310	설원	크랜베리	열매	과실 가공	요리	v0.4
+0317	proposed:source:0205	설원	순록	고기·가죽	피혁	생활	v0.4
+0318	proposed:source:0158	설원	빙하 얼음	얼음	절단 얼음	냉각	v0.4
+0319	proposed:source:0021	설원	고산석영	결정	절단 수정	세공	v0.4
+0320	proposed:source:0348	설원	흰잠이끼	이끼·포자	몽환성 기질	연구	v0.4
+0321	proposed:source:0074	사막	대추야자	열매·잎	건조 과실·엮음재	식품·바구니	v0.4
+0322	proposed:source:0220	사막	알로에	잎	식물 추출물	연구	v0.4
+0323	proposed:source:0189	사막	선인장	줄기·열매	섬유	공예	v0.4
+0324	proposed:source:0218	사막	아카시아 고무	수지	정제 수지	접착	v0.4
+0325	proposed:source:0182	사막	석영사	모래	유리 원료	유리	v0.4
+0326	proposed:source:0178	사막	석고층	석고	분말	건축	v0.4
+0327	proposed:source:0163	사막	사막 딱정벌레	갑각	건조 갑각	표본	v0.4
+0328	proposed:source:0102	사막	모래종꽃	꽃·씨앗	건조 꽃가루	기상 연구	v0.4
+0329	proposed:source:0066	해안·항구	다시마	엽체	건조 해조	요리·비료	v0.4
+0330	proposed:source:0119	해안·항구	미역	엽체	건조 해조	요리	v0.4
+0331	proposed:source:0029	해안·항구	굴	살·패각	정제 패각	세공	v0.4
+0332	proposed:source:0011	해안·항구	게	살·갑각	손질 갑각	요리·공예	v0.4
+0333	proposed:source:0326	해안·항구	해초	섬유	건조 섬유	그물	v0.4
+0334	proposed:source:0316	해안·항구	패각 모래	패각 파편	분쇄 패각	건축	v0.4
+0335	proposed:source:0234	해안·항구	염전	소금	정제 소금	요리	v0.4
+0336	proposed:source:0314	해안·항구	파도유리조개	패각·진주	연마 패각	세공	v0.4
+0337	proposed:source:0018	바다	고등어	어육·뼈	손질 어육	요리	v0.4
+0338	proposed:source:0306	바다	청어	어육·비늘	손질 어육	요리	v0.4
+0339	proposed:source:0239	바다	오징어	어육·먹물	정제 먹물	요리·안료	v0.4
+0340	proposed:source:0192	바다	성게	가시·표본	정리 표본	연구	v0.4
+0341	proposed:source:0154	바다	불가사리	표본	건조 표본	생태	v0.4
+0342	proposed:source:0323	바다	해면동물	해면체	세척 해면	생활용품	v0.4
+0343	proposed:source:0125	바다	바다거북 보호관찰	관찰 기록	도감 기록	비채취 연구	v0.4
+0344	proposed:source:0208	바다	심연수정해파리	결정질 부산물	발광 핵 후보	해양 연구	v0.4
+0345	proposed:source:0329	화산지대	현무암	암석	절단 석판	건축	v0.4
+0346	proposed:source:0151	화산지대	부석	암석	연마재	생활	v0.4
+0347	proposed:source:0347	화산지대	흑요석	유리질 암석	날붙이	공예	v0.4
+0348	proposed:source:0299	화산지대	천연황	황	정제 황	연금 연구	v0.4
+0349	proposed:source:0339	화산지대	화산재	재	혼합 건축재	건축	v0.4
+0350	proposed:source:0256	화산지대	응회암	석재	절단 블록	석공	v0.4
+0351	proposed:source:0338	화산지대	화산 유리	유리질 암석	절단 장식	세공	v0.4
+0352	proposed:source:0045	화산지대	꺼지지 않는 잿꽃	꽃잎·씨앗	내열 분말	열 연구	v0.4
+0353	proposed:source:0305	고대 유적	청동 유물 조각	청동 파편	분류 유물	복원	v0.4
+0354	proposed:source:0103	고대 유적	모자이크 타일	색석 타일	세척 타일	전시	v0.4
+0355	proposed:source:0017	고대 유적	고대 유리병	유리 조각	복원 유리	전시	v0.4
+0356	proposed:source:0187	고대 유적	석판 기록	비문 조각	탁본	언어 연구	v0.4
+0357	proposed:source:0016	고대 유적	고대 벽돌	벽돌	복원 벽돌	건축	v0.4
+0358	proposed:source:0219	고대 유적	안료 흔적	안료 시료	복원 안료	그림	v0.4
+0359	proposed:source:0340	고대 유적	화석 목재	규화목	연마 규화목	세공	v0.4
+0360	proposed:source:0084	고대 유적	되감긴 서판	문자 파편	복원 기록 후보	시간 연구	v0.4
+0361	proposed:source:0058	폐허·묘지	녹슨 못	철못	금속 선별	재활용	v0.4
+0362	proposed:source:0150	폐허·묘지	부서진 도기	도기 조각	도기 복원	전시	v0.4
+0363	proposed:source:0237	폐허·묘지	오래된 목재	풍화 목재	판재 복원 후보	보수	v0.4
+0364	proposed:source:0055	폐허·묘지	납골장 유리	유리 조각	연마 유리	장식	v0.4
+0365	proposed:source:0344	폐허·묘지	회색지 지의류	지의류	건조 표본	생태	v0.4
+0366	proposed:source:0259	폐허·묘지	이끼 낀 돌	돌·이끼	분리 표본	석공·생태	v0.4
+0367	proposed:source:0044	폐허·묘지	까마귀 깃털	깃털	정리 깃털	필기구	v0.4
+0368	proposed:source:0041	폐허·묘지	기억먹는 꽃	꽃잎·꽃가루	향료 후보	기억 연구	v0.4
+0369	proposed:source:0118	만신전	미사용 밀랍	밀랍	양초 원료	양초	v0.4
+0370	proposed:source:0038	만신전	기록용 먹	먹	먹물	기록	v0.4
+0371	proposed:source:0147	만신전	봉헌용 곡물	곡물	제분	봉헌	v0.4
+0372	proposed:source:0184	만신전	석재 조각상 재료	석재	조각용 블록	신상	v0.4
+0373	proposed:source:0283	만신전	제단 보수 목재	목재	판재	개인 제단	v0.4
+0374	proposed:source:0046	만신전	꽃다발 재료	꽃·줄기	꽃다발	봉헌	v0.4
+0375	proposed:source:0039	만신전	기록용 양피지	양피지	정리 문서	기록	v0.4
+0376	proposed:source:0042	만신전	기척 없는 향	향료 잔재	안정화 향분	의식 연구	v0.4
+0377	proposed:source:0133	지하미궁	방해석 결정	방해석	연마 결정	장식	v0.4
+0378	proposed:source:0130	지하미궁	반딧불이 유충 관찰	관찰 기록	생태 기록	비채취 연구	v0.4
+0379	proposed:source:0289	지하미궁	지하 민물게	갑각·살	갑각 표본	생태	v0.4
+0380	proposed:source:0081	지하미궁	동굴 진주	탄산염 결정	연마 진주	세공	v0.4
+0381	proposed:source:0082	지하미궁	동굴석고	석고	분말	주형	v0.4
+0382	proposed:source:0291	지하미궁	지하 퇴적점토	점토	정제 점토	도기	v0.4
+0383	proposed:source:0079	지하미궁	동굴 실크나방	고치·비단	방적 비단	직물	v0.4
+0384	proposed:source:0106	지하미궁	무응답의 씨앗	씨앗·껍질	봉인 표본	기원 연구	v0.4

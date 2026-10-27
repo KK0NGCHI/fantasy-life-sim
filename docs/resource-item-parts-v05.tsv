@@ -1,0 +1,540 @@
+proposedItemId	sourceId	sourceName	partOrLoot	regions	roleCandidate	originDocs	status
+proposed:item:0001-01	proposed:source:0001	가리비	조갯살	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0001-02	proposed:source:0001	가리비	껍질	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0002-01	proposed:source:0002	가문비나무	목재	설원	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0002-02	proposed:source:0002	가문비나무	수지	설원	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0003-01	proposed:source:0003	가재	가재	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0003-02	proposed:source:0003	가재	껍질	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0004-01	proposed:source:0004	갈대	줄기	강·호수;습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0004-02	proposed:source:0004	갈대	잎	강·호수;습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0005-01	proposed:source:0005	갈철석	철 함유 광물	광산	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0006-01	proposed:source:0006	감자	덩이줄기	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0007-01	proposed:source:0007	개구리	생체 관찰	습지	observation-only	v0.3	proposed-not-runtime
+proposed:item:0007-02	proposed:source:0007	개구리	분비물 연구	습지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0008-01	proposed:source:0008	개암나무	열매	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0008-02	proposed:source:0008	개암나무	가지	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0009-01	proposed:source:0009	거울선인장	반사 표피	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0009-02	proposed:source:0009	거울선인장	열매	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0010-01	proposed:source:0010	거울수피나무	수피	숲	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0010-02	proposed:source:0010	거울수피나무	목재	숲	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0011-01	proposed:source:0011	게	고기	해안·항구	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0011-02	proposed:source:0011	게	갑각	해안·항구	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0011-03	proposed:source:0011	게	살	해안·항구	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0012-01	proposed:source:0012	겨우살이	가지	숲	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0012-02	proposed:source:0012	겨우살이	열매	숲	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0013-01	proposed:source:0013	결정질 이끼	이끼	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0014-01	proposed:source:0014	고대 기록 파편	석판 조각	만신전	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0015-01	proposed:source:0015	고대 목재	목재 조각	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0016-01	proposed:source:0016	고대 벽돌	벽돌	고대 유적	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0017-01	proposed:source:0017	고대 유리병	유리 조각	고대 유적	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0018-01	proposed:source:0018	고등어	어획물	바다	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0018-02	proposed:source:0018	고등어	어육	바다	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0018-03	proposed:source:0018	고등어	뼈	바다	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0019-01	proposed:source:0019	고사리	새순	습지;숲	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0019-02	proposed:source:0019	고사리	잎	습지;숲	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0019-03	proposed:source:0019	고사리	어린 순	습지;숲	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0020-01	proposed:source:0020	고산 두송	열매	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0020-02	proposed:source:0020	고산 두송	가지	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0021-01	proposed:source:0021	고산석영	결정	설원	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0022-01	proposed:source:0022	고산초롱꽃	꽃	산맥	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0022-02	proposed:source:0022	고산초롱꽃	씨앗	산맥	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0023-01	proposed:source:0023	고서 조각	종이	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0023-02	proposed:source:0023	고서 조각	기록	폐허·묘지	observation-only	v0.3	proposed-not-runtime
+proposed:item:0024-01	proposed:source:0024	공작석	구리 함유 광물	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0025-01	proposed:source:0025	공허근목	뿌리	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0025-02	proposed:source:0025	공허근목	목질	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0026-01	proposed:source:0026	공허박편	얇은 이질적 결정	광산	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0027-01	proposed:source:0027	광물 안료	색소 광물	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0028-01	proposed:source:0028	구리광맥	구리광석	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0029-01	proposed:source:0029	굴	조갯살	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0029-02	proposed:source:0029	굴	껍질	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0029-03	proposed:source:0029	굴	살	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0029-04	proposed:source:0029	굴	패각	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0030-01	proposed:source:0030	귀리	곡물	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0030-02	proposed:source:0030	귀리	짚	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0031-01	proposed:source:0031	규사	석영사	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0032-01	proposed:source:0032	규산염 암석	광물 원료	화산지대	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0033-01	proposed:source:0033	규조류 퇴적물	규조토	강·호수	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0034-01	proposed:source:0034	그물버섯	자실체	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0035-01	proposed:source:0035	극지 이끼	이끼	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0036-01	proposed:source:0036	금 광맥	자연금 함유 원료	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0037-01	proposed:source:0037	기도의 결정	의례 부산물	만신전	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0038-01	proposed:source:0038	기록용 먹	먹	만신전	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0039-01	proposed:source:0039	기록용 양피지	양피지	만신전	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0040-01	proposed:source:0040	기억 부스러기	고유 파편	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0041-01	proposed:source:0041	기억먹는 꽃	꽃잎	폐허·묘지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0041-02	proposed:source:0041	기억먹는 꽃	꽃가루	폐허·묘지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0042-01	proposed:source:0042	기척 없는 향	향료 잔재	만신전	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0043-01	proposed:source:0043	길잃은 암석	움직이는 광물껍질	산맥	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0044-01	proposed:source:0044	까마귀 깃털	깃털	폐허·묘지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0045-01	proposed:source:0045	꺼지지 않는 잿꽃	꽃잎	화산지대	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0045-02	proposed:source:0045	꺼지지 않는 잿꽃	씨앗	화산지대	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0046-01	proposed:source:0046	꽃다발 재료	꽃	만신전	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0046-02	proposed:source:0046	꽃다발 재료	줄기	만신전	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0047-01	proposed:source:0047	꾀꼬리버섯	자실체	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0048-01	proposed:source:0048	꿀벌	벌꿀	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0048-02	proposed:source:0048	꿀벌	밀랍	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0049-01	proposed:source:0049	꿈비늘짐승	특수 비늘	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0049-02	proposed:source:0049	꿈비늘짐승	털	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0050-01	proposed:source:0050	꿈콩	꼬투리	거점 마을	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0050-02	proposed:source:0050	꿈콩	씨앗	거점 마을	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0051-01	proposed:source:0051	끝나지 않은 모래	시간성 모래	사막	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0052-01	proposed:source:0052	낙엽송	목재	설원	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0052-02	proposed:source:0052	낙엽송	수피	설원	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0053-01	proposed:source:0053	난파선 잔해	금속 조각	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0053-02	proposed:source:0053	난파선 잔해	목재	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0054-01	proposed:source:0054	납 광맥	방연석	광산	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0055-01	proposed:source:0055	납골장 유리	유리 조각	폐허·묘지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0056-01	proposed:source:0056	납작돌	돌판	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0057-01	proposed:source:0057	내열 관목	목질	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0057-02	proposed:source:0057	내열 관목	씨앗	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0058-01	proposed:source:0058	녹슨 못	철못	폐허·묘지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0059-01	proposed:source:0059	녹슨 사슬	철제 사슬	폐허·묘지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0060-01	proposed:source:0060	눈얼음	얼음	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0061-01	proposed:source:0061	눈자작나무	목재	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0061-02	proposed:source:0061	눈자작나무	수피	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0062-01	proposed:source:0062	느타리버섯	자실체	숲	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0063-01	proposed:source:0063	늪 진흙	점토질 흙	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0064-01	proposed:source:0064	늪은방울버섯	자실체	습지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0064-02	proposed:source:0064	늪은방울버섯	포자	습지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0065-01	proposed:source:0065	늪지 사초	섬유	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0065-02	proposed:source:0065	늪지 사초	뿌리	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0066-01	proposed:source:0066	다시마	잎몸	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0066-02	proposed:source:0066	다시마	엽체	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0067-01	proposed:source:0067	단풍나무	목재	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0067-02	proposed:source:0067	단풍나무	수액	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0067-03	proposed:source:0067	단풍나무	씨앗	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0068-01	proposed:source:0068	달그림자 해초	발광 잎몸	해안·항구	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0069-01	proposed:source:0069	달빛수	잎	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0069-02	proposed:source:0069	달빛수	목재	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0069-03	proposed:source:0069	달빛수	수액	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0070-01	proposed:source:0070	닭	알	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0070-02	proposed:source:0070	닭	고기	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0071-01	proposed:source:0071	담쟁이덩굴	덩굴	숲	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0071-02	proposed:source:0071	담쟁이덩굴	잎	숲	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0072-01	proposed:source:0072	당근	뿌리	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0072-02	proposed:source:0072	당근	잎	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0073-01	proposed:source:0073	대마	줄기	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0073-02	proposed:source:0073	대마	씨앗	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0074-01	proposed:source:0074	대추야자	대추	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0074-02	proposed:source:0074	대추야자	잎	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0074-03	proposed:source:0074	대추야자	목질	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0074-04	proposed:source:0074	대추야자	열매	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0075-01	proposed:source:0075	도마뱀	비늘	사막	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0075-02	proposed:source:0075	도마뱀	생태 관찰	사막	observation-only	v0.3	proposed-not-runtime
+proposed:item:0076-01	proposed:source:0076	도자기 조각	도기 파편	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0077-01	proposed:source:0077	동굴 민물새우	새우	지하미궁	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0077-02	proposed:source:0077	동굴 민물새우	껍질	지하미궁	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0078-01	proposed:source:0078	동굴 버섯	자실체	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0079-01	proposed:source:0079	동굴 실크나방	고치	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0079-02	proposed:source:0079	동굴 실크나방	비단	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0080-01	proposed:source:0080	동굴 점토	점토	지하미궁	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0081-01	proposed:source:0081	동굴 진주	탄산염 결정	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0082-01	proposed:source:0082	동굴석고	석고	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0083-01	proposed:source:0083	동전	주화	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0084-01	proposed:source:0084	되감긴 서판	문자 파편	고대 유적	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0085-01	proposed:source:0085	되감긴 유리	유리질 파편	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0086-01	proposed:source:0086	들주름버섯	자실체	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0087-01	proposed:source:0087	들풀	풀섬유	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0087-02	proposed:source:0087	들풀	풀잎	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0088-01	proposed:source:0088	등불해파리	발광 조직	바다	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0089-01	proposed:source:0089	라벤더	꽃	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0089-02	proposed:source:0089	라벤더	줄기	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0090-01	proposed:source:0090	마늘	구근	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0091-01	proposed:source:0091	마른하늘꽃	꽃잎	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0091-02	proposed:source:0091	마른하늘꽃	꽃가루	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0092-01	proposed:source:0092	말불버섯	자실체	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0092-02	proposed:source:0092	말불버섯	포자	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0093-01	proposed:source:0093	말조개	조갯살	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0093-02	proposed:source:0093	말조개	껍질	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0094-01	proposed:source:0094	망간 광물	망간 함유 원료	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0095-01	proposed:source:0095	매몰 씨앗	고종자	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0096-01	proposed:source:0096	먹물버섯	자실체	습지;폐허·묘지	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0096-02	proposed:source:0096	먹물버섯	색소	습지;폐허·묘지	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0097-01	proposed:source:0097	먼지 덩굴	덩굴 섬유	폐허·묘지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0098-01	proposed:source:0098	메기	어획물	강·호수	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0098-02	proposed:source:0098	메기	뼈	강·호수	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0098-03	proposed:source:0098	메기	어육	강·호수	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0099-01	proposed:source:0099	메밀	메밀알	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0100-01	proposed:source:0100	모래	모래	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0101-01	proposed:source:0101	모래백합	꽃	사막	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0101-02	proposed:source:0101	모래백합	뿌리	사막	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0102-01	proposed:source:0102	모래종꽃	꽃	사막	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0102-02	proposed:source:0102	모래종꽃	씨앗	사막	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0103-01	proposed:source:0103	모자이크 타일	색석 타일	고대 유적	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0104-01	proposed:source:0104	목이버섯	자실체	숲;습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0105-01	proposed:source:0105	묘비 파편	새김돌	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0106-01	proposed:source:0106	무응답의 씨앗	씨앗	지하미궁	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0106-02	proposed:source:0106	무응답의 씨앗	껍질	지하미궁	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0107-01	proposed:source:0107	무저광석	이질적 광물 원료	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0108-01	proposed:source:0108	무저의 껍데기	비정상 패각	바다	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0109-01	proposed:source:0109	문어	고기	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0109-02	proposed:source:0109	문어	먹물	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0110-01	proposed:source:0110	문자먹는 이끼	이끼	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0110-02	proposed:source:0110	문자먹는 이끼	기록 흔적	고대 유적	observation-only	v0.3	proposed-not-runtime
+proposed:item:0111-01	proposed:source:0111	물거울조개	껍질	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0111-02	proposed:source:0111	물거울조개	진주 유사체	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0112-01	proposed:source:0112	물미나리	줄기	습지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0112-02	proposed:source:0112	물미나리	잎	습지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0113-01	proposed:source:0113	물밤	열매	강·호수	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0113-02	proposed:source:0113	물밤	종자	강·호수	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0114-01	proposed:source:0114	물방울수초	잎	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0114-02	proposed:source:0114	물방울수초	수액	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0115-01	proposed:source:0115	물봉선	꽃	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0115-02	proposed:source:0115	물봉선	씨앗	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0116-01	proposed:source:0116	물이끼	이끼	습지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0117-01	proposed:source:0117	미나리	줄기	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0117-02	proposed:source:0117	미나리	잎	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0118-01	proposed:source:0118	미사용 밀랍	밀랍	만신전	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0119-01	proposed:source:0119	미역	잎몸	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0119-02	proposed:source:0119	미역	엽체	해안·항구	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0120-01	proposed:source:0120	민들레	꽃	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0120-02	proposed:source:0120	민들레	잎	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0120-03	proposed:source:0120	민들레	뿌리	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0121-01	proposed:source:0121	민물가재	살	강·호수	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0121-02	proposed:source:0121	민물가재	갑각	강·호수	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0122-01	proposed:source:0122	민물새우	새우	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0122-02	proposed:source:0122	민물새우	껍질	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0123-01	proposed:source:0123	민물조개	살	강·호수	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0123-02	proposed:source:0123	민물조개	패각	강·호수	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0124-01	proposed:source:0124	밀	곡물	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0124-02	proposed:source:0124	밀	짚	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0125-01	proposed:source:0125	바다거북 보호관찰	관찰 기록	바다	observation-only	v0.4	proposed-not-runtime
+proposed:item:0126-01	proposed:source:0126	바닷모래	모래	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0126-02	proposed:source:0126	바닷모래	패각 부스러기	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0127-01	proposed:source:0127	바람철꽃	광물성 꽃잎	산맥	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0128-01	proposed:source:0128	바지락	조갯살	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0128-02	proposed:source:0128	바지락	껍질	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0129-01	proposed:source:0129	박쥐 구아노	퇴적물	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0130-01	proposed:source:0130	반딧불이 유충 관찰	관찰 기록	지하미궁	observation-only	v0.4	proposed-not-runtime
+proposed:item:0131-01	proposed:source:0131	밤나무	밤	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0131-02	proposed:source:0131	밤나무	목재	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0132-01	proposed:source:0132	방연석	납 함유 광물	광산	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0133-01	proposed:source:0133	방해석 결정	방해석	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0134-01	proposed:source:0134	배나무	과실	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0134-02	proposed:source:0134	배나무	가지	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0134-03	proposed:source:0134	배나무	목재	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0135-01	proposed:source:0135	백야꽃	꽃잎	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0136-01	proposed:source:0136	백운석	광물	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0137-01	proposed:source:0137	버드나무	가지	강·호수;습지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0137-02	proposed:source:0137	버드나무	수피	강·호수;습지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0137-03	proposed:source:0137	버드나무	목재	강·호수;습지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0138-01	proposed:source:0138	버드나무 공방	가지	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0139-01	proposed:source:0139	벌통	밀랍	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0139-02	proposed:source:0139	벌통	벌꿀	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0140-01	proposed:source:0140	벽돌 잔해	벽돌	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0140-02	proposed:source:0140	벽돌 잔해	석분	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0141-01	proposed:source:0141	별껍질호박	과육	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0141-02	proposed:source:0141	별껍질호박	씨앗	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0141-03	proposed:source:0141	별껍질호박	껍질	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0142-01	proposed:source:0142	보리	곡물	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0142-02	proposed:source:0142	보리	짚	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0143-01	proposed:source:0143	봄구름풀	꽃가루	초원·농경지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0143-02	proposed:source:0143	봄구름풀	잎	초원·농경지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0144-01	proposed:source:0144	봉인 사슬	금속 사슬	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0145-01	proposed:source:0145	봉인씨앗	씨앗	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0145-02	proposed:source:0145	봉인씨앗	껍질	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0146-01	proposed:source:0146	봉헌 동전	주화	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0147-01	proposed:source:0147	봉헌용 곡물	곡물	만신전	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0148-01	proposed:source:0148	봉헌용 꽃	꽃다발	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0149-01	proposed:source:0149	부들	꽃대	강·호수;습지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0149-02	proposed:source:0149	부들	잎	강·호수;습지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0149-03	proposed:source:0149	부들	솜털	강·호수;습지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0149-04	proposed:source:0149	부들	줄기	강·호수;습지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0150-01	proposed:source:0150	부서진 도기	도기 조각	폐허·묘지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0151-01	proposed:source:0151	부석	다공성 석재	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0151-02	proposed:source:0151	부석	암석	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0152-01	proposed:source:0152	북극버드나무	잔가지	설원	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0152-02	proposed:source:0152	북극버드나무	잎	설원	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0153-01	proposed:source:0153	분향재	목재 재	만신전	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0154-01	proposed:source:0154	불가사리	표본	바다	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0155-01	proposed:source:0155	붕어	어획물	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0156-01	proposed:source:0156	블루베리	열매	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0156-02	proposed:source:0156	블루베리	묘목	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0157-01	proposed:source:0157	빙어	어획물	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0158-01	proposed:source:0158	빙하 얼음	얼음	설원	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0159-01	proposed:source:0159	빙하 자갈	자갈	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0159-02	proposed:source:0159	빙하 자갈	석분	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0160-01	proposed:source:0160	빛결실	빛 응집체	만신전	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0161-01	proposed:source:0161	뼈 조각	유골 관련 유물	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0162-01	proposed:source:0162	사과나무	과실	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0162-02	proposed:source:0162	사과나무	가지	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0162-03	proposed:source:0162	사과나무	목재	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0163-01	proposed:source:0163	사막 딱정벌레	갑각	사막	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0164-01	proposed:source:0164	사막 아카시아	목재	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0164-02	proposed:source:0164	사막 아카시아	수지	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0164-03	proposed:source:0164	사막 아카시아	씨앗	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0165-01	proposed:source:0165	사막 전갈	외골격	사막	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0165-02	proposed:source:0165	사막 전갈	분비물 연구	사막	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0166-01	proposed:source:0166	사암	석재	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0167-01	proposed:source:0167	사초	줄기	습지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0167-02	proposed:source:0167	사초	잎	습지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0168-01	proposed:source:0168	산딸기	열매	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0168-02	proposed:source:0168	산딸기	묘목	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0169-01	proposed:source:0169	산양	털	산맥	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0169-02	proposed:source:0169	산양	고기	산맥	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0169-03	proposed:source:0169	산양	가죽	산맥	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0169-04	proposed:source:0169	산양	우유	산맥	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0170-01	proposed:source:0170	산호	산호 골격	바다	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0171-01	proposed:source:0171	상징 목판	새김 목판	만신전	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0172-01	proposed:source:0172	새벽기록 잉크	의식 안료	만신전	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0173-01	proposed:source:0173	새우	새우	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0173-02	proposed:source:0173	새우	껍질	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0174-01	proposed:source:0174	색유리	유리 조각	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0175-01	proposed:source:0175	서리수정	얼음성 결정	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0176-01	proposed:source:0176	서양톱풀	꽃	초원·농경지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0176-02	proposed:source:0176	서양톱풀	잎	초원·농경지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0177-01	proposed:source:0177	석고	석고	사막;광산	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0177-02	proposed:source:0177	석고	광물	사막;광산	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0178-01	proposed:source:0178	석고층	석고	광산;사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0179-01	proposed:source:0179	석석	주석 함유 광석	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0180-01	proposed:source:0180	석영	수정 원석	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0181-01	proposed:source:0181	석영 결정	수정	지하미궁	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0182-01	proposed:source:0182	석영사	모래	사막	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0183-01	proposed:source:0183	석재 기둥	석재 조각	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0184-01	proposed:source:0184	석재 조각상 재료	석재	만신전	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0185-01	proposed:source:0185	석탄층	석탄	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0186-01	proposed:source:0186	석판	글자가 새겨진 판	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0187-01	proposed:source:0187	석판 기록	비문 조각	고대 유적	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0188-01	proposed:source:0188	석회동굴 석순	탄산염 침전물	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0189-01	proposed:source:0189	선인장	과실	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0189-02	proposed:source:0189	선인장	줄기 섬유	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0189-03	proposed:source:0189	선인장	줄기	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0189-04	proposed:source:0189	선인장	열매	사막	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0190-01	proposed:source:0190	설원 송어	어획물	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0191-01	proposed:source:0191	섬아연석	아연 함유 광물	광산	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0192-01	proposed:source:0192	성게	생식소	해안·항구;바다	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0192-02	proposed:source:0192	성게	가시	해안·항구;바다	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0192-03	proposed:source:0192	성게	껍질	해안·항구;바다	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0192-04	proposed:source:0192	성게	표본	해안·항구;바다	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0193-01	proposed:source:0193	소금습지 식물	잎	해안·항구	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0193-02	proposed:source:0193	소금습지 식물	씨앗	해안·항구	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0194-01	proposed:source:0194	소나무	통나무	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0194-02	proposed:source:0194	소나무	솔방울	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0194-03	proposed:source:0194	소나무	송진	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0195-01	proposed:source:0195	속삭이는 항아리 파편	도기 조각	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0196-01	proposed:source:0196	속삭임균	자실체	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0196-02	proposed:source:0196	속삭임균	포자	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0197-01	proposed:source:0197	솔이끼	이끼	숲	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0198-01	proposed:source:0198	송어	어획물	강·호수	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0198-02	proposed:source:0198	송어	뼈	강·호수	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0199-01	proposed:source:0199	수렁등불초	발광 잎	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0199-02	proposed:source:0199	수렁등불초	씨앗	습지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0200-01	proposed:source:0200	수련	꽃	강·호수	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0200-02	proposed:source:0200	수련	잎	강·호수	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0201-01	proposed:source:0201	수면편지병	유리병	해안·항구	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0201-02	proposed:source:0201	수면편지병	기록물	해안·항구	observation-only	v0.3	proposed-not-runtime
+proposed:item:0202-01	proposed:source:0202	수생 달팽이	연체부	습지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0202-02	proposed:source:0202	수생 달팽이	껍질	습지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0203-01	proposed:source:0203	수수	곡물	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0203-02	proposed:source:0203	수수	줄기	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0204-01	proposed:source:0204	수정 공동	석영 결정	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0205-01	proposed:source:0205	순록	털	설원	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0205-02	proposed:source:0205	순록	고기	설원	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0205-03	proposed:source:0205	순록	가죽	설원	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0206-01	proposed:source:0206	숨결이끼	이끼	숲	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0206-02	proposed:source:0206	숨결이끼	포자	숲	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0207-01	proposed:source:0207	심맥유리	광맥 유리	광산	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0208-01	proposed:source:0208	심연수정해파리	결정질 부산물	바다	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0209-01	proposed:source:0209	심연유영어	고유 어획물	바다	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0210-01	proposed:source:0210	심장석	주기적 열을 띠는 돌	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0211-01	proposed:source:0211	심층 철괴석	특수 철광석	광산	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0212-01	proposed:source:0212	싸리버섯	자실체	숲	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0213-01	proposed:source:0213	쐐기풀	줄기	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0213-02	proposed:source:0213	쐐기풀	잎	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0214-01	proposed:source:0214	쑥류 관목	잎	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0214-02	proposed:source:0214	쑥류 관목	줄기	사막	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0215-01	proposed:source:0215	아마	줄기	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0215-02	proposed:source:0215	아마	씨앗	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0216-01	proposed:source:0216	아마란스	알곡	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0216-02	proposed:source:0216	아마란스	잎	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0217-01	proposed:source:0217	아연 광맥	섬아연석	광산	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0218-01	proposed:source:0218	아카시아 고무	수지	사막	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0219-01	proposed:source:0219	안료 흔적	안료 시료	고대 유적	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0220-01	proposed:source:0220	알로에	잎	사막	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0220-02	proposed:source:0220	알로에	수액	사막	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0221-01	proposed:source:0221	알팔파	줄기	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0221-02	proposed:source:0221	알팔파	잎	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0222-01	proposed:source:0222	암염	소금 원료	사막;광산	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0222-02	proposed:source:0222	암염	소금 광물	사막;광산	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0223-01	proposed:source:0223	암염층	암염	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0224-01	proposed:source:0224	애도의 버섯	자실체	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0224-02	proposed:source:0224	애도의 버섯	포자	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0225-01	proposed:source:0225	양	양털	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0225-02	proposed:source:0225	양	우유	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0225-03	proposed:source:0225	양	고기	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0225-04	proposed:source:0225	양	가죽	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0226-01	proposed:source:0226	양배추	잎	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0226-02	proposed:source:0226	양배추	씨앗	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0227-01	proposed:source:0227	양초	밀랍	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0227-02	proposed:source:0227	양초	심지	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0228-01	proposed:source:0228	양파	구근	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0229-01	proposed:source:0229	어둠먹이 광물체	광물성 생체 잔재	광산	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0230-01	proposed:source:0230	에델바이스	꽃	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0230-02	proposed:source:0230	에델바이스	잎	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0231-01	proposed:source:0231	열수 미생물막	생물막 시료	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0232-01	proposed:source:0232	열수 침전물	광물 침전물	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0233-01	proposed:source:0233	염소	우유	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0233-02	proposed:source:0233	염소	고기	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0233-03	proposed:source:0233	염소	가죽	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0234-01	proposed:source:0234	염전	소금	해안·항구	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0235-01	proposed:source:0235	옛 유리병	유리병	폐허·묘지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0236-01	proposed:source:0236	오래된 도기	토기	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0237-01	proposed:source:0237	오래된 목재	목재 조각	폐허·묘지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0237-02	proposed:source:0237	오래된 목재	풍화 목재	폐허·묘지	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0238-01	proposed:source:0238	오리	알	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0238-02	proposed:source:0238	오리	고기	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0239-01	proposed:source:0239	오징어	고기	바다	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0239-02	proposed:source:0239	오징어	먹물	바다	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0239-03	proposed:source:0239	오징어	어육	바다	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0240-01	proposed:source:0240	온천 점토	점토	화산지대	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0241-01	proposed:source:0241	용암울림껍질	공명 광물판	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0242-01	proposed:source:0242	운모	박편	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0243-01	proposed:source:0243	운지버섯	자실체	숲	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0244-01	proposed:source:0244	울림수정	공명 결정	산맥	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0245-01	proposed:source:0245	월귤	열매	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0246-01	proposed:source:0246	유령실	비물질성 섬유	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0247-01	proposed:source:0247	유리 파편	유리 조각	고대 유적	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0248-01	proposed:source:0248	유리부표	인양품	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0249-01	proposed:source:0249	유리잠복충	유리질 껍질	사막	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0250-01	proposed:source:0250	유리조개	투명 패각	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0251-01	proposed:source:0251	유황 침전물	황	지하미궁	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0252-01	proposed:source:0252	은 광맥	은 함유 원료	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0253-01	proposed:source:0253	은빛 보리	곡물	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0253-02	proposed:source:0253	은빛 보리	짚	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0254-01	proposed:source:0254	은서리열매	과실	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0254-02	proposed:source:0254	은서리열매	씨앗	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0255-01	proposed:source:0255	은실잉어	어획물	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0255-02	proposed:source:0255	은실잉어	은빛 비늘	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0256-01	proposed:source:0256	응회암	석재	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0257-01	proposed:source:0257	의례 종	금속 종	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0258-01	proposed:source:0258	의식용 천	직물	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0259-01	proposed:source:0259	이끼 낀 돌	돌	폐허·묘지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0259-02	proposed:source:0259	이끼 낀 돌	이끼	폐허·묘지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0260-01	proposed:source:0260	이름없는 결정	결정	지하미궁	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0261-01	proposed:source:0261	이름없는 장미	꽃잎	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0261-02	proposed:source:0261	이름없는 장미	가시	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0262-01	proposed:source:0262	이탄	이탄 덩어리	습지	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0263-01	proposed:source:0263	잃어버린 나무상자	목재 상자	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0263-02	proposed:source:0263	잃어버린 나무상자	잡화	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0264-01	proposed:source:0264	잉어	어획물	강·호수	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0264-02	proposed:source:0264	잉어	뼈	강·호수	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0265-01	proposed:source:0265	자연황	황	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0266-01	proposed:source:0266	자작나무	목재	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0266-02	proposed:source:0266	자작나무	수피	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0266-03	proposed:source:0266	자작나무	수액	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0267-01	proposed:source:0267	자철석	철 함유 광석	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0268-01	proposed:source:0268	잔향수초	잎	강·호수	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0268-02	proposed:source:0268	잔향수초	섬유	강·호수	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0269-01	proposed:source:0269	잘피	잎	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0269-02	proposed:source:0269	잘피	씨앗	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0270-01	proposed:source:0270	잠긴 뼈가지	뿌리 유사체	습지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0271-01	proposed:source:0271	잠긴별버섯	자실체	습지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0271-02	proposed:source:0271	잠긴별버섯	포자	습지	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0272-01	proposed:source:0272	잣나무	잣	숲	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0272-02	proposed:source:0272	잣나무	목재	숲	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0273-01	proposed:source:0273	장석	장석	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0274-01	proposed:source:0274	장어	어획물	강·호수	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0275-01	proposed:source:0275	잿빛 균핵	균핵	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0275-02	proposed:source:0275	잿빛 균핵	포자	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0276-01	proposed:source:0276	적열꽃	고열 꽃잎	화산지대	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0277-01	proposed:source:0277	적철석	철 함유 광석	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0278-01	proposed:source:0278	전나무	목재	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0278-02	proposed:source:0278	전나무	수지	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0279-01	proposed:source:0279	점토 채취장	점토	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0280-01	proposed:source:0280	점판암	판석	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0281-01	proposed:source:0281	정어리	어획물	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0282-01	proposed:source:0282	정제 향료	향료	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0283-01	proposed:source:0283	제단 보수 목재	목재	만신전	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0284-01	proposed:source:0284	제단용 석재	석재 블록	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0285-01	proposed:source:0285	종소리콩	콩	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0285-02	proposed:source:0285	종소리콩	꼬투리	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0286-01	proposed:source:0286	주니퍼	열매	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0286-02	proposed:source:0286	주니퍼	목재	설원	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0287-01	proposed:source:0287	주석광맥	주석광석	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0288-01	proposed:source:0288	지의류	지의체	설원	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0289-01	proposed:source:0289	지하 민물게	갑각	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0289-02	proposed:source:0289	지하 민물게	살	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0290-01	proposed:source:0290	지하 점토층	점토	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0291-01	proposed:source:0291	지하 퇴적점토	점토	지하미궁	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0292-01	proposed:source:0292	지하수	물	지하미궁	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0293-01	proposed:source:0293	진주조개	조갯살	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0293-02	proposed:source:0293	진주조개	진주 후보	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0294-01	proposed:source:0294	진흙	점질 토양	습지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0295-01	proposed:source:0295	질경이	잎	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0295-02	proposed:source:0295	질경이	씨앗	초원·농경지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0296-01	proposed:source:0296	참깨	씨앗	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0297-01	proposed:source:0297	참나무	통나무	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0297-02	proposed:source:0297	참나무	수피	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0297-03	proposed:source:0297	참나무	도토리	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0297-04	proposed:source:0297	참나무	수액	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0298-01	proposed:source:0298	참치	어획물	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0299-01	proposed:source:0299	천연황	황	화산지대	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0300-01	proposed:source:0300	철 고철	고철	폐허·묘지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0301-01	proposed:source:0301	철 못	철제 부속	고대 유적	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0302-01	proposed:source:0302	철 함유 암석	철광석	지하미궁	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0303-01	proposed:source:0303	철광맥	철광석	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0304-01	proposed:source:0304	청동 부속	금속 부속	고대 유적	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0305-01	proposed:source:0305	청동 유물 조각	청동 파편	고대 유적	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0306-01	proposed:source:0306	청어	어육	바다	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0306-02	proposed:source:0306	청어	비늘	바다	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0307-01	proposed:source:0307	촛농 잔여	밀랍	만신전	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0308-01	proposed:source:0308	침묵의 고치	고치 섬유	습지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0309-01	proposed:source:0309	침묵의 금박	금속 박편	만신전	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0310-01	proposed:source:0310	크랜베리	열매	설원	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0311-01	proposed:source:0311	클로버	잎	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0311-02	proposed:source:0311	클로버	꽃	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0312-01	proposed:source:0312	토끼	고기	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0312-02	proposed:source:0312	토끼	가죽	초원·농경지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0313-01	proposed:source:0313	톳	조체	해안·항구	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0314-01	proposed:source:0314	파도유리조개	패각	해안·항구	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0314-02	proposed:source:0314	파도유리조개	진주	해안·항구	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0315-01	proposed:source:0315	팥	콩	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0315-02	proposed:source:0315	팥	꼬투리	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0316-01	proposed:source:0316	패각 모래	패각 파편	해안·항구	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0317-01	proposed:source:0317	편마암	암석	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0318-01	proposed:source:0318	표고버섯	자실체	숲	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0319-01	proposed:source:0319	표류목	나무 조각	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0320-01	proposed:source:0320	풍명석	공명 광편	산맥	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0321-01	proposed:source:0321	풍화된 석재	암석	폐허·묘지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0322-01	proposed:source:0322	해면	해면 골격	바다	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0323-01	proposed:source:0323	해면동물	해면체	바다	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0324-01	proposed:source:0324	해바라기	씨앗	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0324-02	proposed:source:0324	해바라기	꽃	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0325-01	proposed:source:0325	해조류 군락	해조체	바다	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0326-01	proposed:source:0326	해초	섬유	해안·항구	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0327-01	proposed:source:0327	해파리	생체 관찰	바다	observation-only	v0.3	proposed-not-runtime
+proposed:item:0327-02	proposed:source:0327	해파리	교질	바다	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0328-01	proposed:source:0328	향등나무	향목	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0328-02	proposed:source:0328	향등나무	수액	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0329-01	proposed:source:0329	현무암	현무암 블록	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0329-02	proposed:source:0329	현무암	암석	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0330-01	proposed:source:0330	혈맥초	붉은 잎	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0330-02	proposed:source:0330	혈맥초	뿌리	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0331-01	proposed:source:0331	형석	결정	산맥;광산	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0332-01	proposed:source:0332	호두나무	호두	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0332-02	proposed:source:0332	호두나무	목재	거점 마을	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0333-01	proposed:source:0333	호랑가시나무	가지	숲	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0333-02	proposed:source:0333	호랑가시나무	잎	숲	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0334-01	proposed:source:0334	호밀	곡물	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0334-02	proposed:source:0334	호밀	짚	거점 마을	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0335-01	proposed:source:0335	호박	과육	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0335-02	proposed:source:0335	호박	씨앗	초원·농경지	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0336-01	proposed:source:0336	홍합	조갯살	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0336-02	proposed:source:0336	홍합	껍질	해안·항구	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0337-01	proposed:source:0337	화강암	암석 블록	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0338-01	proposed:source:0338	화산 유리	유리질 암편	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0338-02	proposed:source:0338	화산 유리	유리질 암석	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0339-01	proposed:source:0339	화산재	화산재	화산지대	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0339-02	proposed:source:0339	화산재	재	화산지대	research-or-display	v0.3;v0.4	proposed-not-runtime
+proposed:item:0340-01	proposed:source:0340	화석 목재	규화목	고대 유적	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0341-01	proposed:source:0341	황동석	구리 함유 광석	산맥	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0342-01	proposed:source:0342	황철석	광물	광산	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0343-01	proposed:source:0343	황폐지 이끼	이끼	폐허·묘지	research-or-display	v0.3	proposed-not-runtime
+proposed:item:0344-01	proposed:source:0344	회색지 지의류	지의류	폐허·묘지	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0345-01	proposed:source:0345	흑연	흑연	산맥	material-candidate	v0.4	proposed-not-runtime
+proposed:item:0346-01	proposed:source:0346	흑연층	흑연	광산	material-candidate	v0.3	proposed-not-runtime
+proposed:item:0347-01	proposed:source:0347	흑요석	흑요석 파편	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0347-02	proposed:source:0347	흑요석	유리질 암석	화산지대	material-candidate	v0.3;v0.4	proposed-not-runtime
+proposed:item:0348-01	proposed:source:0348	흰잠이끼	이끼	설원	research-or-display	v0.4	proposed-not-runtime
+proposed:item:0348-02	proposed:source:0348	흰잠이끼	포자	설원	research-or-display	v0.4	proposed-not-runtime

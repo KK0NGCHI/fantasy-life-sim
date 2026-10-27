@@ -1,0 +1,57 @@
+recipeId	name	inputs	outputs	station	propertyAndProvenanceRules	status
+wood.plank	목재 판재	wood.log ×2	wood.plank ×2	작업대	species/provenance; structural	design-proposal
+wood.charcoal	목탄	wood.log ×2	fuel.charcoal ×1	숯가마	species trace; heat transformation	design-proposal
+wood.resin	정제 수지	wood.resin ×2	binder.resin ×1	가열솥	volatile traits may decay	design-proposal
+wood.box	목재 상자	wood.plank ×4; binding.fiber ×1	storage.wood-box ×1	작업대	structural + binding	design-proposal
+wood.chair	목재 의자	wood.plank ×3	furniture.wood-chair ×1	작업대	species-aware structural	design-proposal
+wood.rod	낚싯대	wood.plank ×2; binding.fiber ×2	tool.fishing-rod ×1	작업대	functional rod; historical 05-I exact material	design-proposal
+wood.frame	나무 액자	wood.plank ×2; pigment.color ×1	decor.wood-frame ×1	작업대	wood + ornament	design-proposal
+fiber.thread	섬유 실	plant.spinnable-fiber ×2	textile.thread ×2	방적 설비	fiber provenance	design-proposal
+fiber.rope	밧줄	plant.spinnable-fiber ×3	textile.rope ×1	꼬기 도구	tensile capability	design-proposal
+fiber.fabric	직물	textile.thread ×3	textile.fabric ×1	직조 설비	fiber composition	design-proposal
+fiber.basket	바구니	plant.flexible-strip ×3; binding.fiber ×1	storage.basket ×1	작업대	flexibility required	design-proposal
+fiber.net	어망	textile.rope ×3	tool.fishing-net ×1	직조 설비	wet strength	design-proposal
+plant.flour	곡물 가루	grain.millable ×2	food.flour ×2	맷돌	food-safe validated only	design-proposal
+plant.oil	식물성 기름	seed.oil-bearing ×3	food.plant-oil ×1	착유기	edibility verified	design-proposal
+plant.jam	과일잼	fruit.edible ×3; sweetener ×1	food.jam ×1	조리대	flavor source retained	design-proposal
+plant.bread	빵	food.flour ×2; water ×1	food.bread ×1	조리대	validated food-only	design-proposal
+plant.feed	초식 사료	forage.plant ×3	feed.herbivore ×1	사료 제조대	animal diet herbivore	design-proposal
+animal.milk	유제품	livestock.milk ×2	food.dairy ×1	조리대	species origin	design-proposal
+animal.leather	가공 가죽	livestock.hide ×2	material.leather ×1	무두질 설비	species origin	design-proposal
+animal.wool	방적 양털	livestock.wool ×2	textile.wool-yarn ×2	방적 설비	species origin	design-proposal
+animal.egg	달걀 요리	livestock.egg ×2	food.egg-dish ×1	조리대	species origin	design-proposal
+animal.gloves	가죽 장갑	material.leather ×2; textile.thread ×1	gear.gloves ×1	재봉대	structural leather	design-proposal
+mineral.cutstone	다듬은 석재	stone.workable ×2	stone.cut ×1	석공대	rock species	design-proposal
+mineral.brick	점토 벽돌	clay workable ×2	stone.clay-brick ×1	가마	clay provenance	design-proposal
+mineral.glass	유리 원료	sand.silica ×2	glass.raw ×1	용광로	remove impurities	design-proposal
+mineral.glass-bottle	유리병	glass.raw ×2	container.glass-bottle ×1	유리공방	glass purity	design-proposal
+mineral.copper	구리 주괴	ore.copper-feed ×2	metal.copper-ingot ×1	용광로	legacy 05-H ingot; ore feed mapping pending	existing-analog-not-identical
+mineral.iron	철 주괴	ore.iron-feed ×2	metal.iron-ingot ×1	용광로	legacy 05-H ingot; ore feed mapping pending	existing-analog-not-identical
+mineral.tin	주석 주괴	ore.tin-feed ×2	metal.tin-ingot ×1	용광로	legacy 05-H ingot; ore feed mapping pending	existing-analog-not-identical
+mineral.bronze	청동 주괴	metal.copper-ingot ×2; metal.tin-ingot ×1	metal.bronze-ingot ×2	용광로	legacy 05-H exact ratio	existing-analog-not-identical
+mineral.pickaxe	금속 곡괭이	metal.tool-head ×2; stone.cut ×1	tool.pickaxe ×1	작업대	legacy 05-I metal-specific exact ids	existing-analog-not-identical
+mineral.gem	연마 보석	gem.cuttable ×1	gem.polished ×1	세공대	species,color preserved	design-proposal
+mineral.plaster	석고 주형	mineral.gypsum ×2; water ×1	craft.mold ×1	석공대	purpose-specific	design-proposal
+fish.fillet	손질 어육	fish.food-safe ×1	food.fillet ×1	조리대	species preserved, edibility reviewed	design-proposal
+fish.broth	생선 국물	food.fillet ×2; water ×1	food.fish-broth ×1	조리대	species taste	design-proposal
+fish.ink	해양 먹물	marine.ink ×1; binder ×1	writing.ink ×1	연금술대	pigment survives	design-proposal
+fish.shell	패각 가루	marine.shell ×2	mineral.shell-powder ×1	분쇄대	species provenance	design-proposal
+fish.pearl	진주 세공	gem.pearl ×1	jewelry.pearl-pendant ×1	세공대	provenance preserved	design-proposal
+fungus.dried	균류 건조 표본	fungus.fruiting-body ×1	research.fungal-specimen ×1	건조 설비	no food safety implication	design-proposal
+fungus.ink	균류 안료	fungus.pigmented-body ×2	pigment.fungal ×1	연금술대	color/chemistry	design-proposal
+fungus.gloves	균사 섬유 장갑	fungus.fiber ×2; plant.fiber ×2	tool.gather-gloves ×1	작업대	legacy 05-I wood-ear exact id	existing-analog-not-identical
+relic.repair	유물 복원 표본	relic.fragment ×3; binder ×1	display.restored-relic ×1	복원대	historical origin remains	design-proposal
+relic.inscription	문자 탁본	relic.inscription ×1; writing.ink ×1	research.rubbing ×1	기록대	non-destructive preferred	design-proposal
+faith.candle	봉헌 양초	wax ×2; textile.wick ×1	faith.candle ×1	양초 공방	faith optional	design-proposal
+faith.altar	개인 제단 보수	stone.cut ×2; wood.plank ×2	building.personal-altar-repair ×1	제단 작업대	each deity altar separately	design-proposal
+special.glow	발광 장식	magic.luminescent-material ×1; decor.frame ×1	decor.glow-light ×1	연금술대	only if surviving process	design-proposal
+special.echo	공명판	magic.resonant-mineral ×2; metal.binder ×1	research.echo-plate ×1	세공대	not automatically combat power	design-proposal
+special.study	이질적 표본 봉인	origin.otherworld ×1; container.glass-bottle ×1	research.sealed-sample ×1	연구대	no automatic gear; origin tags	design-proposal
+plant.dry-herb	말린 식물 표본	plant.leaf-or-flower ×2	research.dried-botanical ×1	건조대	food-safe not implied	design-proposal
+plant.dye	식물성 염료	plant.pigment-bearing ×2; water ×1	pigment.plant ×1	염색대	pigment role only	design-proposal
+plant.tea	식물차	plant.verified-edible ×2; water ×1	food.herbal-tea ×1	조리대	verified edible-only	design-proposal
+mineral.powder	광물 분말	mineral.grindable ×2	mineral.powder ×1	분쇄대	minerals kept by origin	design-proposal
+metal.recycle	금속 회수	metal.scrap ×2	metal.recycled ×1	용광로	salvaged origin preserved	design-proposal
+animal.bone	골질 장식	animal.bone ×2	decor.bone-carving ×1	조각대	source identification	design-proposal
+fungus.substrate	균류 배지	fungus.valid-substrate ×2	agriculture.fungal-bed ×1	배양 시설	not edible by default	design-proposal
+research.catalog	생태·유물 관찰 기록	observation.existing-source ×1	knowledge.record ×1	도감	no inventory item consumed or granted; observational action only	design-proposal
