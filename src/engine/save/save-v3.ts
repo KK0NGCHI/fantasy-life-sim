@@ -69,7 +69,7 @@ const candidateCaps05A:Readonly<Record<string,number>>={
  'source05a:mussel':4,'source05a:marsh-bell':2,'source05a:sacred-oak':1
 };
 function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
- if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed','ecologySubstrates','woodland05C','mineralDeposits05E']))return false;
+ if(!keys(x,['schema','nodes','candidateSites','compendium','ecologySites','ecologyClimateSeed','ecologySubstrates','woodland05C','mineralDeposits05E','treeByproducts05M']))return false;
  if(Object.hasOwn(x,'candidateSites')){
   if(!obj(x.candidateSites)||Object.keys(x.candidateSites).length>100)return false;
   if(!Object.entries(x.candidateSites).every(([id,v])=>obj(v)&&keys(v,['sourceId','region','remaining','discovered','lastSecond','recoveryProgress'])&&
@@ -78,6 +78,22 @@ function validCandidates05A(x:Record<string,unknown>,now:number):boolean{
    uint(v.remaining)&&Number(v.remaining)<=(candidateCaps05A[v.sourceId]??-1)&&typeof v.discovered==='boolean'&&
    (!Object.hasOwn(v,'lastSecond')||(uint(v.lastSecond)&&Number(v.lastSecond)<=now))&&
    (!Object.hasOwn(v,'recoveryProgress')||(typeof v.recoveryProgress==='number'&&Number.isFinite(v.recoveryProgress)&&v.recoveryProgress>=0&&v.recoveryProgress<=3*86400))))return false;
+ }
+ if(Object.hasOwn(x,'treeByproducts05M')){
+  const stocks=x.treeByproducts05M;
+  if(!obj(stocks)||Object.keys(stocks).length>5000)return false;
+  const allowed:Readonly<Record<string,string[]>>={
+   'resource05a:oak-log':['item05m:oak-acorn','item05a:oak-sap'],
+   'resource05a:pine-log':['item05m:pine-cone','item05m:pine-resin'],
+   'resource05a:birch-log':['item05m:birch-bark','item05m:birch-sap'],
+   'resource05a:willow-log':['item05m:willow-branch']
+  };
+  if(!Object.entries(stocks).every(([id,v])=>{
+   const split=id.lastIndexOf('|'),nodeId=id.slice(0,split),itemId=id.slice(split+1);
+   const def=Object.entries(allowed).find(([resourceId])=>nodeId.startsWith(resourceId+':'));
+   return split>0&&Boolean(def)&&def![1].includes(itemId)&&obj(v)&&keys(v,['remaining','lastSecond'])&&
+    uint(v.remaining)&&Number(v.remaining)<=2&&uint(v.lastSecond)&&Number(v.lastSecond)<=now;
+  }))return false;
  }
  if(Object.hasOwn(x,'ecologyClimateSeed')&&(typeof x.ecologyClimateSeed!=='string'||x.ecologyClimateSeed.length<1||x.ecologyClimateSeed.length>200))return false;
  if(Object.hasOwn(x,'mineralDeposits05E')){
