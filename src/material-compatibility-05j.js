@@ -11,6 +11,7 @@ export function materialMatches(item,slot){
  if(!record(item)||!record(slot))return false;
  if(typeof slot.exactId==='string')return item.definitionId===slot.exactId;
  if(!record(slot.material))return false;
+ if(slot.allowedDefinitionId!==undefined&&item.definitionId!==slot.allowedDefinitionId)return false;
  const m=slot.material;
  if(typeof m.family!=='string'||!m.family||item.family!==m.family)return false;
  if(m.form!==undefined&&item.form!==m.form)return false;
