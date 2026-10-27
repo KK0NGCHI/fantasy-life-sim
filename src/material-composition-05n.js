@@ -31,4 +31,4 @@ export function readCraftMaterials05N(instance){
   return rows;
  }catch{return null;}
 }
-export const TRACKED_RECIPES_05N=recipe=>/^craft05l:|^craft05m:|^refine05m:/.test(recipe.id??'');
+export const TRACKED_RECIPES_05N=recipe=>/^craft05l:|^craft05m:|^refine05m:|^craft05n:/.test(recipe.id??'');
