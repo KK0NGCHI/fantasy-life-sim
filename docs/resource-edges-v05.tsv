@@ -127,70 +127,70 @@ rowId	sourceId	region	stage0Source	stage1Drop	stage2Processed	stage3Use	evidence
 0126	proposed:source:0135	설원	백야꽃	꽃잎	가공 공정 검토	광원 장식 후보	v0.3
 0127	proposed:source:0175	설원	서리수정	얼음성 결정	가공 공정 검토	냉각 연구 후보	v0.3
 0128	proposed:source:0049	설원	꿈비늘짐승	특수 비늘·털	가공 공정 검토	사육·도감 후보	v0.3
-0129	proposed:source:0164	사막	사막 아카시아	see-v0.3-source	to-specify	to-specify	v0.3
-0130	proposed:source:0074	사막	대추야자	see-v0.3-source	to-specify	to-specify	v0.3
-0131	proposed:source:0189	사막	선인장	see-v0.3-source	to-specify	to-specify	v0.3
-0132	proposed:source:0220	사막	알로에	see-v0.3-source	to-specify	to-specify	v0.3
-0133	proposed:source:0214	사막	쑥류 관목	see-v0.3-source	to-specify	to-specify	v0.3
-0134	proposed:source:0100	사막	모래	see-v0.3-source	to-specify	to-specify	v0.3
-0135	proposed:source:0031	사막	규사	see-v0.3-source	to-specify	to-specify	v0.3
-0136	proposed:source:0166	사막	사암	see-v0.3-source	to-specify	to-specify	v0.3
-0137	proposed:source:0177	사막	석고	see-v0.3-source	to-specify	to-specify	v0.3
-0138	proposed:source:0222	사막	암염	see-v0.3-source	to-specify	to-specify	v0.3
-0139	proposed:source:0165	사막	사막 전갈	see-v0.3-source	to-specify	to-specify	v0.3
-0140	proposed:source:0075	사막	도마뱀	see-v0.3-source	to-specify	to-specify	v0.3
-0141	proposed:source:0101	사막	모래백합	see-v0.3-source	to-specify	to-specify	v0.3
-0142	proposed:source:0051	사막	끝나지 않은 모래	see-v0.3-source	to-specify	to-specify	v0.3
-0143	proposed:source:0009	사막	거울선인장	see-v0.3-source	to-specify	to-specify	v0.3
-0144	proposed:source:0249	사막	유리잠복충	see-v0.3-source	to-specify	to-specify	v0.3
-0145	proposed:source:0336	해안·항구	홍합	see-v0.3-source	to-specify	to-specify	v0.3
-0146	proposed:source:0029	해안·항구	굴	see-v0.3-source	to-specify	to-specify	v0.3
-0147	proposed:source:0128	해안·항구	바지락	see-v0.3-source	to-specify	to-specify	v0.3
-0148	proposed:source:0011	해안·항구	게	see-v0.3-source	to-specify	to-specify	v0.3
-0149	proposed:source:0192	해안·항구	성게	see-v0.3-source	to-specify	to-specify	v0.3
-0150	proposed:source:0119	해안·항구	미역	see-v0.3-source	to-specify	to-specify	v0.3
-0151	proposed:source:0066	해안·항구	다시마	see-v0.3-source	to-specify	to-specify	v0.3
-0152	proposed:source:0313	해안·항구	톳	see-v0.3-source	to-specify	to-specify	v0.3
-0153	proposed:source:0269	해안·항구	잘피	see-v0.3-source	to-specify	to-specify	v0.3
-0154	proposed:source:0193	해안·항구	소금습지 식물	see-v0.3-source	to-specify	to-specify	v0.3
-0155	proposed:source:0126	해안·항구	바닷모래	see-v0.3-source	to-specify	to-specify	v0.3
-0156	proposed:source:0319	해안·항구	표류목	see-v0.3-source	to-specify	to-specify	v0.3
-0157	proposed:source:0248	해안·항구	유리부표	see-v0.3-source	to-specify	to-specify	v0.3
-0158	proposed:source:0250	해안·항구	유리조개	see-v0.3-source	to-specify	to-specify	v0.3
-0159	proposed:source:0068	해안·항구	달그림자 해초	see-v0.3-source	to-specify	to-specify	v0.3
-0160	proposed:source:0201	해안·항구	수면편지병	see-v0.3-source	to-specify	to-specify	v0.3
-0161	proposed:source:0281	바다	정어리	see-v0.3-source	to-specify	to-specify	v0.3
-0162	proposed:source:0018	바다	고등어	see-v0.3-source	to-specify	to-specify	v0.3
-0163	proposed:source:0298	바다	참치	see-v0.3-source	to-specify	to-specify	v0.3
-0164	proposed:source:0109	바다	문어	see-v0.3-source	to-specify	to-specify	v0.3
-0165	proposed:source:0239	바다	오징어	see-v0.3-source	to-specify	to-specify	v0.3
-0166	proposed:source:0173	바다	새우	see-v0.3-source	to-specify	to-specify	v0.3
-0167	proposed:source:0001	바다	가리비	see-v0.3-source	to-specify	to-specify	v0.3
-0168	proposed:source:0293	바다	진주조개	see-v0.3-source	to-specify	to-specify	v0.3
-0169	proposed:source:0327	바다	해파리	see-v0.3-source	to-specify	to-specify	v0.3
-0170	proposed:source:0170	바다	산호	see-v0.3-source	to-specify	to-specify	v0.3
-0171	proposed:source:0322	바다	해면	see-v0.3-source	to-specify	to-specify	v0.3
-0172	proposed:source:0325	바다	해조류 군락	see-v0.3-source	to-specify	to-specify	v0.3
-0173	proposed:source:0053	바다	난파선 잔해	see-v0.3-source	to-specify	to-specify	v0.3
-0174	proposed:source:0088	바다	등불해파리	see-v0.3-source	to-specify	to-specify	v0.3
-0175	proposed:source:0209	바다	심연유영어	see-v0.3-source	to-specify	to-specify	v0.3
-0176	proposed:source:0108	바다	무저의 껍데기	see-v0.3-source	to-specify	to-specify	v0.3
-0177	proposed:source:0329	화산지대	현무암	see-v0.3-source	to-specify	to-specify	v0.3
-0178	proposed:source:0347	화산지대	흑요석	see-v0.3-source	to-specify	to-specify	v0.3
-0179	proposed:source:0151	화산지대	부석	see-v0.3-source	to-specify	to-specify	v0.3
-0180	proposed:source:0256	화산지대	응회암	see-v0.3-source	to-specify	to-specify	v0.3
-0181	proposed:source:0265	화산지대	자연황	see-v0.3-source	to-specify	to-specify	v0.3
-0182	proposed:source:0339	화산지대	화산재	see-v0.3-source	to-specify	to-specify	v0.3
-0183	proposed:source:0338	화산지대	화산 유리	see-v0.3-source	to-specify	to-specify	v0.3
-0184	proposed:source:0232	화산지대	열수 침전물	see-v0.3-source	to-specify	to-specify	v0.3
-0185	proposed:source:0032	화산지대	규산염 암석	see-v0.3-source	to-specify	to-specify	v0.3
-0186	proposed:source:0057	화산지대	내열 관목	see-v0.3-source	to-specify	to-specify	v0.3
-0187	proposed:source:0231	화산지대	열수 미생물막	see-v0.3-source	to-specify	to-specify	v0.3
-0188	proposed:source:0240	화산지대	온천 점토	see-v0.3-source	to-specify	to-specify	v0.3
-0189	proposed:source:0276	화산지대	적열꽃	see-v0.3-source	to-specify	to-specify	v0.3
-0190	proposed:source:0275	화산지대	잿빛 균핵	see-v0.3-source	to-specify	to-specify	v0.3
-0191	proposed:source:0210	화산지대	심장석	see-v0.3-source	to-specify	to-specify	v0.3
-0192	proposed:source:0241	화산지대	용암울림껍질	see-v0.3-source	to-specify	to-specify	v0.3
+0129	proposed:source:0164	사막	사막 아카시아	목재·수지·씨앗	가공 공정 검토	목공·접착	v0.3
+0130	proposed:source:0074	사막	대추야자	대추·잎·목질	가공 공정 검토	음식·직조	v0.3
+0131	proposed:source:0189	사막	선인장	과실·줄기 섬유	가공 공정 검토	음식·섬유	v0.3
+0132	proposed:source:0220	사막	알로에	잎·수액	가공 공정 검토	연금술 연구	v0.3
+0133	proposed:source:0214	사막	쑥류 관목	잎·줄기	가공 공정 검토	향료·연료	v0.3
+0134	proposed:source:0100	사막	모래	모래	가공 공정 검토	유리·건축	v0.3
+0135	proposed:source:0031	사막	규사	석영사	가공 공정 검토	유리	v0.3
+0136	proposed:source:0166	사막	사암	석재	가공 공정 검토	석공·건축	v0.3
+0137	proposed:source:0177	사막	석고	석고	가공 공정 검토	벽재·주형	v0.3
+0138	proposed:source:0222	사막	암염	소금 원료	가공 공정 검토	정제·식품	v0.3
+0139	proposed:source:0165	사막	사막 전갈	외골격·분비물 연구	가공 공정 검토	생물 도감·연구	v0.3
+0140	proposed:source:0075	사막	도마뱀	비늘·생태 관찰	가공 공정 검토	도감·연구	v0.3
+0141	proposed:source:0101	사막	모래백합	꽃·뿌리	가공 공정 검토	연구·장식	v0.3
+0142	proposed:source:0051	사막	끝나지 않은 모래	시간성 모래	가공 공정 검토	특수 연구 후보	v0.3
+0143	proposed:source:0009	사막	거울선인장	반사 표피·열매	가공 공정 검토	광학·식품 후보	v0.3
+0144	proposed:source:0249	사막	유리잠복충	유리질 껍질	가공 공정 검토	세공·생태 연구 후보	v0.3
+0145	proposed:source:0336	해안·항구	홍합	조갯살·껍질	가공 공정 검토	요리·석회재	v0.3
+0146	proposed:source:0029	해안·항구	굴	조갯살·껍질	가공 공정 검토	요리·세공	v0.3
+0147	proposed:source:0128	해안·항구	바지락	조갯살·껍질	가공 공정 검토	요리	v0.3
+0148	proposed:source:0011	해안·항구	게	고기·갑각	가공 공정 검토	요리·도감	v0.3
+0149	proposed:source:0192	해안·항구	성게	생식소·가시·껍질	가공 공정 검토	요리 검토·장식	v0.3
+0150	proposed:source:0119	해안·항구	미역	잎몸	가공 공정 검토	요리·추출물	v0.3
+0151	proposed:source:0066	해안·항구	다시마	잎몸	가공 공정 검토	요리·추출물	v0.3
+0152	proposed:source:0313	해안·항구	톳	조체	가공 공정 검토	요리 검토·연구	v0.3
+0153	proposed:source:0269	해안·항구	잘피	잎·씨앗	가공 공정 검토	생태 조사	v0.3
+0154	proposed:source:0193	해안·항구	소금습지 식물	잎·씨앗	가공 공정 검토	염생 연구	v0.3
+0155	proposed:source:0126	해안·항구	바닷모래	모래·패각 부스러기	가공 공정 검토	유리·골재	v0.3
+0156	proposed:source:0319	해안·항구	표류목	나무 조각	가공 공정 검토	목공·연료	v0.3
+0157	proposed:source:0248	해안·항구	유리부표	인양품	가공 공정 검토	유리 세공·장식	v0.3
+0158	proposed:source:0250	해안·항구	유리조개	투명 패각	가공 공정 검토	창호·세공 후보	v0.3
+0159	proposed:source:0068	해안·항구	달그림자 해초	발광 잎몸	가공 공정 검토	광원·연구 후보	v0.3
+0160	proposed:source:0201	해안·항구	수면편지병	유리병·기록물	가공 공정 검토	도감·퀘스트 후보	v0.3
+0161	proposed:source:0281	바다	정어리	어획물	가공 공정 검토	조리·사료	v0.3
+0162	proposed:source:0018	바다	고등어	어획물	가공 공정 검토	조리	v0.3
+0163	proposed:source:0298	바다	참치	어획물	가공 공정 검토	조리	v0.3
+0164	proposed:source:0109	바다	문어	고기·먹물	가공 공정 검토	음식·안료	v0.3
+0165	proposed:source:0239	바다	오징어	고기·먹물	가공 공정 검토	음식·안료	v0.3
+0166	proposed:source:0173	바다	새우	새우·껍질	가공 공정 검토	음식·사료	v0.3
+0167	proposed:source:0001	바다	가리비	조갯살·껍질	가공 공정 검토	음식·장식	v0.3
+0168	proposed:source:0293	바다	진주조개	조갯살·진주 후보	가공 공정 검토	양식·세공	v0.3
+0169	proposed:source:0327	바다	해파리	생체 관찰·교질	가공 공정 검토	연구	v0.3
+0170	proposed:source:0170	바다	산호	산호 골격	가공 공정 검토	연구·장식	v0.3
+0171	proposed:source:0322	바다	해면	해면 골격	가공 공정 검토	세척·연구	v0.3
+0172	proposed:source:0325	바다	해조류 군락	해조체	가공 공정 검토	식품·추출	v0.3
+0173	proposed:source:0053	바다	난파선 잔해	금속 조각·목재	가공 공정 검토	인양·재활용	v0.3
+0174	proposed:source:0088	바다	등불해파리	발광 조직	가공 공정 검토	광원 연구 후보	v0.3
+0175	proposed:source:0209	바다	심연유영어	고유 어획물	가공 공정 검토	심해 연구·요리 후보	v0.3
+0176	proposed:source:0108	바다	무저의 껍데기	비정상 패각	가공 공정 검토	연구·장식 후보	v0.3
+0177	proposed:source:0329	화산지대	현무암	현무암 블록	가공 공정 검토	석공·도로	v0.3
+0178	proposed:source:0347	화산지대	흑요석	흑요석 파편	가공 공정 검토	절삭·장식	v0.3
+0179	proposed:source:0151	화산지대	부석	다공성 석재	가공 공정 검토	연마·건축	v0.3
+0180	proposed:source:0256	화산지대	응회암	석재	가공 공정 검토	건축	v0.3
+0181	proposed:source:0265	화산지대	자연황	황	가공 공정 검토	연금술·농업 연구	v0.3
+0182	proposed:source:0339	화산지대	화산재	화산재	가공 공정 검토	도자기·토양 연구	v0.3
+0183	proposed:source:0338	화산지대	화산 유리	유리질 암편	가공 공정 검토	세공	v0.3
+0184	proposed:source:0232	화산지대	열수 침전물	광물 침전물	가공 공정 검토	지질 연구	v0.3
+0185	proposed:source:0032	화산지대	규산염 암석	광물 원료	가공 공정 검토	석공·도기	v0.3
+0186	proposed:source:0057	화산지대	내열 관목	목질·씨앗	가공 공정 검토	연료·생태 연구	v0.3
+0187	proposed:source:0231	화산지대	열수 미생물막	생물막 시료	가공 공정 검토	생태 연구	v0.3
+0188	proposed:source:0240	화산지대	온천 점토	점토	가공 공정 검토	도기	v0.3
+0189	proposed:source:0276	화산지대	적열꽃	고열 꽃잎	가공 공정 검토	온기 매개 연구 후보	v0.3
+0190	proposed:source:0275	화산지대	잿빛 균핵	균핵·포자	가공 공정 검토	내열 균류 연구 후보	v0.3
+0191	proposed:source:0210	화산지대	심장석	주기적 열을 띠는 돌	가공 공정 검토	난방·마력 연구 후보	v0.3
+0192	proposed:source:0241	화산지대	용암울림껍질	공명 광물판	가공 공정 검토	방열판 연구 후보	v0.3
 0193	proposed:source:0140	고대 유적	벽돌 잔해	see-v0.3-source	to-specify	to-specify	v0.3
 0194	proposed:source:0304	고대 유적	청동 부속	see-v0.3-source	to-specify	to-specify	v0.3
 0195	proposed:source:0301	고대 유적	철 못	see-v0.3-source	to-specify	to-specify	v0.3
