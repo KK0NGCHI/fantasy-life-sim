@@ -1,4 +1,5 @@
-import {craftPreview1,CRAFTING_DEFINITIONS_1} from './crafting-batch-stage1.js';
+import {craftPreview1,craftBatch1,CRAFTING_DEFINITIONS_1} from './crafting-batch-stage1.js';
+import {materialMatches} from './material-compatibility-05j.js';
 import {ALL_CRAFTING_RECIPES_05L,REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
 import {CRAFTING_MATERIALS_05L} from './resource-crafting-05l.js';
 import {FOREST_MATERIALS_05M} from './forest-resources-05m.js';
@@ -213,14 +214,34 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      const requiredText=requirements.map(req=>req.itemId?named(req.itemId)+' ×'+req.quantity:
        '호환 소재('+req.material.family+(req.material.form?'/'+req.material.form:'')+') ×'+req.quantity).join(' · ');
      make('span',{class:'muted',text:requiredText+' → '+named(recipe.output)+' ×'+recipe.outputQty},row);
-     const availability=craftPreview1(allItems,snapshotWorld.player.id,recipe.id);
-     if(!availability.ok)make('span',{class:'tiny muted',text:'부족 또는 호환 불가: '+availability.reason},row);
+     const choices={};
+     const owner=snapshotWorld.player.id;
+     const stocks=allItems.items.filter(item=>allItems.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===owner))
+      .map(item=>({...item,...(CRAFTING_DEFINITIONS_1[item.definitionId]??{})}));
+     requirements.forEach((req,index)=>{
+      if(!req.material)return;
+      const slot={material:req.material};
+      const candidates=[...new Set(stocks.filter(item=>materialMatches(item,slot)).map(item=>item.definitionId))];
+      const chooser=make('select',{'aria-label':recipe.name+' 재료 선택 '+(index+1)},row);
+      for(const [value,label] of [['','자동 선택'],...candidates.map(id=>[id,named(id)])]){
+       const option=make('option',{text:label},chooser);option.value=value;
+      }
+      chooser.onchange=()=>{if(chooser.value)choices[index]=chooser.value;else delete choices[index];updateAvailability()};
+     });
+     const msg=make('span',{class:'tiny muted'},row);
      const refine=btn('제작 ('+Math.floor(recipe.seconds/60)+'분/회)',()=>{
       const count=Number(craftingCount.value);
-      if(!executeV2('craft.batch',{recipeId:recipe.id,count}))return render();
+      if(!executeV2('craft.batch',{recipeId:recipe.id,count,choices}))return render();
       nextLog('제작',recipe.name+' '+count+'회 완료');render();
      },'btn',row);
-     refine.disabled=s.region!=='거점 마을'||!availability.ok;
+     const updateAvailability=()=>{
+      const preview=craftPreview1(allItems,owner,recipe.id,choices);
+      const trial=preview.ok?craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices):preview;
+      msg.textContent=trial.ok?'제작 가능':'재료 부족/호환 불가: '+trial.reason;
+      refine.disabled=s.region!=='거점 마을'||!trial.ok;
+     };
+     craftingCount.addEventListener('change',updateAvailability);
+     updateAvailability();
     }
     const tools=mainV2.availableTools05A('mining');
     const rankOf=id=>id==='tool05a:pickaxe'?1:({'copper':2,'bronze':2,'iron':3,'steel':4}[id.split(':').at(-1)]??0);
