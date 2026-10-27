@@ -10,7 +10,7 @@ test('05-A taxonomy covers exactly the 16 existing regions and four nested areas
 test('05-A additive item catalogue preserves all twelve live legacy IDs and node fixture',()=>{
  const ids=new Set(CATALOG_ITEMS_05A.map(x=>x.id));
  for(const r of RESOURCES_05A)assert.ok(ids.has(r.itemId),r.itemId);
- assert.equal(RESOURCES_05A.length,14);
+ assert.equal(RESOURCES_05A.length,17);
  assert.ok(Object.keys(createResourceNodes05A()).length>0);
 });
 test('05-A species and item IDs separate, multi-output source and obtain-only catalogue hook',()=>{
