@@ -67,3 +67,21 @@ test('live failed batch does not consume time or resources',()=>{
  const before=g.current(),result=g.dispatch('craft.batch',{recipeId:'craft05l:wood-basket',count:2});
  assert.equal(result.accepted,false);assert.equal(result.turnsSpent,0);assert.deepEqual(g.current(),before);
 });
+
+test('pinned material species is used rather than arbitrary compatible inventory order',()=>{
+ const inventory=w([['item05h:oak-planks',2],['item05m:birch-planks',2],['item05l:grass-rope',2]]);
+ assert.equal(craftPreview1(inventory,'p','craft05l:wood-basket',{0:'item05m:birch-planks'}).ok,true);
+ const result=craftBatch1(inventory,'p','craft05l:wood-basket',1,{0:'item05m:birch-planks'});
+ assert.equal(result.ok,true);
+ const receipt=readCraftMaterials05N(result.itemWorld.items.find(i=>i.definitionId==='item05l:wood-basket'));
+ assert.ok(receipt.some(i=>i.definitionId==='item05m:birch-planks'&&i.quantity===2));
+ assert.equal(result.itemWorld.items.find(i=>i.definitionId==='item05h:oak-planks').quantity,2);
+});
+test('invalid and incompatible material pinning is atomic',()=>{
+ const inventory=w([['item05h:oak-planks',2],['item05l:grass-rope',1]]);
+ for(const choice of [{0:'item05a:stone'},{1:'item05l:grass-rope'},{999:'item05h:oak-planks'}]){
+  const result=craftBatch1(inventory,'p','craft05l:wood-basket',1,choice);
+  assert.equal(result.ok,false);
+  assert.deepEqual(inventory,w([['item05h:oak-planks',2],['item05l:grass-rope',1]]));
+ }
+});
