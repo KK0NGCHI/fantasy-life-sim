@@ -47,3 +47,11 @@ faith.altar	개인 제단 보수	stone.cut ×2; wood.plank ×2	building.personal
 special.glow	발광 장식	magic.luminescent-material ×1; decor.frame ×1	decor.glow-light ×1	연금술대	only if surviving process	design-proposal
 special.echo	공명판	magic.resonant-mineral ×2; metal.binder ×1	research.echo-plate ×1	세공대	not automatically combat power	design-proposal
 special.study	이질적 표본 봉인	origin.otherworld ×1; container.glass-bottle ×1	research.sealed-sample ×1	연구대	no automatic gear; origin tags	design-proposal
+plant.dry-herb	말린 식물 표본	plant.leaf-or-flower ×2	research.dried-botanical ×1	건조대	food-safe not implied	design-proposal
+plant.dye	식물성 염료	plant.pigment-bearing ×2; water ×1	pigment.plant ×1	염색대	pigment role only	design-proposal
+plant.tea	식물차	plant.verified-edible ×2; water ×1	food.herbal-tea ×1	조리대	verified edible-only	design-proposal
+mineral.powder	광물 분말	mineral.grindable ×2	mineral.powder ×1	분쇄대	minerals kept by origin	design-proposal
+metal.recycle	금속 회수	metal.scrap ×2	metal.recycled ×1	용광로	salvaged origin preserved	design-proposal
+animal.bone	골질 장식	animal.bone ×2	decor.bone-carving ×1	조각대	source identification	design-proposal
+fungus.substrate	균류 배지	fungus.valid-substrate ×2	agriculture.fungal-bed ×1	배양 시설	not edible by default	design-proposal
+research.catalog	생태·유물 관찰 기록	observation.existing-source ×1	knowledge.record ×1	도감	no inventory item consumed or granted; observational action only	design-proposal
