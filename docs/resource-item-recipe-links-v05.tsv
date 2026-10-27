@@ -1,0 +1,540 @@
+itemPartId	sourceId	partName	materialFamilyCandidate	conceptualRecipes	verificationStatus
+proposed:item:0001-01	proposed:source:0001	조갯살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0001-02	proposed:source:0001	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0002-01	proposed:source:0002	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0002-02	proposed:source:0002	수지	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0003-01	proposed:source:0003	가재	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0003-02	proposed:source:0003	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0004-01	proposed:source:0004	줄기	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0004-02	proposed:source:0004	잎	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0005-01	proposed:source:0005	철 함유 광물	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0006-01	proposed:source:0006	덩이줄기	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0007-01	proposed:source:0007	생체 관찰	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0007-02	proposed:source:0007	분비물 연구	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0008-01	proposed:source:0008	열매	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0008-02	proposed:source:0008	가지	wood	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0009-01	proposed:source:0009	반사 표피	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0009-02	proposed:source:0009	열매	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0010-01	proposed:source:0010	수피	wood	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0010-02	proposed:source:0010	목재	wood	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0011-01	proposed:source:0011	고기	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0011-02	proposed:source:0011	갑각	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0011-03	proposed:source:0011	살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0012-01	proposed:source:0012	가지	wood	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0012-02	proposed:source:0012	열매	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0013-01	proposed:source:0013	이끼	botanical	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0014-01	proposed:source:0014	석판 조각	relic-or-artifact	relic.repair;relic.inscription;special.study;faith.candle;faith.altar	not-slot-validated
+proposed:item:0015-01	proposed:source:0015	목재 조각	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0016-01	proposed:source:0016	벽돌	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0017-01	proposed:source:0017	유리 조각	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0018-01	proposed:source:0018	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0018-02	proposed:source:0018	어육	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0018-03	proposed:source:0018	뼈	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0019-01	proposed:source:0019	새순	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0019-02	proposed:source:0019	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0019-03	proposed:source:0019	어린 순	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0020-01	proposed:source:0020	열매	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0020-02	proposed:source:0020	가지	wood	research.display-unmodeled	not-slot-validated
+proposed:item:0021-01	proposed:source:0021	결정	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0022-01	proposed:source:0022	꽃	botanical	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0022-02	proposed:source:0022	씨앗	botanical	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0023-01	proposed:source:0023	종이	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0023-02	proposed:source:0023	기록	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0024-01	proposed:source:0024	구리 함유 광물	mineral	fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0025-01	proposed:source:0025	뿌리	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0025-02	proposed:source:0025	목질	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0026-01	proposed:source:0026	얇은 이질적 결정	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0027-01	proposed:source:0027	색소 광물	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0028-01	proposed:source:0028	구리광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0029-01	proposed:source:0029	조갯살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0029-02	proposed:source:0029	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0029-03	proposed:source:0029	살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0029-04	proposed:source:0029	패각	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0030-01	proposed:source:0030	곡물	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0030-02	proposed:source:0030	짚	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0031-01	proposed:source:0031	석영사	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0032-01	proposed:source:0032	광물 원료	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0033-01	proposed:source:0033	규조토	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0034-01	proposed:source:0034	자실체	fungal	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0035-01	proposed:source:0035	이끼	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0036-01	proposed:source:0036	자연금 함유 원료	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0037-01	proposed:source:0037	의례 부산물	unclassified	relic.repair;relic.inscription;special.study;faith.candle;faith.altar	not-slot-validated
+proposed:item:0038-01	proposed:source:0038	먹	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0039-01	proposed:source:0039	양피지	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0040-01	proposed:source:0040	고유 파편	relic-or-artifact	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0041-01	proposed:source:0041	꽃잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0041-02	proposed:source:0041	꽃가루	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0042-01	proposed:source:0042	향료 잔재	unclassified	relic.repair;relic.inscription;special.study;faith.candle;faith.altar	not-slot-validated
+proposed:item:0043-01	proposed:source:0043	움직이는 광물껍질	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0044-01	proposed:source:0044	깃털	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0045-01	proposed:source:0045	꽃잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0045-02	proposed:source:0045	씨앗	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0046-01	proposed:source:0046	꽃	botanical	faith.candle;faith.altar	not-slot-validated
+proposed:item:0046-02	proposed:source:0046	줄기	botanical	faith.candle;faith.altar	not-slot-validated
+proposed:item:0047-01	proposed:source:0047	자실체	fungal	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0048-01	proposed:source:0048	벌꿀	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;faith.candle;faith.altar	not-slot-validated
+proposed:item:0048-02	proposed:source:0048	밀랍	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;faith.candle;faith.altar	not-slot-validated
+proposed:item:0049-01	proposed:source:0049	특수 비늘	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0049-02	proposed:source:0049	털	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0050-01	proposed:source:0050	꼬투리	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0050-02	proposed:source:0050	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0051-01	proposed:source:0051	시간성 모래	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0052-01	proposed:source:0052	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0052-02	proposed:source:0052	수피	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0053-01	proposed:source:0053	금속 조각	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0053-02	proposed:source:0053	목재	wood	research.display-unmodeled	not-slot-validated
+proposed:item:0054-01	proposed:source:0054	방연석	unclassified	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0055-01	proposed:source:0055	유리 조각	relic-or-artifact	research.display-unmodeled	not-slot-validated
+proposed:item:0056-01	proposed:source:0056	돌판	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0057-01	proposed:source:0057	목질	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0057-02	proposed:source:0057	씨앗	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0058-01	proposed:source:0058	철못	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0059-01	proposed:source:0059	철제 사슬	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0060-01	proposed:source:0060	얼음	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0061-01	proposed:source:0061	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0061-02	proposed:source:0061	수피	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0062-01	proposed:source:0062	자실체	fungal	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0063-01	proposed:source:0063	점토질 흙	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0064-01	proposed:source:0064	자실체	fungal	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0064-02	proposed:source:0064	포자	fungal	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0065-01	proposed:source:0065	섬유	fiber	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0065-02	proposed:source:0065	뿌리	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0066-01	proposed:source:0066	잎몸	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0066-02	proposed:source:0066	엽체	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0067-01	proposed:source:0067	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0067-02	proposed:source:0067	수액	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0067-03	proposed:source:0067	씨앗	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0068-01	proposed:source:0068	발광 잎몸	botanical	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0069-01	proposed:source:0069	잎	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;special.glow;special.echo;special.study	not-slot-validated
+proposed:item:0069-02	proposed:source:0069	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;special.glow;special.echo;special.study	not-slot-validated
+proposed:item:0069-03	proposed:source:0069	수액	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;special.glow;special.echo;special.study	not-slot-validated
+proposed:item:0070-01	proposed:source:0070	알	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0070-02	proposed:source:0070	고기	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0071-01	proposed:source:0071	덩굴	unclassified	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0071-02	proposed:source:0071	잎	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0072-01	proposed:source:0072	뿌리	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0072-02	proposed:source:0072	잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0073-01	proposed:source:0073	줄기	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0073-02	proposed:source:0073	씨앗	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0074-01	proposed:source:0074	대추	unclassified	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0074-02	proposed:source:0074	잎	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0074-03	proposed:source:0074	목질	wood	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0074-04	proposed:source:0074	열매	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0075-01	proposed:source:0075	비늘	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0075-02	proposed:source:0075	생태 관찰	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0076-01	proposed:source:0076	도기 파편	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0077-01	proposed:source:0077	새우	animal-or-marine	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0077-02	proposed:source:0077	껍질	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0078-01	proposed:source:0078	자실체	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0079-01	proposed:source:0079	고치	fiber	research.display-unmodeled	not-slot-validated
+proposed:item:0079-02	proposed:source:0079	비단	fiber	research.display-unmodeled	not-slot-validated
+proposed:item:0080-01	proposed:source:0080	점토	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0081-01	proposed:source:0081	탄산염 결정	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0082-01	proposed:source:0082	석고	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0083-01	proposed:source:0083	주화	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0084-01	proposed:source:0084	문자 파편	relic-or-artifact	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0085-01	proposed:source:0085	유리질 파편	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0086-01	proposed:source:0086	자실체	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0087-01	proposed:source:0087	풀섬유	fiber	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0087-02	proposed:source:0087	풀잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0088-01	proposed:source:0088	발광 조직	unclassified	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0089-01	proposed:source:0089	꽃	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0089-02	proposed:source:0089	줄기	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0090-01	proposed:source:0090	구근	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0091-01	proposed:source:0091	꽃잎	botanical	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0091-02	proposed:source:0091	꽃가루	botanical	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0092-01	proposed:source:0092	자실체	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0092-02	proposed:source:0092	포자	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0093-01	proposed:source:0093	조갯살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0093-02	proposed:source:0093	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0094-01	proposed:source:0094	망간 함유 원료	unclassified	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0095-01	proposed:source:0095	고종자	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0096-01	proposed:source:0096	자실체	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0096-02	proposed:source:0096	색소	unclassified	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0097-01	proposed:source:0097	덩굴 섬유	fiber	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0098-01	proposed:source:0098	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0098-02	proposed:source:0098	뼈	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0098-03	proposed:source:0098	어육	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0099-01	proposed:source:0099	메밀알	animal-or-marine	research.display-unmodeled	not-slot-validated
+proposed:item:0100-01	proposed:source:0100	모래	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0101-01	proposed:source:0101	꽃	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0101-02	proposed:source:0101	뿌리	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0102-01	proposed:source:0102	꽃	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0102-02	proposed:source:0102	씨앗	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0103-01	proposed:source:0103	색석 타일	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0104-01	proposed:source:0104	자실체	fungal	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0105-01	proposed:source:0105	새김돌	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0106-01	proposed:source:0106	씨앗	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0106-02	proposed:source:0106	껍질	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0107-01	proposed:source:0107	이질적 광물 원료	mineral	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0108-01	proposed:source:0108	비정상 패각	animal-or-marine	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0109-01	proposed:source:0109	고기	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0109-02	proposed:source:0109	먹물	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0110-01	proposed:source:0110	이끼	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0110-02	proposed:source:0110	기록 흔적	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0111-01	proposed:source:0111	껍질	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0111-02	proposed:source:0111	진주 유사체	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0112-01	proposed:source:0112	줄기	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0112-02	proposed:source:0112	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0113-01	proposed:source:0113	열매	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0113-02	proposed:source:0113	종자	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0114-01	proposed:source:0114	잎	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0114-02	proposed:source:0114	수액	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0115-01	proposed:source:0115	꽃	botanical	fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0115-02	proposed:source:0115	씨앗	botanical	fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0116-01	proposed:source:0116	이끼	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0117-01	proposed:source:0117	줄기	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0117-02	proposed:source:0117	잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0118-01	proposed:source:0118	밀랍	unclassified	faith.candle;faith.altar	not-slot-validated
+proposed:item:0119-01	proposed:source:0119	잎몸	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0119-02	proposed:source:0119	엽체	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0120-01	proposed:source:0120	꽃	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0120-02	proposed:source:0120	잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0120-03	proposed:source:0120	뿌리	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0121-01	proposed:source:0121	살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0121-02	proposed:source:0121	갑각	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0122-01	proposed:source:0122	새우	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0122-02	proposed:source:0122	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0123-01	proposed:source:0123	살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0123-02	proposed:source:0123	패각	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0124-01	proposed:source:0124	곡물	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0124-02	proposed:source:0124	짚	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0125-01	proposed:source:0125	관찰 기록	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0126-01	proposed:source:0126	모래	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0126-02	proposed:source:0126	패각 부스러기	animal-or-marine	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0127-01	proposed:source:0127	광물성 꽃잎	botanical	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0128-01	proposed:source:0128	조갯살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0128-02	proposed:source:0128	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0129-01	proposed:source:0129	퇴적물	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0130-01	proposed:source:0130	관찰 기록	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0131-01	proposed:source:0131	밤	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0131-02	proposed:source:0131	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0132-01	proposed:source:0132	납 함유 광물	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0133-01	proposed:source:0133	방해석	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0134-01	proposed:source:0134	과실	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0134-02	proposed:source:0134	가지	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0134-03	proposed:source:0134	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0135-01	proposed:source:0135	꽃잎	botanical	special.glow;special.echo;special.study	not-slot-validated
+proposed:item:0136-01	proposed:source:0136	광물	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0137-01	proposed:source:0137	가지	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0137-02	proposed:source:0137	수피	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0137-03	proposed:source:0137	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0138-01	proposed:source:0138	가지	wood	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0139-01	proposed:source:0139	밀랍	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;faith.candle;faith.altar	not-slot-validated
+proposed:item:0139-02	proposed:source:0139	벌꿀	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;faith.candle;faith.altar	not-slot-validated
+proposed:item:0140-01	proposed:source:0140	벽돌	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0140-02	proposed:source:0140	석분	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0141-01	proposed:source:0141	과육	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0141-02	proposed:source:0141	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0141-03	proposed:source:0141	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0142-01	proposed:source:0142	곡물	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0142-02	proposed:source:0142	짚	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0143-01	proposed:source:0143	꽃가루	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0143-02	proposed:source:0143	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0144-01	proposed:source:0144	금속 사슬	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0145-01	proposed:source:0145	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0145-02	proposed:source:0145	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0146-01	proposed:source:0146	주화	relic-or-artifact	faith.candle;faith.altar	not-slot-validated
+proposed:item:0147-01	proposed:source:0147	곡물	botanical	faith.candle;faith.altar	not-slot-validated
+proposed:item:0148-01	proposed:source:0148	꽃다발	botanical	faith.candle;faith.altar	not-slot-validated
+proposed:item:0149-01	proposed:source:0149	꽃대	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0149-02	proposed:source:0149	잎	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0149-03	proposed:source:0149	솜털	unclassified	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0149-04	proposed:source:0149	줄기	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0150-01	proposed:source:0150	도기 조각	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0151-01	proposed:source:0151	다공성 석재	mineral	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;research.display-unmodeled	not-slot-validated
+proposed:item:0151-02	proposed:source:0151	암석	mineral	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;research.display-unmodeled	not-slot-validated
+proposed:item:0152-01	proposed:source:0152	잔가지	wood	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0152-02	proposed:source:0152	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0153-01	proposed:source:0153	목재 재	wood	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0154-01	proposed:source:0154	표본	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0155-01	proposed:source:0155	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0156-01	proposed:source:0156	열매	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0156-02	proposed:source:0156	묘목	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0157-01	proposed:source:0157	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0158-01	proposed:source:0158	얼음	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0159-01	proposed:source:0159	자갈	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0159-02	proposed:source:0159	석분	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0160-01	proposed:source:0160	빛 응집체	unclassified	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0161-01	proposed:source:0161	유골 관련 유물	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0162-01	proposed:source:0162	과실	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0162-02	proposed:source:0162	가지	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0162-03	proposed:source:0162	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0163-01	proposed:source:0163	갑각	animal-or-marine	research.display-unmodeled	not-slot-validated
+proposed:item:0164-01	proposed:source:0164	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0164-02	proposed:source:0164	수지	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0164-03	proposed:source:0164	씨앗	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0165-01	proposed:source:0165	외골격	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0165-02	proposed:source:0165	분비물 연구	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0166-01	proposed:source:0166	석재	mineral	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0167-01	proposed:source:0167	줄기	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0167-02	proposed:source:0167	잎	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0168-01	proposed:source:0168	열매	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0168-02	proposed:source:0168	묘목	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0169-01	proposed:source:0169	털	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0169-02	proposed:source:0169	고기	animal-or-marine	research.display-unmodeled	not-slot-validated
+proposed:item:0169-03	proposed:source:0169	가죽	animal-or-marine	research.display-unmodeled	not-slot-validated
+proposed:item:0169-04	proposed:source:0169	우유	animal-or-marine	research.display-unmodeled	not-slot-validated
+proposed:item:0170-01	proposed:source:0170	산호 골격	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0171-01	proposed:source:0171	새김 목판	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0172-01	proposed:source:0172	의식 안료	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0173-01	proposed:source:0173	새우	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0173-02	proposed:source:0173	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0174-01	proposed:source:0174	유리 조각	relic-or-artifact	research.display-unmodeled	not-slot-validated
+proposed:item:0175-01	proposed:source:0175	얼음성 결정	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0176-01	proposed:source:0176	꽃	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0176-02	proposed:source:0176	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0177-01	proposed:source:0177	석고	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;wood.plank;wood.box;wood.chair;wood.resin	not-slot-validated
+proposed:item:0177-02	proposed:source:0177	광물	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;wood.plank;wood.box;wood.chair;wood.resin	not-slot-validated
+proposed:item:0178-01	proposed:source:0178	석고	mineral	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0179-01	proposed:source:0179	주석 함유 광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0180-01	proposed:source:0180	수정 원석	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0181-01	proposed:source:0181	수정	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0182-01	proposed:source:0182	모래	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0183-01	proposed:source:0183	석재 조각	mineral	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0184-01	proposed:source:0184	석재	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0185-01	proposed:source:0185	석탄	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0186-01	proposed:source:0186	글자가 새겨진 판	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0187-01	proposed:source:0187	비문 조각	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0188-01	proposed:source:0188	탄산염 침전물	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0189-01	proposed:source:0189	과실	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;research.display-unmodeled	not-slot-validated
+proposed:item:0189-02	proposed:source:0189	줄기 섬유	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;research.display-unmodeled	not-slot-validated
+proposed:item:0189-03	proposed:source:0189	줄기	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;research.display-unmodeled	not-slot-validated
+proposed:item:0189-04	proposed:source:0189	열매	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;research.display-unmodeled	not-slot-validated
+proposed:item:0190-01	proposed:source:0190	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0191-01	proposed:source:0191	아연 함유 광물	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0192-01	proposed:source:0192	생식소	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0192-02	proposed:source:0192	가시	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0192-03	proposed:source:0192	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0192-04	proposed:source:0192	표본	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0193-01	proposed:source:0193	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0193-02	proposed:source:0193	씨앗	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0194-01	proposed:source:0194	통나무	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0194-02	proposed:source:0194	솔방울	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0194-03	proposed:source:0194	송진	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0195-01	proposed:source:0195	도기 조각	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0196-01	proposed:source:0196	자실체	fungal	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0196-02	proposed:source:0196	포자	fungal	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0197-01	proposed:source:0197	이끼	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0198-01	proposed:source:0198	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0198-02	proposed:source:0198	뼈	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0199-01	proposed:source:0199	발광 잎	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0199-02	proposed:source:0199	씨앗	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0200-01	proposed:source:0200	꽃	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0200-02	proposed:source:0200	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0201-01	proposed:source:0201	유리병	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0201-02	proposed:source:0201	기록물	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0202-01	proposed:source:0202	연체부	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0202-02	proposed:source:0202	껍질	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0203-01	proposed:source:0203	곡물	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0203-02	proposed:source:0203	줄기	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0204-01	proposed:source:0204	석영 결정	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0205-01	proposed:source:0205	털	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0205-02	proposed:source:0205	고기	animal-or-marine	research.display-unmodeled	not-slot-validated
+proposed:item:0205-03	proposed:source:0205	가죽	animal-or-marine	research.display-unmodeled	not-slot-validated
+proposed:item:0206-01	proposed:source:0206	이끼	botanical	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0206-02	proposed:source:0206	포자	fungal	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0207-01	proposed:source:0207	광맥 유리	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0208-01	proposed:source:0208	결정질 부산물	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0209-01	proposed:source:0209	고유 어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0210-01	proposed:source:0210	주기적 열을 띠는 돌	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0211-01	proposed:source:0211	특수 철광석	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0212-01	proposed:source:0212	자실체	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0213-01	proposed:source:0213	줄기	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0213-02	proposed:source:0213	잎	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0214-01	proposed:source:0214	잎	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0214-02	proposed:source:0214	줄기	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0215-01	proposed:source:0215	줄기	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0215-02	proposed:source:0215	씨앗	botanical	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0216-01	proposed:source:0216	알곡	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0216-02	proposed:source:0216	잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0217-01	proposed:source:0217	섬아연석	unclassified	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0218-01	proposed:source:0218	수지	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0219-01	proposed:source:0219	안료 시료	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0220-01	proposed:source:0220	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0220-02	proposed:source:0220	수액	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0221-01	proposed:source:0221	줄기	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0221-02	proposed:source:0221	잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0222-01	proposed:source:0222	소금 원료	mineral	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0222-02	proposed:source:0222	소금 광물	mineral	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0223-01	proposed:source:0223	암염	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0224-01	proposed:source:0224	자실체	fungal	relic.repair;relic.inscription;special.study;faith.candle;faith.altar	not-slot-validated
+proposed:item:0224-02	proposed:source:0224	포자	fungal	relic.repair;relic.inscription;special.study;faith.candle;faith.altar	not-slot-validated
+proposed:item:0225-01	proposed:source:0225	양털	fiber	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0225-02	proposed:source:0225	우유	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0225-03	proposed:source:0225	고기	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0225-04	proposed:source:0225	가죽	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0226-01	proposed:source:0226	잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0226-02	proposed:source:0226	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0227-01	proposed:source:0227	밀랍	unclassified	faith.candle;faith.altar;special.glow;special.echo;special.study	not-slot-validated
+proposed:item:0227-02	proposed:source:0227	심지	unclassified	faith.candle;faith.altar;special.glow;special.echo;special.study	not-slot-validated
+proposed:item:0228-01	proposed:source:0228	구근	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0229-01	proposed:source:0229	광물성 생체 잔재	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0230-01	proposed:source:0230	꽃	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0230-02	proposed:source:0230	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0231-01	proposed:source:0231	생물막 시료	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0232-01	proposed:source:0232	광물 침전물	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0233-01	proposed:source:0233	우유	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0233-02	proposed:source:0233	고기	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0233-03	proposed:source:0233	가죽	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0234-01	proposed:source:0234	소금	mineral	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0235-01	proposed:source:0235	유리병	relic-or-artifact	research.display-unmodeled	not-slot-validated
+proposed:item:0236-01	proposed:source:0236	토기	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0237-01	proposed:source:0237	목재 조각	wood	research.display-unmodeled;wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0237-02	proposed:source:0237	풍화 목재	wood	research.display-unmodeled;wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0238-01	proposed:source:0238	알	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0238-02	proposed:source:0238	고기	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0239-01	proposed:source:0239	고기	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0239-02	proposed:source:0239	먹물	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0239-03	proposed:source:0239	어육	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0240-01	proposed:source:0240	점토	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0241-01	proposed:source:0241	공명 광물판	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0242-01	proposed:source:0242	박편	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0243-01	proposed:source:0243	자실체	fungal	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0244-01	proposed:source:0244	공명 결정	mineral	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0245-01	proposed:source:0245	열매	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0246-01	proposed:source:0246	비물질성 섬유	fiber	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0247-01	proposed:source:0247	유리 조각	relic-or-artifact	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0248-01	proposed:source:0248	인양품	relic-or-artifact	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0249-01	proposed:source:0249	유리질 껍질	relic-or-artifact	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0250-01	proposed:source:0250	투명 패각	animal-or-marine	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0251-01	proposed:source:0251	황	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0252-01	proposed:source:0252	은 함유 원료	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0253-01	proposed:source:0253	곡물	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;faith.candle;faith.altar	not-slot-validated
+proposed:item:0253-02	proposed:source:0253	짚	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;faith.candle;faith.altar	not-slot-validated
+proposed:item:0254-01	proposed:source:0254	과실	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0254-02	proposed:source:0254	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0255-01	proposed:source:0255	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0255-02	proposed:source:0255	은빛 비늘	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0256-01	proposed:source:0256	석재	mineral	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0257-01	proposed:source:0257	금속 종	mineral	faith.candle;faith.altar;special.glow;special.echo;special.study	not-slot-validated
+proposed:item:0258-01	proposed:source:0258	직물	unclassified	faith.candle;faith.altar	not-slot-validated
+proposed:item:0259-01	proposed:source:0259	돌	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0259-02	proposed:source:0259	이끼	botanical	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0260-01	proposed:source:0260	결정	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0261-01	proposed:source:0261	꽃잎	botanical	relic.repair;relic.inscription;special.study;faith.candle;faith.altar	not-slot-validated
+proposed:item:0261-02	proposed:source:0261	가시	unclassified	relic.repair;relic.inscription;special.study;faith.candle;faith.altar	not-slot-validated
+proposed:item:0262-01	proposed:source:0262	이탄 덩어리	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0263-01	proposed:source:0263	목재 상자	wood	research.display-unmodeled	not-slot-validated
+proposed:item:0263-02	proposed:source:0263	잡화	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0264-01	proposed:source:0264	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0264-02	proposed:source:0264	뼈	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0265-01	proposed:source:0265	황	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0266-01	proposed:source:0266	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0266-02	proposed:source:0266	수피	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0266-03	proposed:source:0266	수액	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0267-01	proposed:source:0267	철 함유 광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0268-01	proposed:source:0268	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0268-02	proposed:source:0268	섬유	fiber	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0269-01	proposed:source:0269	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0269-02	proposed:source:0269	씨앗	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0270-01	proposed:source:0270	뿌리 유사체	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0271-01	proposed:source:0271	자실체	fungal	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0271-02	proposed:source:0271	포자	fungal	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0272-01	proposed:source:0272	잣	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0272-02	proposed:source:0272	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0273-01	proposed:source:0273	장석	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0274-01	proposed:source:0274	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0275-01	proposed:source:0275	균핵	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0275-02	proposed:source:0275	포자	fungal	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0276-01	proposed:source:0276	고열 꽃잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0277-01	proposed:source:0277	철 함유 광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0278-01	proposed:source:0278	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0278-02	proposed:source:0278	수지	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0279-01	proposed:source:0279	점토	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0280-01	proposed:source:0280	판석	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0281-01	proposed:source:0281	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0282-01	proposed:source:0282	향료	unclassified	faith.candle;faith.altar	not-slot-validated
+proposed:item:0283-01	proposed:source:0283	목재	wood	faith.candle;faith.altar	not-slot-validated
+proposed:item:0284-01	proposed:source:0284	석재 블록	mineral	faith.candle;faith.altar	not-slot-validated
+proposed:item:0285-01	proposed:source:0285	콩	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0285-02	proposed:source:0285	꼬투리	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0286-01	proposed:source:0286	열매	botanical	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0286-02	proposed:source:0286	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0287-01	proposed:source:0287	주석광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0288-01	proposed:source:0288	지의체	botanical	relic.repair;relic.inscription;special.study;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0289-01	proposed:source:0289	갑각	animal-or-marine	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0289-02	proposed:source:0289	살	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0290-01	proposed:source:0290	점토	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0291-01	proposed:source:0291	점토	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0292-01	proposed:source:0292	물	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0293-01	proposed:source:0293	조갯살	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0293-02	proposed:source:0293	진주 후보	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0294-01	proposed:source:0294	점질 토양	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0295-01	proposed:source:0295	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0295-02	proposed:source:0295	씨앗	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0296-01	proposed:source:0296	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0297-01	proposed:source:0297	통나무	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0297-02	proposed:source:0297	수피	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0297-03	proposed:source:0297	도토리	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0297-04	proposed:source:0297	수액	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0298-01	proposed:source:0298	어획물	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0299-01	proposed:source:0299	황	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0300-01	proposed:source:0300	고철	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0301-01	proposed:source:0301	철제 부속	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0302-01	proposed:source:0302	철광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0303-01	proposed:source:0303	철광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0304-01	proposed:source:0304	금속 부속	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0305-01	proposed:source:0305	청동 파편	relic-or-artifact	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0306-01	proposed:source:0306	어육	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0306-02	proposed:source:0306	비늘	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0307-01	proposed:source:0307	밀랍	unclassified	faith.candle;faith.altar	not-slot-validated
+proposed:item:0308-01	proposed:source:0308	고치 섬유	fiber	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0309-01	proposed:source:0309	금속 박편	mineral	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0310-01	proposed:source:0310	열매	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0311-01	proposed:source:0311	잎	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0311-02	proposed:source:0311	꽃	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0312-01	proposed:source:0312	고기	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0312-02	proposed:source:0312	가죽	animal-or-marine	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0313-01	proposed:source:0313	조체	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0314-01	proposed:source:0314	패각	animal-or-marine	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0314-02	proposed:source:0314	진주	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0315-01	proposed:source:0315	콩	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0315-02	proposed:source:0315	꼬투리	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0316-01	proposed:source:0316	패각 파편	animal-or-marine	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0317-01	proposed:source:0317	암석	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0318-01	proposed:source:0318	자실체	fungal	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0319-01	proposed:source:0319	나무 조각	relic-or-artifact	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0320-01	proposed:source:0320	공명 광편	unclassified	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0321-01	proposed:source:0321	암석	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0322-01	proposed:source:0322	해면 골격	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0323-01	proposed:source:0323	해면체	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0324-01	proposed:source:0324	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0324-02	proposed:source:0324	꽃	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;fungus.dried;fungus.ink;fish.ink	not-slot-validated
+proposed:item:0325-01	proposed:source:0325	해조체	animal-or-marine	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0326-01	proposed:source:0326	섬유	fiber	fiber.thread;fiber.rope;fiber.basket;fiber.fabric;fiber.net	not-slot-validated
+proposed:item:0327-01	proposed:source:0327	생체 관찰	observation	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0327-02	proposed:source:0327	교질	unclassified	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0328-01	proposed:source:0328	향목	wood	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0328-02	proposed:source:0328	수액	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0329-01	proposed:source:0329	현무암 블록	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;wood.plank;wood.box;wood.chair;wood.resin	not-slot-validated
+proposed:item:0329-02	proposed:source:0329	암석	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;wood.plank;wood.box;wood.chair;wood.resin	not-slot-validated
+proposed:item:0330-01	proposed:source:0330	붉은 잎	botanical	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0330-02	proposed:source:0330	뿌리	botanical	relic.repair;relic.inscription;special.study;special.glow;special.echo	not-slot-validated
+proposed:item:0331-01	proposed:source:0331	결정	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster;relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0332-01	proposed:source:0332	호두	unclassified	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0332-02	proposed:source:0332	목재	wood	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0333-01	proposed:source:0333	가지	wood	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0333-02	proposed:source:0333	잎	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0334-01	proposed:source:0334	곡물	botanical	research.display-unmodeled	not-slot-validated
+proposed:item:0334-02	proposed:source:0334	짚	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0335-01	proposed:source:0335	과육	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0335-02	proposed:source:0335	씨앗	botanical	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet	not-slot-validated
+proposed:item:0336-01	proposed:source:0336	조갯살	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0336-02	proposed:source:0336	껍질	unclassified	plant.flour;plant.oil;plant.jam;plant.bread;plant.feed;fish.fillet;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0337-01	proposed:source:0337	암석 블록	mineral	wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0338-01	proposed:source:0338	유리질 암편	relic-or-artifact	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0338-02	proposed:source:0338	유리질 암석	mineral	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0339-01	proposed:source:0339	화산재	unclassified	relic.repair;relic.inscription;special.study;wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0339-02	proposed:source:0339	재	unclassified	relic.repair;relic.inscription;special.study;wood.plank;wood.box;wood.chair;wood.resin;mineral.cutstone	not-slot-validated
+proposed:item:0340-01	proposed:source:0340	규화목	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0341-01	proposed:source:0341	구리 함유 광석	mineral	mineral.copper;mineral.iron;mineral.tin;mineral.bronze;mineral.pickaxe	not-slot-validated
+proposed:item:0342-01	proposed:source:0342	광물	mineral	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0343-01	proposed:source:0343	이끼	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0344-01	proposed:source:0344	지의류	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0345-01	proposed:source:0345	흑연	unclassified	mineral.cutstone;mineral.brick;mineral.glass;mineral.gem;mineral.plaster	not-slot-validated
+proposed:item:0346-01	proposed:source:0346	흑연	unclassified	research.display-unmodeled	not-slot-validated
+proposed:item:0347-01	proposed:source:0347	흑요석 파편	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0347-02	proposed:source:0347	유리질 암석	mineral	research.display-unmodeled	not-slot-validated
+proposed:item:0348-01	proposed:source:0348	이끼	botanical	relic.repair;relic.inscription;special.study	not-slot-validated
+proposed:item:0348-02	proposed:source:0348	포자	fungal	relic.repair;relic.inscription;special.study	not-slot-validated
