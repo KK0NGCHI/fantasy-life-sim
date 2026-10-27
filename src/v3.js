@@ -11,6 +11,7 @@ import {eligibleBotanicalObservations05A} from './botanical-lifecycle-05a.js';
 import {ACTIVITY_TABLES_05A} from './activity-tables-05a.js';
 import {RESOURCE_SPECIES_05A,CATALOG_ITEMS_05A} from './resource-catalog-05a.js';
 import {SOURCE_WORK_RULES_05A} from './resource-sites-05a.js';
+import {TREE_BYPRODUCTS_05M} from './tree-byproducts-05m.js';
 import {RESOURCES_05A,RESOURCE_MAP_05A,resourceAt05A} from './resources-05a.js';
 import {availableOriginInteractions} from './origin-interactions-04c.js';
 import {SPECIES,BACKGROUNDS} from './character-origin-04b.js';
@@ -328,6 +329,15 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      render();
     },'btn',row);
     bulk.disabled=updated.remaining===0;
+    if(def.activity==='logging'&&updated.remaining>0){
+     for(const byproduct of TREE_BYPRODUCTS_05M[def.id]??[]){
+      btn(byproduct.name+' 비파괴 채취',()=>{
+       if(!executeV2('resource.tree.byproduct',{nodeId,itemId:byproduct.itemId}))return render();
+       nextLog('수목 부산물',byproduct.name+' 1개 획득');
+       render();
+      },'btn',row);
+     }
+    }
    }
   }
   populate();
