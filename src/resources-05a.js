@@ -6,7 +6,7 @@ export const RESOURCES_05A=Object.freeze(RESOURCE_BALANCE_ROWS_05A.map(([key,nam
  materialOrigin:'mundane',traits:Object.freeze([])})));
 export const RESOURCE_MAP_05A=new Map(RESOURCES_05A.map(r=>[r.id,r]));
 export function createResourceNodes05A(){
- const counts={'wild-herb':18,mushroom:12,grass:20,'oak-log':18,'pine-log':14,stone:6,coal:3,'copper-ore':4,'iron-ore':3,'small-fish':3,carp:3,trout:3};
+ const counts={'wild-herb':18,mushroom:12,grass:20,'oak-log':18,'pine-log':14,'birch-log':10,'willow-log':10,stone:6,coal:3,'copper-ore':4,'iron-ore':3,'small-fish':3,carp:3,trout:3};
  return Object.fromEntries(RESOURCES_05A.flatMap(r=>Array.from({length:counts[r.id.split(':')[1]]},(_,i)=>{
   const id=r.id+':'+String(i+1).padStart(2,'0');
   return [id,{resourceId:r.id,remaining:r.capacity,progress:0,lastSecond:0,recoveryProgress:0,discovered:i<2,cycle:0}];
