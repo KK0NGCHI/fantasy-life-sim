@@ -616,7 +616,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  });
  const projected=()=>state.itemWorld.items
   .filter(item=>state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
-  .map(item=>({...templates.get(item.definitionId),id:item.id,qty:item.quantity}));
+  .map(item=>({...templates.get(item.definitionId),id:item.id,qty:item.quantity,condition:item.condition}));
  const current=()=>structuredClone(state);
  const validateLocalPosition=(reg,p)=>{const map=[...reg.maps.values()].find(m=>m.siteId===p.siteId&&m.floor===p.floor);return !!map&&p.x>=0&&p.y>=0&&p.x<map.width&&p.y<map.height&&!!reg.terrains.get(map.tiles[p.y]?.split(' ')[p.x])?.traversable};
  const replace=(candidate,expectedRevision=null)=>{
