@@ -191,70 +191,70 @@ rowId	sourceId	region	stage0Source	stage1Drop	stage2Processed	stage3Use	evidence
 0190	proposed:source:0275	화산지대	잿빛 균핵	균핵·포자	가공 공정 검토	내열 균류 연구 후보	v0.3
 0191	proposed:source:0210	화산지대	심장석	주기적 열을 띠는 돌	가공 공정 검토	난방·마력 연구 후보	v0.3
 0192	proposed:source:0241	화산지대	용암울림껍질	공명 광물판	가공 공정 검토	방열판 연구 후보	v0.3
-0193	proposed:source:0140	고대 유적	벽돌 잔해	see-v0.3-source	to-specify	to-specify	v0.3
-0194	proposed:source:0304	고대 유적	청동 부속	see-v0.3-source	to-specify	to-specify	v0.3
-0195	proposed:source:0301	고대 유적	철 못	see-v0.3-source	to-specify	to-specify	v0.3
-0196	proposed:source:0083	고대 유적	동전	see-v0.3-source	to-specify	to-specify	v0.3
-0197	proposed:source:0076	고대 유적	도자기 조각	see-v0.3-source	to-specify	to-specify	v0.3
-0198	proposed:source:0247	고대 유적	유리 파편	see-v0.3-source	to-specify	to-specify	v0.3
-0199	proposed:source:0186	고대 유적	석판	see-v0.3-source	to-specify	to-specify	v0.3
-0200	proposed:source:0015	고대 유적	고대 목재	see-v0.3-source	to-specify	to-specify	v0.3
-0201	proposed:source:0095	고대 유적	매몰 씨앗	see-v0.3-source	to-specify	to-specify	v0.3
-0202	proposed:source:0027	고대 유적	광물 안료	see-v0.3-source	to-specify	to-specify	v0.3
-0203	proposed:source:0183	고대 유적	석재 기둥	see-v0.3-source	to-specify	to-specify	v0.3
-0204	proposed:source:0144	고대 유적	봉인 사슬	see-v0.3-source	to-specify	to-specify	v0.3
-0205	proposed:source:0110	고대 유적	문자먹는 이끼	see-v0.3-source	to-specify	to-specify	v0.3
-0206	proposed:source:0085	고대 유적	되감긴 유리	see-v0.3-source	to-specify	to-specify	v0.3
-0207	proposed:source:0145	고대 유적	봉인씨앗	see-v0.3-source	to-specify	to-specify	v0.3
-0208	proposed:source:0040	고대 유적	기억 부스러기	see-v0.3-source	to-specify	to-specify	v0.3
-0209	proposed:source:0237	폐허·묘지	오래된 목재	see-v0.3-source	to-specify	to-specify	v0.3
-0210	proposed:source:0300	폐허·묘지	철 고철	see-v0.3-source	to-specify	to-specify	v0.3
-0211	proposed:source:0235	폐허·묘지	옛 유리병	see-v0.3-source	to-specify	to-specify	v0.3
-0212	proposed:source:0321	폐허·묘지	풍화된 석재	see-v0.3-source	to-specify	to-specify	v0.3
-0213	proposed:source:0105	폐허·묘지	묘비 파편	see-v0.3-source	to-specify	to-specify	v0.3
-0214	proposed:source:0023	폐허·묘지	고서 조각	see-v0.3-source	to-specify	to-specify	v0.3
-0215	proposed:source:0343	폐허·묘지	황폐지 이끼	see-v0.3-source	to-specify	to-specify	v0.3
-0216	proposed:source:0096	폐허·묘지	먹물버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0217	proposed:source:0161	폐허·묘지	뼈 조각	see-v0.3-source	to-specify	to-specify	v0.3
-0218	proposed:source:0059	폐허·묘지	녹슨 사슬	see-v0.3-source	to-specify	to-specify	v0.3
-0219	proposed:source:0056	폐허·묘지	납작돌	see-v0.3-source	to-specify	to-specify	v0.3
-0220	proposed:source:0097	폐허·묘지	먼지 덩굴	see-v0.3-source	to-specify	to-specify	v0.3
-0221	proposed:source:0330	폐허·묘지	혈맥초	see-v0.3-source	to-specify	to-specify	v0.3
-0222	proposed:source:0261	폐허·묘지	이름없는 장미	see-v0.3-source	to-specify	to-specify	v0.3
-0223	proposed:source:0224	폐허·묘지	애도의 버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0224	proposed:source:0246	폐허·묘지	유령실	see-v0.3-source	to-specify	to-specify	v0.3
-0225	proposed:source:0148	만신전	봉헌용 꽃	see-v0.3-source	to-specify	to-specify	v0.3
-0226	proposed:source:0282	만신전	정제 향료	see-v0.3-source	to-specify	to-specify	v0.3
-0227	proposed:source:0227	만신전	양초	see-v0.3-source	to-specify	to-specify	v0.3
-0228	proposed:source:0284	만신전	제단용 석재	see-v0.3-source	to-specify	to-specify	v0.3
-0229	proposed:source:0174	만신전	색유리	see-v0.3-source	to-specify	to-specify	v0.3
-0230	proposed:source:0258	만신전	의식용 천	see-v0.3-source	to-specify	to-specify	v0.3
-0231	proposed:source:0171	만신전	상징 목판	see-v0.3-source	to-specify	to-specify	v0.3
-0232	proposed:source:0014	만신전	고대 기록 파편	see-v0.3-source	to-specify	to-specify	v0.3
-0233	proposed:source:0146	만신전	봉헌 동전	see-v0.3-source	to-specify	to-specify	v0.3
-0234	proposed:source:0257	만신전	의례 종	see-v0.3-source	to-specify	to-specify	v0.3
-0235	proposed:source:0307	만신전	촛농 잔여	see-v0.3-source	to-specify	to-specify	v0.3
-0236	proposed:source:0153	만신전	분향재	see-v0.3-source	to-specify	to-specify	v0.3
-0237	proposed:source:0037	만신전	기도의 결정	see-v0.3-source	to-specify	to-specify	v0.3
-0238	proposed:source:0160	만신전	빛결실	see-v0.3-source	to-specify	to-specify	v0.3
-0239	proposed:source:0309	만신전	침묵의 금박	see-v0.3-source	to-specify	to-specify	v0.3
-0240	proposed:source:0172	만신전	새벽기록 잉크	see-v0.3-source	to-specify	to-specify	v0.3
-0241	proposed:source:0078	지하미궁	동굴 버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0242	proposed:source:0129	지하미궁	박쥐 구아노	see-v0.3-source	to-specify	to-specify	v0.3
-0243	proposed:source:0188	지하미궁	석회동굴 석순	see-v0.3-source	to-specify	to-specify	v0.3
-0244	proposed:source:0181	지하미궁	석영 결정	see-v0.3-source	to-specify	to-specify	v0.3
-0245	proposed:source:0080	지하미궁	동굴 점토	see-v0.3-source	to-specify	to-specify	v0.3
-0246	proposed:source:0292	지하미궁	지하수	see-v0.3-source	to-specify	to-specify	v0.3
-0247	proposed:source:0302	지하미궁	철 함유 암석	see-v0.3-source	to-specify	to-specify	v0.3
-0248	proposed:source:0251	지하미궁	유황 침전물	see-v0.3-source	to-specify	to-specify	v0.3
-0249	proposed:source:0094	지하미궁	망간 광물	see-v0.3-source	to-specify	to-specify	v0.3
-0250	proposed:source:0013	지하미궁	결정질 이끼	see-v0.3-source	to-specify	to-specify	v0.3
-0251	proposed:source:0077	지하미궁	동굴 민물새우	see-v0.3-source	to-specify	to-specify	v0.3
-0252	proposed:source:0236	지하미궁	오래된 도기	see-v0.3-source	to-specify	to-specify	v0.3
-0253	proposed:source:0196	지하미궁	속삭임균	see-v0.3-source	to-specify	to-specify	v0.3
-0254	proposed:source:0025	지하미궁	공허근목	see-v0.3-source	to-specify	to-specify	v0.3
-0255	proposed:source:0107	지하미궁	무저광석	see-v0.3-source	to-specify	to-specify	v0.3
-0256	proposed:source:0260	지하미궁	이름없는 결정	see-v0.3-source	to-specify	to-specify	v0.3
+0193	proposed:source:0140	고대 유적	벽돌 잔해	벽돌·석분	가공 공정 검토	복원·건축	v0.3
+0194	proposed:source:0304	고대 유적	청동 부속	금속 부속	가공 공정 검토	복원·재활용	v0.3
+0195	proposed:source:0301	고대 유적	철 못	철제 부속	가공 공정 검토	재활용·수리	v0.3
+0196	proposed:source:0083	고대 유적	동전	주화	가공 공정 검토	교역·연구	v0.3
+0197	proposed:source:0076	고대 유적	도자기 조각	도기 파편	가공 공정 검토	복원·연구	v0.3
+0198	proposed:source:0247	고대 유적	유리 파편	유리 조각	가공 공정 검토	유리 공예	v0.3
+0199	proposed:source:0186	고대 유적	석판	글자가 새겨진 판	가공 공정 검토	연구·기록	v0.3
+0200	proposed:source:0015	고대 유적	고대 목재	목재 조각	가공 공정 검토	복원·목공	v0.3
+0201	proposed:source:0095	고대 유적	매몰 씨앗	고종자	가공 공정 검토	재배 연구	v0.3
+0202	proposed:source:0027	고대 유적	광물 안료	색소 광물	가공 공정 검토	복원·장식	v0.3
+0203	proposed:source:0183	고대 유적	석재 기둥	석재 조각	가공 공정 검토	건축·복원	v0.3
+0204	proposed:source:0144	고대 유적	봉인 사슬	금속 사슬	가공 공정 검토	연구·재활용	v0.3
+0205	proposed:source:0110	고대 유적	문자먹는 이끼	이끼·기록 흔적	가공 공정 검토	기록·연구 후보	v0.3
+0206	proposed:source:0085	고대 유적	되감긴 유리	유리질 파편	가공 공정 검토	광학 연구 후보	v0.3
+0207	proposed:source:0145	고대 유적	봉인씨앗	씨앗·껍질	가공 공정 검토	재배·유물 연구 후보	v0.3
+0208	proposed:source:0040	고대 유적	기억 부스러기	고유 파편	가공 공정 검토	꿈·기록 연구 후보	v0.3
+0209	proposed:source:0237	폐허·묘지	오래된 목재	목재 조각	가공 공정 검토	재활용	v0.3
+0210	proposed:source:0300	폐허·묘지	철 고철	고철	가공 공정 검토	금속 회수	v0.3
+0211	proposed:source:0235	폐허·묘지	옛 유리병	유리병	가공 공정 검토	수리·보관	v0.3
+0212	proposed:source:0321	폐허·묘지	풍화된 석재	암석	가공 공정 검토	석공	v0.3
+0213	proposed:source:0105	폐허·묘지	묘비 파편	새김돌	가공 공정 검토	기록·복원	v0.3
+0214	proposed:source:0023	폐허·묘지	고서 조각	종이·기록	가공 공정 검토	연구·복구	v0.3
+0215	proposed:source:0343	폐허·묘지	황폐지 이끼	이끼	가공 공정 검토	생태 연구	v0.3
+0216	proposed:source:0096	폐허·묘지	먹물버섯	자실체	가공 공정 검토	안료 연구	v0.3
+0217	proposed:source:0161	폐허·묘지	뼈 조각	유골 관련 유물	가공 공정 검토	연구·윤리 판정	v0.3
+0218	proposed:source:0059	폐허·묘지	녹슨 사슬	철제 사슬	가공 공정 검토	회수·수리	v0.3
+0219	proposed:source:0056	폐허·묘지	납작돌	돌판	가공 공정 검토	묘지 복원	v0.3
+0220	proposed:source:0097	폐허·묘지	먼지 덩굴	덩굴 섬유	가공 공정 검토	직조·생태	v0.3
+0221	proposed:source:0330	폐허·묘지	혈맥초	붉은 잎·뿌리	가공 공정 검토	혈액 마법 연구 후보	v0.3
+0222	proposed:source:0261	폐허·묘지	이름없는 장미	꽃잎·가시	가공 공정 검토	추모·연구 후보	v0.3
+0223	proposed:source:0224	폐허·묘지	애도의 버섯	자실체·포자	가공 공정 검토	추모 의식 연구 후보	v0.3
+0224	proposed:source:0246	폐허·묘지	유령실	비물질성 섬유	가공 공정 검토	공예·연구 후보	v0.3
+0225	proposed:source:0148	만신전	봉헌용 꽃	꽃다발	가공 공정 검토	봉헌·장식	v0.3
+0226	proposed:source:0282	만신전	정제 향료	향료	가공 공정 검토	봉헌·의식	v0.3
+0227	proposed:source:0227	만신전	양초	밀랍·심지	가공 공정 검토	의식·광원	v0.3
+0228	proposed:source:0284	만신전	제단용 석재	석재 블록	가공 공정 검토	개인 제단 제작	v0.3
+0229	proposed:source:0174	만신전	색유리	유리 조각	가공 공정 검토	창호·장식	v0.3
+0230	proposed:source:0258	만신전	의식용 천	직물	가공 공정 검토	의식·장식	v0.3
+0231	proposed:source:0171	만신전	상징 목판	새김 목판	가공 공정 검토	서약·기록	v0.3
+0232	proposed:source:0014	만신전	고대 기록 파편	석판 조각	가공 공정 검토	신앙 연구	v0.3
+0233	proposed:source:0146	만신전	봉헌 동전	주화	가공 공정 검토	봉헌·교역	v0.3
+0234	proposed:source:0257	만신전	의례 종	금속 종	가공 공정 검토	의식·음향	v0.3
+0235	proposed:source:0307	만신전	촛농 잔여	밀랍	가공 공정 검토	재활용·양초	v0.3
+0236	proposed:source:0153	만신전	분향재	목재 재	가공 공정 검토	향 연구	v0.3
+0237	proposed:source:0037	만신전	기도의 결정	의례 부산물	가공 공정 검토	신앙 연구 후보	v0.3
+0238	proposed:source:0160	만신전	빛결실	빛 응집체	가공 공정 검토	광원·연구 후보	v0.3
+0239	proposed:source:0309	만신전	침묵의 금박	금속 박편	가공 공정 검토	장식·금기 연구 후보	v0.3
+0240	proposed:source:0172	만신전	새벽기록 잉크	의식 안료	가공 공정 검토	기록·공예 후보	v0.3
+0241	proposed:source:0078	지하미궁	동굴 버섯	자실체	가공 공정 검토	균류 연구	v0.3
+0242	proposed:source:0129	지하미궁	박쥐 구아노	퇴적물	가공 공정 검토	비료 연구	v0.3
+0243	proposed:source:0188	지하미궁	석회동굴 석순	탄산염 침전물	가공 공정 검토	지질 연구	v0.3
+0244	proposed:source:0181	지하미궁	석영 결정	수정	가공 공정 검토	세공	v0.3
+0245	proposed:source:0080	지하미궁	동굴 점토	점토	가공 공정 검토	도자기	v0.3
+0246	proposed:source:0292	지하미궁	지하수	물	가공 공정 검토	생활·연금술	v0.3
+0247	proposed:source:0302	지하미궁	철 함유 암석	철광석	가공 공정 검토	제련	v0.3
+0248	proposed:source:0251	지하미궁	유황 침전물	황	가공 공정 검토	연금술	v0.3
+0249	proposed:source:0094	지하미궁	망간 광물	망간 함유 원료	가공 공정 검토	합금 연구	v0.3
+0250	proposed:source:0013	지하미궁	결정질 이끼	이끼	가공 공정 검토	광원 연구	v0.3
+0251	proposed:source:0077	지하미궁	동굴 민물새우	새우·껍질	가공 공정 검토	생태·식재료 검토	v0.3
+0252	proposed:source:0236	지하미궁	오래된 도기	토기	가공 공정 검토	유물·연구	v0.3
+0253	proposed:source:0196	지하미궁	속삭임균	자실체·포자	가공 공정 검토	정신계 연구 후보	v0.3
+0254	proposed:source:0025	지하미궁	공허근목	뿌리·목질	가공 공정 검토	목공·금기 연구 후보	v0.3
+0255	proposed:source:0107	지하미궁	무저광석	이질적 광물 원료	가공 공정 검토	장비 제작 금기 연구 후보	v0.3
+0256	proposed:source:0260	지하미궁	이름없는 결정	결정	가공 공정 검토	도감·기억 연구 후보	v0.3
 0257	proposed:source:0332	거점 마을	호두나무	호두·목재	견과 선별·판재	식품·가구	v0.4
 0258	proposed:source:0072	거점 마을	당근	뿌리·잎	손질 채소	요리·사료	v0.4
 0259	proposed:source:0228	거점 마을	양파	구근	건조 향신채	요리	v0.4
