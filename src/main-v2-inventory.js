@@ -1,3 +1,4 @@
+import {craftBatch1} from './crafting-batch-stage1.js';
 import {TREE_BYPRODUCT_ITEMS_05M,takeTreeByproduct05M} from './tree-byproducts-05m.js';
 import {creditOwnedResource05A} from './resource-credit-05a.js';
 import {creditMineralOutputs05E} from './mineral-credit-05e.js';
@@ -292,6 +293,15 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,rng:draw.rng,itemWorld,
    world:{...snapshot.world,runtime:{...runtime,resource05A:{...runtime.resource05A,mineralDeposits05E:attempt.deposits}}}},
    events:[{type:'mineral.assemblage.extracted',payload:{siteIds:command.payload.siteIds,outputs:attempt.outputs,remainingBySite:attempt.remainingBySite}}]};
+ }],
+ ['craft.batch',(snapshot,command)=>{
+  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을')
+   throw Error('WORKSTATION_REQUIRED');
+  const result=craftBatch1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,command.payload?.count);
+  if(!result.ok)throw Error(result.reason);
+  return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
+   events:[{type:'craft.batch_completed',payload:{recipeId:result.recipe.id,count:result.count,
+    outputId:result.recipe.output,quantity:result.recipe.outputQty*result.count}}]};
  }],
  ['mineral.refine',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon)throw Error('REFINING_UNAVAILABLE');
@@ -589,6 +599,11 @@ export function createMainV2Inventory(uiItems,options={}) {
     if(action.type==='mineral.prospect')return {turns:1,worldUnits:600};
     if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
     if(action.type==='mineral.refine')return {turns:1,worldUnits:REFINING_BY_ID_05H.get(action.payload?.recipeId)?.seconds??300};
+    if(action.type==='craft.batch'){
+     const recipe=REFINING_BY_ID_05H.get(action.payload?.recipeId),count=action.payload?.count;
+     if(!recipe||!Number.isSafeInteger(count)||count<1||count>20)throw Error('INVALID_BATCH_COUNT');
+     return {turns:count,worldUnits:recipe.seconds*count};
+    }
     if(action.type==='mineral.assemblage.extract')return {turns:1,worldUnits:180};
     if(action.type==='botanical.patch.harvest')return {turns:1,worldUnits:60};
     if(action.type==='botanical.observe')return {turns:1,worldUnits:600};
