@@ -25,7 +25,8 @@ test('source and region restrictions block harvesting',()=>{
  assert.equal(takeTreeByproduct05M(nodes,{},'resource05a:oak-log:03','item05m:oak-acorn','숲',0,RESOURCE_MAP_05A).reason,'UNDISCOVERED');
 });
 test('live dispatcher grants byproduct without reducing timber stock',()=>{
- const g=make();const before=g.current();const nodeId='resource05a:oak-log:01';
+ const g=make();assert.equal(g.dispatch('world.travel',{region:'숲'}).accepted,true);
+ const before=g.current();const nodeId='resource05a:oak-log:01';
  const call=g.dispatch('resource.tree.byproduct',{nodeId,itemId:'item05m:oak-acorn'});
  assert.equal(call.accepted,true,JSON.stringify(call));
  const after=g.current();
