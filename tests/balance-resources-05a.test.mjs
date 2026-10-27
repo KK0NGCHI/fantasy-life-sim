@@ -6,11 +6,12 @@ import {RESOURCES_05A,RESOURCE_MAP_05A,createResourceNodes05A,resourceAt05A} fro
 test('provisional resource tuning extraction preserves all twelve original values and validates two new tree rows',()=>{
  const expected={
  'wild-herb':[5,3,7],'mushroom':[4,4,9],'grass':[8,2,3],
+ reed:[5,3,6],flax:[5,4,7],nettle:[5,3,7],
  'oak-log':[5,18,30],'pine-log':[4,14,24],'birch-log':[4,16,25],'willow-log':[4,12,23],
  stone:[12,2,3],coal:[10,0,8],'copper-ore':[12,0,8],'iron-ore':[10,0,11],
  'small-fish':[12,2,10],carp:[8,4,13],trout:[6,5,16]};
- assert.equal(RESOURCE_BALANCE_ROWS_05A.length,14);
- assert.equal(RESOURCES_05A.length,14);
+ assert.equal(RESOURCE_BALANCE_ROWS_05A.length,17);
+ assert.equal(RESOURCES_05A.length,17);
  for(const row of RESOURCE_BALANCE_ROWS_05A){
   assert.ok(Object.isFrozen(row));
   const [key,name,activity,region,capacity,regenDays,xp]=row;
