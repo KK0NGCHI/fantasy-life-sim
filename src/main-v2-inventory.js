@@ -297,7 +297,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  ['craft.batch',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을')
    throw Error('WORKSTATION_REQUIRED');
-  const result=craftBatch1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,command.payload?.count);
+  const result=craftBatch1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,command.payload?.count,command.payload?.choices??{});
   if(!result.ok)throw Error(result.reason);
   return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
    events:[{type:'craft.batch_completed',payload:{recipeId:result.recipe.id,count:result.count,
