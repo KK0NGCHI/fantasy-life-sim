@@ -14,7 +14,7 @@ function withItems(lines){
  const g=make(),saveV2=createSaveV2(g.current(),meta,'test',g.registry),v3=prepareSecondsV2ToV3(saveV2,g.registry);
  assert.equal(v3.ok,true);
  const save=createSaveV3(v3.state,meta,'test',g.registry);
- const items=w(lines);save.state.itemWorld={...save.state.itemWorld,items:[...save.state.itemWorld.items,...items.items],placements:[...save.state.itemWorld.placements,...items.placements]};
+ const items=w(lines);save.state.itemWorld={...save.state.itemWorld,items:[...save.state.itemWorld.items,...items.items],placements:[...save.state.itemWorld.placements,...items.placements.map(p=>({...p,location:{...p.location,ownerId:save.state.player.id}}))]};
  const loaded=make();loaded.applyApprovedSave(save);return loaded;
 }
 test('generic wood preview recognizes actual plank type, not accidental exact-ID check',()=>{
