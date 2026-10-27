@@ -1,3 +1,4 @@
+import {craftWithAllocatedMaterials} from './material-crafting-05k.js';
 /** 05-H pilot mineral processing; deterministic and independent of geology/save layers.
  * This is an intentionally small crafting bridge, not a metallurgical simulation.
  */
@@ -30,37 +31,11 @@ export const REFINED_ITEMS_05H=Object.freeze([
  {id:'item05h:oak-planks',name:'참나무 판재',family:'processed_wood'},
  {id:'item05h:bronze-ingot',name:'청동 주괴',family:'processed_metal'}
 ]);
+/** Legacy 05-H/I dispatcher API; now shares the 05-J allocator through 05-K.
+ * All existing exact-ID recipes, output IDs, and station/duration metadata stay unchanged.
+ */
 export function refineMineral05H(itemWorld,ownerId,recipeId){
  const recipe=REFINING_BY_ID_05H.get(recipeId);
  if(!recipe)return {ok:false,reason:'UNKNOWN_RECIPE'};
- const requirements=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
- let items=itemWorld.items;
- for(const req of requirements){
-  const owned=items.filter(item=>item.definitionId===req.itemId&&item.quantity>0&&
-   itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===ownerId));
-  if(owned.reduce((n,item)=>n+item.quantity,0)<req.quantity)return {ok:false,reason:'INSUFFICIENT_MATERIAL'};
- }
- // All material availability was checked before changing any item instance.
- for(const req of requirements){
-  let needed=req.quantity;
-  items=items.map(item=>{
-   if(needed===0||item.definitionId!==req.itemId||!itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===ownerId))return item;
-   const used=Math.min(needed,item.quantity);needed-=used;
-   return {...item,quantity:item.quantity-used};
-  });
- }
- const exhausted=new Set(items.filter(item=>item.quantity===0).map(item=>item.id));
- items=items.filter(item=>item.quantity>0);
- const retainedPlacements=itemWorld.placements.filter(p=>!exhausted.has(p.itemId));
- const outputId='refined05h:'+recipe.output;
- const prev=items.find(item=>item.id===outputId);
- if(prev){
-  if(prev.definitionId!==recipe.output||
-   !retainedPlacements.some(p=>p.itemId===outputId&&p.location.kind==='inventory'&&p.location.ownerId===ownerId))
-   return {ok:false,reason:'OUTPUT_NOT_OWNED'};
-  if(!Number.isSafeInteger(prev.quantity+recipe.outputQty))return {ok:false,reason:'OUTPUT_OVERFLOW'};
-  items=items.map(item=>item.id===outputId?{...item,quantity:item.quantity+recipe.outputQty}:item);
- }else items=[...items,{id:outputId,definitionId:recipe.output,quantity:recipe.outputQty}];
- const placements=prev?retainedPlacements:[...retainedPlacements,{itemId:outputId,location:{kind:'inventory',ownerId}}];
- return {ok:true,itemWorld:{...itemWorld,items,placements},recipe};
+ return craftWithAllocatedMaterials(itemWorld,ownerId,recipe);
 }
