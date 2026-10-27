@@ -1,0 +1,129 @@
+rowId	region	realm	source	drops	processing	uses	status
+r04-01-01	거점 마을	reality-candidate	호두나무	호두·목재	견과 선별·판재	식품·가구	candidate-unapproved
+r04-01-02	거점 마을	reality-candidate	당근	뿌리·잎	손질 채소	요리·사료	candidate-unapproved
+r04-01-03	거점 마을	reality-candidate	양파	구근	건조 향신채	요리	candidate-unapproved
+r04-01-04	거점 마을	reality-candidate	마늘	구근	건조 향신채	요리	candidate-unapproved
+r04-01-05	거점 마을	reality-candidate	염소	우유·고기·가죽	유제품·피혁	요리·의류	candidate-unapproved
+r04-01-06	거점 마을	reality-candidate	오리	알·고기	식재료 손질	요리·부화	candidate-unapproved
+r04-01-07	거점 마을	reality-candidate	버드나무 공방	가지	엮음재	바구니	candidate-unapproved
+r04-01-08	거점 마을	fantasy	종소리콩	콩·꼬투리	향미 분말	축제 요리	candidate-unapproved
+r04-02-01	초원·농경지	reality-candidate	알팔파	줄기·잎	건초	초식 사료	candidate-unapproved
+r04-02-02	초원·농경지	reality-candidate	메밀	메밀알	메밀가루	면·죽	candidate-unapproved
+r04-02-03	초원·농경지	reality-candidate	참깨	씨앗	식물성 기름	요리	candidate-unapproved
+r04-02-04	초원·농경지	reality-candidate	아마란스	알곡·잎	가루·건조 잎	요리	candidate-unapproved
+r04-02-05	초원·농경지	reality-candidate	서양톱풀	꽃·잎	건조 표본	약학 연구	candidate-unapproved
+r04-02-06	초원·농경지	reality-candidate	꿀벌	벌꿀·밀랍	정제 밀랍	음식·양초	candidate-unapproved
+r04-02-07	초원·농경지	reality-candidate	토끼	고기·가죽	피혁	요리·의류	candidate-unapproved
+r04-02-08	초원·농경지	fantasy	봄구름풀	꽃가루·잎	부유성 섬유	장식 연구	candidate-unapproved
+r04-03-01	숲	reality-candidate	고사리	어린 순·잎	표본	생태 연구	candidate-unapproved
+r04-03-02	숲	reality-candidate	담쟁이덩굴	덩굴·잎	엮음재	끈·장식	candidate-unapproved
+r04-03-03	숲	reality-candidate	잣나무	잣·목재	견과·판재	요리·목공	candidate-unapproved
+r04-03-04	숲	reality-candidate	호랑가시나무	가지·잎	목재 장식	장식·도감	candidate-unapproved
+r04-03-05	숲	reality-candidate	솔이끼	이끼	건조 기질	원예	candidate-unapproved
+r04-03-06	숲	reality-candidate	겨우살이	가지·열매	표본	생태 연구	candidate-unapproved
+r04-03-07	숲	reality-candidate	싸리버섯	자실체	균류 표본	균류 연구	candidate-unapproved
+r04-03-08	숲	fantasy	거울수피나무	수피·목재	반사 목판	장식·빛 연구	candidate-unapproved
+r04-04-01	강·호수	reality-candidate	수련	잎·꽃	식물 표본	장식·생태	candidate-unapproved
+r04-04-02	강·호수	reality-candidate	부들	솜털·줄기	엮음재	돗자리	candidate-unapproved
+r04-04-03	강·호수	reality-candidate	물밤	열매·종자	손질 과실	식재료 검토	candidate-unapproved
+r04-04-04	강·호수	reality-candidate	메기	어육·뼈	손질 어육	요리	candidate-unapproved
+r04-04-05	강·호수	reality-candidate	민물가재	살·갑각	정제 갑각	요리·공예	candidate-unapproved
+r04-04-06	강·호수	reality-candidate	민물조개	살·패각	분쇄 패각	세공·요리	candidate-unapproved
+r04-04-07	강·호수	reality-candidate	규조류 퇴적물	규조토	정제 분말	여과재	candidate-unapproved
+r04-04-08	강·호수	fantasy	잔향수초	잎·섬유	음향 섬유	낚시 도구 연구	candidate-unapproved
+r04-05-01	습지	reality-candidate	물미나리	줄기·잎	식물 표본	생태 연구	candidate-unapproved
+r04-05-02	습지	reality-candidate	사초	줄기·잎	엮음재	바구니	candidate-unapproved
+r04-05-03	습지	reality-candidate	진흙	점질 토양	점토 선별	도기	candidate-unapproved
+r04-05-04	습지	reality-candidate	물이끼	이끼	건조 기질	원예	candidate-unapproved
+r04-05-05	습지	reality-candidate	이탄	이탄 덩어리	건조 연료	연료	candidate-unapproved
+r04-05-06	습지	reality-candidate	버드나무	가지·수피	엮음재	직조	candidate-unapproved
+r04-05-07	습지	reality-candidate	먹물버섯	자실체·색소	안료 추출	기록·연구	candidate-unapproved
+r04-05-08	습지	fantasy	잠긴별버섯	자실체·포자	발광 안료	등불 연구	candidate-unapproved
+r04-06-01	산맥	reality-candidate	백운석	광물	내화 분말	세라믹	candidate-unapproved
+r04-06-02	산맥	reality-candidate	운모	박편	절연 박편	장식	candidate-unapproved
+r04-06-03	산맥	reality-candidate	흑연	흑연	분말·봉	필기·주형	candidate-unapproved
+r04-06-04	산맥	reality-candidate	장석	장석	분쇄 광물	유약	candidate-unapproved
+r04-06-05	산맥	reality-candidate	산양	우유·고기·가죽	유제품·피혁	생활	candidate-unapproved
+r04-06-06	산맥	reality-candidate	에델바이스	꽃·잎	압화	생태	candidate-unapproved
+r04-06-07	산맥	reality-candidate	고산 두송	열매·가지	향료 기질	장식	candidate-unapproved
+r04-06-08	산맥	fantasy	풍명석	공명 광편	공명판	탐지 연구	candidate-unapproved
+r04-07-01	광산	reality-candidate	갈철석	철 함유 광물	철 원료	제철 연구	candidate-unapproved
+r04-07-02	광산	reality-candidate	방연석	납 함유 광물	선광 시료	금속 연구	candidate-unapproved
+r04-07-03	광산	reality-candidate	섬아연석	아연 함유 광물	선광 시료	합금 연구	candidate-unapproved
+r04-07-04	광산	reality-candidate	황철석	광물	분쇄 표본	장식·연구	candidate-unapproved
+r04-07-05	광산	reality-candidate	형석	결정	절단 결정	세공	candidate-unapproved
+r04-07-06	광산	reality-candidate	석고	광물	석고 분말	건축	candidate-unapproved
+r04-07-07	광산	reality-candidate	암염	소금 광물	정제 소금	요리	candidate-unapproved
+r04-07-08	광산	fantasy	심맥유리	광맥 유리	안정화 판편	장식 연구	candidate-unapproved
+r04-08-01	설원	reality-candidate	가문비나무	목재·수지	판재·정제 수지	목공	candidate-unapproved
+r04-08-02	설원	reality-candidate	낙엽송	목재·수피	판재	목공	candidate-unapproved
+r04-08-03	설원	reality-candidate	북극버드나무	잔가지·잎	섬유 표본	생태	candidate-unapproved
+r04-08-04	설원	reality-candidate	크랜베리	열매	과실 가공	요리	candidate-unapproved
+r04-08-05	설원	reality-candidate	순록	고기·가죽	피혁	생활	candidate-unapproved
+r04-08-06	설원	reality-candidate	빙하 얼음	얼음	절단 얼음	냉각	candidate-unapproved
+r04-08-07	설원	reality-candidate	고산석영	결정	절단 수정	세공	candidate-unapproved
+r04-08-08	설원	fantasy	흰잠이끼	이끼·포자	몽환성 기질	연구	candidate-unapproved
+r04-09-01	사막	reality-candidate	대추야자	열매·잎	건조 과실·엮음재	식품·바구니	candidate-unapproved
+r04-09-02	사막	reality-candidate	알로에	잎	식물 추출물	연구	candidate-unapproved
+r04-09-03	사막	reality-candidate	선인장	줄기·열매	섬유	공예	candidate-unapproved
+r04-09-04	사막	reality-candidate	아카시아 고무	수지	정제 수지	접착	candidate-unapproved
+r04-09-05	사막	reality-candidate	석영사	모래	유리 원료	유리	candidate-unapproved
+r04-09-06	사막	reality-candidate	석고층	석고	분말	건축	candidate-unapproved
+r04-09-07	사막	reality-candidate	사막 딱정벌레	갑각	건조 갑각	표본	candidate-unapproved
+r04-09-08	사막	fantasy	모래종꽃	꽃·씨앗	건조 꽃가루	기상 연구	candidate-unapproved
+r04-10-01	해안·항구	reality-candidate	다시마	엽체	건조 해조	요리·비료	candidate-unapproved
+r04-10-02	해안·항구	reality-candidate	미역	엽체	건조 해조	요리	candidate-unapproved
+r04-10-03	해안·항구	reality-candidate	굴	살·패각	정제 패각	세공	candidate-unapproved
+r04-10-04	해안·항구	reality-candidate	게	살·갑각	손질 갑각	요리·공예	candidate-unapproved
+r04-10-05	해안·항구	reality-candidate	해초	섬유	건조 섬유	그물	candidate-unapproved
+r04-10-06	해안·항구	reality-candidate	패각 모래	패각 파편	분쇄 패각	건축	candidate-unapproved
+r04-10-07	해안·항구	reality-candidate	염전	소금	정제 소금	요리	candidate-unapproved
+r04-10-08	해안·항구	fantasy	파도유리조개	패각·진주	연마 패각	세공	candidate-unapproved
+r04-11-01	바다	reality-candidate	고등어	어육·뼈	손질 어육	요리	candidate-unapproved
+r04-11-02	바다	reality-candidate	청어	어육·비늘	손질 어육	요리	candidate-unapproved
+r04-11-03	바다	reality-candidate	오징어	어육·먹물	정제 먹물	요리·안료	candidate-unapproved
+r04-11-04	바다	reality-candidate	성게	가시·표본	정리 표본	연구	candidate-unapproved
+r04-11-05	바다	reality-candidate	불가사리	표본	건조 표본	생태	candidate-unapproved
+r04-11-06	바다	reality-candidate	해면동물	해면체	세척 해면	생활용품	candidate-unapproved
+r04-11-07	바다	reality-candidate	바다거북 보호관찰	관찰 기록	도감 기록	비채취 연구	candidate-unapproved
+r04-11-08	바다	fantasy	심연수정해파리	결정질 부산물	발광 핵 후보	해양 연구	candidate-unapproved
+r04-12-01	화산지대	reality-candidate	현무암	암석	절단 석판	건축	candidate-unapproved
+r04-12-02	화산지대	reality-candidate	부석	암석	연마재	생활	candidate-unapproved
+r04-12-03	화산지대	reality-candidate	흑요석	유리질 암석	날붙이	공예	candidate-unapproved
+r04-12-04	화산지대	reality-candidate	천연황	황	정제 황	연금 연구	candidate-unapproved
+r04-12-05	화산지대	reality-candidate	화산재	재	혼합 건축재	건축	candidate-unapproved
+r04-12-06	화산지대	reality-candidate	응회암	석재	절단 블록	석공	candidate-unapproved
+r04-12-07	화산지대	reality-candidate	화산 유리	유리질 암석	절단 장식	세공	candidate-unapproved
+r04-12-08	화산지대	fantasy	꺼지지 않는 잿꽃	꽃잎·씨앗	내열 분말	열 연구	candidate-unapproved
+r04-13-01	고대 유적	reality-candidate	청동 유물 조각	청동 파편	분류 유물	복원	candidate-unapproved
+r04-13-02	고대 유적	reality-candidate	모자이크 타일	색석 타일	세척 타일	전시	candidate-unapproved
+r04-13-03	고대 유적	reality-candidate	고대 유리병	유리 조각	복원 유리	전시	candidate-unapproved
+r04-13-04	고대 유적	reality-candidate	석판 기록	비문 조각	탁본	언어 연구	candidate-unapproved
+r04-13-05	고대 유적	reality-candidate	고대 벽돌	벽돌	복원 벽돌	건축	candidate-unapproved
+r04-13-06	고대 유적	reality-candidate	안료 흔적	안료 시료	복원 안료	그림	candidate-unapproved
+r04-13-07	고대 유적	reality-candidate	화석 목재	규화목	연마 규화목	세공	candidate-unapproved
+r04-13-08	고대 유적	fantasy	되감긴 서판	문자 파편	복원 기록 후보	시간 연구	candidate-unapproved
+r04-14-01	폐허·묘지	reality-candidate	녹슨 못	철못	금속 선별	재활용	candidate-unapproved
+r04-14-02	폐허·묘지	reality-candidate	부서진 도기	도기 조각	도기 복원	전시	candidate-unapproved
+r04-14-03	폐허·묘지	reality-candidate	오래된 목재	풍화 목재	판재 복원 후보	보수	candidate-unapproved
+r04-14-04	폐허·묘지	reality-candidate	납골장 유리	유리 조각	연마 유리	장식	candidate-unapproved
+r04-14-05	폐허·묘지	reality-candidate	회색지 지의류	지의류	건조 표본	생태	candidate-unapproved
+r04-14-06	폐허·묘지	reality-candidate	이끼 낀 돌	돌·이끼	분리 표본	석공·생태	candidate-unapproved
+r04-14-07	폐허·묘지	reality-candidate	까마귀 깃털	깃털	정리 깃털	필기구	candidate-unapproved
+r04-14-08	폐허·묘지	fantasy	기억먹는 꽃	꽃잎·꽃가루	향료 후보	기억 연구	candidate-unapproved
+r04-15-01	만신전	reality-candidate	미사용 밀랍	밀랍	양초 원료	양초	candidate-unapproved
+r04-15-02	만신전	reality-candidate	기록용 먹	먹	먹물	기록	candidate-unapproved
+r04-15-03	만신전	reality-candidate	봉헌용 곡물	곡물	제분	봉헌	candidate-unapproved
+r04-15-04	만신전	reality-candidate	석재 조각상 재료	석재	조각용 블록	신상	candidate-unapproved
+r04-15-05	만신전	reality-candidate	제단 보수 목재	목재	판재	개인 제단	candidate-unapproved
+r04-15-06	만신전	reality-candidate	꽃다발 재료	꽃·줄기	꽃다발	봉헌	candidate-unapproved
+r04-15-07	만신전	reality-candidate	기록용 양피지	양피지	정리 문서	기록	candidate-unapproved
+r04-15-08	만신전	fantasy	기척 없는 향	향료 잔재	안정화 향분	의식 연구	candidate-unapproved
+r04-16-01	지하미궁	reality-candidate	방해석 결정	방해석	연마 결정	장식	candidate-unapproved
+r04-16-02	지하미궁	reality-candidate	반딧불이 유충 관찰	관찰 기록	생태 기록	비채취 연구	candidate-unapproved
+r04-16-03	지하미궁	reality-candidate	지하 민물게	갑각·살	갑각 표본	생태	candidate-unapproved
+r04-16-04	지하미궁	reality-candidate	동굴 진주	탄산염 결정	연마 진주	세공	candidate-unapproved
+r04-16-05	지하미궁	reality-candidate	동굴석고	석고	분말	주형	candidate-unapproved
+r04-16-06	지하미궁	reality-candidate	지하 퇴적점토	점토	정제 점토	도기	candidate-unapproved
+r04-16-07	지하미궁	reality-candidate	동굴 실크나방	고치·비단	방적 비단	직물	candidate-unapproved
+r04-16-08	지하미궁	fantasy	무응답의 씨앗	씨앗·껍질	봉인 표본	기원 연구	candidate-unapproved
