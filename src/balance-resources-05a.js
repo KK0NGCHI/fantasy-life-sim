@@ -5,6 +5,8 @@ export const RESOURCE_BALANCE_ROWS_05A=Object.freeze([
  ['grass','들풀','gather','숲',8,2,3],
  ['oak-log','참나무 통나무','logging','숲',5,18,30],
  ['pine-log','소나무 통나무','logging','숲',4,14,24],
+ ['birch-log','자작나무 통나무','logging','숲',4,16,25],
+ ['willow-log','버드나무 통나무','logging','습지',4,12,23],
  ['stone','일반 돌','mining','광산',12,2,3],
  ['coal','석탄','mining','광산',10,0,8],
  ['copper-ore','구리광석','mining','광산',12,0,8],
