@@ -9,10 +9,10 @@ const make=()=>createMainV2Inventory(item,opts);
 const slot={slotId:'05a-test',worldId:'world',kind:'manual',label:'test',savedAt:'2026-10-24T00:00:00Z',revision:0};
 function saved(g){const v2=createSaveV2(g.current(),slot,'test',g.registry);const v3=prepareSecondsV2ToV3(v2,g.registry);assert.equal(v3.ok,true);return createSaveV3(v3.state,slot,'test',g.registry)}
 test('05-A stable catalogue and deterministic initial node counts',()=>{
- assert.equal(RESOURCES_05A.length,14);
+ assert.equal(RESOURCES_05A.length,17);
  const a=createResourceNodes05A(),b=createResourceNodes05A();
  assert.deepEqual(a,b);
- assert.equal(Object.keys(a).length,18+12+20+18+14+10+10+6+3+4+3+3+3+3);
+ assert.equal(Object.keys(a).length,18+12+20+8+8+8+18+14+10+10+6+3+4+3+3+3+3);
 });
 test('05-A harvesting cannot duplicate consumed node and respects discovery, region, regeneration',()=>{
  const nodes=createResourceNodes05A(),id='resource05a:wild-herb:01';

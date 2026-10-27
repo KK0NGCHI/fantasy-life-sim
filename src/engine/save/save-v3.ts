@@ -60,6 +60,7 @@ function validProgressionExtension(progression:unknown):boolean{
  * No resource data is synthesized for legacy slots. */
 const resourceCaps05A:Readonly<Record<string,number>>={
  'resource05a:wild-herb':5,'resource05a:mushroom':4,'resource05a:grass':8,
+ 'resource05a:reed':5,'resource05a:flax':5,'resource05a:nettle':5,
  'resource05a:oak-log':5,'resource05a:pine-log':4,'resource05a:birch-log':4,'resource05a:willow-log':4,'resource05a:stone':12,
  'resource05a:coal':10,'resource05a:copper-ore':12,'resource05a:iron-ore':10,
  'resource05a:small-fish':12,'resource05a:carp':8,'resource05a:trout':6

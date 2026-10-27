@@ -33,7 +33,7 @@ item('coal','석탄','nonmetal_mineral'),item('copper-ore','구리광석','metal
 item('iron-ore','철광석','metal_ore'),item('small-fish','작은 민물고기','freshwater_life'),
 item('carp','잉어','freshwater_life'),item('trout','송어','freshwater_life'),
 item('blueberry','블루베리','fruit'),item('oak-sap','참나무 수액','wood'),
-item('quartz','수정 원석','gem'),item('reed','갈대','herb'),
+item('quartz','수정 원석','gem'),item('reed','갈대','herb'),item('flax','아마 줄기','herb'),item('nettle','쐐기풀 줄기','herb'),
 item('mussel','홍합','marine_life'),item('sacred-oak-log','신성한 참나무 통나무','wood'),
 item('marsh-bell-mushroom','늪은방울버섯','fungus')
 ]);
@@ -55,7 +55,9 @@ export const RESOURCE_SPECIES_05A=Object.freeze([
 {id:'source05a:trout',name:'송어',family:'freshwater_life',regions:['강·호수','설원'],outputs:['item05a:trout'],status:'existing'},
 {id:'source05a:blueberry',name:'블루베리 관목',family:'fruit',regions:['숲','초원·농경지'],outputs:['item05a:blueberry'],status:'candidate'},
 {id:'source05a:quartz',name:'수정 광맥',family:'gem',regions:['광산','산맥'],outputs:['item05a:quartz'],status:'candidate'},
-{id:'source05a:reed',name:'갈대',family:'herb',regions:['습지','강·호수'],outputs:['item05a:reed'],status:'candidate'},
+{id:'source05a:reed',name:'갈대',family:'herb',regions:['습지','강·호수'],outputs:['item05a:reed'],status:'existing'},
+{id:'source05m:flax',name:'아마',family:'herb',regions:['초원·농경지'],outputs:['item05a:flax'],status:'existing'},
+{id:'source05m:nettle',name:'쐐기풀',family:'herb',regions:['숲'],outputs:['item05a:nettle'],status:'existing'},
 {id:'source05a:mussel',name:'홍합',family:'marine_life',regions:['해안·항구'],outputs:['item05a:mussel'],status:'candidate'},
 {id:'source05a:sacred-oak',name:'신성한 참나무',family:'tree',regions:['깊은 숲'],outputs:['item05a:sacred-oak-log'],status:'test-only'},
 {id:'source05a:marsh-bell',name:'늪은방울버섯',family:'fungus',regions:['습지'],outputs:['item05a:marsh-bell-mushroom'],status:'candidate'}
