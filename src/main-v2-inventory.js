@@ -597,6 +597,7 @@ export function createMainV2Inventory(uiItems,options={}) {
     if(action.type==='resource.candidate.discover')return {turns:1,worldUnits:600};
     if(action.type==='resource.candidate.work')return {turns:1,worldUnits:60};
     if(action.type==='resource.search')return {turns:1,worldUnits:600};
+    if(action.type==='resource.tree.byproduct')return {turns:1,worldUnits:60};
     if(action.type==='resource.work'){
      const node=current.world.runtime.resource05A?.nodes?.[action.payload?.nodeId];
      const def=RESOURCE_MAP_05A.get(node?.resourceId);
