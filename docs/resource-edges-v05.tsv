@@ -1,68 +1,68 @@
 rowId	sourceId	region	stage0Source	stage1Drop	stage2Processed	stage3Use	evidence
-0001	proposed:source:0124	거점 마을	밀	see-v0.3-source	to-specify	to-specify	v0.3
-0002	proposed:source:0142	거점 마을	보리	see-v0.3-source	to-specify	to-specify	v0.3
-0003	proposed:source:0030	거점 마을	귀리	see-v0.3-source	to-specify	to-specify	v0.3
-0004	proposed:source:0334	거점 마을	호밀	see-v0.3-source	to-specify	to-specify	v0.3
-0005	proposed:source:0006	거점 마을	감자	see-v0.3-source	to-specify	to-specify	v0.3
-0006	proposed:source:0226	거점 마을	양배추	see-v0.3-source	to-specify	to-specify	v0.3
-0007	proposed:source:0215	거점 마을	아마	see-v0.3-source	to-specify	to-specify	v0.3
-0008	proposed:source:0073	거점 마을	대마	see-v0.3-source	to-specify	to-specify	v0.3
-0009	proposed:source:0162	거점 마을	사과나무	see-v0.3-source	to-specify	to-specify	v0.3
-0010	proposed:source:0134	거점 마을	배나무	see-v0.3-source	to-specify	to-specify	v0.3
-0011	proposed:source:0139	거점 마을	벌통	see-v0.3-source	to-specify	to-specify	v0.3
-0012	proposed:source:0279	거점 마을	점토 채취장	see-v0.3-source	to-specify	to-specify	v0.3
-0013	proposed:source:0050	거점 마을	꿈콩	see-v0.3-source	to-specify	to-specify	v0.3
-0014	proposed:source:0253	거점 마을	은빛 보리	see-v0.3-source	to-specify	to-specify	v0.3
-0015	proposed:source:0328	거점 마을	향등나무	see-v0.3-source	to-specify	to-specify	v0.3
-0016	proposed:source:0195	거점 마을	속삭이는 항아리 파편	see-v0.3-source	to-specify	to-specify	v0.3
-0017	proposed:source:0087	초원·농경지	들풀	see-v0.3-source	to-specify	to-specify	v0.3
-0018	proposed:source:0120	초원·농경지	민들레	see-v0.3-source	to-specify	to-specify	v0.3
-0019	proposed:source:0213	초원·농경지	쐐기풀	see-v0.3-source	to-specify	to-specify	v0.3
-0020	proposed:source:0295	초원·농경지	질경이	see-v0.3-source	to-specify	to-specify	v0.3
-0021	proposed:source:0089	초원·농경지	라벤더	see-v0.3-source	to-specify	to-specify	v0.3
-0022	proposed:source:0311	초원·농경지	클로버	see-v0.3-source	to-specify	to-specify	v0.3
-0023	proposed:source:0324	초원·농경지	해바라기	see-v0.3-source	to-specify	to-specify	v0.3
-0024	proposed:source:0203	초원·농경지	수수	see-v0.3-source	to-specify	to-specify	v0.3
-0025	proposed:source:0315	초원·농경지	팥	see-v0.3-source	to-specify	to-specify	v0.3
-0026	proposed:source:0335	초원·농경지	호박	see-v0.3-source	to-specify	to-specify	v0.3
-0027	proposed:source:0225	초원·농경지	양	see-v0.3-source	to-specify	to-specify	v0.3
-0028	proposed:source:0070	초원·농경지	닭	see-v0.3-source	to-specify	to-specify	v0.3
-0029	proposed:source:0086	초원·농경지	들주름버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0030	proposed:source:0092	초원·농경지	말불버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0031	proposed:source:0141	초원·농경지	별껍질호박	see-v0.3-source	to-specify	to-specify	v0.3
-0032	proposed:source:0091	초원·농경지	마른하늘꽃	see-v0.3-source	to-specify	to-specify	v0.3
-0033	proposed:source:0297	숲	참나무	see-v0.3-source	to-specify	to-specify	v0.3
-0034	proposed:source:0194	숲	소나무	see-v0.3-source	to-specify	to-specify	v0.3
-0035	proposed:source:0266	숲	자작나무	see-v0.3-source	to-specify	to-specify	v0.3
-0036	proposed:source:0067	숲	단풍나무	see-v0.3-source	to-specify	to-specify	v0.3
-0037	proposed:source:0131	숲	밤나무	see-v0.3-source	to-specify	to-specify	v0.3
-0038	proposed:source:0008	숲	개암나무	see-v0.3-source	to-specify	to-specify	v0.3
-0039	proposed:source:0156	숲	블루베리	see-v0.3-source	to-specify	to-specify	v0.3
-0040	proposed:source:0168	숲	산딸기	see-v0.3-source	to-specify	to-specify	v0.3
-0041	proposed:source:0062	숲	느타리버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0042	proposed:source:0318	숲	표고버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0043	proposed:source:0104	숲	목이버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0044	proposed:source:0243	숲	운지버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0045	proposed:source:0047	숲	꾀꼬리버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0046	proposed:source:0034	숲	그물버섯	see-v0.3-source	to-specify	to-specify	v0.3
-0047	proposed:source:0069	숲	달빛수	see-v0.3-source	to-specify	to-specify	v0.3
-0048	proposed:source:0206	숲	숨결이끼	see-v0.3-source	to-specify	to-specify	v0.3
-0049	proposed:source:0264	강·호수	잉어	see-v0.3-source	to-specify	to-specify	v0.3
-0050	proposed:source:0198	강·호수	송어	see-v0.3-source	to-specify	to-specify	v0.3
-0051	proposed:source:0098	강·호수	메기	see-v0.3-source	to-specify	to-specify	v0.3
-0052	proposed:source:0155	강·호수	붕어	see-v0.3-source	to-specify	to-specify	v0.3
-0053	proposed:source:0274	강·호수	장어	see-v0.3-source	to-specify	to-specify	v0.3
-0054	proposed:source:0122	강·호수	민물새우	see-v0.3-source	to-specify	to-specify	v0.3
-0055	proposed:source:0003	강·호수	가재	see-v0.3-source	to-specify	to-specify	v0.3
-0056	proposed:source:0093	강·호수	말조개	see-v0.3-source	to-specify	to-specify	v0.3
-0057	proposed:source:0004	강·호수	갈대	see-v0.3-source	to-specify	to-specify	v0.3
-0058	proposed:source:0137	강·호수	버드나무	see-v0.3-source	to-specify	to-specify	v0.3
-0059	proposed:source:0149	강·호수	부들	see-v0.3-source	to-specify	to-specify	v0.3
-0060	proposed:source:0200	강·호수	수련	see-v0.3-source	to-specify	to-specify	v0.3
-0061	proposed:source:0114	강·호수	물방울수초	see-v0.3-source	to-specify	to-specify	v0.3
-0062	proposed:source:0255	강·호수	은실잉어	see-v0.3-source	to-specify	to-specify	v0.3
-0063	proposed:source:0111	강·호수	물거울조개	see-v0.3-source	to-specify	to-specify	v0.3
-0064	proposed:source:0263	강·호수	잃어버린 나무상자	see-v0.3-source	to-specify	to-specify	v0.3
+0001	proposed:source:0124	거점 마을	밀	곡물·짚	가공 공정 검토	제분·사료	v0.3
+0002	proposed:source:0142	거점 마을	보리	곡물·짚	가공 공정 검토	제분·사료	v0.3
+0003	proposed:source:0030	거점 마을	귀리	곡물·짚	가공 공정 검토	죽·사료	v0.3
+0004	proposed:source:0334	거점 마을	호밀	곡물·짚	가공 공정 검토	제분·빵	v0.3
+0005	proposed:source:0006	거점 마을	감자	덩이줄기	가공 공정 검토	조리·종서	v0.3
+0006	proposed:source:0226	거점 마을	양배추	잎·씨앗	가공 공정 검토	요리·재배	v0.3
+0007	proposed:source:0215	거점 마을	아마	줄기·씨앗	가공 공정 검토	방적·기름	v0.3
+0008	proposed:source:0073	거점 마을	대마	줄기·씨앗	가공 공정 검토	밧줄·천	v0.3
+0009	proposed:source:0162	거점 마을	사과나무	과실·가지·목재	가공 공정 검토	과수·목공	v0.3
+0010	proposed:source:0134	거점 마을	배나무	과실·가지·목재	가공 공정 검토	과수·목공	v0.3
+0011	proposed:source:0139	거점 마을	벌통	밀랍·벌꿀	가공 공정 검토	양초·음식	v0.3
+0012	proposed:source:0279	거점 마을	점토 채취장	점토	가공 공정 검토	벽돌·도자기	v0.3
+0013	proposed:source:0050	거점 마을	꿈콩	꼬투리·씨앗	가공 공정 검토	이질식 사료 후보·연구	v0.3
+0014	proposed:source:0253	거점 마을	은빛 보리	곡물·짚	가공 공정 검토	의식 음식 후보	v0.3
+0015	proposed:source:0328	거점 마을	향등나무	향목·수액	가공 공정 검토	장식·향료 후보	v0.3
+0016	proposed:source:0195	거점 마을	속삭이는 항아리 파편	도기 조각	가공 공정 검토	수리·고고학	v0.3
+0017	proposed:source:0087	초원·농경지	들풀	풀섬유·풀잎	가공 공정 검토	밧줄·사료	v0.3
+0018	proposed:source:0120	초원·농경지	민들레	꽃·잎·뿌리	가공 공정 검토	염료·조리	v0.3
+0019	proposed:source:0213	초원·농경지	쐐기풀	줄기·잎	가공 공정 검토	방적·약학연구	v0.3
+0020	proposed:source:0295	초원·농경지	질경이	잎·씨앗	가공 공정 검토	채집·연구	v0.3
+0021	proposed:source:0089	초원·농경지	라벤더	꽃·줄기	가공 공정 검토	향료·장식	v0.3
+0022	proposed:source:0311	초원·농경지	클로버	잎·꽃	가공 공정 검토	사료·양봉	v0.3
+0023	proposed:source:0324	초원·농경지	해바라기	씨앗·꽃	가공 공정 검토	기름·염료	v0.3
+0024	proposed:source:0203	초원·농경지	수수	곡물·줄기	가공 공정 검토	조리·사료	v0.3
+0025	proposed:source:0315	초원·농경지	팥	콩·꼬투리	가공 공정 검토	조리·종자	v0.3
+0026	proposed:source:0335	초원·농경지	호박	과육·씨앗	가공 공정 검토	음식·장식	v0.3
+0027	proposed:source:0225	초원·농경지	양	양털·우유·고기·가죽	가공 공정 검토	사육·방적·음식	v0.3
+0028	proposed:source:0070	초원·농경지	닭	알·고기	가공 공정 검토	사육·요리	v0.3
+0029	proposed:source:0086	초원·농경지	들주름버섯	자실체	가공 공정 검토	균류 연구·식재료 검토	v0.3
+0030	proposed:source:0092	초원·농경지	말불버섯	자실체·포자	가공 공정 검토	균류 연구	v0.3
+0031	proposed:source:0141	초원·농경지	별껍질호박	과육·씨앗·껍질	가공 공정 검토	요리·등불 후보	v0.3
+0032	proposed:source:0091	초원·농경지	마른하늘꽃	꽃잎·꽃가루	가공 공정 검토	염료·기상 연구	v0.3
+0033	proposed:source:0297	숲	참나무	통나무·수피·도토리·수액	가공 공정 검토	목공·식품·수지	v0.3
+0034	proposed:source:0194	숲	소나무	통나무·솔방울·송진	가공 공정 검토	목공·연료·수지	v0.3
+0035	proposed:source:0266	숲	자작나무	목재·수피·수액	가공 공정 검토	목공·용기	v0.3
+0036	proposed:source:0067	숲	단풍나무	목재·수액·씨앗	가공 공정 검토	목공·가공	v0.3
+0037	proposed:source:0131	숲	밤나무	밤·목재	가공 공정 검토	식품·목공	v0.3
+0038	proposed:source:0008	숲	개암나무	열매·가지	가공 공정 검토	식품·바구니	v0.3
+0039	proposed:source:0156	숲	블루베리	열매·묘목	가공 공정 검토	가공식품·재배	v0.3
+0040	proposed:source:0168	숲	산딸기	열매·묘목	가공 공정 검토	가공식품	v0.3
+0041	proposed:source:0062	숲	느타리버섯	자실체	가공 공정 검토	요리 후보·균류 연구	v0.3
+0042	proposed:source:0318	숲	표고버섯	자실체	가공 공정 검토	요리 후보·재배	v0.3
+0043	proposed:source:0104	숲	목이버섯	자실체	가공 공정 검토	채집 장갑·요리 후보	v0.3
+0044	proposed:source:0243	숲	운지버섯	자실체	가공 공정 검토	연금술 연구	v0.3
+0045	proposed:source:0047	숲	꾀꼬리버섯	자실체	가공 공정 검토	균근 생태·요리 후보	v0.3
+0046	proposed:source:0034	숲	그물버섯	자실체	가공 공정 검토	균근 생태·요리 후보	v0.3
+0047	proposed:source:0069	숲	달빛수	잎·목재·수액	가공 공정 검토	몽환 소재·목공 후보	v0.3
+0048	proposed:source:0206	숲	숨결이끼	이끼·포자	가공 공정 검토	습도계·마법 연구 후보	v0.3
+0049	proposed:source:0264	강·호수	잉어	어획물·뼈	가공 공정 검토	요리·수생 도감	v0.3
+0050	proposed:source:0198	강·호수	송어	어획물·뼈	가공 공정 검토	요리·수생 도감	v0.3
+0051	proposed:source:0098	강·호수	메기	어획물·뼈	가공 공정 검토	요리	v0.3
+0052	proposed:source:0155	강·호수	붕어	어획물	가공 공정 검토	요리·양어 후보	v0.3
+0053	proposed:source:0274	강·호수	장어	어획물	가공 공정 검토	요리·양어 후보	v0.3
+0054	proposed:source:0122	강·호수	민물새우	새우·껍질	가공 공정 검토	요리·사료	v0.3
+0055	proposed:source:0003	강·호수	가재	가재·껍질	가공 공정 검토	요리·공예	v0.3
+0056	proposed:source:0093	강·호수	말조개	조갯살·껍질	가공 공정 검토	요리·석회 재료	v0.3
+0057	proposed:source:0004	강·호수	갈대	줄기·잎	가공 공정 검토	지붕·바구니	v0.3
+0058	proposed:source:0137	강·호수	버드나무	가지·수피·목재	가공 공정 검토	바구니·목공	v0.3
+0059	proposed:source:0149	강·호수	부들	꽃대·잎	가공 공정 검토	충전재·돗자리	v0.3
+0060	proposed:source:0200	강·호수	수련	꽃·잎	가공 공정 검토	장식·식물 연구	v0.3
+0061	proposed:source:0114	강·호수	물방울수초	잎·수액	가공 공정 검토	투명 가공재 후보	v0.3
+0062	proposed:source:0255	강·호수	은실잉어	어획물·은빛 비늘	가공 공정 검토	장식·양어 후보	v0.3
+0063	proposed:source:0111	강·호수	물거울조개	껍질·진주 유사체	가공 공정 검토	거울장식 후보	v0.3
+0064	proposed:source:0263	강·호수	잃어버린 나무상자	목재 상자·잡화	가공 공정 검토	낚시 인양	v0.3
 0065	proposed:source:0004	습지	갈대	see-v0.3-source	to-specify	to-specify	v0.3
 0066	proposed:source:0149	습지	부들	see-v0.3-source	to-specify	to-specify	v0.3
 0067	proposed:source:0262	습지	이탄	see-v0.3-source	to-specify	to-specify	v0.3
