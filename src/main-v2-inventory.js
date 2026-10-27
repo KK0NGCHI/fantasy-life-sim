@@ -1,3 +1,4 @@
+import {checkWorkshopStage1,craftUntilStage1} from './crafting-workshop-stage1.js';
 import {craftBatch1} from './crafting-batch-stage1.js';
 import {TREE_BYPRODUCT_ITEMS_05M,takeTreeByproduct05M} from './tree-byproducts-05m.js';
 import {creditOwnedResource05A} from './resource-credit-05a.js';
@@ -295,20 +296,30 @@ export function createMainV2Inventory(uiItems,options={}) {
    events:[{type:'mineral.assemblage.extracted',payload:{siteIds:command.payload.siteIds,outputs:attempt.outputs,remainingBySite:attempt.remainingBySite}}]};
  }],
  ['craft.batch',(snapshot,command)=>{
-  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을')
-   throw Error('WORKSTATION_REQUIRED');
+  const access=checkWorkshopStage1(snapshot.world.runtime,command.payload?.recipeId);
+  if(!access.ok)throw Error(access.reason);
   const result=craftBatch1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,command.payload?.count,command.payload?.choices??{});
   if(!result.ok)throw Error(result.reason);
   return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
    events:[{type:'craft.batch_completed',payload:{recipeId:result.recipe.id,count:result.count,
     outputId:result.recipe.output,quantity:result.recipe.outputQty*result.count}}]};
  }],
+ ['craft.until',(snapshot,command)=>{
+  const access=checkWorkshopStage1(snapshot.world.runtime,command.payload?.recipeId);
+  if(!access.ok)throw Error(access.reason);
+  const result=craftUntilStage1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,
+   command.payload?.count,command.payload?.choices??{});
+  if(!result.ok)throw Error(result.reason);
+  return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
+   events:[{type:'craft.repeat_stopped',payload:{recipeId:result.recipe.id,
+    requested:result.requested,completed:result.completed,stopReason:result.stopReason??'LIMIT',
+    outputId:result.recipe.output,quantity:result.recipe.outputQty*result.completed}}]};
+ }],
  ['mineral.refine',(snapshot,command)=>{
-  if(snapshot.world.runtime.dungeon)throw Error('REFINING_UNAVAILABLE');
-  // Prototype town facilities are fixed world services, not craftable inventory items.
-  if(snapshot.world.runtime.region!=='거점 마을')throw Error('WORKSTATION_REQUIRED');
-  const recipe=REFINING_BY_ID_05H.get(command.payload?.recipeId);
-  if(!recipe)throw Error('UNKNOWN_RECIPE');
+  // Both legacy single-craft and batched commands obey the same station policy.
+  const access=checkWorkshopStage1(snapshot.world.runtime,command.payload?.recipeId);
+  if(!access.ok)throw Error(access.reason);
+  const recipe=access.recipe;
   const result=refineMineral05H(snapshot.itemWorld,snapshot.player.id,recipe.id);
   if(!result.ok)throw Error(result.reason);
   return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
@@ -599,6 +610,14 @@ export function createMainV2Inventory(uiItems,options={}) {
     if(action.type==='mineral.prospect')return {turns:1,worldUnits:600};
     if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
     if(action.type==='mineral.refine')return {turns:1,worldUnits:REFINING_BY_ID_05H.get(action.payload?.recipeId)?.seconds??300};
+    if(action.type==='craft.until'){
+     const access=checkWorkshopStage1(current.world.runtime,action.payload?.recipeId);
+     if(!access.ok)throw Error(access.reason);
+     const result=craftUntilStage1(current.itemWorld,current.player.id,action.payload?.recipeId,
+      action.payload?.count,action.payload?.choices??{});
+     if(!result.ok)throw Error(result.reason);
+     return {turns:result.completed,worldUnits:result.seconds};
+    }
     if(action.type==='craft.batch'){
      const recipe=REFINING_BY_ID_05H.get(action.payload?.recipeId),count=action.payload?.count;
      if(!recipe||!Number.isSafeInteger(count)||count<1||count>20)throw Error('INVALID_BATCH_COUNT');
