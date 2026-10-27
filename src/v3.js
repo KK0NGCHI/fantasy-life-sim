@@ -1,5 +1,6 @@
 import {ALL_CRAFTING_RECIPES_05L,REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
 import {CRAFTING_MATERIALS_05L} from './resource-crafting-05l.js';
+import {FOREST_MATERIALS_05M} from './forest-resources-05m.js';
 import {planMaterialAllocation} from './material-compatibility-05j.js';
 import {MINERAL_DEFINITIONS_05E,mineralDepositId05E} from './mineral-deposits-05e.js';
 import {geologyProfile05F} from './mineral-geology-05f.js';
@@ -624,7 +625,7 @@ for(const recipe of REFINING_RECIPES_05H){
  const owner=craftingSnapshot.player.id;
  const inventory=craftingSnapshot.itemWorld.items.filter(item=>item.quantity>0&&
  craftingSnapshot.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===owner))
- .map(item=>({...item,...(CRAFTING_MATERIALS_05L[item.definitionId]??{})}));
+ .map(item=>({...item,...(CRAFTING_MATERIALS_05L[item.definitionId]??FOREST_MATERIALS_05M[item.definitionId]??{})}));
  const plan=planMaterialAllocation(inventory,inputs.map((x,i)=>({
   slotId:'slot:'+i,quantity:x.quantity,...(x.itemId?{exactId:x.itemId}:{material:x.material})
  })));
