@@ -1,3 +1,4 @@
+import {FIBER_ITEMS_05M,FIBER_RECIPES_05M,FIBER_MATERIALS_05M} from './fiber-crafting-05m.js';
 import {BYPRODUCT_CRAFT_ITEMS_05M,BYPRODUCT_CRAFT_RECIPES_05M} from './byproduct-crafting-05m.js';
 import {craftWithAllocatedMaterials} from './material-crafting-05k.js';
 import {FOREST_ITEMS_05M,FOREST_RECIPES_05M,FOREST_MATERIALS_05M} from './forest-resources-05m.js';
@@ -25,7 +26,7 @@ export const REFINING_RECIPES_05H=Object.freeze([
  {id:'craft05i:mycelium-gloves',name:'균사 섬유 채집 장갑 제작 (임시 생활 연결)',station:'workbench',inputs:[{itemId:'item05b:wood-ear',quantity:2},{itemId:'item05a:grass',quantity:2}],output:'tool05a:gloves:mycelium',outputQty:1,seconds:600}
 ]);
 /** All executable recipes. Keep the legacy 05-H/I catalog stable for existing consumers. */
-export const ALL_CRAFTING_RECIPES_05L=Object.freeze([...REFINING_RECIPES_05H,...CRAFTING_RECIPES_05L,...FOREST_RECIPES_05M,...BYPRODUCT_CRAFT_RECIPES_05M]);
+export const ALL_CRAFTING_RECIPES_05L=Object.freeze([...REFINING_RECIPES_05H,...CRAFTING_RECIPES_05L,...FOREST_RECIPES_05M,...BYPRODUCT_CRAFT_RECIPES_05M,...FIBER_RECIPES_05M]);
 export const REFINING_BY_ID_05H=new Map(ALL_CRAFTING_RECIPES_05L.map(r=>[r.id,r]));
 export const REFINED_ITEMS_05H=Object.freeze([
  {id:'item05h:copper-ingot',name:'구리 주괴',family:'processed_metal'},
@@ -37,7 +38,8 @@ export const REFINED_ITEMS_05H=Object.freeze([
  {id:'item05h:bronze-ingot',name:'청동 주괴',family:'processed_metal'},
  ...CRAFTING_ITEMS_05L,
  ...FOREST_ITEMS_05M,
- ...BYPRODUCT_CRAFT_ITEMS_05M
+ ...BYPRODUCT_CRAFT_ITEMS_05M,
+ ...FIBER_ITEMS_05M
 ]);
 /** Legacy 05-H/I dispatcher API; now shares the 05-J allocator through 05-K.
  * All existing exact-ID recipes, output IDs, and station/duration metadata stay unchanged.
@@ -45,5 +47,5 @@ export const REFINED_ITEMS_05H=Object.freeze([
 export function refineMineral05H(itemWorld,ownerId,recipeId){
  const recipe=REFINING_BY_ID_05H.get(recipeId);
  if(!recipe)return {ok:false,reason:'UNKNOWN_RECIPE'};
- return craftWithAllocatedMaterials(itemWorld,ownerId,recipe,{...CRAFTING_MATERIALS_05L,...FOREST_MATERIALS_05M});
+ return craftWithAllocatedMaterials(itemWorld,ownerId,recipe,{...CRAFTING_MATERIALS_05L,...FOREST_MATERIALS_05M,...FIBER_MATERIALS_05M});
 }
