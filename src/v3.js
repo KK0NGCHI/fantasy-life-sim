@@ -1,4 +1,6 @@
-import {REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
+import {ALL_CRAFTING_RECIPES_05L,REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
+import {CRAFTING_MATERIALS_05L} from './resource-crafting-05l.js';
+import {planMaterialAllocation} from './material-compatibility-05j.js';
 import {MINERAL_DEFINITIONS_05E,mineralDepositId05E} from './mineral-deposits-05e.js';
 import {geologyProfile05F} from './mineral-geology-05f.js';
 import {mineralAssemblage05F,ASSEMBLAGE_TYPES_05F} from './mineral-assemblages-05f.js';
@@ -197,7 +199,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     const ownedQty=itemId=>allItems.items.filter(item=>item.definitionId===itemId&&
      allItems.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===mainV2.current().player.id))
      .reduce((total,item)=>total+item.quantity,0);
-    for(const recipe of REFINING_RECIPES_05H){
+    for(const recipe of ALL_CRAFTING_RECIPES_05L){
      const requirements=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
      const label=requirements.map(req=>{
       const name=REFINED_ITEMS_05H.find(i=>i.id===req.itemId)?.name??
@@ -619,10 +621,17 @@ const ownedQtyForCraft=id=>craftingSnapshot.itemWorld.items.filter(item=>item.de
  .reduce((sum,item)=>sum+item.quantity,0);
 for(const recipe of REFINING_RECIPES_05H){
  const inputs=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
- const ready=s.region==='거점 마을'&&!craftingSnapshot.world.runtime.dungeon&&inputs.every(x=>ownedQtyForCraft(x.itemId)>=x.quantity);
+ const owner=craftingSnapshot.player.id;
+ const inventory=craftingSnapshot.itemWorld.items.filter(item=>item.quantity>0&&
+ craftingSnapshot.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===owner))
+ .map(item=>({...item,...(CRAFTING_MATERIALS_05L[item.definitionId]??{})}));
+ const plan=planMaterialAllocation(inventory,inputs.map((x,i)=>({
+  slotId:'slot:'+i,quantity:x.quantity,...(x.itemId?{exactId:x.itemId}:{material:x.material})
+ })));
+ const ready=s.region==='거점 마을'&&!craftingSnapshot.world.runtime.dungeon&&plan.ok;
  const row=make('div',{class:'resource05a-row'},realPanel);
  make('strong',{text:recipe.name},row);
- make('span',{class:'muted',text:inputs.map(x=>x.itemId+' '+ownedQtyForCraft(x.itemId)+'/'+x.quantity).join(' · ')},row);
+ make('span',{class:'muted',text:inputs.map(x=>x.itemId?x.itemId+' '+ownedQtyForCraft(x.itemId)+'/'+x.quantity:'호환 판재 '+x.quantity+'개').join(' · ')},row);
  const action=btn('제작 ('+Math.floor(recipe.seconds/60)+'분)',()=>{
   if(executeV2('mineral.refine',{recipeId:recipe.id})){nextLog('제작',recipe.name+' 완료');}
   render();
