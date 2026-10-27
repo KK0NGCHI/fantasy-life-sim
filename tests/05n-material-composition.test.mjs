@@ -2,7 +2,6 @@ import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {refineMineral05H} from '../src/mineral-refining-05h.js';
 import {readCraftMaterials05N} from '../src/material-composition-05n.js';
-import {canStackItems} from '../dist/engine/v2.js';
 const make=entries=>({items:entries.map(([definitionId,quantity],i)=>({id:'stack:'+i,definitionId,quantity})),placements:entries.map((_,i)=>({itemId:'stack:'+i,location:{kind:'inventory',ownerId:'p'}}))});
 const crafted=(world,id)=>world.items.find(x=>x.definitionId===id);
 test('exact consumed species is displayed in receipt on hybrid basket',()=>{
