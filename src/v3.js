@@ -164,6 +164,14 @@ if(s.region==='거점 마을'){
  },'btn',fields);
 
  btn('농지 한 칸 확장 (10G)',()=>use({type:'home.expand'}),'btn',fields);
+ btn('목재 농업 창고 건축 (참나무 판재 2개 · 농지 +1)',()=>{
+  const outcome=mainV2.m1BuildWoodShed();
+  refreshV2Inventory();
+  nextLog('생활',outcome.accepted&&outcome.outcome==='success'?'목재 농업 창고를 완성했습니다.':'목재 농업 창고 건축 실패 · 판재 2개 필요');
+  render();
+ },'btn',fields);
+ make('p',{class:'muted',text:'기존 제작에서 참나무 원목 2개로 판재를 만들 수 있습니다. 목재 창고: '+(life.facilities.woodShed?'건축됨':'미건축')},fields);
+
  const kitchen=make('div',{class:'resource05a-panel'},panel);
  make('h3',{text:'요리·식사·판매'},kitchen);
  btn('밀빵 요리 (밀 2개)',()=>use({type:'food.cook',recipe:'m1:food:bread'}),'btn',kitchen);
