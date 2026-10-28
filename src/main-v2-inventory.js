@@ -85,7 +85,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
  const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,{...item}]));
  const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(x=>x.group))];
- const catalog={categories,rarities:[],materials:[],effects:[],items:[...initialItems,...resourceItems,...materialTools05A].map(item=>({
+ const catalog={categories,rarities:[],materials:[],effects:[],items:[...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>({
   id:item.id,nameKey:item.name,categoryId:item.group,tags:item.tags??[],capabilities:[]
  }))};
  const built=buildItemRegistry(catalog);
