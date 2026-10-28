@@ -5,7 +5,7 @@ import {planMaterialAllocation} from './material-compatibility-05j.js';
  * Inputs are immutable server-side recipe definitions; metadata is resolved by
  * trusted caller. Returned itemWorld is committed only after full validation.
  */
-export function craftWithAllocatedMaterials(itemWorld,ownerId,recipe,definitions={},choices={}){
+export function craftWithAllocatedMaterials(itemWorld,ownerId,recipe,definitions={},choices={},stackChoices={}){
  if(!itemWorld||!Array.isArray(itemWorld.items)||!Array.isArray(itemWorld.placements)||
   typeof ownerId!=='string'||!ownerId||!recipe||typeof recipe.output!=='string'||
   !Number.isSafeInteger(recipe.outputQty)||recipe.outputQty<1)
@@ -15,8 +15,11 @@ export function craftWithAllocatedMaterials(itemWorld,ownerId,recipe,definitions
  if(!choices||typeof choices!=='object'||Array.isArray(choices)||Object.entries(choices).some(([k,v])=>
   !/^(0|[1-9][0-9]*)$/.test(k)||Number(k)>=inputs.length||typeof v!=='string'||!v||inputs[Number(k)].itemId))
   return {ok:false,reason:'INVALID_MATERIAL_CHOICE'};
+ if(!stackChoices||typeof stackChoices!=='object'||Array.isArray(stackChoices)||Object.entries(stackChoices).some(([k,v])=>
+  !/^(0|[1-9][0-9]*)$/.test(k)||Number(k)>=inputs.length||typeof v!=='string'||!v))
+  return {ok:false,reason:'INVALID_STACK_CHOICE'};
  const slots=inputs.map((x,i)=>({
-  slotId:'slot:'+i,quantity:x.quantity,
+  slotId:'slot:'+i,quantity:x.quantity,...(stackChoices[i]?{allowedItemId:stackChoices[i]}:{}),
   ...(x.itemId?{exactId:x.itemId}:{material:x.material,...(choices[i]?{allowedDefinitionId:choices[i]}:{})})
  }));
  const owned=new Set(itemWorld.placements.filter(p=>p.location?.kind==='inventory'&&p.location.ownerId===ownerId).map(p=>p.itemId));
