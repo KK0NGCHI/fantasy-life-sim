@@ -296,3 +296,34 @@ test('M1 grants farming and cooking XP on completed actions, not failed attempts
  assert.equal(g.m1Action({type:'food.cook',recipe:'m1:food:bread'}).outcome,'failed');
  assert.equal(xp('skill-18'),initialCook+4);
 });
+
+test('M1 rejects corrupted save without changing live state or owner inventory',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const options={worldSeed:'m1-corrupt-atomicity'};
+ const g=createMainV2Inventory(fixture,options);
+ assert.equal(g.m1Action({type:'trade.buy',item:'m1:seed:wheat',quantity:1}).accepted,true);
+ const before=structuredClone(g.current());
+ const {schemaVersion,clock,...rest}=before;
+ const snapshot={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const slot={slotId:'m1-damaged',worldId:'m1-world',kind:'manual',label:'damaged',savedAt:'2026-10-28T00:00:00Z',revision:0};
+ const valid=createSaveV3(snapshot,slot,'m1-test',g.registry);
+ for(const mutate of [
+  x=>{x.state.world.runtime.m1Life.merchant.stock['m1:seed:wheat']=-1;},
+  x=>{x.state.world.runtime.m1Life.plots=[{crop:'missing',readyAt:1,spoilsAt:2,remainingHarvests:1},null];},
+  x=>{x.saveVersion=99;},
+  x=>{x.state.world.runtime.m1Life.merchant.lastRestock=x.state.clock.elapsedSeconds+1;}
+ ]){
+  const bad=structuredClone(valid);mutate(bad);
+  assert.equal(decodeSaveV3(bad,g.registry).ok,false);
+  assert.throws(()=>g.applyApprovedSave(bad));
+  assert.deepEqual(g.current(),before);
+ }
+});
+test('M1 rejects ownerless and foreign-owned items rather than granting free cooking materials',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m1-owner-check'});
+ assert.equal(g.m1Action({type:'food.cook',recipe:'m1:food:bread'}).outcome,'failed');
+ assert.equal(g.m1Life().inventory['m1:food:bread']??0,0);
+ assert.equal(g.m1Action({type:'trade.sell',item:'m1:crop:wheat',quantity:1}).outcome,'failed');
+ assert.equal(g.m1Life().inventory['m1:crop:wheat']??0,0);
+});
