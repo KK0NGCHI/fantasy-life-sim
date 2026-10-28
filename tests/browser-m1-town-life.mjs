@@ -50,5 +50,24 @@ try{
  assert.match(await restored.innerText(),/사과나무/);
 
 
+ const conflict=await page.evaluate(async()=>{
+  const {createMainV2Inventory}=await import('/src/main-v2-inventory.js');
+  const fixture=[{id:'m1-conflict-fixture',name:'시험용',group:'재료',qty:1,tags:[]}];
+  const opts={worldSeed:'m1-conflict',preferences:{getItem:()=>null,setItem:()=>{}}};
+  const first=createMainV2Inventory(fixture,opts);
+  const second=createMainV2Inventory(fixture,opts);
+  const slotId='m1-browser-revision-conflict';
+  const a=await first.save('quick',slotId,'first');
+  const b=await second.save('quick',slotId,'second');
+  let staleRejected=false;
+  try{await first.save('quick',slotId,'stale');}
+  catch{staleRejected=true;}
+  const latest=await second.loadCandidate(slotId);
+  return {staleRejected,revisionIncreased:b.slot.revision>a.slot.revision,
+   latestRevision:latest?.slot?.revision,secondRevision:b.slot.revision};
+ });
+ assert.equal(conflict.staleRejected,true,JSON.stringify(conflict));
+ assert.equal(conflict.revisionIncreased,true);
+ assert.equal(conflict.latestRevision,conflict.secondRevision);
  console.log('M1_TOWN_LIFE_BROWSER_PASS');
 }finally{await browser.close();}
