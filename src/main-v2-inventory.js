@@ -1,3 +1,4 @@
+import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
 import {checkWorkshopStage1,craftUntilStage1} from './crafting-workshop-stage1.js';
 import {craftBatch1} from './crafting-batch-stage1.js';
 import {TREE_BYPRODUCT_ITEMS_05M,takeTreeByproduct05M} from './tree-byproducts-05m.js';
@@ -305,6 +306,8 @@ export function createMainV2Inventory(uiItems,options={}) {
     outputId:result.recipe.output,quantity:result.recipe.outputQty*result.count}}]};
  }],
  ['craft.until',(snapshot,command)=>{
+  const safety=checkCraftSurvivalStage1(snapshot.player,command.payload?.survivalLimits??{});
+  if(!safety.ok)throw Error(safety.reason);
   const access=checkWorkshopStage1(snapshot.world.runtime,command.payload?.recipeId);
   if(!access.ok)throw Error(access.reason);
   const result=craftUntilStage1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,
@@ -611,6 +614,8 @@ export function createMainV2Inventory(uiItems,options={}) {
     if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
     if(action.type==='mineral.refine')return {turns:1,worldUnits:REFINING_BY_ID_05H.get(action.payload?.recipeId)?.seconds??300};
     if(action.type==='craft.until'){
+     const safety=checkCraftSurvivalStage1(current.player,action.payload?.survivalLimits??{});
+     if(!safety.ok)throw Error(safety.reason);
      const access=checkWorkshopStage1(current.world.runtime,action.payload?.recipeId);
      if(!access.ok)throw Error(access.reason);
      const result=craftUntilStage1(current.itemWorld,current.player.id,action.payload?.recipeId,
