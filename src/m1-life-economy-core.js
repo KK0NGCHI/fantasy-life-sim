@@ -159,6 +159,7 @@ export function runM1LifeAction(source,action){
  }
  if(!integer(s.turn+1))return fail('TURN_OVERFLOW');
  s.turn+=1;
+ if(a.requestId)s.recentRequests=[...(s.recentRequests??[]),a.requestId].slice(-32);
  s.events.push(event);if(s.events.length>200)s.events.shift();
  if(!validateM1LifeState(s))return fail('INVALID_RESULT');
  return {ok:true,state:s,event};
