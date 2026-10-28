@@ -828,7 +828,11 @@ export function createMainV2Inventory(uiItems,options={}) {
    }
    return life;
   },
-  m1Action(action){return this.dispatch('m1.life',action);},
+  m1Action(action){
+   if(action?.requestId&&state.world.runtime.m1Life?.recentRequests?.includes(action.requestId))
+    return {accepted:false,outcome:'rejected',reason:'DUPLICATE_REQUEST',events:[]};
+   return this.dispatch('m1.life',action);
+  },
   m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
   /** Bounded synchronous automation. Calls exactly the same game actions as a
    * manual player, with safety evaluated before each attempt. */
