@@ -1,4 +1,4 @@
-import {newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
+import {M1_PRICES,newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
 import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
 import {checkWorkshopStage1,craftUntilStage1} from './crafting-workshop-stage1.js';
 import {craftBatch1} from './crafting-batch-stage1.js';
@@ -77,9 +77,14 @@ export function createMainV2Inventory(uiItems,options={}) {
    id:'tool05a:gloves:'+material,name:name+' 채집 장갑',group:'도구',qty:0,tags:['tool:gather','material:'+material,'rank:'+rank]
   }))
  ];
+ const m1Names={'m1:seed:wheat':'밀 씨앗','m1:seed:potato':'감자 씨앗','m1:seed:strawberry':'딸기 씨앗',
+  'm1:seed:blueberry':'블루베리 씨앗','m1:crop:wheat':'밀','m1:crop:potato':'감자',
+  'm1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리','m1:food:bread':'밀빵',
+  'm1:food:baked-potato':'구운 감자'};
+ const m1Catalog=Object.keys(M1_PRICES).map(id=>({id,name:m1Names[id],group:id.includes(':seed:')?'씨앗':'식재료',qty:0,tags:['m1:life']}));
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
- const templates=new Map([...initialItems,...resourceItems,...materialTools05A].map(item=>[item.id,{...item}]));
- const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A].map(x=>x.group))];
+ const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,{...item}]));
+ const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(x=>x.group))];
  const catalog={categories,rarities:[],materials:[],effects:[],items:[...initialItems,...resourceItems,...materialTools05A].map(item=>({
   id:item.id,nameKey:item.name,categoryId:item.group,tags:item.tags??[],capabilities:[]
  }))};
@@ -219,7 +224,17 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(snapshot.world.runtime.region!=='거점 마을')throw Error('M1_TOWN_REQUIRED');
   const previous=snapshot.world.runtime.m1Life??newM1LifeState();
   if(!validateM1LifeState(previous))throw Error('M1_INVALID_STATE');
-  const aligned={...previous,now:snapshot.clock.elapsedUnits,turn:snapshot.turn};
+  // The existing itemWorld is the only authoritative source of item quantities.
+  // The reducer's inventory projection is rehydrated from player-owned stacks.
+  const owned={};
+  for(const item of snapshot.itemWorld.items){
+   if(!Object.hasOwn(M1_PRICES,item.definitionId))continue;
+   if(!snapshot.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&
+    p.location.ownerId===snapshot.player.id))continue;
+   owned[item.definitionId]=(owned[item.definitionId]??0)+item.quantity;
+  }
+  const aligned={...previous,inventory:owned,hunger:snapshot.player.hunger,
+   now:snapshot.clock.elapsedUnits,turn:snapshot.turn};
   const result=runM1LifeAction(aligned,command.payload);
   if(!result.ok){
    // An attempted but unsuccessful in-world action still spends one turn.
@@ -233,7 +248,32 @@ export function createMainV2Inventory(uiItems,options={}) {
   }
   // Single authoritative embedded snapshot. The dispatcher charges clock/turn.
   const life={...result.state,turn:snapshot.turn+1};
-  const next={...snapshot,player:{...snapshot.player,hunger:life.hunger},world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
+  let itemWorld=snapshot.itemWorld;
+  for(const [id,qty] of Object.entries(life.inventory)){
+   const delta=qty-(owned[id]??0);
+   if(delta>0)itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,
+    'm1:stack:'+snapshot.player.id+':'+id,id,delta);
+  }
+  // Decrement only stacks owned by the player; a missing stack is not created.
+  for(const [id,original] of Object.entries(owned)){
+   let remaining=original-(life.inventory[id]??0);
+   if(remaining<=0)continue;
+   const items=[];
+   for(const item of itemWorld.items){
+    const isOwned=item.definitionId===id&&itemWorld.placements.some(p=>p.itemId===item.id&&
+     p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id);
+    if(!isOwned||remaining===0){items.push(item);continue;}
+    const used=Math.min(item.quantity,remaining);remaining-=used;
+    if(item.quantity>used)items.push({...item,quantity:item.quantity-used});
+   }
+   if(remaining!==0)throw Error('M1_ITEM_LEDGER_DESYNC');
+   const ids=new Set(items.map(x=>x.id));
+   itemWorld={...itemWorld,items,placements:itemWorld.placements.filter(p=>ids.has(p.itemId))};
+  }
+  // No second item ledger persists in m1Life: it is a presentation-only projection.
+  life.inventory={};
+  const next={...snapshot,itemWorld,player:{...snapshot.player,hunger:life.hunger},
+   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
   return {outcome:'success',nextState:next,events:[{type:result.event.type,payload:result.event}]};
  }],
 
@@ -723,7 +763,17 @@ export function createMainV2Inventory(uiItems,options={}) {
  };
  return {
   registry,projected,current,
-  m1Life(){return structuredClone(state.world.runtime.m1Life??newM1LifeState());},
+  m1Life(){
+   const life=structuredClone(state.world.runtime.m1Life??newM1LifeState());
+   life.hunger=state.player.hunger;
+   life.inventory={};
+   for(const item of state.itemWorld.items){
+    if(!Object.hasOwn(M1_PRICES,item.definitionId))continue;
+    if(state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
+     life.inventory[item.definitionId]=(life.inventory[item.definitionId]??0)+item.quantity;
+   }
+   return life;
+  },
   m1Action(action){return this.dispatch('m1.life',action);},
 
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
