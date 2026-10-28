@@ -308,7 +308,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const access=checkWorkshopStage1(snapshot.world.runtime,command.payload?.recipeId);
   if(!access.ok)throw Error(access.reason);
   const result=craftUntilStage1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,
-   command.payload?.count,command.payload?.choices??{},command.payload?.stackChoices??{});
+   command.payload?.count,command.payload?.choices??{},command.payload?.stackChoices??{},command.payload?.policy??{});
   if(!result.ok)throw Error(result.reason);
   return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
    events:[{type:'craft.repeat_stopped',payload:{recipeId:result.recipe.id,
