@@ -1,3 +1,4 @@
+import {checkCraftingTabooStage1} from './crafting-taboo-stage1.js';
 import {MATERIALS_CONDITION_05N,craftMaterialReceipt05N,TRACKED_RECIPES_05N} from './material-composition-05n.js';
 import {planMaterialAllocation} from './material-compatibility-05j.js';
 
@@ -28,6 +29,8 @@ export function craftWithAllocatedMaterials(itemWorld,ownerId,recipe,definitions
  }));
  const plan=planMaterialAllocation(stocks,slots);
  if(!plan.ok)return {ok:false,reason:plan.reason==='INVALID_MATERIAL_PLAN'?'INVALID_RECIPE':plan.reason};
+ const taboo=checkCraftingTabooStage1(recipe,plan.allocations,itemWorld,definitions);
+ if(!taboo.ok)return taboo;
  const spent=new Map();
  for(const allocation of plan.allocations)spent.set(allocation.itemId,(spent.get(allocation.itemId)??0)+allocation.quantity);
  const remaining=itemWorld.items.map(i=>({...i,quantity:i.quantity-(spent.get(i.id)??0)}));
