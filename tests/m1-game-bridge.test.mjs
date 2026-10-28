@@ -45,3 +45,17 @@ test('M1 opt-in life extension survives strict v3 save roundtrip and rejects cor
  bad.state.world.runtime.m1Life.gold=-1;
  assert.deepEqual(decodeSaveV3(bad,bridge.registry),{ok:false,reason:'INVALID_DATA'});
 });
+
+test('M1 real failed harvest spends one turn without granting crops',()=>{
+ const b=createMainV2Inventory([{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}],{worldSeed:'m1-failed-seed'});
+ const before=b.current();
+ const result=b.m1Action({type:'farm.harvest',plot:0});
+ assert.equal(result.accepted,true);
+ assert.equal(result.outcome,'failed');
+ assert.equal(b.current().turn,before.turn+1);
+ assert.equal(b.current().clock.elapsedUnits,before.clock.elapsedUnits+60);
+ assert.equal(b.m1Life().inventory['m1:crop:wheat']??0,0);
+ const malformed=b.m1Action({type:'farm.harvest',plot:-1});
+ assert.equal(malformed.accepted,false);
+ assert.equal(b.current().turn,before.turn+1);
+});
