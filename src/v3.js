@@ -159,7 +159,7 @@ if(incidental){
 }
 
 for(const a of regionActions()){const b=make('button',{class:'v3-action',type:'button'},actions);b.innerHTML=svgIcon(ACTION_ICONS[a]||'compass')+'<span>'+esc(actionLabel(a))+'</span>';b.addEventListener('click',()=>act(a));}
-if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','산맥'].includes(s.region)){
+if(['거점 마을','숲','광산','강·호수','습지','해안·항구','초원·농경지','산맥'].includes(s.region)){
  const snapshot=mainV2.resources05A();
  if(snapshot){
   const panel=make('section',{class:'resource05a-panel','aria-label':'지역 자원 활동'},el);
@@ -184,7 +184,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
    }
   }
   const groups=RESOURCES_05A.filter(r=>r.region===s.region).map(r=>r.activity);
-  const kinds=[...new Set(groups)],titles={gather:'채집',logging:'벌목',mining:'채광',fishing:'낚시'};
+  const kinds=s.region==='거점 마을'?['mining']:[...new Set(groups)],titles={gather:'채집',logging:'벌목',mining:'채광',fishing:'낚시'};
   const tabs=make('div',{class:'resource05a-tabs'},panel);
   const results=make('div',{class:'resource05a-list'},panel);
   const state={kind:kinds[0]};
