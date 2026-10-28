@@ -30,7 +30,7 @@ try{
  // A real orchard purchase, first fruit, then browser reload from IndexedDB.
  await panel.getByRole('button',{name:/감자 1개 판매/}).click();
  await panel.getByRole('button',{name:/사과나무 씨앗 구매/}).click();
- await panel.getByRole('button',{name:'사과나무 심기'}).first().click();
+ await panel.getByRole('button',{name:'사과 심기'}).first().click();
  for(let day=0;day<7;day++)await panel.getByRole('button',{name:/하루 경과/}).click();
  await panel.getByRole('button',{name:'수확'}).first().click();
  assert.match(await panel.innerText(),/사과 4/);
