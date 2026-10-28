@@ -80,7 +80,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  const m1Names={'m1:seed:wheat':'밀 씨앗','m1:seed:potato':'감자 씨앗','m1:seed:strawberry':'딸기 씨앗',
   'm1:seed:blueberry':'블루베리 씨앗','m1:crop:wheat':'밀','m1:crop:potato':'감자',
   'm1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리','m1:food:bread':'밀빵',
-  'm1:food:baked-potato':'구운 감자'};
+  'm1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
  const m1Catalog=Object.keys(M1_PRICES).map(id=>({id,name:m1Names[id],group:id.includes(':seed:')?'씨앗':'식재료',qty:0,tags:['m1:life']}));
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
  const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,{...item}]));
@@ -271,7 +271,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    // Malformed or unsupported commands remain zero-turn dispatch rejections.
    const gameplayFailures=new Set(['PLOT_OCCUPIED','NO_SEED','EMPTY_PLOT','NOT_RIPE','OVER_RIPE',
     'OUT_OF_STOCK','INSUFFICIENT_GOLD','NOT_OWNED','MISSING_INGREDIENTS','KITCHEN_REQUIRED',
-    'MAX_PLOTS','NOT_EDIBLE']);
+    'MAX_PLOTS','NOT_EDIBLE','WRONG_SEASON']);
    if(gameplayFailures.has(result.reason))return {outcome:'failed',nextState:snapshot,
     events:[{type:'m1.action_failed',payload:{reason:result.reason,action:command.payload.type}}]};
    throw Error(result.reason);
