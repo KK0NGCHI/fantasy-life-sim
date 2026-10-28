@@ -348,3 +348,41 @@ test('M1 requestId deduplicates accepted purchases before and after v3 restore',
  assert.equal(restored.m1Action({...cmd,requestId:'buy-wheat-0002'}).accepted,true);
  assert.equal(restored.m1Life().inventory['m1:seed:wheat'],2);
 });
+
+test('M1 E2E-07 request-keyed manual and auto remain identical after interruption and save',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const opts={worldSeed:'m1-final-parity',progression04A:true};
+ const manual=createMainV2Inventory(fixture,opts),automatic=createMainV2Inventory(fixture,opts);
+ const first=[
+  {type:'trade.buy',item:'m1:seed:wheat',quantity:1,requestId:'final-buy'},
+  {type:'farm.plant',plot:0,crop:'wheat',requestId:'final-plant'},
+  {type:'time.advance',seconds:86400,requestId:'final-day'},
+  {type:'farm.harvest',plot:0,requestId:'final-harvest'}
+ ];
+ for(const a of first)assert.equal(manual.m1Action(a).accepted,true);
+ const batch=automatic.m1RunPlan(first,{hungerMin:1});
+ assert.equal(batch.completed,4);assert.equal(batch.stopReason,'COMPLETED');
+ assert.deepEqual(automatic.current(),manual.current());
+ const before=structuredClone(automatic.current());
+ assert.equal(automatic.m1Action(first[0]).reason,'DUPLICATE_REQUEST');
+ assert.deepEqual(automatic.current(),before);
+ const {schemaVersion,clock,...rest}=before;
+ const state={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const slot={slotId:'m1-final-parity',worldId:'m1-world',kind:'manual',label:'parity',savedAt:'2026-10-28T00:00:00Z',revision:0};
+ const saved=createSaveV3(state,slot,'m1-test',automatic.registry);
+ const resumed=createMainV2Inventory(fixture,opts);
+ resumed.applyApprovedSave(JSON.parse(JSON.stringify(saved)));
+ assert.equal(resumed.m1Action(first[3]).reason,'DUPLICATE_REQUEST');
+ assert.deepEqual(resumed.current(),manual.current());
+ const final=[
+  {type:'food.cook',recipe:'m1:food:bread',requestId:'final-cook'},
+  {type:'food.eat',item:'m1:food:bread',requestId:'final-eat'},
+  {type:'trade.sell',item:'m1:crop:wheat',quantity:1,requestId:'final-sale'},
+  {type:'trade.buy',item:'m1:seed:potato',quantity:1,requestId:'final-reinvest'}
+ ];
+ for(const a of final)assert.equal(manual.m1Action(a).accepted,true);
+ const second=resumed.m1RunPlan(final,{hungerMin:1});
+ assert.equal(second.completed,4);assert.equal(second.stopReason,'COMPLETED');
+ assert.deepEqual(resumed.current(),manual.current());
+ assert.equal(resumed.m1Life().inventory['m1:seed:potato'],1);
+});
