@@ -921,6 +921,16 @@ btn('주변 위험 탐색 (M2)',()=>{
  render();
 },'btn',right);
 
+const avoidActions=make('div',{class:'dungeon-main-actions'},right);
+for(const [mode,label] of [['sneak','은신하여 통과 (M2)'],['bypass','위험 우회 (M2)']]){
+ btn(label,()=>{
+  stopAuto();
+  const result=mainV2.m2AvoidEncounter(mode);
+  if(result.accepted){refreshV2Inventory();nextLog('탐험',result.outcome==='success'?'위험을 전투 없이 통과했습니다.':'위험 회피에 실패했습니다.');}
+  else nextLog('위험','회피 요청 거부: '+(result.reason??''));
+  render();
+ },'btn',avoidActions);
+}
 const actions=make('div',{class:'dungeon-main-actions'},right);
 btn(autoTimer?'자동 탐색 중지':'자동 탐색 시작',()=>{
  if(autoTimer){stopAuto();nextLog('시스템','자동 이동 중지');render()}
