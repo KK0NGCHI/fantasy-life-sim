@@ -312,7 +312,8 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
     crop.includes(String(p.crop))&&nonnegative(p.readyAt)&&nonnegative(p.spoilsAt)&&
     Number(p.spoilsAt)>=Number(p.readyAt)&&nonnegative(p.remainingHarvests)&&
     Number(p.remainingHarvests)>0&&Number(p.remainingHarvests)<=3))||
-   !obj(x.merchant)||!keys(x.merchant,['stock'])||!obj(x.merchant.stock)||
+   !obj(x.merchant)||!keys(x.merchant,['stock','lastRestock'])||!obj(x.merchant.stock)||
+   (Object.hasOwn(x.merchant,'lastRestock')&&(!nonnegative(x.merchant.lastRestock)||Number(x.merchant.lastRestock)>Number(x.now)))||
    !Object.entries(x.merchant.stock).every(([k,v])=>catalog.includes(k)&&nonnegative(v))||
    !Array.isArray(x.events)||x.events.length>200||
    !x.events.every((e:unknown)=>obj(e)&&typeof e.type==='string'&&e.type.length>0&&e.type.length<=80))return {ok:false,reason:'INVALID_DATA'};
