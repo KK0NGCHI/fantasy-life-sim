@@ -132,3 +132,30 @@ test('M1 automatic safety stops before consuming any turn and valid failed attem
  assert.equal(invalid.ok,false);
  assert.equal(a.current().turn,1);
 });
+
+test('M1 uses legacy oak-plank processing to construct a one-time functional shed',()=>{
+ const fixture=[
+  {id:'item05a:oak-log',name:'참나무 원목',group:'재료',qty:2,tags:[]}
+ ];
+ const b=createMainV2Inventory(fixture,{worldSeed:'m1-wood-shed'});
+ const owned=id=>b.current().itemWorld.items.filter(i=>i.definitionId===id&&b.current().itemWorld.placements.some(p=>
+  p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===b.current().player.id)).reduce((n,i)=>n+i.quantity,0);
+ const before=b.current().turn;
+ const tooSoon=b.m1BuildWoodShed();
+ assert.equal(tooSoon.accepted,true);
+ assert.equal(tooSoon.outcome,'failed');
+ assert.equal(b.current().turn,before+1);
+ const crafted=b.dispatch('mineral.refine',{recipeId:'refine05h:oak-planks'});
+ assert.equal(crafted.accepted,true,JSON.stringify(crafted));
+ assert.equal(owned('item05a:oak-log'),0);
+ assert.equal(owned('item05h:oak-planks'),2);
+ const built=b.m1BuildWoodShed();
+ assert.equal(built.accepted,true,JSON.stringify(built));
+ assert.equal(built.outcome,'success');
+ assert.equal(owned('item05h:oak-planks'),0);
+ assert.equal(b.m1Life().plots.length,3);
+ assert.equal(b.m1Life().facilities.woodShed,true);
+ const duplicate=b.m1BuildWoodShed();
+ assert.equal(duplicate.outcome,'failed');
+ assert.equal(b.m1Life().plots.length,3);
+});
