@@ -82,3 +82,26 @@ test('merchant restock is world-time based, bounded and identical for split/whol
  assert.equal(whole.merchant.lastRestock,14*86400);
  assert.equal(doAction(whole,{type:'time.advance',seconds:60}).merchant.stock['m1:seed:wheat'],8);
 });
+
+test('M1 seasonal gates reject winter planting without charging the pure reducer',()=>{
+ let s=newM1LifeState();
+ s=doAction(s,{type:'time.advance',seconds:84*86400});
+ const before=JSON.stringify(s);
+ const result=runM1LifeAction(s,{type:'farm.plant',plot:0,crop:'wheat'});
+ assert.equal(result.ok,false);
+ assert.equal(result.reason,'WRONG_SEASON');
+ assert.equal(JSON.stringify(s),before);
+});
+test('M1 orchard apple first fruit, yearly repeat and long-time stock conservation',()=>{
+ let s=newM1LifeState();
+ s=doAction(s,{type:'trade.buy',item:'m1:seed:apple',quantity:1});
+ s=doAction(s,{type:'farm.plant',plot:0,crop:'apple'});
+ s=doAction(s,{type:'time.advance',seconds:7*86400});
+ s=doAction(s,{type:'farm.harvest',plot:0});
+ assert.equal(s.inventory['m1:crop:apple'],4);
+ assert.equal(s.plots[0].remainingHarvests,2);
+ s=doAction(s,{type:'time.advance',seconds:112*86400});
+ s=doAction(s,{type:'farm.harvest',plot:0});
+ assert.equal(s.inventory['m1:crop:apple'],8);
+ assert.equal(s.plots[0].remainingHarvests,1);
+});
