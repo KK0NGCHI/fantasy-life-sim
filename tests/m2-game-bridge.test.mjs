@@ -73,3 +73,19 @@ test('M2 mid-combat v3 roundtrip preserves initiative, HP and one-time outcome',
  assert.throws(()=>g.applyApprovedSave(corrupted));
  assert.deepEqual(g.current(),before);
 });
+
+test('M2 victory grants one real owned trophy and cannot pay twice',()=>{
+ const g=createMainV2Inventory([{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}],{worldSeed:'m2-one-reward',progression04A:true});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ assert.equal(g.m2StartEncounter({encounterId:'m2:loot:one',enemyHps:[3],seed:42}).accepted,true);
+ const won=g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'});
+ assert.equal(won.accepted,true,JSON.stringify(won));
+ const state=g.current();
+ const stack=state.itemWorld.items.filter(i=>i.definitionId==='m2:loot:fang');
+ assert.equal(stack.length,1);
+ assert.equal(stack[0].quantity,1);
+ assert.equal(state.itemWorld.placements.some(p=>p.itemId===stack[0].id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id),true);
+ assert.deepEqual(state.world.runtime.m2RewardedEncounters,['m2:loot:one']);
+ assert.equal(g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'}).accepted,false);
+ assert.deepEqual(g.current(),state);
+});
