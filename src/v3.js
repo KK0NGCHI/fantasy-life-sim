@@ -121,7 +121,7 @@ if(s.region==='거점 마을'){
  const stock=make('div',{class:'resource05a-row'},panel);
  const labels={'m1:seed:wheat':'밀 씨앗','m1:seed:potato':'감자 씨앗','m1:seed:strawberry':'딸기 씨앗','m1:seed:blueberry':'블루베리 씨앗',
   'm1:crop:wheat':'밀','m1:crop:potato':'감자','m1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리',
-  'm1:food:bread':'밀빵','m1:food:baked-potato':'구운 감자'};
+  'm1:food:bread':'밀빵','m1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
  make('span',{text:Object.entries(life.inventory).map(([id,n])=>(labels[id]??id)+' '+n).join(' · ')||'실제 생산 재고 없음'},stock);
  const use=(action)=>{
   const result=mainV2.m1Action(action);
@@ -132,18 +132,18 @@ if(s.region==='거점 마을'){
  };
  const controls=make('div',{class:'resource05a-panel'},panel);
  make('h3',{text:'상인 · 씨앗 구매'},controls);
- for(const [crop,caption] of [['wheat','밀'],['potato','감자'],['strawberry','딸기'],['blueberry','블루베리']]){
+ for(const [crop,caption] of [['wheat','밀'],['potato','감자'],['strawberry','딸기'],['blueberry','블루베리'],['apple','사과나무']]){
   const id='m1:seed:'+crop;
-  btn(caption+' 씨앗 구매 ('+(crop==='wheat'||crop==='potato'?2:4)+'G / 재고 '+(life.merchant.stock[id]??0)+')',
+  btn(caption+' 씨앗 구매 ('+(crop==='apple'?12:crop==='wheat'||crop==='potato'?2:4)+'G / 재고 '+(life.merchant.stock[id]??0)+')',
    ()=>use({type:'trade.buy',item:id,quantity:1}),'btn',controls);
  }
  const fields=make('div',{class:'resource05a-panel'},panel);
  make('h3',{text:'농지 · 파종과 수확'},fields);
  life.plots.forEach((plot,i)=>{
   const row=make('div',{class:'resource05a-row'},fields);
-  make('strong',{text:'농지 '+(i+1)+' · '+(plot?(labels['m1:crop:'+plot.crop]??plot.crop)+' / '+(mainV2.current().clock.elapsedUnits>=plot.readyAt?'수확 가능':'생장 중'):'빈 밭')},row);
+  make('strong',{text:'농지 '+(i+1)+' · '+(plot?(labels['m1:crop:'+plot.crop]??plot.crop)+' / '+(mainV2.current().clock.elapsedUnits>=plot.readyAt?'수확 시기 확인':'생장 중'):'빈 밭')},row);
   if(plot)btn('수확',()=>use({type:'farm.harvest',plot:i}),'btn',row);
-  else for(const crop of ['wheat','potato','strawberry','blueberry'])
+  else for(const crop of ['wheat','potato','strawberry','blueberry','apple'])
    if((life.inventory['m1:seed:'+crop]??0)>0)btn((labels['m1:crop:'+crop]??crop)+' 심기',()=>use({type:'farm.plant',plot:i,crop}),'btn',row);
  });
  btn('하루 경과 (게임 시간 24시간)',()=>use({type:'time.advance',seconds:86400}),'btn',fields);
