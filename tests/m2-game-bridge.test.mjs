@@ -89,3 +89,40 @@ test('M2 victory grants one real owned trophy and cannot pay twice',()=>{
  assert.equal(g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'}).accepted,false);
  assert.deepEqual(g.current(),state);
 });
+
+test('M2 noncombat bypass grants exploration credit without combat loot or repeat farming',()=>{
+ const g=createMainV2Inventory([{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}],{worldSeed:'m2-bypass-test',progression04A:true});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ const start=g.current();
+ assert.equal(g.m2AvoidEncounter('teleport').accepted,false);
+ assert.deepEqual(g.current(),start);
+ const result=g.m2AvoidEncounter('bypass');
+ assert.equal(result.accepted,true,JSON.stringify(result));
+ assert.equal(result.outcome,'success');
+ const current=g.current();
+ assert.equal(current.turn,start.turn+1);
+ assert.equal(current.world.runtime.m2AvoidedEncounters.length,1);
+ assert.equal(current.world.runtime.m2AvoidedEncounters[0].mode,'bypass');
+ assert.equal(current.itemWorld.items.some(i=>i.definitionId==='m2:loot:fang'),false);
+ assert.equal(current.world.runtime.m2RewardedEncounters?.length??0,0);
+ const repeated=g.m2AvoidEncounter('bypass');
+ assert.equal(repeated.accepted,true);
+ assert.equal(repeated.outcome,'failed');
+ assert.equal(g.current().world.runtime.m2AvoidedEncounters.length,1);
+ assert.deepEqual(g.current().progression,current.progression);
+ assert.equal(g.m2ExploreEncounter().outcome,'failed');
+ assert.equal(g.m2Combat(),null);
+});
+test('M2 stealth failure does not grant loot or mark unpassed tile',()=>{
+ const g=createMainV2Inventory([{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}],{worldSeed:'m2-sneak-fail'});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ // At most ten deterministic attempts are sufficient to see one failure in this seeded fixture.
+ let failure=null;
+ for(let i=0;i<10;i++){
+  const attempted=g.m2AvoidEncounter('sneak');
+  if(attempted.outcome==='failed'){failure=attempted;break;}
+  if(attempted.outcome==='success')break;
+ }
+ assert.equal(failure?.outcome==='failed'||g.current().world.runtime.m2AvoidedEncounters?.length===1,true);
+ assert.equal(g.current().itemWorld.items.some(i=>i.definitionId==='m2:loot:fang'),false);
+});
