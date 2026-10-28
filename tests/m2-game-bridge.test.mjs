@@ -50,7 +50,7 @@ test('M2 exploration encounter is consumed once per dungeon tile and enemy turn 
  assert.deepEqual(g.current().world.runtime.pos,pos);
 });
 
-test('M2 mid-combat v3 roundtrip preserves initiative, HP and one-time outcome',()=>{
+test('M2 mid-combat v3 roundtrip preserves initiative, HP and one-time outcome',async()=>{
  const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
  const g=createMainV2Inventory(fixture,{worldSeed:'m2-v3-roundtrip'});
  assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
