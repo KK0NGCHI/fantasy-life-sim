@@ -100,7 +100,7 @@ export function runM1LifeAction(source,action){
   changeStock(s.inventory,c.yield,c.quantity);
   p.remainingHarvests--;
   if(p.remainingHarvests===0)s.plots[a.plot]=null;
-  else{p.readyAt=s.now+(c.orchard?28*86400:c.grow);p.spoilsAt=p.readyAt+c.window;}
+  else{p.readyAt=s.now+(c.orchard?112*86400:c.grow);p.spoilsAt=p.readyAt+c.window;}
   event={type:'farm.harvested',crop:p.crop,quantity:c.quantity};
   break;
  }
