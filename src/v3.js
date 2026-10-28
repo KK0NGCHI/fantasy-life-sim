@@ -886,7 +886,7 @@ function m2CombatScreen(){
   btn('방어',()=>act('defend'),'btn',buttons);
   btn('퇴각',()=>act('retreat'),'btn',buttons);
  }else{
-  btn('적의 행동 진행',()=>act('attack','player'),'btn primary',buttons);
+  btn('적의 행동 진행',()=>{const result=mainV2.m2EnemyTurn();if(!result.accepted)nextLog('위험','적 행동 거부: '+(result.reason??''));else{refreshV2Inventory();nextLog('전투','적 행동 처리');}render();},'btn primary',buttons);
  }
 }
 function dungeon(){
@@ -913,9 +913,9 @@ for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
 make('h2',{text:'탐색 제어'},right);
 const activeM2=mainV2.m2Combat();
 if(activeM2?.phase==='resolved')make('p',{text:'최근 전투 결과: '+activeM2.outcome},right);
-btn('적 조우 (M2 시험)',()=>{
+btn('주변 위험 탐색 (M2)',()=>{
  stopAuto();
- const result=mainV2.m2StartEncounter({encounterId:'m2:demo:'+mainV2.current().turn,enemyHps:[12,9],seed:1});
+ const result=mainV2.m2ExploreEncounter();
  if(result.accepted){refreshV2Inventory();nextLog('전투','M2 조우 시작');}
  else nextLog('위험','조우 시작 실패: '+(result.reason??''));
  render();
