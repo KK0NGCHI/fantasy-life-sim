@@ -218,7 +218,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      const requiredText=requirements.map(req=>req.itemId?named(req.itemId)+' ×'+req.quantity:
        '호환 소재('+req.material.family+(req.material.form?'/'+req.material.form:'')+') ×'+req.quantity).join(' · ');
      make('span',{class:'muted',text:requiredText+' → '+named(recipe.output)+' ×'+recipe.outputQty},row);
-     const choices={};
+     const choices={},stackChoices={};
      const owner=snapshotWorld.player.id;
      const stocks=allItems.items.filter(item=>allItems.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===owner))
       .map(item=>({...item,...(CRAFTING_DEFINITIONS_1[item.definitionId]??{})}));
@@ -230,18 +230,28 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
       for(const [value,label] of [['','자동 선택'],...candidates.map(id=>[id,named(id)])]){
        const option=make('option',{text:label},chooser);option.value=value;
       }
-      chooser.onchange=()=>{if(chooser.value)choices[index]=chooser.value;else delete choices[index];updateAvailability()};
+      chooser.onchange=()=>{if(chooser.value)choices[index]=chooser.value;else delete choices[index];delete stackChoices[index];stackChooser.value='';refreshStackChoices();updateAvailability()};
+      const stackChooser=make('select',{'aria-label':recipe.name+' 보유 스택 선택 '+(index+1)},row);
+      function refreshStackChoices(){
+       stackChooser.replaceChildren();
+       const auto=make('option',{text:'스택 자동 선택'},stackChooser);auto.value='';
+       for(const item of stocks.filter(item=>materialMatches(item,{material:req.material,...(choices[index]?{allowedDefinitionId:choices[index]}:{})}))){
+        const o=make('option',{text:named(item.definitionId)+' ×'+item.quantity+' ['+item.id+']'},stackChooser);o.value=item.id;
+       }
+      }
+      refreshStackChoices();
+      stackChooser.onchange=()=>{if(stackChooser.value)stackChoices[index]=stackChooser.value;else delete stackChoices[index];updateAvailability()};
      });
      const msg=make('span',{class:'tiny muted'},row);
      const refine=btn('제작 ('+Math.floor(recipe.seconds/60)+'분/회)',()=>{
       const count=Number(craftingCount.value);
       const type=craftingMode.value==='until'?'craft.until':'craft.batch';
-      if(!executeV2(type,{recipeId:recipe.id,count,choices}))return render();
+      if(!executeV2(type,{recipeId:recipe.id,count,choices,stackChoices}))return render();
       nextLog('제작',recipe.name+' 반복 제작 처리 완료');render();
      },'btn',row);
      const updateAvailability=()=>{
-      const preview=craftPreview1(allItems,owner,recipe.id,choices);
-      const trial=preview.ok?(craftingMode.value==='until'?preview:craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices)):preview;
+      const preview=craftPreview1(allItems,owner,recipe.id,choices,stackChoices);
+      const trial=preview.ok?(craftingMode.value==='until'?preview:craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices,stackChoices)):preview;
       msg.textContent=trial.ok?'제작 가능'+(craftingMode.value==='until'?' · 재료 고갈 시 자동 중단':''):'재료 부족/호환 불가: '+trial.reason;
       refine.disabled=s.region!=='거점 마을'||!trial.ok;
      };

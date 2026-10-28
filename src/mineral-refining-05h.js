@@ -48,8 +48,8 @@ export const REFINED_ITEMS_05H=Object.freeze([
 /** Legacy 05-H/I dispatcher API; now shares the 05-J allocator through 05-K.
  * All existing exact-ID recipes, output IDs, and station/duration metadata stay unchanged.
  */
-export function refineMineral05H(itemWorld,ownerId,recipeId,choices={}){
+export function refineMineral05H(itemWorld,ownerId,recipeId,choices={},stackChoices={}){
  const recipe=REFINING_BY_ID_05H.get(recipeId);
  if(!recipe)return {ok:false,reason:'UNKNOWN_RECIPE'};
- return craftWithAllocatedMaterials(itemWorld,ownerId,recipe,{...CRAFTING_MATERIALS_05L,...FOREST_MATERIALS_05M,...FIBER_MATERIALS_05M},choices);
+ return craftWithAllocatedMaterials(itemWorld,ownerId,recipe,{...CRAFTING_MATERIALS_05L,...FOREST_MATERIALS_05M,...FIBER_MATERIALS_05M},choices,stackChoices);
 }

@@ -18,14 +18,14 @@ export function checkWorkshopStage1(runtime,recipeId){
  * is retained when ingredients run out. No extra time for the blocked attempt.
  * This is NOT a background job and requires one explicit player command.
  */
-export function craftUntilStage1(world,ownerId,recipeId,count,choices={}){
+export function craftUntilStage1(world,ownerId,recipeId,count,choices={},stackChoices={}){
  if(!Number.isSafeInteger(count)||count<1||count>CRAFTING_BATCH_LIMIT_1)
   return {ok:false,reason:'INVALID_BATCH_COUNT',completed:0};
  const recipe=REFINING_BY_ID_05H.get(recipeId);
  if(!recipe)return {ok:false,reason:'UNKNOWN_RECIPE',completed:0};
  let current=world,completed=0,blockedBy=null;
  for(let i=0;i<count;i++){
-  const next=craftBatch1(current,ownerId,recipeId,1,choices);
+  const next=craftBatch1(current,ownerId,recipeId,1,choices,stackChoices);
   if(!next.ok){blockedBy=next.reason;break;}
   current=next.itemWorld;completed++;
  }
