@@ -251,6 +251,8 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
       refreshStackChoices();
       stackChooser.onchange=()=>{if(stackChooser.value)stackChoices[index]=stackChooser.value;else delete stackChoices[index];updateAvailability()};
      });
+     const tabooNotice=make('span',{class:'tiny muted',text:recipe.output.startsWith('tool05a:')?
+      '장비 제작: 이질적 기원 소재를 실제 투입하면 제작 금기가 적용됩니다.':'일반 제작: 이질적 기원 장비 제작 금기는 적용되지 않습니다.'},row);
      const msg=make('span',{class:'tiny muted'},row);
      const refine=btn('제작 ('+Math.floor(recipe.seconds/60)+'분/회)',()=>{
       const count=Number(craftingCount.value);
