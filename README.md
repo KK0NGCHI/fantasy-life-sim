@@ -4,6 +4,7 @@
 
 - [현재 구현·실행 경로·CI/검수 구분](docs/PROJECT_STATUS.md)
 - [M0~M5 통합 개발 마스터 로드맵](docs/MASTER_ROADMAP.md)
+- [통합 실행계획서 v1](docs/SOMNIUM_EXECUTION_PLAN_v1.md)
 - [확정 규칙·시험값·세계관 충돌 원장](docs/DECISIONS_AND_CONFLICTS.md)
 - [자원·제작 상세 기술 참고 (상위 로드맵 아님)](docs/resource-crafting-roadmap-v2-consolidated.md)
 
