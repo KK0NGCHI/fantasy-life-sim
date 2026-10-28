@@ -31,7 +31,7 @@ export function newM1LifeState(){
  return {schema:1,now:0,turn:0,gold:20,hunger:85,inventory:{},plots:[null,null],
   facilities:{kitchen:true,workbench:true,plotCapacity:2},
   merchant:{stock:{...SEED_STOCK},lastRestock:0},
-  events:[]};
+  events:[],recentRequests:[]};
 }
 export function validateM1LifeState(s){
  if(!s||s.schema!==1||!integer(s.now)||!integer(s.turn)||!integer(s.gold)||
@@ -42,6 +42,9 @@ export function validateM1LifeState(s){
    typeof s.facilities.kitchen!=='boolean'||typeof s.facilities.workbench!=='boolean'||
    (s.facilities.woodShed!==undefined&&typeof s.facilities.woodShed!=='boolean')||
    !s.merchant||!s.merchant.stock||!Object.entries(s.merchant.stock).every(([k,v])=>own(M1_PRICES,k)&&integer(v))||
+   (!Array.isArray(s.recentRequests??[])||(s.recentRequests??[]).length>32||
+    !(s.recentRequests??[]).every(id=>typeof id==='string'&&/^[A-Za-z0-9:_-]{1,80}$/.test(id))||
+    new Set(s.recentRequests??[]).size!==(s.recentRequests??[]).length)||
    !Array.isArray(s.events)||s.events.length>200||
    !integer(s.merchant.lastRestock??0)||s.merchant.lastRestock>s.now)return false;
  return s.plots.every(p=>p===null||(p&&own(M1_CROPS,p.crop)&&integer(p.readyAt)&&
@@ -56,6 +59,8 @@ function changeStock(inv,id,delta){
 }
 export function runM1LifeAction(source,action){
  if(!validateM1LifeState(source)||!action||typeof action.type!=='string')return fail('INVALID_STATE_OR_ACTION');
+ if(action.requestId!==undefined&&(typeof action.requestId!=='string'||!/^[A-Za-z0-9:_-]{1,80}$/.test(action.requestId)))return fail('INVALID_REQUEST_ID');
+ if(action.requestId&&(source.recentRequests??[]).includes(action.requestId))return fail('DUPLICATE_REQUEST');
  const s=clone(source),a=action,positive=n=>integer(n)&&n>0;
  let event={type:a.type};
  switch(a.type){
