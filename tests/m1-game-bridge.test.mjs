@@ -20,5 +20,10 @@ test('M1 town controls dispatch through active game bridge and charge global clo
  const harvested=bridge.m1Action({type:'farm.harvest',plot:0});
  assert.equal(harvested.accepted,true,JSON.stringify(harvested));
  assert.equal(bridge.m1Life().inventory['m1:crop:wheat'],3);
+ const cooked=bridge.m1Action({type:'food.cook',recipe:'m1:food:bread'});
+ assert.equal(cooked.accepted,true,JSON.stringify(cooked));
+ const eaten=bridge.m1Action({type:'food.eat',item:'m1:food:bread'});
+ assert.equal(eaten.accepted,true,JSON.stringify(eaten));
+ assert.equal(bridge.current().player.hunger,100);
  assert.equal(bridge.m1Life().turn,bridge.current().turn);
 });
