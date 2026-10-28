@@ -327,3 +327,24 @@ test('M1 rejects ownerless and foreign-owned items rather than granting free coo
  assert.equal(g.m1Action({type:'trade.sell',item:'m1:crop:wheat',quantity:1}).outcome,'failed');
  assert.equal(g.m1Life().inventory['m1:crop:wheat']??0,0);
 });
+
+test('M1 requestId deduplicates accepted purchases before and after v3 restore',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const opts={worldSeed:'m1-request-id'};
+ const g=createMainV2Inventory(fixture,opts);
+ const cmd={type:'trade.buy',item:'m1:seed:wheat',quantity:1,requestId:'buy-wheat-0001'};
+ assert.equal(g.m1Action(cmd).accepted,true);
+ const before=structuredClone(g.current());
+ assert.equal(g.m1Action(cmd).reason,'DUPLICATE_REQUEST');
+ assert.deepEqual(g.current(),before);
+ const {schemaVersion,clock,...rest}=before;
+ const state={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const slot={slotId:'m1-request-id',worldId:'m1-world',kind:'manual',label:'request',savedAt:'2026-10-28T00:00:00Z',revision:0};
+ const saved=createSaveV3(state,slot,'m1-test',g.registry);
+ const restored=createMainV2Inventory(fixture,opts);
+ restored.applyApprovedSave(JSON.parse(JSON.stringify(saved)));
+ assert.equal(restored.m1Action(cmd).reason,'DUPLICATE_REQUEST');
+ assert.deepEqual(restored.current(),before);
+ assert.equal(restored.m1Action({...cmd,requestId:'buy-wheat-0002'}).accepted,true);
+ assert.equal(restored.m1Life().inventory['m1:seed:wheat'],2);
+});
