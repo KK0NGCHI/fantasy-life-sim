@@ -1,3 +1,4 @@
+import {checkCraftingTabooStage1} from './crafting-taboo-stage1.js';
 import {REFINING_BY_ID_05H,refineMineral05H} from './mineral-refining-05h.js';
 import {CRAFTING_MATERIALS_05L} from './resource-crafting-05l.js';
 import {FOREST_MATERIALS_05M} from './forest-resources-05m.js';
@@ -21,7 +22,12 @@ export function craftPreview1(itemWorld,ownerId,recipeId,choices={},stackChoices
  }));
  const owned=new Set(itemWorld.placements.filter(p=>p.location?.kind==='inventory'&&p.location.ownerId===ownerId).map(p=>p.itemId));
  const stocks=itemWorld.items.filter(i=>owned.has(i.id)&&i.quantity>0).map(i=>({...i,...(CRAFTING_DEFINITIONS_1[i.definitionId]??{})}));
- return {...planMaterialAllocation(stocks,slots),slots};
+ const plan=planMaterialAllocation(stocks,slots);
+ if(!plan.ok)return {...plan,slots};
+ // Preview uses the same trusted pre-consumption taboo policy as execution.
+ // Never infer provenance from client-provided condition fields.
+ const taboo=checkCraftingTabooStage1(recipe,plan.allocations,itemWorld,CRAFTING_DEFINITIONS_1);
+ return taboo.ok?{...plan,slots}:{...taboo,slots};
 }
 /** Atomic bulk craft: all results commit together; shortage rejects without spending turns.
  * Same sequential algorithm as manual, so receipts and stack identities stay identical.
