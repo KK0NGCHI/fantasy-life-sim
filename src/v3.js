@@ -123,6 +123,15 @@ if(s.region==='거점 마을'){
   'm1:crop:wheat':'밀','m1:crop:potato':'감자','m1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리',
   'm1:food:bread':'밀빵','m1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
  make('span',{text:Object.entries(life.inventory).map(([id,n])=>(labels[id]??id)+' '+n).join(' · ')||'실제 생산 재고 없음'},stock);
+ for(const item of mainV2.current().itemWorld.items){
+  if(!item.definitionId.startsWith('m1:food:'))continue;
+  const world=mainV2.current(),owner=world.player.id;
+  if(!world.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===owner))continue;
+  const receipt=readCraftMaterials05N(item);
+  if(receipt)make('p',{class:'tiny muted',text:(labels[item.definitionId]??item.definitionId)+' 직전 조리 재료: '+
+   receipt.map(r=>(labels[r.definitionId]??r.definitionId)+' ×'+r.quantity).join(' · ')},panel);
+ }
+
  const use=(action)=>{
   const result=mainV2.m1Action(action);
   if(!result.accepted){nextLog('생활','M1 행동 거부: '+(result.detail??result.reason));return render();}
