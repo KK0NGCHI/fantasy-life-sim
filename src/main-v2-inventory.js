@@ -221,7 +221,16 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(!validateM1LifeState(previous))throw Error('M1_INVALID_STATE');
   const aligned={...previous,now:snapshot.clock.elapsedUnits,turn:snapshot.turn};
   const result=runM1LifeAction(aligned,command.payload);
-  if(!result.ok)throw Error(result.reason);
+  if(!result.ok){
+   // An attempted but unsuccessful in-world action still spends one turn.
+   // Malformed or unsupported commands remain zero-turn dispatch rejections.
+   const gameplayFailures=new Set(['PLOT_OCCUPIED','NO_SEED','EMPTY_PLOT','NOT_RIPE','OVER_RIPE',
+    'OUT_OF_STOCK','INSUFFICIENT_GOLD','NOT_OWNED','MISSING_INGREDIENTS','KITCHEN_REQUIRED',
+    'MAX_PLOTS','NOT_EDIBLE']);
+   if(gameplayFailures.has(result.reason))return {outcome:'failed',nextState:snapshot,
+    events:[{type:'m1.action_failed',payload:{reason:result.reason,action:command.payload.type}}]};
+   throw Error(result.reason);
+  }
   // Single authoritative embedded snapshot. The dispatcher charges clock/turn.
   const life={...result.state,turn:snapshot.turn+1};
   const next={...snapshot,player:{...snapshot.player,hunger:life.hunger},world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
