@@ -1,4 +1,5 @@
-import {craftPreview1,craftBatch1,CRAFTING_DEFINITIONS_1} from './crafting-batch-stage1.js';
+import {CRAFTING_DEFINITIONS_1} from './crafting-batch-stage1.js';
+import {previewWorkshopActionStage1} from './crafting-preflight-stage1.js';
 import {materialMatches} from './material-compatibility-05j.js';
 import {ALL_CRAFTING_RECIPES_05L,REFINING_RECIPES_05H,REFINED_ITEMS_05H} from './mineral-refining-05h.js';
 import {CRAFTING_MATERIALS_05L} from './resource-crafting-05l.js';
@@ -218,7 +219,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     for(const [value,label] of [['off','생존 임계치 사용 안 함'],['cautious','HP·MP·허기 20 미만이면 시작하지 않음']]){
      const option=make('option',{text:label},survivalGuard);option.value=value;
     }
-    make('p',{class:'tiny muted',text:'현재 생존 조건은 제작 시작 전에만 검사합니다. 제작 도중 HP·MP·허기 변화에 따른 실시간 중단은 아직 지원하지 않습니다.'},refiningPanel);
+    make('p',{class:'tiny muted',text:'HP·MP·허기 검사는 제작 시작 및 매 회 완료 경계에서 수행됩니다. 기본 생존 감소율과 실시간 취소는 현재 지원하지 않습니다.'},refiningPanel);
     const named=id=>mainV2.registry.items.get(id)?.nameKey??id;
     for(const recipe of ALL_CRAFTING_RECIPES_05L){
      const requirements=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
@@ -263,16 +264,20 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
       nextLog('제작',recipe.name+' 반복 제작 처리 완료');render();
      },'btn',row);
      const updateAvailability=()=>{
-      const preview=craftPreview1(allItems,owner,recipe.id,choices,stackChoices);
-      const timeAllowed=craftingMode.value!=='until'||Number(craftingBudget.value)===0||recipe.seconds<=Number(craftingBudget.value);
-      const trial=preview.ok?(craftingMode.value==='until'?(timeAllowed?preview:{ok:false,reason:'TIME_BUDGET_REACHED'}):craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices,stackChoices)):preview;
+      const mode=craftingMode.value==='until'?'until':'atomic';
+      const count=Number(craftingCount.value);
+      const policy=mode==='until'&&Number(craftingBudget.value)>0?{maxSeconds:Number(craftingBudget.value)}:{};
+      const survivalLimits=mode==='until'&&survivalGuard.value==='cautious'?{minHp:20,minMp:20,minHunger:20}:{};
+      const trial=previewWorkshopActionStage1(snapshotWorld,{recipeId:recipe.id,count,mode,
+       choices,stackChoices,policy,survivalLimits});
       const reasons={
        INSUFFICIENT_MATERIAL:'재료 부족',INVALID_MATERIAL_CHOICE:'재료 선택 오류',
        INVALID_STACK_CHOICE:'스택 선택 오류',ALIEN_EQUIPMENT_TABOO:'이질 기원 소재 장비 제작 금기',
        TIME_BUDGET_REACHED:'설정된 시간 안에 1회도 완료할 수 없음',
-       INVALID_MATERIAL_PLAN:'재료 배분 불가',WORKSTATION_REQUIRED:'작업대 필요'
+       INVALID_MATERIAL_PLAN:'재료 배분 불가',WORKSTATION_REQUIRED:'작업대 필요',
+       SURVIVAL_LIMIT_REACHED:'생존 임계치 도달',INVALID_SURVIVAL_LIMIT:'생존 설정 오류'
       };
-      msg.textContent=trial.ok?'제작 가능'+(craftingMode.value==='until'?' · 재료 고갈 시 자동 중단':''):
+      msg.textContent=trial.ok?'제작 가능 '+trial.completed+'/'+trial.requested+'회'+(trial.stopReason?' · 중단: '+(reasons[trial.stopReason]??trial.stopReason):''):
        (reasons[trial.reason]??'제작 불가')+' ('+trial.reason+')';
       if(s.region!=='거점 마을')msg.textContent='거점 마을의 작업대 또는 용광로가 필요합니다.';
       refine.disabled=s.region!=='거점 마을'||!trial.ok;
@@ -280,6 +285,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      craftingCount.addEventListener('change',updateAvailability);
      craftingMode.addEventListener('change',updateAvailability);
      craftingBudget.addEventListener('change',updateAvailability);
+     survivalGuard.addEventListener('change',updateAvailability);
      updateAvailability();
     }
     const tools=mainV2.availableTools05A('mining');
