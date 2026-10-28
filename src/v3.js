@@ -147,6 +147,22 @@ if(s.region==='거점 마을'){
    if((life.inventory['m1:seed:'+crop]??0)>0)btn((labels['m1:crop:'+crop]??crop)+' 심기',()=>use({type:'farm.plant',plot:i,crop}),'btn',row);
  });
  btn('하루 경과 (게임 시간 24시간)',()=>use({type:'time.advance',seconds:86400}),'btn',fields);
+ btn('익은 작물 일괄 수확 (자동·최대 32회)',()=>{
+  const now=mainV2.current().clock.elapsedUnits;
+  const actions=mainV2.m1Life().plots.flatMap((p,i)=>p&&now>=p.readyAt&&now<=p.spoilsAt?
+   [{type:'farm.harvest',plot:i}]:[]);
+  if(actions.length===0){nextLog('생활','수확 가능한 농지가 없습니다.');return render();}
+  const limits={
+   hpMin:s.auto?.hp?.on?(s.auto.hp.pct??0):0,
+   mpMin:s.auto?.mp?.on?(s.auto.mp.pct??0):0,
+   hungerMin:s.auto?.hunger?.on?(s.auto.hunger.pct??0):0
+  };
+  const result=mainV2.m1RunPlan(actions,limits);
+  refreshV2Inventory();
+  nextLog('생활','자동 수확 '+result.completed+'회 · '+(result.stopReason??result.reason));
+  render();
+ },'btn',fields);
+
  btn('농지 한 칸 확장 (10G)',()=>use({type:'home.expand'}),'btn',fields);
  const kitchen=make('div',{class:'resource05a-panel'},panel);
  make('h3',{text:'요리·식사·판매'},kitchen);
