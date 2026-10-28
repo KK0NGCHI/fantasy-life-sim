@@ -160,6 +160,36 @@ try{
  await restoredGather.getByRole('button',{name:'불러오기'}).click();
  await gatherPage.locator('#bottomNav button[aria-label="생활"]').click();
  assert.ok((await gatherPage.getByRole('region',{name:'지역 자원 활동'}).innerText()).includes('가용 4/5'));
+
+ // M1 E2E-04: operate real forest logging, then workshop and functional home.
+ const forestPanel=gatherPage.getByRole('region',{name:'지역 자원 활동'});
+ await forestPanel.getByRole('button',{name:'벌목',exact:true}).click();
+ const oak=forestPanel.locator('.resource05a-row').filter({hasText:'참나무 통나무 · 01'});
+ await oak.getByRole('button',{name:/성과까지/}).click();
+ await forestPanel.getByRole('button',{name:'벌목',exact:true}).click();
+ assert.match(await forestPanel.innerText(),/참나무 통나무/);
+ await gatherPage.getByRole('button',{name:'세계 지도',exact:true}).first().click();
+ await gatherPage.getByRole('button',{name:'거점 마을',exact:true}).click();
+ await gatherPage.getByRole('button',{name:'이동하기'}).click();
+ let townReached=false;
+ for(let tries=0;tries<60;tries++){
+  const encounter=gatherPage.getByRole('dialog',{name:'여행 중 인카운터'});
+  if(await encounter.isVisible()){await encounter.getByRole('button',{name:'확인 후 계속'}).click();continue;}
+  const progress=gatherPage.getByRole('button',{name:'남은 여행 진행'});
+  if(await progress.isVisible()){await progress.click();continue;}
+  await gatherPage.locator('#bottomNav button[aria-label="생활"]').click();
+  if(await gatherPage.getByRole('region',{name:'M1 실제 농업·교역'}).isVisible()){townReached=true;break;}
+  await gatherPage.getByRole('button',{name:'세계 지도',exact:true}).first().click();
+ }
+ assert.equal(townReached,true,'M1 E2E-04 town return unavailable');
+ const townResources=gatherPage.getByRole('region',{name:'지역 자원 활동'});
+ await townResources.getByRole('button',{name:'채광',exact:true}).click();
+ const refine=townResources.locator('.resource05a-row').filter({hasText:'참나무 판재 가공'});
+ await refine.getByRole('button',{name:/제작 \(/}).click();
+ const townLife=gatherPage.getByRole('region',{name:'M1 실제 농업·교역'});
+ await townLife.getByRole('button',{name:/목재 농업 창고 건축/}).click();
+ assert.match(await townLife.innerText(),/농지 3개/);
+ assert.match(await townLife.innerText(),/건축됨/);
  await gatherPage.close();
  assert.deepEqual(errors,[]);
  console.log('03-F Chromium browser smoke: render, F5 commit, reload, F9 approval, 16 regions PASS');

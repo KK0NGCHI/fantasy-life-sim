@@ -1,3 +1,5 @@
+import {M1_PRICES,M1_FOODS,newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
+import {MATERIALS_CONDITION_05N} from './material-composition-05n.js';
 import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
 import {checkWorkshopStage1,craftUntilStage1} from './crafting-workshop-stage1.js';
 import {craftBatch1} from './crafting-batch-stage1.js';
@@ -76,10 +78,15 @@ export function createMainV2Inventory(uiItems,options={}) {
    id:'tool05a:gloves:'+material,name:name+' 채집 장갑',group:'도구',qty:0,tags:['tool:gather','material:'+material,'rank:'+rank]
   }))
  ];
+ const m1Names={'m1:seed:wheat':'밀 씨앗','m1:seed:potato':'감자 씨앗','m1:seed:strawberry':'딸기 씨앗',
+  'm1:seed:blueberry':'블루베리 씨앗','m1:crop:wheat':'밀','m1:crop:potato':'감자',
+  'm1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리','m1:food:bread':'밀빵',
+  'm1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
+ const m1Catalog=Object.keys(M1_PRICES).map(id=>({id,name:m1Names[id],group:id.includes(':seed:')?'씨앗':'식재료',qty:0,tags:['m1:life']}));
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
- const templates=new Map([...initialItems,...resourceItems,...materialTools05A].map(item=>[item.id,{...item}]));
- const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A].map(x=>x.group))];
- const catalog={categories,rarities:[],materials:[],effects:[],items:[...initialItems,...resourceItems,...materialTools05A].map(item=>({
+ const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,{...item}]));
+ const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(x=>x.group))];
+ const catalog={categories,rarities:[],materials:[],effects:[],items:[...new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,item])).values()].map(item=>({
   id:item.id,nameKey:item.name,categoryId:item.group,tags:item.tags??[],capabilities:[]
  }))};
  const built=buildItemRegistry(catalog);
@@ -214,6 +221,115 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {...base,nextState:next,events};
  };
  const handlers=new Map([
+ ['m1.home.wood-shed',(snapshot)=>{
+  if(snapshot.world.runtime.region!=='거점 마을'||snapshot.world.runtime.dungeon)
+   throw Error('M1_TOWN_REQUIRED');
+  const previous=snapshot.world.runtime.m1Life??newM1LifeState();
+  if(!validateM1LifeState(previous))throw Error('M1_INVALID_STATE');
+  if(previous.facilities.woodShed)
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m1.home.already_built',payload:{facility:'woodShed'}}]};
+  const candidates=snapshot.itemWorld.items.filter(i=>i.definitionId==='item05h:oak-planks'&&
+   snapshot.itemWorld.placements.some(p=>p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
+  if(candidates.reduce((n,i)=>n+i.quantity,0)<2)
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m1.home.insufficient_planks',payload:{needed:2}}]};
+  let needed=2;
+  const items=snapshot.itemWorld.items.flatMap(i=>{
+   if(needed===0||!candidates.some(candidate=>candidate.id===i.id))return [i];
+   const used=Math.min(i.quantity,needed);needed-=used;
+   return i.quantity===used?[]:[{...i,quantity:i.quantity-used}];
+  });
+  if(needed!==0)throw Error('M1_ITEM_LEDGER_DESYNC');
+  const validIds=new Set(items.map(i=>i.id));
+  const itemWorld={...snapshot.itemWorld,items,placements:snapshot.itemWorld.placements.filter(p=>validIds.has(p.itemId))};
+  const life=structuredClone(previous);
+  life.facilities.woodShed=true;
+  life.facilities.plotCapacity+=1;
+  life.plots.push(null);
+  life.events.push({type:'m1.home.wood_shed_built'});if(life.events.length>200)life.events.shift();
+  if(!validateM1LifeState(life))throw Error('M1_INVALID_RESULT');
+  return {outcome:'success',nextState:{...snapshot,itemWorld,
+   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}},
+   events:[{type:'m1.home.wood_shed_built',payload:{planks:2,plotsAdded:1}}]};
+ }],
+ ['m1.life',(snapshot,command)=>{
+  if(snapshot.world.runtime.region!=='거점 마을')throw Error('M1_TOWN_REQUIRED');
+  const previous=snapshot.world.runtime.m1Life??newM1LifeState();
+  if(!validateM1LifeState(previous))throw Error('M1_INVALID_STATE');
+  // The existing itemWorld is the only authoritative source of item quantities.
+  // The reducer's inventory projection is rehydrated from player-owned stacks.
+  const owned={};
+  for(const item of snapshot.itemWorld.items){
+   if(!Object.hasOwn(M1_PRICES,item.definitionId))continue;
+   if(!snapshot.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&
+    p.location.ownerId===snapshot.player.id))continue;
+   owned[item.definitionId]=(owned[item.definitionId]??0)+item.quantity;
+  }
+  const aligned={...previous,inventory:owned,hunger:snapshot.player.hunger,
+   now:snapshot.clock.elapsedUnits,turn:snapshot.turn};
+  const result=runM1LifeAction(aligned,command.payload);
+  if(!result.ok){
+   // An attempted but unsuccessful in-world action still spends one turn.
+   // Malformed or unsupported commands remain zero-turn dispatch rejections.
+   const gameplayFailures=new Set(['PLOT_OCCUPIED','NO_SEED','EMPTY_PLOT','NOT_RIPE','OVER_RIPE',
+    'OUT_OF_STOCK','INSUFFICIENT_GOLD','NOT_OWNED','MISSING_INGREDIENTS','KITCHEN_REQUIRED',
+    'MAX_PLOTS','NOT_EDIBLE','WRONG_SEASON']);
+   if(gameplayFailures.has(result.reason))return {outcome:'failed',nextState:snapshot,
+    events:[{type:'m1.action_failed',payload:{reason:result.reason,action:command.payload.type}}]};
+   throw Error(result.reason);
+  }
+  // Single authoritative embedded snapshot. The dispatcher charges clock/turn.
+  const life={...result.state,turn:snapshot.turn+1};
+  let itemWorld=snapshot.itemWorld;
+  for(const [id,qty] of Object.entries(life.inventory)){
+   const delta=qty-(owned[id]??0);
+   if(delta>0)itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,
+    'm1:stack:'+snapshot.player.id+':'+id,id,delta);
+  }
+  // Decrement only stacks owned by the player; a missing stack is not created.
+  for(const [id,original] of Object.entries(owned)){
+   let remaining=original-(life.inventory[id]??0);
+   if(remaining<=0)continue;
+   const items=[];
+   for(const item of itemWorld.items){
+    const isOwned=item.definitionId===id&&itemWorld.placements.some(p=>p.itemId===item.id&&
+     p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id);
+    if(!isOwned||remaining===0){items.push(item);continue;}
+    const used=Math.min(item.quantity,remaining);remaining-=used;
+    if(item.quantity>used)items.push({...item,quantity:item.quantity-used});
+   }
+   if(remaining!==0)throw Error('M1_ITEM_LEDGER_DESYNC');
+   const ids=new Set(items.map(x=>x.id));
+   itemWorld={...itemWorld,items,placements:itemWorld.placements.filter(p=>ids.has(p.itemId))};
+  }
+  // Preserve only the ingredients consumed in the last cooking operation.
+  // M1 recipes have one exact input; unlike materials genealogy, this receipt
+  // neither claims source location nor inherits an ingredient's own recipe.
+  if(command.payload?.type==='food.cook'){
+   const food=M1_FOODS[command.payload.recipe];
+   const receipt=JSON.stringify([{definitionId:food.input,quantity:food.quantity}]);
+   itemWorld={...itemWorld,items:itemWorld.items.map(item=>{
+    if(item.definitionId!==command.payload.recipe||
+     !itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id))
+     return item;
+    return {...item,condition:{...item.condition,[MATERIALS_CONDITION_05N]:receipt}};
+   })};
+  }
+  // No second item ledger persists in m1Life: it is a presentation-only projection.
+  life.inventory={};
+  const xpRule={
+   'farm.plant':['농업',3],'farm.harvest':['농업',5],
+   'food.cook':['요리',4],'home.expand':['건축',3]
+  }[command.payload?.type];
+  const prior=snapshot.progression?.system04A;
+  const skill=xpRule&&SKILL_DEFINITIONS.find(d=>d.name===xpRule[0]);
+  const progression=prior&&skill?{...snapshot.progression,system04A:awardProgression(prior,{
+   actionId:'m1:'+snapshot.turn+':'+command.payload.type,skillId:skill.id,xp:xpRule[1]
+  })}:snapshot.progression;
+  const next={...snapshot,itemWorld,progression,player:{...snapshot.player,hunger:life.hunger},
+   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
+  return {outcome:'success',nextState:next,events:[{type:result.event.type,payload:result.event}]};
+ }],
+
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
  ['world.travel',(snapshot,command)=>{
    const region=command.payload.region;
@@ -610,6 +726,11 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
+    if(action.type==='m1.life'){
+     const a=action.payload;
+     return {turns:1,worldUnits:a.type==='time.advance'?a.seconds:60};
+    }
     if(action.type==='mineral.prospect')return {turns:1,worldUnits:600};
     if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
     if(action.type==='mineral.refine')return {turns:1,worldUnits:REFINING_BY_ID_05H.get(action.payload?.recipeId)?.seconds??300};
@@ -696,6 +817,42 @@ export function createMainV2Inventory(uiItems,options={}) {
  };
  return {
   registry,projected,current,
+  m1Life(){
+   const life=structuredClone(state.world.runtime.m1Life??newM1LifeState());
+   life.hunger=state.player.hunger;
+   life.inventory={};
+   for(const item of state.itemWorld.items){
+    if(!Object.hasOwn(M1_PRICES,item.definitionId))continue;
+    if(state.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===state.player.id))
+     life.inventory[item.definitionId]=(life.inventory[item.definitionId]??0)+item.quantity;
+   }
+   return life;
+  },
+  m1Action(action){
+   if(action?.requestId&&state.world.runtime.m1Life?.recentRequests?.includes(action.requestId))
+    return {accepted:false,outcome:'rejected',reason:'DUPLICATE_REQUEST',events:[]};
+   return this.dispatch('m1.life',action);
+  },
+  m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
+  /** Bounded synchronous automation. Calls exactly the same game actions as a
+   * manual player, with safety evaluated before each attempt. */
+  m1RunPlan(actions,{hpMin=0,mpMin=0,hungerMin=0}={}){
+   if(!Array.isArray(actions)||actions.length<1||actions.length>32||
+    ![hpMin,mpMin,hungerMin].every(v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100)||
+    !actions.every(a=>a&&typeof a.type==='string'))return {ok:false,reason:'INVALID_PLAN',completed:0};
+   const events=[];
+   for(let i=0;i<actions.length;i++){
+    const p=state.player;
+    if(p.currentHp<hpMin||p.currentMp<mpMin||p.hunger<hungerMin)
+     return {ok:true,completed:i,stopReason:'SAFETY_THRESHOLD',events};
+    const result=this.m1Action(actions[i]);
+    if(!result.accepted)return {ok:true,completed:i,stopReason:result.reason,events};
+    events.push(...result.events);
+    if(result.outcome==='failed')return {ok:true,completed:i+1,stopReason:'ACTION_FAILED',events};
+   }
+   return {ok:true,completed:actions.length,stopReason:'COMPLETED',events};
+  },
+
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
   resources05A(){if(!state.world.runtime.resource05A)return null;
@@ -762,6 +919,17 @@ export function createMainV2Inventory(uiItems,options={}) {
        candidate={...candidate,world:{...candidate.world,runtime:{...candidate.world.runtime,
         resource05A:{...eco,woodland05C:{trees:cycle.trees,day:cycle.day},
          ecologySubstrates:cycle.substrates,ecologySites:cycle.sites}}}};
+      }
+     }
+     if(candidate.world.runtime.m1Life){
+      // Every accepted action advances field time, not just M1 actions.
+      const life=candidate.world.runtime.m1Life;
+      const diff=candidate.clock.elapsedUnits-life.now;
+      if(diff>0){
+       const refreshed=runM1LifeAction({...life,turn:Math.max(0,life.turn-1)},{type:'time.advance',seconds:diff});
+       if(!refreshed.ok)throw Error('M1_WORLD_CLOCK_RECONCILIATION_FAILED:'+refreshed.reason);
+       const reconciled={...refreshed.state,turn:candidate.turn};
+       candidate={...candidate,world:{...candidate.world,runtime:{...candidate.world.runtime,m1Life:reconciled}}};
       }
      }
      state=candidate;

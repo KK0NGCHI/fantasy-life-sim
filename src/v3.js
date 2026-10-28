@@ -94,7 +94,7 @@ const day=gameClock?.day??s.day;
 const hour=gameClock?.hour??s.hour;
 const minute=gameClock?.minute??(s.minute??0);
 const second=gameClock?.second??(s.second??0);
-$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+day+'일</span><span>'+svgIcon('clock')+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+':'+String(second).padStart(2,'0')+'</span><span class="gold-data">'+svgIcon('coins')+' 1,250 G</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
+$('#top').innerHTML='<div class="top-title">판타지 생활 기록</div><div class="top-meta"><span>'+svgIcon('calendar-days')+' 봄 '+day+'일</span><span>'+svgIcon('clock')+' '+String(hour).padStart(2,'0')+':'+String(minute).padStart(2,'0')+':'+String(second).padStart(2,'0')+'</span><span class="gold-data">'+svgIcon('coins')+' '+(mainV2.m1Life()?.gold??0)+' G (M1)</span><span class="weather-data">'+svgIcon('sun')+' 맑음</span></div>';
 const group=$('#top .top-meta');
 const save=make('button',{type:'button',class:'top-settings ui-icon-button',title:'저장 관리자','aria-label':'저장 관리자'},group);
 save.innerHTML=svgIcon('save');save.onclick=()=>openSaveManager();
@@ -113,6 +113,84 @@ function regionActions(){return ACTIONS[s.region]||['주변을 살핀다','휴�
 function lifestyle(){
 const el=head(s.region,'');const hue={'거점 마을':'town','초원·농경지':'pasture','숲':'forest','강·호수':'river','습지':'marsh','산맥':'mountain','광산':'mine','설원':'snow','사막':'desert','해안·항구':'coast','바다':'ocean','화산지대':'volcano','고대 유적':'ruins','폐허·묘지':'grave','만신전':'temple','지하미궁':'dungeon'}[s.region]||'pasture';
 const hero=make('section',{class:'region-scene scene-'+hue},el);hero.innerHTML='<div class="scene-heading"><div><h2>'+esc(s.region)+'</h2></div>'+svgIcon(hue==='forest'?'trees':hue==='river'?'waves':hue==='mine'?'mountain':hue==='volcano'?'flame':hue==='snow'?'snowflake':hue==='desert'?'sun':hue==='ocean'||hue==='coast'?'waves':hue==='temple'?'sparkles':hue==='dungeon'?'footprints':'sun')+'</div>';
+if(s.region==='거점 마을'){
+ const life=mainV2.m1Life();
+ const panel=make('section',{class:'resource05a-panel','aria-label':'M1 실제 농업·교역'},el);
+ make('h3',{text:'생활 생산 · 농지와 마을 상인 (시험 경제)'},panel);
+ make('p',{text:'소지금 '+life.gold+'G · 허기 '+life.hunger+'/100 · 농지 '+life.plots.length+'개 · 게임 시간 기반 재배'},panel);
+ const stock=make('div',{class:'resource05a-row'},panel);
+ const labels={'m1:seed:wheat':'밀 씨앗','m1:seed:potato':'감자 씨앗','m1:seed:strawberry':'딸기 씨앗','m1:seed:blueberry':'블루베리 씨앗',
+  'm1:crop:wheat':'밀','m1:crop:potato':'감자','m1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리',
+  'm1:food:bread':'밀빵','m1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
+ make('span',{text:Object.entries(life.inventory).map(([id,n])=>(labels[id]??id)+' '+n).join(' · ')||'실제 생산 재고 없음'},stock);
+ for(const item of mainV2.current().itemWorld.items){
+  if(!item.definitionId.startsWith('m1:food:'))continue;
+  const world=mainV2.current(),owner=world.player.id;
+  if(!world.itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===owner))continue;
+  const receipt=readCraftMaterials05N(item);
+  if(receipt)make('p',{class:'tiny muted',text:(labels[item.definitionId]??item.definitionId)+' 직전 조리 재료: '+
+   receipt.map(r=>(labels[r.definitionId]??r.definitionId)+' ×'+r.quantity).join(' · ')},panel);
+ }
+
+ const use=(action)=>{
+  const result=mainV2.m1Action(action);
+  if(!result.accepted){nextLog('생활','M1 행동 거부: '+(result.detail??result.reason));return render();}
+  refreshV2Inventory();
+  nextLog('생활',result.events?.[0]?.type??action.type);
+  render();
+ };
+ const controls=make('div',{class:'resource05a-panel'},panel);
+ make('h3',{text:'상인 · 씨앗 구매'},controls);
+ for(const [crop,caption] of [['wheat','밀'],['potato','감자'],['strawberry','딸기'],['blueberry','블루베리'],['apple','사과나무']]){
+  const id='m1:seed:'+crop;
+  btn(caption+' 씨앗 구매 ('+(crop==='apple'?12:crop==='wheat'||crop==='potato'?2:4)+'G / 재고 '+(life.merchant.stock[id]??0)+')',
+   ()=>use({type:'trade.buy',item:id,quantity:1}),'btn',controls);
+ }
+ const fields=make('div',{class:'resource05a-panel'},panel);
+ make('h3',{text:'농지 · 파종과 수확'},fields);
+ life.plots.forEach((plot,i)=>{
+  const row=make('div',{class:'resource05a-row'},fields);
+  make('strong',{text:'농지 '+(i+1)+' · '+(plot?(labels['m1:crop:'+plot.crop]??plot.crop)+' / '+(mainV2.current().clock.elapsedUnits>=plot.readyAt?'수확 시기 확인':'생장 중'):'빈 밭')},row);
+  if(plot)btn('수확',()=>use({type:'farm.harvest',plot:i}),'btn',row);
+  else for(const crop of ['wheat','potato','strawberry','blueberry','apple'])
+   if((life.inventory['m1:seed:'+crop]??0)>0)btn((labels['m1:crop:'+crop]??crop)+' 심기',()=>use({type:'farm.plant',plot:i,crop}),'btn',row);
+ });
+ btn('하루 경과 (게임 시간 24시간)',()=>use({type:'time.advance',seconds:86400}),'btn',fields);
+ btn('익은 작물 일괄 수확 (자동·최대 32회)',()=>{
+  const now=mainV2.current().clock.elapsedUnits;
+  const actions=mainV2.m1Life().plots.flatMap((p,i)=>p&&now>=p.readyAt&&now<=p.spoilsAt?
+   [{type:'farm.harvest',plot:i}]:[]);
+  if(actions.length===0){nextLog('생활','수확 가능한 농지가 없습니다.');return render();}
+  const limits={
+   hpMin:s.auto?.hp?.on?(s.auto.hp.pct??0):0,
+   mpMin:s.auto?.mp?.on?(s.auto.mp.pct??0):0,
+   hungerMin:s.auto?.hunger?.on?(s.auto.hunger.pct??0):0
+  };
+  const result=mainV2.m1RunPlan(actions,limits);
+  refreshV2Inventory();
+  nextLog('생활','자동 수확 '+result.completed+'회 · '+(result.stopReason??result.reason));
+  render();
+ },'btn',fields);
+
+ btn('농지 한 칸 확장 (10G)',()=>use({type:'home.expand'}),'btn',fields);
+ btn('목재 농업 창고 건축 (참나무 판재 2개 · 농지 +1)',()=>{
+  const outcome=mainV2.m1BuildWoodShed();
+  refreshV2Inventory();
+  nextLog('생활',outcome.accepted&&outcome.outcome==='success'?'목재 농업 창고를 완성했습니다.':'목재 농업 창고 건축 실패 · 판재 2개 필요');
+  render();
+ },'btn',fields);
+ make('p',{class:'muted',text:'기존 제작에서 참나무 원목 2개로 판재를 만들 수 있습니다. 목재 창고: '+(life.facilities.woodShed?'건축됨':'미건축')},fields);
+
+ const kitchen=make('div',{class:'resource05a-panel'},panel);
+ make('h3',{text:'요리·식사·판매'},kitchen);
+ btn('밀빵 요리 (밀 2개)',()=>use({type:'food.cook',recipe:'m1:food:bread'}),'btn',kitchen);
+ btn('구운 감자 요리 (감자 1개)',()=>use({type:'food.cook',recipe:'m1:food:baked-potato'}),'btn',kitchen);
+ for(const id of ['m1:food:bread','m1:food:baked-potato'])if((life.inventory[id]??0)>0)
+  btn((labels[id]??id)+' 먹기',()=>use({type:'food.eat',item:id}),'btn',kitchen);
+ for(const id of Object.keys(life.inventory).filter(x=>(life.inventory[x]??0)>0&&x.startsWith('m1:crop:')))
+  btn((labels[id]??id)+' 1개 판매',()=>use({type:'trade.sell',item:id,quantity:1}),'btn',kitchen);
+ make('p',{class:'muted',text:'M1 생산품은 기존 소유 아이템 원장에서 관리합니다. 가격·성장 기간은 시험값이며 정식 M1 인수는 아직 아닙니다.'},panel);
+}
 const places=make('div',{class:'scene-spots'},hero);
 const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업장','workshop'],['waves','강변','water']]:hue==='forest'?[['trees','숲길','growing'],['leaf','채집지','workshop'],['tent-tree','야영지','water']]:hue==='river'?[['fish','어장','water'],['waves','강변','growing'],['leaf','수풀','workshop']]:[['compass','탐색지','growing'],['pickaxe','자원지','workshop'],['map-pin','지형','water']];
 for(const [ico,label,cl]of regional){const tile=make('div',{class:'scene-spot '+cl},places);tile.innerHTML=svgIcon(ico)+'<span>'+label+'</span>'}
