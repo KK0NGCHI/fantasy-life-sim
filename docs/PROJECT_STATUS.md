@@ -10,7 +10,7 @@
 - **핵심 미완성:** 농사→요리→판매→재투자, 거점 기능, 실전 전투·회복·사망, 신앙의 실질 보상/금기 반응, 상인·경제, 포획/목축, 심해/수생 전반, 전 범위 수동 QA/밸런스. UI에 표시되는 목업 수치는 실게임 보상과 구분.
 - **열린 PR:** 2026-10-28 조회 시 #125 (Draft, herbal fiber glove recipe). 최신 main과 중복·재현 여부를 먼저 확인하고 사용자 승인 없이 병합하지 않음.
 - **CI:** 2026-10-28 최근 `9bc8a270`의 Engine 01-A / Prototype checks 성공 확인. 기준 HEAD `3cc7222`의 모든 플랫폼 체크가 성공했다는 증거로 확대 해석하지 않음.
-- **로컬 확인:** 이번 M0 수행 환경은 GitHub 도메인 해석 실패로 clone / npm install / npm run check / 실제 브라우저 실행 불가. **로컬 자동 검사 미실시, Windows 수동 QA 미실시.** 기존 GitHub CI 결과만 별도 기록.
+- **로컬 확인:** 이번 M0 수행 환경은 GitHub 도메인 해석 실패로 clone / npm install / npm run check / 실제 브라우저 실행 불가. **로컬 직접 검사는 미실시, Windows 사용자 수동 QA 미실시.** PR #157 커밋 `b0ddb5e` 대상 GitHub Actions의 Prototype checks (syntax), Engine 01-A (engine/windows-smoke/browser-chromium)는 모두 성공. 이후 실행계획서 문서 추가 커밋의 CI는 별도 확인한다.
 
 ## 권위 있는 문서 진입점
 1. [MASTER_ROADMAP](MASTER_ROADMAP.md) — M0~M5 개발 목표/완료 기준.
