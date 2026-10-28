@@ -105,3 +105,43 @@ test('M1 orchard apple first fruit, yearly repeat and long-time stock conservati
  assert.equal(s.inventory['m1:crop:apple'],8);
  assert.equal(s.plots[0].remainingHarvests,1);
 });
+
+test('M1 bulk versus split time advances preserve multi-year crop and merchant state',()=>{
+ for(const days of [28,112,224]){
+  let seed=newM1LifeState();
+  seed=doAction(seed,{type:'trade.buy',item:'m1:seed:apple',quantity:1});
+  seed=doAction(seed,{type:'farm.plant',plot:0,crop:'apple'});
+  seed=doAction(seed,{type:'trade.buy',item:'m1:seed:wheat',quantity:2});
+  let bulk=doAction(seed,{type:'time.advance',seconds:days*86400});
+  let split=seed;
+  for(let d=0;d<days;d++)split=doAction(split,{type:'time.advance',seconds:86400});
+  // Number of player actions is deliberately different, but the world ledger
+  // at the same elapsed second must not depend on time-step granularity.
+  assert.equal(split.now,bulk.now);
+  assert.deepEqual(split.plots,bulk.plots);
+  assert.deepEqual(split.inventory,bulk.inventory);
+  assert.deepEqual(split.merchant,bulk.merchant);
+  assert.equal(split.gold,bulk.gold);
+  assert.equal(validateM1LifeState(split),true);
+  assert.equal(validateM1LifeState(bulk),true);
+ }
+});
+test('M1 stale, malformed and overflow transactions leave source state unchanged',()=>{
+ let seed=newM1LifeState();
+ seed=doAction(seed,{type:'trade.buy',item:'m1:seed:wheat',quantity:1});
+ const original=structuredClone(seed);
+ for(const action of [
+  {type:'trade.buy',item:'m1:seed:wheat',quantity:0},
+  {type:'trade.buy',item:'m1:seed:wheat',quantity:Infinity},
+  {type:'trade.sell',item:'m1:crop:wheat',quantity:1},
+  {type:'farm.harvest',plot:0},
+  {type:'food.cook',recipe:'m1:food:unknown'},
+  {type:'time.advance',seconds:0},
+  {type:'time.advance',seconds:NaN},
+  {type:'farm.plant',plot:100,crop:'wheat'}
+ ]){
+  const result=runM1LifeAction(seed,action);
+  assert.equal(result.ok,false,JSON.stringify(action));
+  assert.deepEqual(seed,original);
+ }
+});
