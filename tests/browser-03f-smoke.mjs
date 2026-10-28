@@ -166,6 +166,7 @@ try{
  await forestPanel.getByRole('button',{name:'벌목',exact:true}).click();
  const oak=forestPanel.locator('.resource05a-row').filter({hasText:'참나무 통나무 · 01'});
  await oak.getByRole('button',{name:/성과까지/}).click();
+ await forestPanel.getByRole('button',{name:'벌목',exact:true}).click();
  assert.match(await forestPanel.innerText(),/참나무 통나무/);
  await gatherPage.getByRole('button',{name:'세계 지도',exact:true}).first().click();
  await gatherPage.getByRole('button',{name:'거점 마을',exact:true}).click();
