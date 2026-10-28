@@ -275,3 +275,24 @@ test('M1 cooking stores only actually consumed immediate ingredients and survive
  assert.equal(restored.m1Life().inventory['m1:food:bread']??0,0);
  assert.equal(restored.m1Action({type:'food.eat',item:'m1:food:bread'}).outcome,'failed');
 });
+
+test('M1 grants farming and cooking XP on completed actions, not failed attempts',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m1-real-skills',progression04A:true});
+ const xp=id=>g.current().progression.system04A.skills[id];
+ const initialFarm=xp('skill-13'),initialCook=xp('skill-18');
+ assert.equal(g.m1Action({type:'farm.harvest',plot:0}).outcome,'failed');
+ assert.equal(xp('skill-13'),initialFarm);
+ assert.equal(g.m1Action({type:'trade.buy',item:'m1:seed:wheat',quantity:1}).accepted,true);
+ assert.equal(g.m1Action({type:'farm.plant',plot:0,crop:'wheat'}).accepted,true);
+ assert.equal(xp('skill-13'),initialFarm+3);
+ assert.equal(g.m1Action({type:'farm.harvest',plot:0}).outcome,'failed');
+ assert.equal(xp('skill-13'),initialFarm+3);
+ assert.equal(g.m1Action({type:'time.advance',seconds:86400}).accepted,true);
+ assert.equal(g.m1Action({type:'farm.harvest',plot:0}).accepted,true);
+ assert.equal(xp('skill-13'),initialFarm+8);
+ assert.equal(g.m1Action({type:'food.cook',recipe:'m1:food:bread'}).accepted,true);
+ assert.equal(xp('skill-18'),initialCook+4);
+ assert.equal(g.m1Action({type:'food.cook',recipe:'m1:food:bread'}).outcome,'failed');
+ assert.equal(xp('skill-18'),initialCook+4);
+});
