@@ -30,6 +30,8 @@ export function craftUntilStage1(world,ownerId,recipeId,count,choices={},stackCh
  if(!recipe)return {ok:false,reason:'UNKNOWN_RECIPE',completed:0};
  if(!Number.isSafeInteger(recipe.seconds)||recipe.seconds<1)
   return {ok:false,reason:'INVALID_RECIPE',completed:0};
+ if(!survivalDelta||typeof survivalDelta!=='object'||Array.isArray(survivalDelta)||Object.entries(survivalDelta).some(([k,v])=>!['hp','mp','hunger'].includes(k)||!Number.isFinite(v)||v>0||v< -1000))
+  return {ok:false,reason:'INVALID_SURVIVAL_DELTA',completed:0};
  let current=world,completed=0,blockedBy=null,activePlayer=player;
  if(player!==null){const check=advanceCraftSurvivalStage1(player,{},survivalLimits);if(!check.ok)return {...check,completed:0};}
  for(let i=0;i<count;i++){
