@@ -57,3 +57,14 @@ export function actM2Combat(source,{actorId,type,targetId}={}){
  s.log=s.log.slice(-40);
  return {ok:true,state:s,event:s.log.at(-1)??{type:'resolved',outcome:s.outcome}};
 }
+
+/** A deterministic provisional enemy decision, evaluated only on its turn.
+ * Defensive posture at low HP avoids every enemy blindly attacking. */
+export function chooseM2EnemyAction(source){
+ if(!validateM2Combat(source)||source.phase!=='active')return {ok:false,reason:'NO_ACTIVE_COMBAT'};
+ const actorId=source.queue[source.cursor];
+ const actor=source.participants.find(p=>p.id===actorId);
+ if(!actor||actor.side!=='enemy'||actor.hp===0)return {ok:false,reason:'NOT_ENEMY_TURN'};
+ if(actor.hp*3<=actor.maxHp&&!actor.guard)return {ok:true,action:{actorId,type:'defend'}};
+ return {ok:true,action:{actorId,type:'attack',targetId:'player'}};
+}
