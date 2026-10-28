@@ -145,3 +145,25 @@ test('M1 stale, malformed and overflow transactions leave source state unchanged
   assert.deepEqual(seed,original);
  }
 });
+
+test('M1 orchard yields exactly three seasonal harvests across years, then stops',()=>{
+ let state=newM1LifeState();
+ state=doAction(state,{type:'trade.buy',item:'m1:seed:apple',quantity:1});
+ state=doAction(state,{type:'farm.plant',plot:0,crop:'apple'});
+ state=doAction(state,{type:'time.advance',seconds:7*86400});
+ for(let year=0;year<3;year++){
+  const before=state.inventory['m1:crop:apple']??0;
+  state=doAction(state,{type:'farm.harvest',plot:0});
+  assert.equal(state.inventory['m1:crop:apple'],before+4);
+  const duplicate=runM1LifeAction(state,{type:'farm.harvest',plot:0});
+  assert.equal(duplicate.ok,false);
+  if(year<2){
+   const next=state.plots[0].readyAt;
+   assert.equal(next-state.now,112*86400);
+   state=doAction(state,{type:'time.advance',seconds:112*86400});
+  }
+ }
+ assert.equal(state.plots[0],null);
+ assert.equal(state.inventory['m1:crop:apple'],12);
+ assert.equal(runM1LifeAction(state,{type:'farm.harvest',plot:0}).reason,'EMPTY_PLOT');
+});
