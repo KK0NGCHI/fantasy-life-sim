@@ -220,6 +220,36 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {...base,nextState:next,events};
  };
  const handlers=new Map([
+ ['m1.home.wood-shed',(snapshot)=>{
+  if(snapshot.world.runtime.region!=='거점 마을'||snapshot.world.runtime.dungeon)
+   throw Error('M1_TOWN_REQUIRED');
+  const previous=snapshot.world.runtime.m1Life??newM1LifeState();
+  if(!validateM1LifeState(previous))throw Error('M1_INVALID_STATE');
+  if(previous.facilities.woodShed)
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m1.home.already_built',payload:{facility:'woodShed'}}]};
+  const candidates=snapshot.itemWorld.items.filter(i=>i.definitionId==='item05h:oak-planks'&&
+   snapshot.itemWorld.placements.some(p=>p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
+  if(candidates.reduce((n,i)=>n+i.quantity,0)<2)
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m1.home.insufficient_planks',payload:{needed:2}}]};
+  let needed=2;
+  const items=snapshot.itemWorld.items.flatMap(i=>{
+   if(needed===0||!candidates.some(candidate=>candidate.id===i.id))return [i];
+   const used=Math.min(i.quantity,needed);needed-=used;
+   return i.quantity===used?[]:[{...i,quantity:i.quantity-used}];
+  });
+  if(needed!==0)throw Error('M1_ITEM_LEDGER_DESYNC');
+  const validIds=new Set(items.map(i=>i.id));
+  const itemWorld={...snapshot.itemWorld,items,placements:snapshot.itemWorld.placements.filter(p=>validIds.has(p.itemId))};
+  const life=structuredClone(previous);
+  life.facilities.woodShed=true;
+  life.facilities.plotCapacity+=1;
+  life.plots.push(null);
+  life.events.push({type:'m1.home.wood_shed_built'});if(life.events.length>200)life.events.shift();
+  if(!validateM1LifeState(life))throw Error('M1_INVALID_RESULT');
+  return {outcome:'success',nextState:{...snapshot,itemWorld,
+   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}},
+   events:[{type:'m1.home.wood_shed_built',payload:{planks:2,plotsAdded:1}}]};
+ }],
  ['m1.life',(snapshot,command)=>{
   if(snapshot.world.runtime.region!=='거점 마을')throw Error('M1_TOWN_REQUIRED');
   const previous=snapshot.world.runtime.m1Life??newM1LifeState();
@@ -673,6 +703,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
      return {turns:1,worldUnits:a.type==='time.advance'?a.seconds:60};
@@ -775,6 +806,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    return life;
   },
   m1Action(action){return this.dispatch('m1.life',action);},
+  m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
   /** Bounded synchronous automation. Calls exactly the same game actions as a
    * manual player, with safety evaluated before each attempt. */
   m1RunPlan(actions,{hpMin=0,mpMin=0,hungerMin=0}={}){
