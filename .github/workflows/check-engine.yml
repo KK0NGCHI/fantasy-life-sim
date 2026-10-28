@@ -55,3 +55,4 @@ jobs:
           node tests/browser-03f-smoke.mjs
           node tests/browser-05e-mineral.mjs
           node tests/browser-stage1-workshop.mjs
+          node tests/browser-m1-town-life.mjs
