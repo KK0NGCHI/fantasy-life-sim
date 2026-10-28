@@ -59,3 +59,25 @@ test('M1 real failed harvest spends one turn without granting crops',()=>{
  assert.equal(malformed.accepted,false);
  assert.equal(b.current().turn,before.turn+1);
 });
+
+test('M1 purchase, harvest and food use the existing owner-scoped itemWorld',()=>{
+ const b=createMainV2Inventory([{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}],{worldSeed:'m1-ledger-seed'});
+ const owned=id=>b.current().itemWorld.items.filter(i=>i.definitionId===id&&b.current().itemWorld.placements.some(p=>
+  p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===b.current().player.id))
+  .reduce((sum,i)=>sum+i.quantity,0);
+ assert.equal(b.m1Action({type:'trade.buy',item:'m1:seed:wheat',quantity:1}).accepted,true);
+ assert.equal(owned('m1:seed:wheat'),1);
+ assert.equal(b.current().world.runtime.m1Life.inventory['m1:seed:wheat']??0,0);
+ assert.equal(b.m1Action({type:'farm.plant',plot:0,crop:'wheat'}).accepted,true);
+ assert.equal(owned('m1:seed:wheat'),0);
+ assert.equal(b.m1Action({type:'time.advance',seconds:86400}).accepted,true);
+ assert.equal(b.m1Action({type:'farm.harvest',plot:0}).accepted,true);
+ assert.equal(owned('m1:crop:wheat'),3);
+ assert.equal(b.m1Action({type:'food.cook',recipe:'m1:food:bread'}).accepted,true);
+ assert.equal(owned('m1:crop:wheat'),1);
+ assert.equal(owned('m1:food:bread'),1);
+ assert.equal(b.m1Action({type:'food.eat',item:'m1:food:bread'}).accepted,true);
+ assert.equal(owned('m1:food:bread'),0);
+ assert.equal(b.m1Action({type:'trade.sell',item:'m1:crop:wheat',quantity:1}).accepted,true);
+ assert.equal(owned('m1:crop:wheat'),0);
+});
