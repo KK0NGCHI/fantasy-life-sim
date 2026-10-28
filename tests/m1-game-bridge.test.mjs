@@ -216,3 +216,34 @@ test('M1 28/112/224-day save restoration conserves owned crops and merchant time
   assert.deepEqual(restored.current(),game.current());
  }
 });
+
+test('E2E-04 processed-wood fishing rod is crafted from actual forest resources and used',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const options={worldSeed:'m1-tool-forest',resources05A:true,progression04A:true,preferences:{getItem:()=>null,setItem:()=>{}}};
+ const b=createMainV2Inventory(fixture,options);
+ const owned=id=>b.current().itemWorld.items.filter(i=>i.definitionId===id&&b.current().itemWorld.placements.some(p=>
+  p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===b.current().player.id))
+  .reduce((n,i)=>n+i.quantity,0);
+ assert.equal(b.dispatch('world.travel',{region:'숲'}).accepted,true);
+ const logged=b.workUntil05A('resource05a:oak-log:01',50);
+ assert.equal(logged.accepted,true,JSON.stringify(logged));
+ assert.ok(owned('item05a:oak-log')>=2);
+ const grass1=b.workUntil05A('resource05a:grass:01',10);
+ assert.equal(grass1.accepted,true,JSON.stringify(grass1));
+ const grass2=b.workUntil05A('resource05a:grass:01',10);
+ assert.equal(grass2.accepted,true,JSON.stringify(grass2));
+ assert.ok(owned('item05a:grass')>=2);
+ assert.equal(b.dispatch('world.travel',{region:'거점 마을'}).accepted,true);
+ assert.equal(b.dispatch('mineral.refine',{recipeId:'refine05h:oak-planks'}).accepted,true);
+ const crafted=b.dispatch('mineral.refine',{recipeId:'craft05i:processed-wood-rod'});
+ assert.equal(crafted.accepted,true,JSON.stringify(crafted));
+ assert.equal(owned('tool05a:rod:processedWood'),1);
+ assert.equal(owned('item05h:oak-planks'),0);
+ assert.ok(b.availableTools05A('fishing').some(t=>t.id==='tool05a:rod:processedWood'));
+ assert.equal(b.dispatch('world.travel',{region:'강·호수'}).accepted,true);
+ const turn=b.current().turn;
+ const used=b.dispatch('resource.work',{nodeId:'resource05a:small-fish:01',toolId:'tool05a:rod:processedWood'});
+ assert.equal(used.accepted,true,JSON.stringify(used));
+ assert.equal(b.current().turn,turn+1);
+ assert.equal(owned('tool05a:rod:processedWood'),1);
+});
