@@ -775,6 +775,24 @@ export function createMainV2Inventory(uiItems,options={}) {
    return life;
   },
   m1Action(action){return this.dispatch('m1.life',action);},
+  /** Bounded synchronous automation. Calls exactly the same game actions as a
+   * manual player, with safety evaluated before each attempt. */
+  m1RunPlan(actions,{hpMin=0,mpMin=0,hungerMin=0}={}){
+   if(!Array.isArray(actions)||actions.length<1||actions.length>32||
+    ![hpMin,mpMin,hungerMin].every(v=>typeof v==='number'&&Number.isFinite(v)&&v>=0&&v<=100)||
+    !actions.every(a=>a&&typeof a.type==='string'))return {ok:false,reason:'INVALID_PLAN',completed:0};
+   const events=[];
+   for(let i=0;i<actions.length;i++){
+    const p=state.player;
+    if(p.currentHp<hpMin||p.currentMp<mpMin||p.hunger<hungerMin)
+     return {ok:true,completed:i,stopReason:'SAFETY_THRESHOLD',events};
+    const result=this.m1Action(actions[i]);
+    if(!result.accepted)return {ok:true,completed:i,stopReason:result.reason,events};
+    events.push(...result.events);
+    if(result.outcome==='failed')return {ok:true,completed:i+1,stopReason:'ACTION_FAILED',events};
+   }
+   return {ok:true,completed:actions.length,stopReason:'COMPLETED',events};
+  },
 
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
