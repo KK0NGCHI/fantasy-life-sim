@@ -6,7 +6,7 @@ import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
 export function advanceCraftSurvivalStage1(player,delta={},limits={}){
  if(!delta||typeof delta!=='object'||Array.isArray(delta)||
   Object.keys(delta).some(k=>!['hp','mp','hunger'].includes(k))||
-  Object.values(delta).some(n=>!Number.isFinite(n)||Math.abs(n)>1000))
+  Object.values(delta).some(n=>!Number.isFinite(n)||n>0||n< -1000))
   return {ok:false,reason:'INVALID_SURVIVAL_DELTA'};
  const before=checkCraftSurvivalStage1(player,limits);
  if(!before.ok)return before;
