@@ -1,7 +1,7 @@
 /**
  * M1 experimental life/economy domain. Pure reducer with no dependency on UI or
- * storage. Not wired into the v2 dispatcher / v3 save; integration is required
- * before gameplay acceptance. All prices and durations are provisional.
+ * storage. The game bridge embeds farm/merchant runtime in v3 world state and
+ * uses itemWorld for authoritative item ownership. All prices and durations are provisional.
  */
 export const M1_CROPS=Object.freeze({
  wheat:{seed:'m1:seed:wheat',yield:'m1:crop:wheat',grow:86400,window:86400,quantity:3,repeat:0},
@@ -18,6 +18,8 @@ export const M1_PRICES=Object.freeze({
  'm1:crop:wheat':3,'m1:crop:potato':3,'m1:crop:strawberry':5,'m1:crop:blueberry':5,
  'm1:food:bread':9,'m1:food:baked-potato':5
 });
+const RESTOCK_SECONDS=7*86400;
+const SEED_STOCK=Object.freeze({'m1:seed:wheat':8,'m1:seed:potato':8,'m1:seed:strawberry':4,'m1:seed:blueberry':4});
 const integer=n=>Number.isSafeInteger(n)&&n>=0;
 const fail=reason=>({ok:false,reason});
 const own=(obj,key)=>Object.prototype.hasOwnProperty.call(obj,key);
@@ -25,7 +27,7 @@ const clone=x=>structuredClone(x);
 export function newM1LifeState(){
  return {schema:1,now:0,turn:0,gold:20,hunger:85,inventory:{},plots:[null,null],
   facilities:{kitchen:true,workbench:true,plotCapacity:2},
-  merchant:{stock:{'m1:seed:wheat':8,'m1:seed:potato':8,'m1:seed:strawberry':4,'m1:seed:blueberry':4}},
+  merchant:{stock:{...SEED_STOCK},lastRestock:0},
   events:[]};
 }
 export function validateM1LifeState(s){
@@ -36,7 +38,8 @@ export function validateM1LifeState(s){
    !integer(s.facilities.plotCapacity)||s.plots.length!==s.facilities.plotCapacity||
    typeof s.facilities.kitchen!=='boolean'||typeof s.facilities.workbench!=='boolean'||
    !s.merchant||!s.merchant.stock||!Object.entries(s.merchant.stock).every(([k,v])=>own(M1_PRICES,k)&&integer(v))||
-   !Array.isArray(s.events)||s.events.length>200)return false;
+   !Array.isArray(s.events)||s.events.length>200||
+   !integer(s.merchant.lastRestock??0)||s.merchant.lastRestock>s.now)return false;
  return s.plots.every(p=>p===null||(p&&own(M1_CROPS,p.crop)&&integer(p.readyAt)&&
   integer(p.spoilsAt)&&p.spoilsAt>=p.readyAt&&integer(p.remainingHarvests)&&
   p.remainingHarvests>=1&&p.remainingHarvests<=1+M1_CROPS[p.crop].repeat));
@@ -55,6 +58,15 @@ export function runM1LifeAction(source,action){
  case 'time.advance':{
   if(!positive(a.seconds)||a.seconds>365*86400||!integer(s.now+a.seconds))return fail('INVALID_TIME');
   s.now+=a.seconds;
+  // Replenish seeds once per completed seven-day bucket; split and bulk clock
+  // advances produce the same stock. No real-time refill and no cash cap.
+  const anchor=s.merchant.lastRestock??0;
+  const cycles=Math.floor((s.now-anchor)/RESTOCK_SECONDS);
+  if(cycles>0){
+   for(const [id,cap] of Object.entries(SEED_STOCK))
+    s.merchant.stock[id]=Math.min(cap,(s.merchant.stock[id]??0)+cap*cycles);
+   s.merchant.lastRestock=anchor+cycles*RESTOCK_SECONDS;
+  }
   // Crops become spoiled in their field; inventory never ages.
   for(let i=0;i<s.plots.length;i++){
    const p=s.plots[i];
