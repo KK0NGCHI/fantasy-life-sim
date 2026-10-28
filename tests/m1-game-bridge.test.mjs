@@ -81,3 +81,16 @@ test('M1 purchase, harvest and food use the existing owner-scoped itemWorld',()=
  assert.equal(b.m1Action({type:'trade.sell',item:'m1:crop:wheat',quantity:1}).accepted,true);
  assert.equal(owned('m1:crop:wheat'),0);
 });
+
+test('merchant restocks after 7 in-game days across authoritative world clock and saves checkpoint',()=>{
+ const b=createMainV2Inventory([{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}],{worldSeed:'m1-restock-seed'});
+ assert.equal(b.m1Action({type:'trade.buy',item:'m1:seed:wheat',quantity:2}).accepted,true);
+ assert.equal(b.m1Life().merchant.stock['m1:seed:wheat'],6);
+ for(let day=0;day<7;day++){
+  const result=b.m1Action({type:'time.advance',seconds:86400});
+  assert.equal(result.accepted,true,JSON.stringify(result));
+ }
+ assert.equal(b.m1Life().merchant.stock['m1:seed:wheat'],8);
+ assert.equal(b.m1Life().merchant.lastRestock,7*86400);
+ assert.equal(b.current().world.runtime.m1Life.merchant.lastRestock,7*86400);
+});
