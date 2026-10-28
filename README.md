@@ -1,28 +1,35 @@
 # Somnium — 판타지 생활 시뮬레이션
 
-> **2026-10-24 현재 작업 기준**: 아래에 보존된 v0.3~v0.x UI 변경 기록은 당시의 개발 일지입니다. 최신 작업 상태와 설치·기획·개발 순서는 다음 문서가 우선합니다. `main`이 아닌 **Draft PR 기반 작업**이며 아직 통합 병합하지 않았습니다.
+> **현행 개발 진입점 (2026-10-28, M0 기준선)**: 최신 개발 상황은 아래 문서 3개가 우선합니다. 이어지는 2026-10-24 및 UI 버전별 기록은 당시의 역사적 기록이며, 현재 브랜치·PR·완료 상태나 실행 안내로 그대로 사용하지 않습니다.
 
-- **[현재 구현 현황 · PR 및 브랜치 의존 관계](docs/project-status-current.md)**
-- **[확정 게임 규칙과 시험용 밸런스 구분](docs/project-decisions-current.md)**
-- **[05-A 이후 개발 로드맵 및 완료 기준](docs/roadmap-next.md)**
-- **[04-D 저장 호환성 검증 기록](docs/04d-growth-save-acceptance.md)**
+- [현재 구현·실행 경로·CI/검수 구분](docs/PROJECT_STATUS.md)
+- [M0~M5 통합 개발 마스터 로드맵](docs/MASTER_ROADMAP.md)
+- [통합 실행계획서 v1](docs/SOMNIUM_EXECUTION_PLAN_v1.md)
+- [확정 규칙·시험값·세계관 충돌 원장](docs/DECISIONS_AND_CONFLICTS.md)
+- [자원·제작 상세 기술 참고 (상위 로드맵 아님)](docs/resource-crafting-roadmap-v2-consolidated.md)
 
-현재 핵심: 16개 고정 광역 지역(전 지역 타일화 아님), 타일 미궁, v3 저장/세계 스냅샷, 54개 숙련·7개 능력치, 8종 종족/16종 배경 **후보**, 보통·소형·초소형 **각 1타일**, 배경별 정보 해석 16종. 아직 채집·제작·전투·경제 전체 루프가 완성된 것은 아닙니다. 다음 핵심 작업은 **05-A 실제 자원 채취·세계 변경·아이템·XP 연결**입니다.
+## 현재 main을 실행하는 방법
 
-최신 개발 브랜치 실행 예시 (Windows PowerShell):
+Node.js **22 이상**, Python 3 및 네트워크 접근이 가능한 환경을 기준으로 합니다. `main`에서 새 작업을 할 때는 먼저 최신 커밋과 열린 PR을 확인합니다.
 
-```powershell
+```bash
 git fetch origin
-git switch docs/roadmap-status-20261024
+git switch main
 git pull --ff-only
 npm install
 npm run check
-py -m http.server 8000
+python3 -m http.server 8000
 ```
 
-`py`가 없으면 `python -m http.server 8000`; 브라우저 주소: http://localhost:8000/. **이 저장소에는 잠금 파일이 없으므로 `npm ci`가 아닌 `npm install`**을 사용합니다. 테스트 통과와 사용자 PC의 실제 Windows Chrome/Edge 수동 검수는 다릅니다. **사용자 승인 없이 `main` 병합 금지.**
+Windows PowerShell에서는 서버 명령 대신 `py -m http.server 8000`을 사용할 수 있습니다. 브라우저 주소는 `http://localhost:8000/` 입니다. **`npm run check`에는 TypeScript 엔진 빌드 및 Node 테스트가 포함되며 `src/main-v2-inventory.js`가 `dist/engine/` 모듈을 가져오므로 빌드 전에 브라우저 화면을 여는 절차를 권장하지 않습니다.** `npm ci`를 사용하지 않습니다(현재 package-lock 미추적). UI는 `index.html → src/v3.js` 입니다.
+
+자동 검증과 실제 Windows Chrome/Edge 사람의 수동 검수는 별개의 판정입니다. 개발 브랜치와 Draft PR 작업을 원칙으로 하고, 사용자 승인 없이 `main`을 병합하지 않습니다. 저장 파일과 기존 슬롯은 명시적 승인 없이 덮어쓰거나 자동 이전하지 않습니다.
+
+**지금의 통합 목표:** M0 기준선 통합 이후 M1 '씨앗 → 재배 → 수확 → 제작·요리 → 판매 → 재투자 → 저장/복원'을 실제 UI에서 완성합니다. 자원·제작 Stage I의 기술적 인수는 게임 전체 또는 M1 완료가 아닙니다.
 
 ---
+
+## 이전 개발 기록 (역사 자료, 최신 기준 아님)
 
 ## 이전 UI 시제품 개발 기록 (역사 자료)
 
