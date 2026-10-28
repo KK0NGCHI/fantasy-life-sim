@@ -298,7 +298,7 @@ export function createMainV2Inventory(uiItems,options={}) {
  ['craft.batch',(snapshot,command)=>{
   const access=checkWorkshopStage1(snapshot.world.runtime,command.payload?.recipeId);
   if(!access.ok)throw Error(access.reason);
-  const result=craftBatch1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,command.payload?.count,command.payload?.choices??{});
+  const result=craftBatch1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,command.payload?.count,command.payload?.choices??{},command.payload?.stackChoices??{});
   if(!result.ok)throw Error(result.reason);
   return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
    events:[{type:'craft.batch_completed',payload:{recipeId:result.recipe.id,count:result.count,
@@ -308,7 +308,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const access=checkWorkshopStage1(snapshot.world.runtime,command.payload?.recipeId);
   if(!access.ok)throw Error(access.reason);
   const result=craftUntilStage1(snapshot.itemWorld,snapshot.player.id,command.payload?.recipeId,
-   command.payload?.count,command.payload?.choices??{});
+   command.payload?.count,command.payload?.choices??{},command.payload?.stackChoices??{});
   if(!result.ok)throw Error(result.reason);
   return {outcome:'success',nextState:{...snapshot,itemWorld:result.itemWorld},
    events:[{type:'craft.repeat_stopped',payload:{recipeId:result.recipe.id,
@@ -614,7 +614,7 @@ export function createMainV2Inventory(uiItems,options={}) {
      const access=checkWorkshopStage1(current.world.runtime,action.payload?.recipeId);
      if(!access.ok)throw Error(access.reason);
      const result=craftUntilStage1(current.itemWorld,current.player.id,action.payload?.recipeId,
-      action.payload?.count,action.payload?.choices??{});
+      action.payload?.count,action.payload?.choices??{},action.payload?.stackChoices??{});
      if(!result.ok)throw Error(result.reason);
      return {turns:result.completed,worldUnits:result.seconds};
     }
