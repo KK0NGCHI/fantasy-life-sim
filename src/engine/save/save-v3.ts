@@ -291,6 +291,27 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
   if(!built.ok||validateWorldSnapshot03E(raw.state.world.runtime.world03E,built.registry).length)
    return {ok:false,reason:'INVALID_DATA'};
  }
+ // M2 combat state is optional; pre-M2 v3 slots remain valid.
+ // A malformed turn queue must never be applied to live gameplay.
+ if(Object.hasOwn(raw.state.world.runtime,'m2Combat')){
+  const x=raw.state.world.runtime.m2Combat;
+  const validNumber=(n:unknown)=>typeof n==='number'&&Number.isSafeInteger(n)&&n>=0;
+  if(!obj(x)||!keys(x,['schema','encounterId','phase','round','queue','cursor','participants','seed','log','outcome'])||
+   x.schema!==1||typeof x.encounterId!=='string'||x.encounterId.length<1||x.encounterId.length>160||
+   !['active','resolved'].includes(String(x.phase))||!validNumber(x.round)||Number(x.round)<1||
+   !validNumber(x.seed)||!validNumber(x.cursor)||!Array.isArray(x.queue)||!Array.isArray(x.participants)||
+   x.participants.length<2||x.participants.length>5||x.queue.length!==x.participants.length||
+   Number(x.cursor)>=x.queue.length||new Set(x.queue).size!==x.queue.length||
+   !x.queue.every((id:unknown)=>typeof id==='string'&&x.participants.some((p:unknown)=>obj(p)&&p.id===id))||
+   !x.participants.every((p:unknown,i:number)=>obj(p)&&keys(p,['id','hp','maxHp','side','guard'])&&
+     p.id===(i?'enemy:'+(i-1):'player')&&p.side===(i?'enemy':'player')&&
+     validNumber(p.hp)&&validNumber(p.maxHp)&&Number(p.maxHp)>0&&Number(p.hp)<=Number(p.maxHp)&&
+     typeof p.guard==='boolean')||
+   !Array.isArray(x.log)||x.log.length>40||
+   !(x.outcome===null||['victory','defeat','retreat'].includes(String(x.outcome)))||
+   (x.phase==='active'&&x.outcome!==null)||(x.phase==='resolved'&&x.outcome===null))
+   return {ok:false,reason:'INVALID_DATA'};
+ }
  // M1 opt-in runtime; legacy v3 saves without this extension stay intact.
  if(Object.hasOwn(raw.state.world.runtime,'m1Life')){
   const x=raw.state.world.runtime.m1Life;
