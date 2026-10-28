@@ -83,11 +83,12 @@ export function createMainV2Inventory(uiItems,options={}) {
   'm1:seed:blueberry':'블루베리 씨앗','m1:crop:wheat':'밀','m1:crop:potato':'감자',
   'm1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리','m1:food:bread':'밀빵',
   'm1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
+ const m2Catalog=[{id:'m2:loot:fang',name:'시험용 야수 송곳니',group:'전리품',qty:0,tags:['m2:loot']}];
  const m1Catalog=Object.keys(M1_PRICES).map(id=>({id,name:m1Names[id],group:id.includes(':seed:')?'씨앗':'식재료',qty:0,tags:['m1:life']}));
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
- const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,{...item}]));
- const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(x=>x.group))];
- const catalog={categories,rarities:[],materials:[],effects:[],items:[...new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,item])).values()].map(item=>({
+ const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog,...m2Catalog].map(item=>[item.id,{...item}]));
+ const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A,...m1Catalog,...m2Catalog].map(x=>x.group))];
+ const catalog={categories,rarities:[],materials:[],effects:[],items:[...new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog,...m2Catalog].map(item=>[item.id,item])).values()].map(item=>({
   id:item.id,nameKey:item.name,categoryId:item.group,tags:item.tags??[],capabilities:[]
  }))};
  const built=buildItemRegistry(catalog);
@@ -251,9 +252,22 @@ export function createMainV2Inventory(uiItems,options={}) {
   const result=actM2Combat(current,command.payload);
   if(!result.ok)throw Error(result.reason);
   const hp=result.state.participants[0].hp;
-  return {outcome:'success',nextState:{...snapshot,player:{...snapshot.player,currentHp:hp},
-   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:result.state}}},
-   events:[{type:'m2.combat.action',payload:{outcome:result.state.outcome,action:command.payload.type}}]};
+  const victory=result.state.outcome==='victory'&&current.outcome!== 'victory';
+  const ledger=snapshot.world.runtime.m2RewardedEncounters??[];
+  if(victory&&ledger.includes(current.encounterId))throw Error('M2_REWARD_ALREADY_CLAIMED');
+  let itemWorld=snapshot.itemWorld,progression=snapshot.progression;
+  if(victory){
+   itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,
+    'm2:reward:'+current.encounterId,'m2:loot:fang',1);
+   const skill=SKILL_DEFINITIONS.find(d=>d.name==='검술');
+   if(progression?.system04A&&skill)progression={...progression,system04A:awardProgression(progression.system04A,{
+    actionId:'m2:victory:'+current.encounterId,skillId:skill.id,xp:3})};
+  }
+  return {outcome:'success',nextState:{...snapshot,itemWorld,progression,player:{...snapshot.player,currentHp:hp},
+   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:result.state,
+    ...(victory?{m2RewardedEncounters:[...ledger,current.encounterId]}:{})}}},
+   events:[{type:'m2.combat.action',payload:{outcome:result.state.outcome,action:command.payload.type}},
+    ...(victory?[{type:'m2.combat.reward',payload:{encounterId:current.encounterId,item:'m2:loot:fang',quantity:1}}]:[])]};
  }],
 
  ['m1.home.wood-shed',(snapshot)=>{
