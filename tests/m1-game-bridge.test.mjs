@@ -189,3 +189,30 @@ test('E2E-04: actual forest logging, town plank refining, functional shed, and v
  assert.deepEqual(restored.current().itemWorld,b.current().itemWorld);
  assert.deepEqual(restored.current().world.runtime.m1Life,b.current().world.runtime.m1Life);
 });
+
+test('M1 28/112/224-day save restoration conserves owned crops and merchant time',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ for(const days of [28,112,224]){
+  const options={worldSeed:'m1-horizon-'+days};
+  const game=createMainV2Inventory(fixture,options);
+  assert.equal(game.m1Action({type:'trade.buy',item:'m1:seed:potato',quantity:1}).accepted,true);
+  assert.equal(game.m1Action({type:'farm.plant',plot:0,crop:'potato'}).accepted,true);
+  for(let d=0;d<days;d++){
+   const progressed=game.m1Action({type:'time.advance',seconds:86400});
+   assert.equal(progressed.accepted,true,JSON.stringify({days,d,progressed}));
+  }
+  assert.equal(game.m1Life().plots[0],null,'unharvested field over-ripens');
+  const life=game.m1Life();
+  assert.equal(life.merchant.stock['m1:seed:potato'],8);
+  assert.ok(life.merchant.lastRestock>=28*86400);
+  const before=game.current();
+  const {schemaVersion,clock,...rest}=structuredClone(before);
+  const snapshot={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+  const slot={slotId:'m1-horizon-'+days,worldId:'m1-world',kind:'manual',label:'long-horizon',savedAt:'2026-10-28T00:00:00Z',revision:0};
+  const saved=createSaveV3(snapshot,slot,'m1-test',game.registry);
+  assert.equal(decodeSaveV3(saved,game.registry).ok,true);
+  const restored=createMainV2Inventory(fixture,options);
+  restored.applyApprovedSave(JSON.parse(JSON.stringify(saved)));
+  assert.deepEqual(restored.current(),game.current());
+ }
+});
