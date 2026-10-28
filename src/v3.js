@@ -915,7 +915,7 @@ const activeM2=mainV2.m2Combat();
 if(activeM2?.phase==='resolved')make('p',{text:'최근 전투 결과: '+activeM2.outcome},right);
 btn('적 조우 (M2 시험)',()=>{
  stopAuto();
- const result=mainV2.m2StartEncounter({encounterId:'m2:demo:'+mainV2.current().turn,enemyHps:[12,9],seed:17});
+ const result=mainV2.m2StartEncounter({encounterId:'m2:demo:'+mainV2.current().turn,enemyHps:[12,9],seed:1});
  if(result.accepted){refreshV2Inventory();nextLog('전투','M2 조우 시작');}
  else nextLog('위험','조우 시작 실패: '+(result.reason??''));
  render();
