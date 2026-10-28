@@ -1,4 +1,4 @@
-import {startM2Encounter,actM2Combat} from './m2-combat-core.js';
+import {startM2Encounter,actM2Combat,chooseM2EnemyAction} from './m2-combat-core.js';
 import {M1_PRICES,M1_FOODS,newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
 import {MATERIALS_CONDITION_05N} from './material-composition-05n.js';
 import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
@@ -873,6 +873,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   m2ExploreEncounter(){return this.dispatch('m2.encounter.explore',{});},
   m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
   m2CombatAction(action){return this.dispatch('m2.combat.act',action);},
+  m2EnemyTurn(){const choice=chooseM2EnemyAction(state.world.runtime.m2Combat);return choice.ok?this.dispatch('m2.combat.act',choice.action):{accepted:false,reason:choice.reason,events:[]};},
   m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
   /** Bounded synchronous automation. Calls exactly the same game actions as a
    * manual player, with safety evaluated before each attempt. */
