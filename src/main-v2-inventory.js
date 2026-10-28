@@ -1,3 +1,4 @@
+import {startM2Encounter,actM2Combat} from './m2-combat-core.js';
 import {M1_PRICES,M1_FOODS,newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
 import {MATERIALS_CONDITION_05N} from './material-composition-05n.js';
 import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
@@ -221,6 +222,25 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {...base,nextState:next,events};
  };
  const handlers=new Map([
+ ['m2.encounter.start',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_ENCOUNTER_UNAVAILABLE');
+  const begun=startM2Encounter({encounterId:command.payload.encounterId,playerHp:snapshot.player.currentHp,enemyHps:command.payload.enemyHps,seed:command.payload.seed});
+  if(!begun.ok)throw Error(begun.reason);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
+   events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
+ }],
+ ['m2.combat.act',(snapshot,command)=>{
+  const current=snapshot.world.runtime.m2Combat;
+  if(!current||current.phase!=='active')throw Error('M2_NO_ACTIVE_COMBAT');
+  if(command.payload.actorId!==current.queue[current.cursor])throw Error('M2_NOT_ACTORS_TURN');
+  const result=actM2Combat(current,command.payload);
+  if(!result.ok)throw Error(result.reason);
+  const hp=result.state.participants[0].hp;
+  return {outcome:'success',nextState:{...snapshot,player:{...snapshot.player,currentHp:hp},
+   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:result.state}}},
+   events:[{type:'m2.combat.action',payload:{outcome:result.state.outcome,action:command.payload.type}}]};
+ }],
+
  ['m1.home.wood-shed',(snapshot)=>{
   if(snapshot.world.runtime.region!=='거점 마을'||snapshot.world.runtime.dungeon)
    throw Error('M1_TOWN_REQUIRED');
@@ -726,6 +746,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='m2.encounter.start'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -833,6 +854,9 @@ export function createMainV2Inventory(uiItems,options={}) {
     return {accepted:false,outcome:'rejected',reason:'DUPLICATE_REQUEST',events:[]};
    return this.dispatch('m1.life',action);
   },
+  m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
+  m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
+  m2CombatAction(action){return this.dispatch('m2.combat.act',action);},
   m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
   /** Bounded synchronous automation. Calls exactly the same game actions as a
    * manual player, with safety evaluated before each attempt. */
