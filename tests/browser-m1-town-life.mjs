@@ -21,5 +21,12 @@ try{
  await panel.getByRole('button',{name:/밀 1개 판매/}).click();
  await panel.getByRole('button',{name:/농지 한 칸 확장/}).click();
  assert.match(await panel.innerText(),/농지 3개/);
+ // Second crop uses the bounded automation path; inventory is still authoritative.
+ await panel.getByRole('button',{name:/감자 씨앗 구매/}).click();
+ await panel.getByRole('button',{name:'감자 심기'}).first().click();
+ await panel.getByRole('button',{name:/하루 경과/}).click();
+ await panel.getByRole('button',{name:/익은 작물 일괄 수확/}).click();
+ assert.match(await panel.innerText(),/감자 2/);
+
  console.log('M1_TOWN_LIFE_BROWSER_PASS');
 }finally{await browser.close();}
