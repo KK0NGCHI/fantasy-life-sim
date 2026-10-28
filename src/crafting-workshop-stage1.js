@@ -18,13 +18,22 @@ export function checkWorkshopStage1(runtime,recipeId){
  * is retained when ingredients run out. No extra time for the blocked attempt.
  * This is NOT a background job and requires one explicit player command.
  */
-export function craftUntilStage1(world,ownerId,recipeId,count,choices={},stackChoices={}){
+export function craftUntilStage1(world,ownerId,recipeId,count,choices={},stackChoices={},policy={}){
  if(!Number.isSafeInteger(count)||count<1||count>CRAFTING_BATCH_LIMIT_1)
   return {ok:false,reason:'INVALID_BATCH_COUNT',completed:0};
+ if(!policy||typeof policy!=='object'||Array.isArray(policy)||
+  Object.keys(policy).some(k=>k!=='maxSeconds')||
+  (policy.maxSeconds!==undefined&&(!Number.isSafeInteger(policy.maxSeconds)||policy.maxSeconds<1||policy.maxSeconds>86400)))
+  return {ok:false,reason:'INVALID_REPEAT_POLICY',completed:0};
  const recipe=REFINING_BY_ID_05H.get(recipeId);
  if(!recipe)return {ok:false,reason:'UNKNOWN_RECIPE',completed:0};
+ if(!Number.isSafeInteger(recipe.seconds)||recipe.seconds<1)
+  return {ok:false,reason:'INVALID_RECIPE',completed:0};
  let current=world,completed=0,blockedBy=null;
  for(let i=0;i<count;i++){
+  if(policy.maxSeconds!==undefined&&recipe.seconds*(completed+1)>policy.maxSeconds){
+   blockedBy='TIME_BUDGET_REACHED';break;
+  }
   const next=craftBatch1(current,ownerId,recipeId,1,choices,stackChoices);
   if(!next.ok){blockedBy=next.reason;break;}
   current=next.itemWorld;completed++;
