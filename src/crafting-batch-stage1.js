@@ -26,7 +26,7 @@ export function craftPreview1(itemWorld,ownerId,recipeId,choices={},stackChoices
 /** Atomic bulk craft: all results commit together; shortage rejects without spending turns.
  * Same sequential algorithm as manual, so receipts and stack identities stay identical.
  */
-export function craftBatch1(itemWorld,ownerId,recipeId,count,choices={}){
+export function craftBatch1(itemWorld,ownerId,recipeId,count,choices={},stackChoices={}){
  if(!Number.isSafeInteger(count)||count<1||count>CRAFTING_BATCH_LIMIT_1)
   return {ok:false,reason:'INVALID_BATCH_COUNT'};
  const recipe=REFINING_BY_ID_05H.get(recipeId);
