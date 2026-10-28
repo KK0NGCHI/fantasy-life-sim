@@ -302,7 +302,7 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
    !validNumber(x.seed)||!validNumber(x.cursor)||!Array.isArray(x.queue)||!Array.isArray(x.participants)||
    x.participants.length<2||x.participants.length>5||x.queue.length!==x.participants.length||
    Number(x.cursor)>=x.queue.length||new Set(x.queue).size!==x.queue.length||
-   !x.queue.every((id:unknown)=>typeof id==='string'&&x.participants.some((p:unknown)=>obj(p)&&p.id===id))||
+   !x.queue.every((id:unknown)=>typeof id==='string'&&(x.participants as unknown[]).some((p:unknown)=>obj(p)&&p.id===id))||
    !x.participants.every((p:unknown,i:number)=>obj(p)&&keys(p,['id','hp','maxHp','side','guard'])&&
      p.id===(i?'enemy:'+(i-1):'player')&&p.side===(i?'enemy':'player')&&
      validNumber(p.hp)&&validNumber(p.maxHp)&&Number(p.maxHp)>0&&Number(p.hp)<=Number(p.maxHp)&&
