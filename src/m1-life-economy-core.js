@@ -4,22 +4,25 @@
  * uses itemWorld for authoritative item ownership. All prices and durations are provisional.
  */
 export const M1_CROPS=Object.freeze({
- wheat:{seed:'m1:seed:wheat',yield:'m1:crop:wheat',grow:86400,window:86400,quantity:3,repeat:0},
- potato:{seed:'m1:seed:potato',yield:'m1:crop:potato',grow:86400,window:86400,quantity:2,repeat:0},
- strawberry:{seed:'m1:seed:strawberry',yield:'m1:crop:strawberry',grow:86400,window:86400,quantity:2,repeat:2},
- blueberry:{seed:'m1:seed:blueberry',yield:'m1:crop:blueberry',grow:172800,window:86400,quantity:2,repeat:2}
+ wheat:{seed:'m1:seed:wheat',yield:'m1:crop:wheat',grow:86400,window:86400,quantity:3,repeat:0,seasons:[0,2]},
+ potato:{seed:'m1:seed:potato',yield:'m1:crop:potato',grow:86400,window:86400,quantity:2,repeat:0,seasons:[0,1,2]},
+ strawberry:{seed:'m1:seed:strawberry',yield:'m1:crop:strawberry',grow:86400,window:86400,quantity:2,repeat:2,seasons:[0,1]},
+ blueberry:{seed:'m1:seed:blueberry',yield:'m1:crop:blueberry',grow:172800,window:86400,quantity:2,repeat:2,seasons:[1,2]},
+ apple:{seed:'m1:seed:apple',yield:'m1:crop:apple',grow:7*86400,window:3*86400,quantity:4,repeat:2,seasons:[0,2],orchard:true}
 });
 export const M1_FOODS=Object.freeze({
  'm1:food:bread':{input:'m1:crop:wheat',quantity:2,hunger:15},
  'm1:food:baked-potato':{input:'m1:crop:potato',quantity:1,hunger:10}
 });
 export const M1_PRICES=Object.freeze({
- 'm1:seed:wheat':2,'m1:seed:potato':2,'m1:seed:strawberry':4,'m1:seed:blueberry':4,
- 'm1:crop:wheat':3,'m1:crop:potato':3,'m1:crop:strawberry':5,'m1:crop:blueberry':5,
+ 'm1:seed:wheat':2,'m1:seed:potato':2,'m1:seed:strawberry':4,'m1:seed:blueberry':4,'m1:seed:apple':12,
+ 'm1:crop:wheat':3,'m1:crop:potato':3,'m1:crop:strawberry':5,'m1:crop:blueberry':5,'m1:crop:apple':8,
  'm1:food:bread':9,'m1:food:baked-potato':5
 });
 const RESTOCK_SECONDS=7*86400;
-const SEED_STOCK=Object.freeze({'m1:seed:wheat':8,'m1:seed:potato':8,'m1:seed:strawberry':4,'m1:seed:blueberry':4});
+const SEED_STOCK=Object.freeze({'m1:seed:wheat':8,'m1:seed:potato':8,'m1:seed:strawberry':4,'m1:seed:blueberry':4,'m1:seed:apple':2});
+export const m1SeasonAt=seconds=>['spring','summer','autumn','winter'][Math.floor((seconds+28800)/(28*86400))%4];
+const seasonIndex=seconds=>Math.floor((seconds+28800)/(28*86400))%4;
 const integer=n=>Number.isSafeInteger(n)&&n>=0;
 const fail=reason=>({ok:false,reason});
 const own=(obj,key)=>Object.prototype.hasOwnProperty.call(obj,key);
@@ -79,6 +82,7 @@ export function runM1LifeAction(source,action){
   if(!integer(a.plot)||a.plot>=s.plots.length||!own(M1_CROPS,a.crop))return fail('INVALID_PLOT_OR_CROP');
   if(s.plots[a.plot])return fail('PLOT_OCCUPIED');
   const c=M1_CROPS[a.crop];
+  if(!c.seasons.includes(seasonIndex(s.now)))return fail('WRONG_SEASON');
   if((s.inventory[c.seed]??0)<1)return fail('NO_SEED');
   changeStock(s.inventory,c.seed,-1);
   s.plots[a.plot]={crop:a.crop,readyAt:s.now+c.grow,spoilsAt:s.now+c.grow+c.window,remainingHarvests:1+c.repeat};
@@ -92,10 +96,11 @@ export function runM1LifeAction(source,action){
   if(s.now<p.readyAt)return fail('NOT_RIPE');
   if(s.now>p.spoilsAt)return fail('OVER_RIPE');
   const c=M1_CROPS[p.crop];
+  if(!c.seasons.includes(seasonIndex(s.now)))return fail('WRONG_SEASON');
   changeStock(s.inventory,c.yield,c.quantity);
   p.remainingHarvests--;
   if(p.remainingHarvests===0)s.plots[a.plot]=null;
-  else{p.readyAt=s.now+c.grow;p.spoilsAt=p.readyAt+c.window;}
+  else{p.readyAt=s.now+(c.orchard?28*86400:c.grow);p.spoilsAt=p.readyAt+c.window;}
   event={type:'farm.harvested',crop:p.crop,quantity:c.quantity};
   break;
  }
