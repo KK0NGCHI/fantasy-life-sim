@@ -94,3 +94,41 @@ test('merchant restocks after 7 in-game days across authoritative world clock an
  assert.equal(b.m1Life().merchant.lastRestock,7*86400);
  assert.equal(b.current().world.runtime.m1Life.merchant.lastRestock,7*86400);
 });
+
+test('M1 automatic plan matches manual actions for turns, clock, items and RNG',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const options={worldSeed:'m1-parity-seed'};
+ const manual=createMainV2Inventory(fixture,options);
+ const automated=createMainV2Inventory(fixture,options);
+ const actions=[
+  {type:'trade.buy',item:'m1:seed:wheat',quantity:1},
+  {type:'farm.plant',plot:0,crop:'wheat'},
+  {type:'time.advance',seconds:86400},
+  {type:'farm.harvest',plot:0},
+  {type:'food.cook',recipe:'m1:food:bread'},
+  {type:'food.eat',item:'m1:food:bread'},
+  {type:'trade.sell',item:'m1:crop:wheat',quantity:1}
+ ];
+ for(const action of actions)assert.equal(manual.m1Action(action).accepted,true);
+ const result=automated.m1RunPlan(actions,{hungerMin:1});
+ assert.equal(result.ok,true);
+ assert.equal(result.completed,actions.length);
+ assert.equal(result.stopReason,'COMPLETED');
+ assert.deepEqual(automated.current(),manual.current());
+});
+test('M1 automatic safety stops before consuming any turn and valid failed attempt stops after one turn',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const a=createMainV2Inventory(fixture,{worldSeed:'m1-safety-seed'});
+ const first=a.m1RunPlan([{type:'farm.harvest',plot:0}],{hungerMin:90});
+ assert.equal(first.stopReason,'SAFETY_THRESHOLD');
+ assert.equal(first.completed,0);
+ assert.equal(a.current().turn,0);
+ const second=a.m1RunPlan([{type:'farm.harvest',plot:0},{type:'time.advance',seconds:86400}]);
+ assert.equal(second.stopReason,'ACTION_FAILED');
+ assert.equal(second.completed,1);
+ assert.equal(a.current().turn,1);
+ assert.equal(a.current().clock.elapsedUnits,60);
+ const invalid=a.m1RunPlan([{type:'time.advance',seconds:86400}],{hungerMin:-1});
+ assert.equal(invalid.ok,false);
+ assert.equal(a.current().turn,1);
+});
