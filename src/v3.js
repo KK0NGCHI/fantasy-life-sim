@@ -859,6 +859,36 @@ const choices=goals.map(i=>mainV2.localRoute([i%grid.width,Math.floor(i/grid.wid
 if(!choices.length){stopAuto();nextLog('시스템','자동 탐색 경로 없음');return render()}
 const route=choices[autoTarget++%choices.length],direction=route[0];
 dungeonMove(direction==='east'?1:direction==='west'?-1:0,direction==='south'?1:direction==='north'?-1:0)}
+function m2CombatScreen(){
+ const battle=mainV2.m2Combat();
+ const el=head('전투','M2 조우 · 참가자 행동 순서');
+ const panel=make('section',{role:'region','aria-label':'M2 실제 전투',class:'resource05a-panel'},el);
+ make('h3',{text:'조우 '+battle.encounterId},panel);
+ make('p',{text:'라운드 '+battle.round+' · 다음 참가자 '+(battle.queue[battle.cursor]??'-')},panel);
+ for(const p of battle.participants)make('p',{text:p.id+' · HP '+p.hp+'/'+p.maxHp+(p.guard?' · 방어 자세':'')},panel);
+ make('p',{text:battle.log.slice(-5).map(x=>x.type+' '+(x.damage??'')).join(' · ')||'전투 개시'},panel);
+ const buttons=make('div',{class:'dungeon-main-actions'},panel);
+ if(battle.phase==='resolved'){
+  make('p',{text:'전투 결과: '+battle.outcome},panel);
+  btn('탐험으로 돌아가기',()=>render(),'btn primary',buttons);
+  return;
+ }
+ const actor=battle.queue[battle.cursor];
+ const act=(type,targetId)=>{
+  const result=mainV2.m2CombatAction({actorId:actor,type,targetId});
+  if(!result.accepted)nextLog('위험','전투 행동 거부: '+(result.reason??''));
+  else{refreshV2Inventory();nextLog('전투',actor+' · '+type);}
+  render();
+ };
+ if(actor==='player'){
+  const target=battle.participants.find(p=>p.side==='enemy'&&p.hp>0);
+  btn('공격',()=>act('attack',target?.id),'btn primary',buttons);
+  btn('방어',()=>act('defend'),'btn',buttons);
+  btn('퇴각',()=>act('retreat'),'btn',buttons);
+ }else{
+  btn('적의 행동 진행',()=>act('attack','player'),'btn primary',buttons);
+ }
+}
 function dungeon(){
 const el=head(mainV2.localSite()==='core:site/forest'?'숲길':'지하미궁',mainV2.localFloor()===0?'지상층':'지하 '+Math.abs(mainV2.localFloor())+'층');
 el.classList.add('dungeon-screen');
@@ -881,6 +911,16 @@ for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
  tile.title=!known?'미탐색':player?'플레이어':stairCells.has(idx)?'계단':v==='#'?'벽':'바닥';
 }
 make('h2',{text:'탐색 제어'},right);
+const activeM2=mainV2.m2Combat();
+if(activeM2?.phase==='resolved')make('p',{text:'최근 전투 결과: '+activeM2.outcome},right);
+btn('적 조우 (M2 시험)',()=>{
+ stopAuto();
+ const result=mainV2.m2StartEncounter({encounterId:'m2:demo:'+mainV2.current().turn,enemyHps:[12,9],seed:17});
+ if(result.accepted){refreshV2Inventory();nextLog('전투','M2 조우 시작');}
+ else nextLog('위험','조우 시작 실패: '+(result.reason??''));
+ render();
+},'btn',right);
+
 const actions=make('div',{class:'dungeon-main-actions'},right);
 btn(autoTimer?'자동 탐색 중지':'자동 탐색 시작',()=>{
  if(autoTimer){stopAuto();nextLog('시스템','자동 이동 중지');render()}
@@ -1062,7 +1102,7 @@ target.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>{const id=b.da
 target.querySelectorAll('[data-pin]').forEach(b=>b.onclick=()=>{const id=b.dataset.pin;s.pinnedIds=s.pinnedIds.includes(id)?s.pinnedIds.filter(x=>x!==id):[...s.pinnedIds,id];filter();iconify()});iconify()};
 for(const kind of ['전체','생활','이동','탐험','위험','시스템'])btn(kind,()=>{s.logFilter=kind;logs()},s.logFilter===kind?'active':'',$('#logFilters'));filter();
 }
-function drawMain(){if(s.page==='생활')lifestyle();else if(s.page==='세계 지도')world();else if(s.page==='인벤토리')inventory();else if(s.page==='캐릭터')character();else if(s.page==='숙련')skills();else if(s.page==='제작')crafts();else if(s.page==='도감'||s.page==='신앙')other();else if(s.page==='던전')dungeon();else settings()}
+function drawMain(){if(mainV2.m2Combat()?.phase==='active')return m2CombatScreen();if(s.page==='생활')lifestyle();else if(s.page==='세계 지도')world();else if(s.page==='인벤토리')inventory();else if(s.page==='캐릭터')character();else if(s.page==='숙련')skills();else if(s.page==='제작')crafts();else if(s.page==='도감'||s.page==='신앙')other();else if(s.page==='던전')dungeon();else settings()}
 
 function playerPanel(){
 const el=$('#player');
