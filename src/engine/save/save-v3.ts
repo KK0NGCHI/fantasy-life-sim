@@ -291,6 +291,32 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
   if(!built.ok||validateWorldSnapshot03E(raw.state.world.runtime.world03E,built.registry).length)
    return {ok:false,reason:'INVALID_DATA'};
  }
+ // M1 opt-in runtime; legacy v3 saves without this extension stay intact.
+ if(Object.hasOwn(raw.state.world.runtime,'m1Life')){
+  const x=raw.state.world.runtime.m1Life;
+  const nonnegative=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0;
+  const catalog=['m1:seed:wheat','m1:seed:potato','m1:seed:strawberry','m1:seed:blueberry',
+   'm1:crop:wheat','m1:crop:potato','m1:crop:strawberry','m1:crop:blueberry',
+   'm1:food:bread','m1:food:baked-potato'];
+  const crop=['wheat','potato','strawberry','blueberry'];
+  if(!obj(x)||!keys(x,['schema','now','turn','gold','hunger','inventory','plots','facilities','merchant','events'])||
+   x.schema!==1||!nonnegative(x.now)||Number(x.now)>Number(clock.elapsedSeconds)||
+   !nonnegative(x.turn)||!nonnegative(x.gold)||!nonnegative(x.hunger)||Number(x.hunger)>100||
+   !obj(x.inventory)||Object.keys(x.inventory).length>catalog.length||
+   !Object.entries(x.inventory).every(([k,v])=>catalog.includes(k)&&nonnegative(v))||
+   !obj(x.facilities)||!keys(x.facilities,['kitchen','workbench','plotCapacity'])||
+   typeof x.facilities.kitchen!=='boolean'||typeof x.facilities.workbench!=='boolean'||
+   !nonnegative(x.facilities.plotCapacity)||Number(x.facilities.plotCapacity)>32||
+   !Array.isArray(x.plots)||x.plots.length!==x.facilities.plotCapacity||
+   !x.plots.every((p:unknown)=>p===null||(obj(p)&&keys(p,['crop','readyAt','spoilsAt','remainingHarvests'])&&
+    crop.includes(String(p.crop))&&nonnegative(p.readyAt)&&nonnegative(p.spoilsAt)&&
+    Number(p.spoilsAt)>=Number(p.readyAt)&&nonnegative(p.remainingHarvests)&&
+    Number(p.remainingHarvests)>0&&Number(p.remainingHarvests)<=3))||
+   !obj(x.merchant)||!keys(x.merchant,['stock'])||!obj(x.merchant.stock)||
+   !Object.entries(x.merchant.stock).every(([k,v])=>catalog.includes(k)&&nonnegative(v))||
+   !Array.isArray(x.events)||x.events.length>200||
+   !x.events.every((e:unknown)=>obj(e)&&typeof e.type==='string'&&e.type.length>0&&e.type.length<=80))return {ok:false,reason:'INVALID_DATA'};
+ }
  if(!validResource05A(raw.state.world.runtime,clock.elapsedSeconds as number))return {ok:false,reason:'INVALID_DATA'};
  if(!validProgressionExtension(raw.state.progression))return {ok:false,reason:'INVALID_DATA'};
  const source=structuredClone(raw.state) as unknown as Record<string,unknown>;
