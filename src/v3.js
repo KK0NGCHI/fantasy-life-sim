@@ -266,7 +266,15 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
       const preview=craftPreview1(allItems,owner,recipe.id,choices,stackChoices);
       const timeAllowed=craftingMode.value!=='until'||Number(craftingBudget.value)===0||recipe.seconds<=Number(craftingBudget.value);
       const trial=preview.ok?(craftingMode.value==='until'?(timeAllowed?preview:{ok:false,reason:'TIME_BUDGET_REACHED'}):craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices,stackChoices)):preview;
-      msg.textContent=trial.ok?'제작 가능'+(craftingMode.value==='until'?' · 재료 고갈 시 자동 중단':''):'재료 부족/호환 불가: '+trial.reason;
+      const reasons={
+       INSUFFICIENT_MATERIAL:'재료 부족',INVALID_MATERIAL_CHOICE:'재료 선택 오류',
+       INVALID_STACK_CHOICE:'스택 선택 오류',ALIEN_EQUIPMENT_TABOO:'이질 기원 소재 장비 제작 금기',
+       TIME_BUDGET_REACHED:'설정된 시간 안에 1회도 완료할 수 없음',
+       INVALID_MATERIAL_PLAN:'재료 배분 불가',WORKSTATION_REQUIRED:'작업대 필요'
+      };
+      msg.textContent=trial.ok?'제작 가능'+(craftingMode.value==='until'?' · 재료 고갈 시 자동 중단':''):
+       (reasons[trial.reason]??'제작 불가')+' ('+trial.reason+')';
+      if(s.region!=='거점 마을')msg.textContent='거점 마을의 작업대 또는 용광로가 필요합니다.';
       refine.disabled=s.region!=='거점 마을'||!trial.ok;
      };
      craftingCount.addEventListener('change',updateAvailability);
