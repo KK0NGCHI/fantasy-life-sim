@@ -1,0 +1,22 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createMainV2Inventory} from '../src/main-v2-inventory.js';
+test('M2 combat is dispatched from dungeon and cannot move battle position',()=>{
+ const g=createMainV2Inventory([{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}],{worldSeed:'m2-bridge'});
+ assert.equal(g.m2StartEncounter({encounterId:'illegal',enemyHps:[7]}).accepted,false);
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ const before=structuredClone(g.current().world.runtime.pos);
+ const started=g.m2StartEncounter({encounterId:'m2:bridge:1',enemyHps:[3],seed:1});
+ assert.equal(started.accepted,true,JSON.stringify(started));
+ assert.equal(g.m2Combat().queue[g.m2Combat().cursor],'player');
+ assert.deepEqual(g.current().world.runtime.pos,before);
+ const fail=g.m2CombatAction({actorId:'enemy:0',type:'attack',targetId:'player'});
+ assert.equal(fail.accepted,false);
+ const moved=g.m2CombatAction({actorId:'player',type:'move'});
+ assert.equal(moved.accepted,false);
+ const attacked=g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'});
+ assert.equal(attacked.accepted,true,JSON.stringify(attacked));
+ assert.equal(g.m2Combat().outcome,'victory');
+ assert.deepEqual(g.current().world.runtime.pos,before);
+ assert.equal(g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'}).accepted,false);
+});
