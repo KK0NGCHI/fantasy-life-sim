@@ -1,0 +1,71 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {newM1LifeState,runM1LifeAction,validateM1LifeState} from '../src/m1-life-economy-core.js';
+const doAction=(s,a)=>{const r=runM1LifeAction(s,a);assert.equal(r.ok,true,JSON.stringify(r));return r.state;};
+
+test('seed purchase, planting, growth, harvest, cooking, eating, sale and reinvestment',()=>{
+ let s=newM1LifeState(),origin=s;
+ s=doAction(s,{type:'trade.buy',item:'m1:seed:wheat',quantity:2});
+ assert.equal(s.gold,16);assert.equal(origin.gold,20);
+ s=doAction(s,{type:'farm.plant',plot:0,crop:'wheat'});
+ assert.equal(s.inventory['m1:seed:wheat'],1);
+ const blocked=runM1LifeAction(s,{type:'farm.harvest',plot:0});
+ assert.equal(blocked.ok,false);assert.equal(blocked.reason,'NOT_RIPE');assert.equal(s.turn,2);
+ s=doAction(s,{type:'time.advance',seconds:86400});
+ s=doAction(s,{type:'farm.harvest',plot:0});
+ assert.equal(s.inventory['m1:crop:wheat'],3);
+ s=doAction(s,{type:'food.cook',recipe:'m1:food:bread'});
+ assert.equal(s.inventory['m1:crop:wheat'],1);
+ s=doAction(s,{type:'food.eat',item:'m1:food:bread'});
+ assert.equal(s.hunger,100);
+ s=doAction(s,{type:'trade.sell',item:'m1:crop:wheat',quantity:1});
+ assert.equal(s.gold,19);
+ s=doAction(s,{type:'trade.buy',item:'m1:seed:potato',quantity:1});
+ assert.equal(s.gold,17);
+ s=doAction(s,{type:'home.expand'});
+ assert.equal(s.plots.length,3);assert.equal(s.gold,7);
+ assert.equal(validateM1LifeState(s),true);
+ assert.equal(JSON.stringify(JSON.parse(JSON.stringify(s))),JSON.stringify(s));
+});
+test('field crop over-ripens, harvested food does not spoil',()=>{
+ let s=newM1LifeState();
+ s=doAction(s,{type:'trade.buy',item:'m1:seed:potato',quantity:2});
+ s=doAction(s,{type:'farm.plant',plot:0,crop:'potato'});
+ s=doAction(s,{type:'time.advance',seconds:172801});
+ assert.equal(s.plots[0],null);
+ assert.equal(s.events.at(-1).type,'crop.overripe');
+ s=doAction(s,{type:'farm.plant',plot:1,crop:'potato'});
+ s=doAction(s,{type:'time.advance',seconds:86400});
+ s=doAction(s,{type:'farm.harvest',plot:1});
+ s=doAction(s,{type:'time.advance',seconds:200*86400});
+ assert.equal(s.inventory['m1:crop:potato'],2);
+});
+test('repeated harvest is finite and each crop regrows',()=>{
+ let s=newM1LifeState();
+ s=doAction(s,{type:'trade.buy',item:'m1:seed:strawberry',quantity:1});
+ s=doAction(s,{type:'farm.plant',plot:0,crop:'strawberry'});
+ for(let i=0;i<3;i++){s=doAction(s,{type:'time.advance',seconds:86400});s=doAction(s,{type:'farm.harvest',plot:0});}
+ assert.equal(s.inventory['m1:crop:strawberry'],6);
+ assert.equal(s.plots[0],null);
+ assert.equal(runM1LifeAction(s,{type:'farm.harvest',plot:0}).ok,false);
+});
+test('bad actions do not alter state or charge a turn',()=>{
+ const s=newM1LifeState(),snapshot=JSON.stringify(s);
+ for(const a of [
+  {type:'farm.plant',plot:0,crop:'wheat'},
+  {type:'trade.sell',item:'m1:crop:wheat',quantity:1},
+  {type:'trade.buy',item:'m1:seed:wheat',quantity:-2},
+  {type:'trade.buy',item:'m1:seed:wheat',quantity:1.5},
+  {type:'food.cook',recipe:'m1:food:bread'},
+  {type:'food.eat',item:'m1:crop:wheat'},
+  {type:'farm.harvest',plot:40},
+  {type:'time.advance',seconds:-1},
+  {type:'unknown'}
+ ])assert.equal(runM1LifeAction(s,a).ok,false);
+ assert.equal(JSON.stringify(s),snapshot);
+});
+test('invalid persisted values are rejected',()=>{
+ const s=newM1LifeState();
+ for(const corrupted of [{...s,gold:-1},{...s,hunger:101},{...s,plots:[{}]},{...s,inventory:{'fake':2}}])
+  assert.equal(validateM1LifeState(corrupted),false);
+});
