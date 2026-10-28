@@ -69,6 +69,16 @@ try{
  await page.getByRole('button',{name:'던전 진입'}).click();
  await page.locator('.dungeon-screen .tile.player').waitFor();
  assert.equal(await page.locator('.dungeon-screen .tile').count(),576);
+ await page.getByRole('button',{name:'적 조우 (M2 시험)'}).click();
+ const battle=page.getByRole('region',{name:'M2 실제 전투'});
+ await battle.waitFor();
+ assert.match(await battle.innerText(),/라운드 1/);
+ assert.equal(await battle.getByRole('button',{name:'위치 변경'}).count(),0);
+ await battle.getByRole('button',{name:'방어'}).click();
+ await battle.getByRole('button',{name:'적의 행동 진행'}).click();
+ await battle.getByRole('button',{name:'적의 행동 진행'}).click();
+ await battle.getByRole('button',{name:'퇴각'}).click();
+ await page.locator('.dungeon-screen .tile.player').waitFor();
  await page.getByRole('button',{name:'자동 탐색 시작'}).click();
  await page.getByRole('button',{name:'자동 탐색 중지'}).click();
  await page.keyboard.press('ArrowRight');
