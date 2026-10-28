@@ -299,7 +299,7 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
    'm1:crop:wheat','m1:crop:potato','m1:crop:strawberry','m1:crop:blueberry',
    'm1:food:bread','m1:food:baked-potato','m1:seed:apple','m1:crop:apple'];
   const crop=['wheat','potato','strawberry','blueberry','apple'];
-  if(!obj(x)||!keys(x,['schema','now','turn','gold','hunger','inventory','plots','facilities','merchant','events'])||
+  if(!obj(x)||!keys(x,['schema','now','turn','gold','hunger','inventory','plots','facilities','merchant','events','recentRequests'])||
    x.schema!==1||!nonnegative(x.now)||Number(x.now)>Number(clock.elapsedSeconds)||
    !nonnegative(x.turn)||!nonnegative(x.gold)||!nonnegative(x.hunger)||Number(x.hunger)>100||
    !obj(x.inventory)||Object.keys(x.inventory).length>catalog.length||
@@ -316,6 +316,9 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
    !obj(x.merchant)||!keys(x.merchant,['stock','lastRestock'])||!obj(x.merchant.stock)||
    (Object.hasOwn(x.merchant,'lastRestock')&&(!nonnegative(x.merchant.lastRestock)||Number(x.merchant.lastRestock)>Number(x.now)))||
    !Object.entries(x.merchant.stock).every(([k,v])=>catalog.includes(k)&&nonnegative(v))||
+   (Object.hasOwn(x,'recentRequests')&&(!Array.isArray(x.recentRequests)||x.recentRequests.length>32||
+    !x.recentRequests.every((id:unknown)=>typeof id==='string'&&/^[A-Za-z0-9:_-]{1,80}$/.test(id))||
+    new Set(x.recentRequests).size!==x.recentRequests.length))||
    !Array.isArray(x.events)||x.events.length>200||
    !x.events.every((e:unknown)=>obj(e)&&typeof e.type==='string'&&e.type.length>0&&e.type.length<=80))return {ok:false,reason:'INVALID_DATA'};
  }
