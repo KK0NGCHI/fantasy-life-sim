@@ -224,7 +224,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   if(!result.ok)throw Error(result.reason);
   // Single authoritative embedded snapshot. The dispatcher charges clock/turn.
   const life={...result.state,turn:snapshot.turn+1};
-  const next={...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
+  const next={...snapshot,player:{...snapshot.player,hunger:life.hunger},world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
   return {outcome:'success',nextState:next,events:[{type:result.event.type,payload:result.event}]};
  }],
 
