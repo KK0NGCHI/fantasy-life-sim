@@ -229,6 +229,21 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
    events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
  }],
+ ['m2.encounter.explore',(snapshot)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_EXPLORATION_UNAVAILABLE');
+  const runtime=snapshot.world.runtime;
+  const encounterId='m2:explore:'+runtime.localSiteId+':'+runtime.localFloor+':'+runtime.pos.join(',')+':'+snapshot.turn;
+  // Initial discovery policy: one encounter only at a distinct explored tile,
+  // no combat-specific movement. Future ecology can replace this provisional rule.
+  const visited=runtime.m2EncounterTiles??[];
+  const key=runtime.localSiteId+':'+runtime.localFloor+':'+runtime.pos.join(',');
+  if(visited.includes(key))return {outcome:'failed',nextState:snapshot,events:[{type:'m2.encounter.empty',payload:{key}}]};
+  const begun=startM2Encounter({encounterId,playerHp:snapshot.player.currentHp,enemyHps:[12],seed:snapshot.turn+1});
+  if(!begun.ok)throw Error(begun.reason);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,
+   m2Combat:begun.state,m2EncounterTiles:[...visited.slice(-63),key]}}},
+   events:[{type:'m2.encounter.discovered',payload:{encounterId}}]};
+ }],
  ['m2.combat.act',(snapshot,command)=>{
   const current=snapshot.world.runtime.m2Combat;
   if(!current||current.phase!=='active')throw Error('M2_NO_ACTIVE_COMBAT');
@@ -746,7 +761,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    if(action.type==='m2.encounter.start'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -855,6 +870,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    return this.dispatch('m1.life',action);
   },
   m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
+  m2ExploreEncounter(){return this.dispatch('m2.encounter.explore',{});},
   m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
   m2CombatAction(action){return this.dispatch('m2.combat.act',action);},
   m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
