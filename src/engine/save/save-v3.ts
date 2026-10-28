@@ -304,8 +304,9 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
    !nonnegative(x.turn)||!nonnegative(x.gold)||!nonnegative(x.hunger)||Number(x.hunger)>100||
    !obj(x.inventory)||Object.keys(x.inventory).length>catalog.length||
    !Object.entries(x.inventory).every(([k,v])=>catalog.includes(k)&&nonnegative(v))||
-   !obj(x.facilities)||!keys(x.facilities,['kitchen','workbench','plotCapacity'])||
+   !obj(x.facilities)||!keys(x.facilities,['kitchen','workbench','plotCapacity','woodShed'])||
    typeof x.facilities.kitchen!=='boolean'||typeof x.facilities.workbench!=='boolean'||
+   (Object.hasOwn(x.facilities,'woodShed')&&typeof x.facilities.woodShed!=='boolean')||
    !nonnegative(x.facilities.plotCapacity)||Number(x.facilities.plotCapacity)>32||
    !Array.isArray(x.plots)||x.plots.length!==x.facilities.plotCapacity||
    !x.plots.every((p:unknown)=>p===null||(obj(p)&&keys(p,['crop','readyAt','spoilsAt','remainingHarvests'])&&
