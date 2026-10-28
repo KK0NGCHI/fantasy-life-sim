@@ -9,6 +9,7 @@ const tags=x=>Array.isArray(x)&&x.every(t=>typeof t==='string'&&t.length>0);
 
 export function materialMatches(item,slot){
  if(!record(item)||!record(slot))return false;
+ if(slot.allowedItemId!==undefined&&item.id!==slot.allowedItemId)return false;
  if(typeof slot.exactId==='string')return item.definitionId===slot.exactId;
  if(!record(slot.material))return false;
  if(slot.allowedDefinitionId!==undefined&&item.definitionId!==slot.allowedDefinitionId)return false;
