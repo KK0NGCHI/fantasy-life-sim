@@ -1,3 +1,4 @@
+import {createSaveV3,decodeSaveV3} from '../dist/engine/v2.js';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {createMainV2Inventory} from '../src/main-v2-inventory.js';
@@ -26,4 +27,21 @@ test('M1 town controls dispatch through active game bridge and charge global clo
  assert.equal(eaten.accepted,true,JSON.stringify(eaten));
  assert.equal(bridge.current().player.hunger,100);
  assert.equal(bridge.m1Life().turn,bridge.current().turn);
+});
+
+test('M1 opt-in life extension survives strict v3 save roundtrip and rejects corruption',()=>{
+ const bridge=createMainV2Inventory([{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}],{worldSeed:'m1-save-seed'});
+ assert.equal(bridge.m1Action({type:'trade.buy',item:'m1:seed:potato',quantity:1}).accepted,true);
+ assert.equal(bridge.m1Action({type:'farm.plant',plot:0,crop:'potato'}).accepted,true);
+ const current=bridge.current();
+ const {schemaVersion,clock,...rest}=structuredClone(current);
+ const v3={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const slot={slotId:'m1-test',worldId:'m1-world',kind:'manual',label:'M1',savedAt:'2026-10-28T00:00:00.000Z',revision:0};
+ const save=createSaveV3(v3,slot,'m1-test',bridge.registry);
+ const parsed=decodeSaveV3(JSON.parse(JSON.stringify(save)),bridge.registry);
+ assert.equal(parsed.ok,true,JSON.stringify(parsed));
+ assert.deepEqual(parsed.save.state.world.runtime.m1Life,current.world.runtime.m1Life);
+ const bad=structuredClone(save);
+ bad.state.world.runtime.m1Life.gold=-1;
+ assert.deepEqual(decodeSaveV3(bad,bridge.registry),{ok:false,reason:'INVALID_DATA'});
 });
