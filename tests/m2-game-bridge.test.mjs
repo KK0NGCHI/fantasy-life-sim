@@ -49,3 +49,27 @@ test('M2 exploration encounter is consumed once per dungeon tile and enemy turn 
  assert.deepEqual(g.current().world.runtime.m2EncounterTiles,before);
  assert.deepEqual(g.current().world.runtime.pos,pos);
 });
+
+test('M2 mid-combat v3 roundtrip preserves initiative, HP and one-time outcome',()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-v3-roundtrip'});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ assert.equal(g.m2StartEncounter({encounterId:'save-combat',enemyHps:[8],seed:42}).accepted,true);
+ assert.equal(g.m2CombatAction({actorId:'player',type:'defend'}).accepted,true);
+ const before=g.current();
+ const {createSaveV3,decodeSaveV3}=await import('../dist/engine/v2.js');
+ const {schemaVersion,clock,...rest}=structuredClone(before);
+ const v3={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const slot={slotId:'m2-in-combat',worldId:'m2-world',kind:'manual',label:'M2 combat',savedAt:'2026-10-29T00:00:00Z',revision:0};
+ const valid=createSaveV3(v3,slot,'m2-test',g.registry);
+ const restored=createMainV2Inventory(fixture,{worldSeed:'m2-v3-roundtrip'});
+ restored.applyApprovedSave(structuredClone(valid));
+ assert.deepEqual(restored.current(),before);
+ assert.equal(restored.m2Combat().queue[restored.m2Combat().cursor],'enemy:0');
+ assert.equal(restored.m2EnemyTurn().accepted,true);
+ const corrupted=structuredClone(valid);
+ corrupted.state.world.runtime.m2Combat.cursor=999;
+ assert.equal(decodeSaveV3(corrupted,g.registry).ok,false);
+ assert.throws(()=>g.applyApprovedSave(corrupted));
+ assert.deepEqual(g.current(),before);
+});
