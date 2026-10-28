@@ -277,7 +277,7 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
        INVALID_MATERIAL_PLAN:'재료 배분 불가',WORKSTATION_REQUIRED:'작업대 필요',
        SURVIVAL_LIMIT_REACHED:'생존 임계치 도달',INVALID_SURVIVAL_LIMIT:'생존 설정 오류'
       };
-      msg.textContent=trial.ok?'제작 가능 '+trial.completed+'/'+trial.requested+'회'+(trial.stopReason?' · 중단: '+(reasons[trial.stopReason]??trial.stopReason):''):'
+      msg.textContent=trial.ok?'제작 가능 '+trial.completed+'/'+trial.requested+'회'+(trial.stopReason?' · 중단: '+(reasons[trial.stopReason]??trial.stopReason):''):
        (reasons[trial.reason]??'제작 불가')+' ('+trial.reason+')';
       if(s.region!=='거점 마을')msg.textContent='거점 마을의 작업대 또는 용광로가 필요합니다.';
       refine.disabled=s.region!=='거점 마을'||!trial.ok;
