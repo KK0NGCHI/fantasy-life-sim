@@ -316,7 +316,16 @@ export function createMainV2Inventory(uiItems,options={}) {
   }
   // No second item ledger persists in m1Life: it is a presentation-only projection.
   life.inventory={};
-  const next={...snapshot,itemWorld,player:{...snapshot.player,hunger:life.hunger},
+  const xpRule={
+   'farm.plant':['농업',3],'farm.harvest':['농업',5],
+   'food.cook':['요리',4],'home.expand':['건축',3]
+  }[command.payload?.type];
+  const prior=snapshot.progression?.system04A;
+  const skill=xpRule&&SKILL_DEFINITIONS.find(d=>d.name===xpRule[0]);
+  const progression=prior&&skill?{...snapshot.progression,system04A:awardProgression(prior,{
+   actionId:'m1:'+snapshot.turn+':'+command.payload.type,skillId:skill.id,xp:xpRule[1]
+  })}:snapshot.progression;
+  const next={...snapshot,itemWorld,progression,player:{...snapshot.player,hunger:life.hunger},
    world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
   return {outcome:'success',nextState:next,events:[{type:result.event.type,payload:result.event}]};
  }],
