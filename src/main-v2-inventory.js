@@ -1,4 +1,5 @@
-import {M1_PRICES,newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
+import {M1_PRICES,M1_FOODS,newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
+import {MATERIALS_CONDITION_05N} from './material-composition-05n.js';
 import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
 import {checkWorkshopStage1,craftUntilStage1} from './crafting-workshop-stage1.js';
 import {craftBatch1} from './crafting-batch-stage1.js';
@@ -299,6 +300,19 @@ export function createMainV2Inventory(uiItems,options={}) {
    if(remaining!==0)throw Error('M1_ITEM_LEDGER_DESYNC');
    const ids=new Set(items.map(x=>x.id));
    itemWorld={...itemWorld,items,placements:itemWorld.placements.filter(p=>ids.has(p.itemId))};
+  }
+  // Preserve only the ingredients consumed in the last cooking operation.
+  // M1 recipes have one exact input; unlike materials genealogy, this receipt
+  // neither claims source location nor inherits an ingredient's own recipe.
+  if(command.payload?.type==='food.cook'){
+   const food=M1_FOODS[command.payload.recipe];
+   const receipt=JSON.stringify([{definitionId:food.input,quantity:food.quantity}]);
+   itemWorld={...itemWorld,items:itemWorld.items.map(item=>{
+    if(item.definitionId!==command.payload.recipe||
+     !itemWorld.placements.some(p=>p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id))
+     return item;
+    return {...item,condition:{...item.condition,[MATERIALS_CONDITION_05N]:receipt}};
+   })};
   }
   // No second item ledger persists in m1Life: it is a presentation-only projection.
   life.inventory={};
