@@ -247,3 +247,31 @@ test('E2E-04 processed-wood fishing rod is crafted from actual forest resources 
  assert.equal(b.current().turn,turn+1);
  assert.equal(owned('tool05a:rod:processedWood'),1);
 });
+
+
+test('M1 cooking stores only actually consumed immediate ingredients and survives v3 restore',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const options={worldSeed:'m1-food-receipt'};
+ const g=createMainV2Inventory(fixture,options);
+ assert.equal(g.m1Action({type:'trade.buy',item:'m1:seed:wheat',quantity:1}).accepted,true);
+ assert.equal(g.m1Action({type:'farm.plant',plot:0,crop:'wheat'}).accepted,true);
+ assert.equal(g.m1Action({type:'time.advance',seconds:86400}).accepted,true);
+ assert.equal(g.m1Action({type:'farm.harvest',plot:0}).accepted,true);
+ assert.equal(g.m1Action({type:'food.cook',recipe:'m1:food:bread'}).accepted,true);
+ const bread=g.current().itemWorld.items.find(i=>i.definitionId==='m1:food:bread');
+ assert.ok(bread);
+ assert.deepEqual(JSON.parse(bread.condition.materials05n),[{definitionId:'m1:crop:wheat',quantity:2}]);
+ assert.equal(g.m1Life().inventory['m1:crop:wheat'],1);
+ const before=structuredClone(g.current());
+ const {schemaVersion,clock,...rest}=before;
+ const state={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const slot={slotId:'m1-food-receipt',worldId:'m1-world',kind:'manual',label:'receipt',savedAt:'2026-10-28T00:00:00Z',revision:0};
+ const saved=createSaveV3(state,slot,'m1-test',g.registry);
+ assert.equal(decodeSaveV3(saved,g.registry).ok,true);
+ const restored=createMainV2Inventory(fixture,options);
+ restored.applyApprovedSave(JSON.parse(JSON.stringify(saved)));
+ assert.deepEqual(restored.current().itemWorld,g.current().itemWorld);
+ assert.equal(restored.m1Action({type:'food.eat',item:'m1:food:bread'}).accepted,true);
+ assert.equal(restored.m1Life().inventory['m1:food:bread']??0,0);
+ assert.equal(restored.m1Action({type:'food.eat',item:'m1:food:bread'}).outcome,'failed');
+});
