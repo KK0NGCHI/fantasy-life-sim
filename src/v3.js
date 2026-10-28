@@ -214,6 +214,11 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     for(const [value,label] of [['0','시간 제한 없음'],['600','최대 10분'],['1800','최대 30분'],['3600','최대 1시간']]){
      const opt=make('option',{text:label},craftingBudget);opt.value=value;
     }
+    const survivalGuard=make('select',{'aria-label':'자동 제작 생존 안전 설정'},refiningPanel);
+    for(const [value,label] of [['off','생존 임계치 사용 안 함'],['cautious','HP·MP·허기 20 미만이면 시작하지 않음']]){
+     const option=make('option',{text:label},survivalGuard);option.value=value;
+    }
+    make('p',{class:'tiny muted',text:'현재 생존 조건은 제작 시작 전에만 검사합니다. 제작 도중 HP·MP·허기 변화에 따른 실시간 중단은 아직 지원하지 않습니다.'},refiningPanel);
     const named=id=>mainV2.registry.items.get(id)?.nameKey??id;
     for(const recipe of ALL_CRAFTING_RECIPES_05L){
      const requirements=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
@@ -251,7 +256,8 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
       const count=Number(craftingCount.value);
       const type=craftingMode.value==='until'?'craft.until':'craft.batch';
       const policy=type==='craft.until'&&Number(craftingBudget.value)>0?{maxSeconds:Number(craftingBudget.value)}:{};
-      if(!executeV2(type,{recipeId:recipe.id,count,choices,stackChoices,policy}))return render();
+      const survivalLimits=type==='craft.until'&&survivalGuard.value==='cautious'?{minHp:20,minMp:20,minHunger:20}:{};
+      if(!executeV2(type,{recipeId:recipe.id,count,choices,stackChoices,policy,survivalLimits}))return render();
       nextLog('제작',recipe.name+' 반복 제작 처리 완료');render();
      },'btn',row);
      const updateAvailability=()=>{
