@@ -900,10 +900,9 @@ export function createMainV2Inventory(uiItems,options={}) {
       const diff=candidate.clock.elapsedUnits-life.now;
       if(diff>0){
        const refreshed=runM1LifeAction({...life,turn:Math.max(0,life.turn-1)},{type:'time.advance',seconds:diff});
-       if(refreshed.ok){
-        const reconciled={...refreshed.state,turn:candidate.turn};
-        candidate={...candidate,world:{...candidate.world,runtime:{...candidate.world.runtime,m1Life:reconciled}}};
-       }
+       if(!refreshed.ok)throw Error('M1_WORLD_CLOCK_RECONCILIATION_FAILED:'+refreshed.reason);
+       const reconciled={...refreshed.state,turn:candidate.turn};
+       candidate={...candidate,world:{...candidate.world,runtime:{...candidate.world.runtime,m1Life:reconciled}}};
       }
      }
      state=candidate;
