@@ -156,7 +156,7 @@ if(s.region==='거점 마을'){
   btn((labels[id]??id)+' 먹기',()=>use({type:'food.eat',item:id}),'btn',kitchen);
  for(const id of Object.keys(life.inventory).filter(x=>(life.inventory[x]??0)>0&&x.startsWith('m1:crop:')))
   btn((labels[id]??id)+' 1개 판매',()=>use({type:'trade.sell',item:id,quantity:1}),'btn',kitchen);
- make('p',{class:'muted',text:'M1 생산 재고는 현재 별도 임시 원장입니다. 기존 제작 재고와 연결되기 전의 시험 기능이며 정식 M1 인수가 아닙니다.'},panel);
+ make('p',{class:'muted',text:'M1 생산품은 기존 소유 아이템 원장에서 관리합니다. 가격·성장 기간은 시험값이며 정식 M1 인수는 아직 아닙니다.'},panel);
 }
 const places=make('div',{class:'scene-spots'},hero);
 const regional=hue==='town'?[['sprout','경작지','growing'],['hammer','작업장','workshop'],['waves','강변','water']]:hue==='forest'?[['trees','숲길','growing'],['leaf','채집지','workshop'],['tent-tree','야영지','water']]:hue==='river'?[['fish','어장','water'],['waves','강변','growing'],['leaf','수풀','workshop']]:[['compass','탐색지','growing'],['pickaxe','자원지','workshop'],['map-pin','지형','water']];
