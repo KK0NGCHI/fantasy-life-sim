@@ -209,7 +209,11 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
     }
     const craftingCount=make('select',{'aria-label':'연속 제작 횟수'},refiningPanel);
     for(const n of [1,2,5,10,20]){const o=make('option',{text:n+'회'},craftingCount);o.value=String(n);}
-    make('p',{class:'tiny muted',text:'연속 제작은 모든 횟수가 가능할 때만 일괄 실행하며, 중간에 재료가 부족하면 전체가 취소됩니다.'},refiningPanel);
+    make('p',{class:'tiny muted',text:'전량 제작은 재료 부족 시 전체 취소됩니다. 가능한 만큼 제작은 완료한 횟수만 반영합니다. 시간 상한은 중단형에만 적용됩니다.'},refiningPanel);
+    const craftingBudget=make('select',{'aria-label':'자동 제작 게임 시간 제한'},refiningPanel);
+    for(const [value,label] of [['0','시간 제한 없음'],['600','최대 10분'],['1800','최대 30분'],['3600','최대 1시간']]){
+     const opt=make('option',{text:label},craftingBudget);opt.value=value;
+    }
     const named=id=>mainV2.registry.items.get(id)?.nameKey??id;
     for(const recipe of ALL_CRAFTING_RECIPES_05L){
      const requirements=recipe.inputs??[{itemId:recipe.input,quantity:recipe.inputQty}];
@@ -246,17 +250,20 @@ if(['숲','광산','강·호수','습지','해안·항구','초원·농경지','
      const refine=btn('제작 ('+Math.floor(recipe.seconds/60)+'분/회)',()=>{
       const count=Number(craftingCount.value);
       const type=craftingMode.value==='until'?'craft.until':'craft.batch';
-      if(!executeV2(type,{recipeId:recipe.id,count,choices,stackChoices}))return render();
+      const policy=type==='craft.until'&&Number(craftingBudget.value)>0?{maxSeconds:Number(craftingBudget.value)}:{};
+      if(!executeV2(type,{recipeId:recipe.id,count,choices,stackChoices,policy}))return render();
       nextLog('제작',recipe.name+' 반복 제작 처리 완료');render();
      },'btn',row);
      const updateAvailability=()=>{
       const preview=craftPreview1(allItems,owner,recipe.id,choices,stackChoices);
-      const trial=preview.ok?(craftingMode.value==='until'?preview:craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices,stackChoices)):preview;
+      const timeAllowed=craftingMode.value!=='until'||Number(craftingBudget.value)===0||recipe.seconds<=Number(craftingBudget.value);
+      const trial=preview.ok?(craftingMode.value==='until'?(timeAllowed?preview:{ok:false,reason:'TIME_BUDGET_REACHED'}):craftBatch1(allItems,owner,recipe.id,Number(craftingCount.value),choices,stackChoices)):preview;
       msg.textContent=trial.ok?'제작 가능'+(craftingMode.value==='until'?' · 재료 고갈 시 자동 중단':''):'재료 부족/호환 불가: '+trial.reason;
       refine.disabled=s.region!=='거점 마을'||!trial.ok;
      };
      craftingCount.addEventListener('change',updateAvailability);
      craftingMode.addEventListener('change',updateAvailability);
+     craftingBudget.addEventListener('change',updateAvailability);
      updateAvailability();
     }
     const tools=mainV2.availableTools05A('mining');
