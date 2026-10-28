@@ -297,8 +297,8 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
   const nonnegative=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0;
   const catalog=['m1:seed:wheat','m1:seed:potato','m1:seed:strawberry','m1:seed:blueberry',
    'm1:crop:wheat','m1:crop:potato','m1:crop:strawberry','m1:crop:blueberry',
-   'm1:food:bread','m1:food:baked-potato'];
-  const crop=['wheat','potato','strawberry','blueberry'];
+   'm1:food:bread','m1:food:baked-potato','m1:seed:apple','m1:crop:apple'];
+  const crop=['wheat','potato','strawberry','blueberry','apple'];
   if(!obj(x)||!keys(x,['schema','now','turn','gold','hunger','inventory','plots','facilities','merchant','events'])||
    x.schema!==1||!nonnegative(x.now)||Number(x.now)>Number(clock.elapsedSeconds)||
    !nonnegative(x.turn)||!nonnegative(x.gold)||!nonnegative(x.hunger)||Number(x.hunger)>100||
