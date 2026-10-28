@@ -16,6 +16,7 @@ try{
  assert.match(await panel.innerText(),/밀 3/);
  await panel.getByRole('button',{name:/밀빵 요리/}).click();
  assert.match(await panel.innerText(),/밀빵 1/);
+ assert.match(await panel.innerText(),/밀빵 직전 조리 재료: 밀 ×2/);
  await panel.getByRole('button',{name:/밀빵 먹기/}).click();
  assert.match(await panel.innerText(),/허기 100\/100/);
  await panel.getByRole('button',{name:/밀 1개 판매/}).click();
