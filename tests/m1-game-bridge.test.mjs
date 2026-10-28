@@ -159,3 +159,33 @@ test('M1 uses legacy oak-plank processing to construct a one-time functional she
  assert.equal(duplicate.outcome,'failed');
  assert.equal(b.m1Life().plots.length,3);
 });
+
+test('E2E-04: actual forest logging, town plank refining, functional shed, and v3 restore',()=>{
+ const fixture=[{id:'m1-fixture',name:'시험 물품',group:'재료',qty:1,tags:[]}];
+ const options={worldSeed:'m1-forest-to-home',resources05A:true,progression04A:true,preferences:{getItem:()=>null,setItem:()=>{}}};
+ const b=createMainV2Inventory(fixture,options);
+ const owned=id=>b.current().itemWorld.items.filter(i=>i.definitionId===id&&b.current().itemWorld.placements.some(p=>
+  p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===b.current().player.id)).reduce((n,i)=>n+i.quantity,0);
+ assert.equal(b.dispatch('world.travel',{region:'숲'}).accepted,true);
+ const logged=b.workUntil05A('resource05a:oak-log:01',50);
+ assert.equal(logged.accepted,true,JSON.stringify(logged));
+ assert.ok(owned('item05a:oak-log')>=2);
+ assert.equal(b.dispatch('world.travel',{region:'거점 마을'}).accepted,true);
+ assert.equal(b.dispatch('mineral.refine',{recipeId:'refine05h:oak-planks'}).accepted,true);
+ assert.ok(owned('item05h:oak-planks')>=2);
+ const built=b.m1BuildWoodShed();
+ assert.equal(built.accepted,true,JSON.stringify(built));
+ assert.equal(built.outcome,'success');
+ assert.equal(b.m1Life().facilities.woodShed,true);
+ assert.equal(b.m1Life().plots.length,3);
+ const {schemaVersion,clock,...rest}=structuredClone(b.current());
+ const snapshot={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const slot={slotId:'m1-forest-home',worldId:'m1-world',kind:'manual',label:'M1 forest',savedAt:'2026-10-28T00:00:00Z',revision:0};
+ const save=createSaveV3(snapshot,slot,'m1-test',b.registry);
+ assert.equal(decodeSaveV3(JSON.parse(JSON.stringify(save)),b.registry).ok,true);
+ const restored=createMainV2Inventory(fixture,options);
+ restored.applyApprovedSave(save);
+ assert.equal(restored.m1Life().facilities.woodShed,true);
+ assert.deepEqual(restored.current().itemWorld,b.current().itemWorld);
+ assert.deepEqual(restored.current().world.runtime.m1Life,b.current().world.runtime.m1Life);
+});
