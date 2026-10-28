@@ -1,3 +1,4 @@
+import {newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
 import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
 import {checkWorkshopStage1,craftUntilStage1} from './crafting-workshop-stage1.js';
 import {craftBatch1} from './crafting-batch-stage1.js';
@@ -214,6 +215,19 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {...base,nextState:next,events};
  };
  const handlers=new Map([
+ ['m1.life',(snapshot,command)=>{
+  if(snapshot.world.runtime.region!=='거점 마을')throw Error('M1_TOWN_REQUIRED');
+  const previous=snapshot.world.runtime.m1Life??newM1LifeState();
+  if(!validateM1LifeState(previous))throw Error('M1_INVALID_STATE');
+  const aligned={...previous,now:snapshot.clock.elapsedUnits,turn:snapshot.turn};
+  const result=runM1LifeAction(aligned,command.payload);
+  if(!result.ok)throw Error(result.reason);
+  // Single authoritative embedded snapshot. The dispatcher charges clock/turn.
+  const life={...result.state,turn:snapshot.turn+1};
+  const next={...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m1Life:life}}};
+  return {outcome:'success',nextState:next,events:[{type:result.event.type,payload:result.event}]};
+ }],
+
  ['life.activity',(snapshot,command)=>({outcome:'success',nextState:snapshot,events:[{type:'life.activity',payload:{name:command.payload.name}}]})],
  ['world.travel',(snapshot,command)=>{
    const region=command.payload.region;
@@ -610,6 +624,10 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='m1.life'){
+     const a=action.payload;
+     return {turns:1,worldUnits:a.type==='time.advance'?a.seconds:60};
+    }
     if(action.type==='mineral.prospect')return {turns:1,worldUnits:600};
     if(action.type==='mineral.extract')return {turns:1,worldUnits:180};
     if(action.type==='mineral.refine')return {turns:1,worldUnits:REFINING_BY_ID_05H.get(action.payload?.recipeId)?.seconds??300};
@@ -696,6 +714,9 @@ export function createMainV2Inventory(uiItems,options={}) {
  };
  return {
   registry,projected,current,
+  m1Life(){return structuredClone(state.world.runtime.m1Life??newM1LifeState());},
+  m1Action(action){return this.dispatch('m1.life',action);},
+
   skillLevels(){const p=state.progression?.system04A;return p&&validateProgression(p)?Object.fromEntries(SKILL_DEFINITIONS.map(def=>[def.name,skillLevel(p.skills[def.id])])):null;},
   progression04A(){return state.progression?.system04A?structuredClone(state.progression.system04A):null;},
   resources05A(){if(!state.world.runtime.resource05A)return null;
@@ -762,6 +783,18 @@ export function createMainV2Inventory(uiItems,options={}) {
        candidate={...candidate,world:{...candidate.world,runtime:{...candidate.world.runtime,
         resource05A:{...eco,woodland05C:{trees:cycle.trees,day:cycle.day},
          ecologySubstrates:cycle.substrates,ecologySites:cycle.sites}}}};
+      }
+     }
+     if(candidate.world.runtime.m1Life){
+      // Every accepted action advances field time, not just M1 actions.
+      const life=candidate.world.runtime.m1Life;
+      const diff=candidate.clock.elapsedUnits-life.now;
+      if(diff>0){
+       const refreshed=runM1LifeAction({...life,turn:Math.max(0,life.turn-1)},{type:'time.advance',seconds:diff});
+       if(refreshed.ok){
+        const reconciled={...refreshed.state,turn:candidate.turn};
+        candidate={...candidate,world:{...candidate.world,runtime:{...candidate.world.runtime,m1Life:reconciled}}};
+       }
       }
      }
      state=candidate;
