@@ -37,6 +37,7 @@ export function validateM1LifeState(s){
    !Array.isArray(s.plots)||s.plots.length>32||!s.facilities||
    !integer(s.facilities.plotCapacity)||s.plots.length!==s.facilities.plotCapacity||
    typeof s.facilities.kitchen!=='boolean'||typeof s.facilities.workbench!=='boolean'||
+   (s.facilities.woodShed!==undefined&&typeof s.facilities.woodShed!=='boolean')||
    !s.merchant||!s.merchant.stock||!Object.entries(s.merchant.stock).every(([k,v])=>own(M1_PRICES,k)&&integer(v))||
    !Array.isArray(s.events)||s.events.length>200||
    !integer(s.merchant.lastRestock??0)||s.merchant.lastRestock>s.now)return false;
