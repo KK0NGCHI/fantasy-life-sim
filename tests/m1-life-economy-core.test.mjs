@@ -69,3 +69,16 @@ test('invalid persisted values are rejected',()=>{
  for(const corrupted of [{...s,gold:-1},{...s,hunger:101},{...s,plots:[{}]},{...s,inventory:{'fake':2}}])
   assert.equal(validateM1LifeState(corrupted),false);
 });
+
+test('merchant restock is world-time based, bounded and identical for split/whole advances',()=>{
+ const bought=doAction(newM1LifeState(),{type:'trade.buy',item:'m1:seed:wheat',quantity:3});
+ assert.equal(bought.merchant.stock['m1:seed:wheat'],5);
+ const whole=doAction(bought,{type:'time.advance',seconds:14*86400});
+ let split=bought;
+ for(let i=0;i<14;i++)split=doAction(split,{type:'time.advance',seconds:86400});
+ assert.equal(whole.merchant.stock['m1:seed:wheat'],8);
+ assert.equal(split.merchant.stock['m1:seed:wheat'],8);
+ assert.equal(whole.merchant.lastRestock,split.merchant.lastRestock);
+ assert.equal(whole.merchant.lastRestock,14*86400);
+ assert.equal(doAction(whole,{type:'time.advance',seconds:60}).merchant.stock['m1:seed:wheat'],8);
+});
