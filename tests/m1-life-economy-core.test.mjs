@@ -167,3 +167,20 @@ test('M1 orchard yields exactly three seasonal harvests across years, then stops
  assert.equal(state.inventory['m1:crop:apple'],12);
  assert.equal(runM1LifeAction(state,{type:'farm.harvest',plot:0}).reason,'EMPTY_PLOT');
 });
+
+test('M1 legacy state lacking request history stays usable; invalid IDs never mutate state',()=>{
+ const old=newM1LifeState();delete old.recentRequests;
+ assert.equal(validateM1LifeState(old),true);
+ for(const id of ['','bad id','!'.repeat(81)]){
+  const result=runM1LifeAction(old,{type:'trade.buy',item:'m1:seed:wheat',quantity:1,requestId:id});
+  assert.equal(result.ok,false);
+  assert.equal(result.reason,'INVALID_REQUEST_ID');
+ }
+ assert.equal(old.recentRequests,undefined);
+ const first=runM1LifeAction(old,{type:'trade.buy',item:'m1:seed:wheat',quantity:1,requestId:'seed-order-1'});
+ assert.equal(first.ok,true);
+ assert.deepEqual(first.state.recentRequests,['seed-order-1']);
+ const repeated=runM1LifeAction(first.state,{type:'trade.buy',item:'m1:seed:wheat',quantity:1,requestId:'seed-order-1'});
+ assert.equal(repeated.reason,'DUPLICATE_REQUEST');
+ assert.equal(first.state.inventory['m1:seed:wheat'],1);
+});
