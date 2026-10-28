@@ -230,6 +230,30 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
    events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
  }],
+ ['m2.encounter.avoid',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')
+   throw Error('M2_EXPLORATION_UNAVAILABLE');
+  const mode=command.payload?.mode;
+  if(!['sneak','bypass'].includes(mode))throw Error('M2_INVALID_AVOIDANCE');
+  const runtime=snapshot.world.runtime;
+  const key=runtime.localSiteId+':'+runtime.localFloor+':'+runtime.pos.join(',');
+  const visited=runtime.m2EncounterTiles??[];
+  if(visited.includes(key))
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m2.encounter.empty',payload:{key}}]};
+  // An explicit attempt has a real failure possibility; neither path drops monster loot.
+  const seed=(Math.imul((snapshot.turn+1)>>>0,1664525)+1013904223)>>>0;
+  const success=mode==='bypass'||seed%100<70;
+  if(!success)return {outcome:'failed',nextState:snapshot,
+   events:[{type:'m2.encounter.avoid_failed',payload:{key,mode}}]};
+  const prior=snapshot.progression?.system04A;
+  const skill=SKILL_DEFINITIONS.find(d=>d.name===(mode==='sneak'?'은신':'탐색'));
+  const progression=prior&&skill?{...snapshot.progression,system04A:awardProgression(prior,{
+   actionId:'m2:avoid:'+mode+':'+key,skillId:skill.id,xp:2})}:snapshot.progression;
+  return {outcome:'success',nextState:{...snapshot,progression,world:{...snapshot.world,runtime:{
+   ...runtime,m2EncounterTiles:[...visited.slice(-63),key],
+   m2AvoidedEncounters:[...(runtime.m2AvoidedEncounters??[]),{key,mode}].slice(-64)}}},
+   events:[{type:'m2.encounter.avoided',payload:{key,mode,skill:skill?.name??null}}]};
+ }],
  ['m2.encounter.explore',(snapshot)=>{
   if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_EXPLORATION_UNAVAILABLE');
   const runtime=snapshot.world.runtime;
@@ -775,7 +799,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -884,6 +908,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    return this.dispatch('m1.life',action);
   },
   m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
+  m2AvoidEncounter(mode){return this.dispatch('m2.encounter.avoid',{mode});},
   m2ExploreEncounter(){return this.dispatch('m2.encounter.explore',{});},
   m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
   m2CombatAction(action){return this.dispatch('m2.combat.act',action);},
