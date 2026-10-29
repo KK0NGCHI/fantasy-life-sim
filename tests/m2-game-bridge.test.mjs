@@ -326,7 +326,7 @@ test('M2 town supply awards only one owned salve and persists its claim flag',()
 test('M2 player combat damage derives from existing strength allocation, not caller bonus',()=>{
  const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
  const low=createMainV2Inventory(fixture,{worldSeed:'m2-strength',progression04A:true});
- const high=createMainV2Inventory(fixture,{worldSeed:'m2-strength',progression04A:true,attributeAllocation:{'근력':8}});
+ const high=createMainV2Inventory(fixture,{worldSeed:'m2-strength',progression04A:true,attributeAllocation:{'근력':5}});
  for(const g of [low,high]){
   assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
   assert.equal(g.m2StartEncounter({encounterId:'m2:strength',enemyHps:[30],seed:5}).accepted,true);
