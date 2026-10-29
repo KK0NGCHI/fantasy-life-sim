@@ -1,3 +1,4 @@
+import {startM2Encounter,actM2Combat,chooseM2EnemyAction} from './m2-combat-core.js';
 import {M1_PRICES,M1_FOODS,newM1LifeState,runM1LifeAction,validateM1LifeState} from './m1-life-economy-core.js';
 import {MATERIALS_CONDITION_05N} from './material-composition-05n.js';
 import {checkCraftSurvivalStage1} from './crafting-survival-stage1.js';
@@ -82,11 +83,13 @@ export function createMainV2Inventory(uiItems,options={}) {
   'm1:seed:blueberry':'블루베리 씨앗','m1:crop:wheat':'밀','m1:crop:potato':'감자',
   'm1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리','m1:food:bread':'밀빵',
   'm1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
+ const m2Catalog=[{id:'m2:loot:fang',name:'시험용 야수 송곳니',group:'전리품',qty:0,tags:['m2:loot']},
+ {id:'m2:consumable:salve',name:'시험용 응급 연고',group:'소모품',qty:0,tags:['m2:healing']}];
  const m1Catalog=Object.keys(M1_PRICES).map(id=>({id,name:m1Names[id],group:id.includes(':seed:')?'씨앗':'식재료',qty:0,tags:['m1:life']}));
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
- const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,{...item}]));
- const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(x=>x.group))];
- const catalog={categories,rarities:[],materials:[],effects:[],items:[...new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog].map(item=>[item.id,item])).values()].map(item=>({
+ const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog,...m2Catalog].map(item=>[item.id,{...item}]));
+ const categories=[...new Set([...initialItems,...resourceItems,...materialTools05A,...m1Catalog,...m2Catalog].map(x=>x.group))];
+ const catalog={categories,rarities:[],materials:[],effects:[],items:[...new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog,...m2Catalog].map(item=>[item.id,item])).values()].map(item=>({
   id:item.id,nameKey:item.name,categoryId:item.group,tags:item.tags??[],capabilities:[]
  }))};
  const built=buildItemRegistry(catalog);
@@ -221,6 +224,199 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {...base,nextState:next,events};
  };
  const handlers=new Map([
+ ['m2.encounter.start',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_ENCOUNTER_UNAVAILABLE');
+  const begun=startM2Encounter({encounterId:command.payload.encounterId,playerHp:snapshot.player.currentHp,enemyHps:command.payload.enemyHps,seed:command.payload.seed});
+  if(!begun.ok)throw Error(begun.reason);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
+   events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
+ }],
+ ['m2.supply.salve',(snapshot)=>{
+  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
+   snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_SUPPLY_TOWN_REQUIRED');
+  if(snapshot.world.runtime.m2StarterSalveClaimed)
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m2.supply.already_claimed',payload:{}}]};
+  const itemWorld=creditOwnedResource05A(snapshot.itemWorld,snapshot.player.id,
+   'm2:supply:'+snapshot.player.id,'m2:consumable:salve',1);
+  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{
+   ...snapshot.world.runtime,m2StarterSalveClaimed:true}}},
+   events:[{type:'m2.supply.granted',payload:{itemId:'m2:consumable:salve',quantity:1}}]};
+ }],
+ ['m2.rest',(snapshot)=>{
+  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
+   snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_REST_TOWN_REQUIRED');
+  const hp=snapshot.player.currentHp,mp=snapshot.player.currentMp;
+  if(!Number.isSafeInteger(hp)||hp<1||hp>100||!Number.isSafeInteger(mp)||mp<0||mp>80)
+   throw Error('M2_INVALID_VITALS');
+  if(hp===100&&mp===80)return {outcome:'failed',nextState:snapshot,events:[{type:'m2.rest.unneeded',payload:{}}]};
+  const player={...snapshot.player,currentHp:Math.min(100,hp+25),currentMp:Math.min(80,mp+20)};
+  return {outcome:'success',nextState:{...snapshot,player},
+   events:[{type:'m2.rest.completed',payload:{hp:player.currentHp,mp:player.currentMp}}]};
+ }],
+ ['m2.corpse.rescue',(snapshot,command)=>{
+  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
+   snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_RESCUE_TOWN_REQUIRED');
+  const all=snapshot.world.runtime.m2Corpses??[];
+  const corpse=all.find(c=>c.id===command.payload?.corpseId&&!c.recovered);
+  if(!corpse||corpse.ownerId!==snapshot.player.id)throw Error('M2_CORPSE_NOT_FOUND');
+  // Explicit fallback is limited to removed/invalid map references, not a free substitute
+  // for visiting a reachable death location.
+  const reachable=['core:site/labyrinth','core:site/forest'].includes(corpse.siteId)&&
+   [0,-1].includes(corpse.floor)&&corpse.pos.every(v=>Number.isSafeInteger(v)&&v>=0&&v<24);
+  if(reachable)throw Error('M2_CORPSE_STILL_REACHABLE');
+  let itemWorld=snapshot.itemWorld;
+  for(const item of corpse.items)itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,item.id,item.definitionId,item.quantity);
+  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{
+   ...snapshot.world.runtime,m2Corpses:all.map(c=>c.id===corpse.id?{...c,recovered:true}:c)}}},
+   events:[{type:'m2.corpse.rescued',payload:{corpseId:corpse.id}}]};
+ }],
+ ['m2.corpse.recover',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')
+   throw Error('M2_RECOVERY_UNAVAILABLE');
+  const all=snapshot.world.runtime.m2Corpses??[];
+  const corpse=all.find(c=>c.id===command.payload?.corpseId&&!c.recovered);
+  if(!corpse||corpse.ownerId!==snapshot.player.id)throw Error('M2_CORPSE_NOT_FOUND');
+  if(corpse.siteId!==snapshot.world.runtime.localSiteId||corpse.floor!==snapshot.world.runtime.localFloor||
+   corpse.pos[0]!==snapshot.world.runtime.pos[0]||corpse.pos[1]!==snapshot.world.runtime.pos[1])
+   throw Error('M2_CORPSE_WRONG_LOCATION');
+  let itemWorld=snapshot.itemWorld;
+  for(const item of corpse.items)itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,item.id,item.definitionId,item.quantity);
+  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{
+   ...snapshot.world.runtime,m2Corpses:all.map(c=>c.id===corpse.id?{...c,recovered:true}:c)}}},
+   events:[{type:'m2.corpse.recovered',payload:{corpseId:corpse.id,count:corpse.items.length}}]};
+ }],
+ ['m2.encounter.avoid',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')
+   throw Error('M2_EXPLORATION_UNAVAILABLE');
+  const mode=command.payload?.mode;
+  if(!['sneak','bypass'].includes(mode))throw Error('M2_INVALID_AVOIDANCE');
+  const runtime=snapshot.world.runtime;
+  const key=runtime.localSiteId+':'+runtime.localFloor+':'+runtime.pos.join(',');
+  const visited=runtime.m2EncounterTiles??[];
+  if(visited.includes(key))
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m2.encounter.empty',payload:{key}}]};
+  // An explicit attempt has a real failure possibility; neither path drops monster loot.
+  const seed=(Math.imul((snapshot.turn+1)>>>0,1664525)+1013904223)>>>0;
+  const success=mode==='bypass'||seed%100<70;
+  if(!success)return {outcome:'failed',nextState:snapshot,
+   events:[{type:'m2.encounter.avoid_failed',payload:{key,mode}}]};
+  const prior=snapshot.progression?.system04A;
+  const skill=SKILL_DEFINITIONS.find(d=>d.name===(mode==='sneak'?'은신':'탐색'));
+  const progression=prior&&skill?{...snapshot.progression,system04A:awardProgression(prior,{
+   actionId:'m2:avoid:'+mode+':'+key,skillId:skill.id,xp:2})}:snapshot.progression;
+  return {outcome:'success',nextState:{...snapshot,progression,world:{...snapshot.world,runtime:{
+   ...runtime,m2EncounterTiles:[...visited.slice(-63),key],
+   m2AvoidedEncounters:[...(runtime.m2AvoidedEncounters??[]),{key,mode}].slice(-64)}}},
+   events:[{type:'m2.encounter.avoided',payload:{key,mode,skill:skill?.name??null}}]};
+ }],
+ ['m2.hazard.inspect',(snapshot)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_HAZARD_UNAVAILABLE');
+  const rt=snapshot.world.runtime,key=rt.localSiteId+':'+rt.localFloor+':'+rt.pos.join(',');
+  const inspected=rt.m2InspectedHazards??[];
+  if(inspected.includes(key))return {outcome:'failed',nextState:snapshot,
+   events:[{type:'m2.hazard.already_inspected',payload:{key}}]};
+  const kind=(rt.pos[0]+rt.pos[1]+Math.abs(rt.localFloor))%2===0?'trap':'environment';
+  const progression=snapshot.progression?.system04A;
+  const skill=SKILL_DEFINITIONS.find(d=>d.name==='탐색');
+  const nextProgress=progression&&skill?{...snapshot.progression,system04A:awardProgression(progression,{
+   actionId:'m2:hazard:inspect:'+key,skillId:skill.id,xp:2})}:snapshot.progression;
+  return {outcome:'success',nextState:{...snapshot,progression:nextProgress,world:{...snapshot.world,runtime:{
+   ...rt,m2InspectedHazards:[...inspected.slice(-63),key],m2Alert:'suspicious'}}},
+   events:[{type:'m2.hazard.discovered',payload:{key,kind,alert:'suspicious'}}]};
+ }],
+ ['m2.hazard.resolve',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_HAZARD_UNAVAILABLE');
+  const mode=command.payload?.mode;
+  if(!['disarm','bypass','force'].includes(mode))throw Error('M2_INVALID_HAZARD_ACTION');
+  const rt=snapshot.world.runtime,key=rt.localSiteId+':'+rt.localFloor+':'+rt.pos.join(',');
+  if(!(rt.m2InspectedHazards??[]).includes(key))throw Error('M2_HAZARD_UNDISCOVERED');
+  const cleared=rt.m2ClearedHazards??[];
+  if(cleared.includes(key))return {outcome:'failed',nextState:snapshot,events:[{type:'m2.hazard.already_cleared',payload:{key}}]};
+  const kind=(rt.pos[0]+rt.pos[1]+Math.abs(rt.localFloor))%2===0?'trap':'environment';
+  const roll=(Math.imul((snapshot.turn+1)>>>0,1664525)+1013904223)>>>0;
+  const success=mode==='bypass'||mode==='force'||roll%100<65;
+  const hp=Math.max(1,snapshot.player.currentHp-(!success||mode==='force'?(kind==='trap'?6:4):0));
+  return {outcome:success?'success':'failed',nextState:{...snapshot,
+   player:{...snapshot.player,currentHp:hp},world:{...snapshot.world,runtime:{...rt,
+    m2Alert:success?'idle':'alert',
+    ...(success?{m2ClearedHazards:[...cleared.slice(-63),key]}:{})}}},
+   events:[{type:success?'m2.hazard.cleared':'m2.hazard.triggered',
+    payload:{key,kind,mode,damage:snapshot.player.currentHp-hp}}]};
+ }],
+ ['m2.encounter.explore',(snapshot)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_EXPLORATION_UNAVAILABLE');
+  const runtime=snapshot.world.runtime;
+  const encounterId='m2:explore:'+runtime.localSiteId+':'+runtime.localFloor+':'+runtime.pos.join(',')+':'+snapshot.turn;
+  // Initial discovery policy: one encounter only at a distinct explored tile,
+  // no combat-specific movement. Future ecology can replace this provisional rule.
+  const visited=runtime.m2EncounterTiles??[];
+  const key=runtime.localSiteId+':'+runtime.localFloor+':'+runtime.pos.join(',');
+  if(visited.includes(key))return {outcome:'failed',nextState:snapshot,events:[{type:'m2.encounter.empty',payload:{key}}]};
+  const begun=startM2Encounter({encounterId,playerHp:snapshot.player.currentHp,enemyHps:[12],seed:snapshot.turn+1});
+  if(!begun.ok)throw Error(begun.reason);
+  return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...runtime,
+   m2Combat:begun.state,m2EncounterTiles:[...visited.slice(-63),key]}}},
+   events:[{type:'m2.encounter.discovered',payload:{encounterId}}]};
+ }],
+ ['m2.combat.act',(snapshot,command)=>{
+  const current=snapshot.world.runtime.m2Combat;
+  if(!current||current.phase!=='active')throw Error('M2_NO_ACTIVE_COMBAT');
+  if(command.payload.actorId!==current.queue[current.cursor])throw Error('M2_NOT_ACTORS_TURN');
+  if(command.payload.type==='skill'&&(command.payload.actorId!=='player'||snapshot.player.currentMp<5))
+   throw Error('M2_INSUFFICIENT_MP');
+  let consumable=null;
+  if(command.payload.type==='item'){
+   consumable=snapshot.itemWorld.items.find(i=>i.definitionId==='m2:consumable:salve'&&i.quantity>0&&
+    snapshot.itemWorld.placements.some(p=>p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
+   if(!consumable||command.payload.actorId!=='player')throw Error('M2_ITEM_NOT_OWNED');
+  }
+  const skills=snapshot.progression?.system04A;
+  const attackSkill=SKILL_DEFINITIONS.find(d=>d.name==='검술');
+  const meleeLevel=skills&&attackSkill?skillLevel(skills.skills[attackSkill.id]):1;
+  const strength=skills?.attributes?.['근력']??10;
+  // Provisional, capped, deterministic damage contribution of the existing progression.
+  const damageBonus=Math.min(3,Math.max(0,Math.floor((strength-10)/4)+Math.floor((meleeLevel-1)/5)));
+  const result=actM2Combat(current,{...command.payload,damageBonus});
+  if(!result.ok)throw Error(result.reason);
+  const hp=result.state.participants[0].hp;
+  const defeated=result.state.outcome==='defeat';
+  const difficulty=['easy','normal','hard'].includes(options.m2Difficulty)?options.m2Difficulty:'normal';
+  const deathPlace={siteId:snapshot.world.runtime.localSiteId,floor:snapshot.world.runtime.localFloor,pos:[...snapshot.world.runtime.pos]};
+  // Stash only player-owned stacks; never take another owner's item.
+  const lost=defeated&&difficulty!=='easy'?snapshot.itemWorld.items.filter(item=>
+   (item.definitionId.startsWith('m2:loot:')||(difficulty==='hard'&&item.definitionId.startsWith('m1:crop:')))&&snapshot.itemWorld.placements.some(p=>
+    p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id)):[];
+  const lostIds=new Set(lost.map(i=>i.id));
+  const corpse=defeated&&lost.length?{id:'m2:corpse:'+current.encounterId,ownerId:snapshot.player.id,
+   ...deathPlace,items:lost.map(i=>({...i})),recovered:false}:null;
+  const deathWorld=defeated?{...snapshot.world,activeRegionId:'거점 마을',runtime:{
+   ...snapshot.world.runtime,region:'거점 마을',dungeon:false,localFloor:0,pos:[2,2],
+   m2Corpses:corpse?[...(snapshot.world.runtime.m2Corpses??[]),corpse]:snapshot.world.runtime.m2Corpses??[]
+  }}:snapshot.world;
+  const deathItems=lostIds.size?{...snapshot.itemWorld,
+   items:snapshot.itemWorld.items.filter(i=>!lostIds.has(i.id)),
+   placements:snapshot.itemWorld.placements.filter(p=>!lostIds.has(p.itemId))}:snapshot.itemWorld;
+  const victory=result.state.outcome==='victory'&&current.outcome!== 'victory';
+  const ledger=snapshot.world.runtime.m2RewardedEncounters??[];
+  if(victory&&ledger.includes(current.encounterId))throw Error('M2_REWARD_ALREADY_CLAIMED');
+  let itemWorld=deathItems,progression=snapshot.progression;
+  if(consumable){itemWorld={...itemWorld,items:itemWorld.items.map(i=>i.id===consumable.id?{...i,quantity:i.quantity-1}:i)};}
+  if(victory){
+   itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,
+    'm2:reward:'+current.encounterId,'m2:loot:fang',1);
+   const skill=SKILL_DEFINITIONS.find(d=>d.name==='검술');
+   if(progression?.system04A&&skill)progression={...progression,system04A:awardProgression(progression.system04A,{
+    actionId:'m2:victory:'+current.encounterId,skillId:skill.id,xp:3})};
+  }
+  return {outcome:'success',nextState:{...snapshot,itemWorld,progression,player:{...snapshot.player,currentHp:defeated?Math.max(1,Math.floor(result.state.participants[0].maxHp/2)):hp,
+    currentMp:snapshot.player.currentMp-(command.payload.type==='skill'?5:0),
+    ...(defeated?{regionId:'거점 마을'}:{})},
+   world:{...deathWorld,runtime:{...deathWorld.runtime,m2Combat:result.state,
+    ...(victory?{m2RewardedEncounters:[...ledger,current.encounterId]}:{})}}},
+   events:[{type:'m2.combat.action',payload:{outcome:result.state.outcome,action:command.payload.type}},
+    ...(victory?[{type:'m2.combat.reward',payload:{encounterId:current.encounterId,item:'m2:loot:fang',quantity:1}}]:[])]};
+ }],
+
  ['m1.home.wood-shed',(snapshot)=>{
   if(snapshot.world.runtime.region!=='거점 마을'||snapshot.world.runtime.dungeon)
    throw Error('M1_TOWN_REQUIRED');
@@ -726,6 +922,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.hazard.inspect'||action.type==='m2.hazard.resolve'||action.type==='m2.encounter.avoid'||action.type==='m2.supply.salve'||action.type==='m2.rest'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -833,6 +1030,39 @@ export function createMainV2Inventory(uiItems,options={}) {
     return {accepted:false,outcome:'rejected',reason:'DUPLICATE_REQUEST',events:[]};
    return this.dispatch('m1.life',action);
   },
+  m2ClaimStarterSalve(){return this.dispatch('m2.supply.salve',{});},
+  m2Rest(){return this.dispatch('m2.rest',{});},
+  m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
+  m2RescueCorpse(corpseId){return this.dispatch('m2.corpse.rescue',{corpseId});},
+  m2RecoverCorpse(corpseId){return this.dispatch('m2.corpse.recover',{corpseId});},
+  m2AvoidEncounter(mode){return this.dispatch('m2.encounter.avoid',{mode});},
+  m2InspectHazard(){return this.dispatch('m2.hazard.inspect',{});},
+  m2ResolveHazard(mode){return this.dispatch('m2.hazard.resolve',{mode});},
+  m2ExploreEncounter(){return this.dispatch('m2.encounter.explore',{});},
+  m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
+  m2CombatAction(action){return this.dispatch('m2.combat.act',action);},
+  m2EnemyTurn(){const choice=chooseM2EnemyAction(state.world.runtime.m2Combat);return choice.ok?this.dispatch('m2.combat.act',choice.action):{accepted:false,reason:choice.reason,events:[]};},
+  /** Bounded combat automation; each step uses the ordinary turn dispatcher. */
+  m2AutoCombat({hpMin=25,mpMin=0,hungerMin=0,maxActions=12}={}){
+   if(![hpMin,mpMin,hungerMin].every(v=>Number.isSafeInteger(v)&&v>=0&&v<=100)||
+    !Number.isSafeInteger(maxActions)||maxActions<1||maxActions>32)
+    return {ok:false,reason:'INVALID_AUTO_POLICY',completed:0};
+   const events=[];
+   for(let i=0;i<maxActions;i++){
+    const battle=state.world.runtime.m2Combat;
+    if(!battle||battle.phase!=='active')return {ok:true,completed:i,stopReason:'BATTLE_RESOLVED',events};
+    const player=state.player;
+    if(player.currentHp<=hpMin||player.currentMp<=mpMin&&mpMin>0||player.hunger<=hungerMin&&hungerMin>0)
+     return {ok:true,completed:i,stopReason:'SAFETY_THRESHOLD',events};
+    const actor=battle.queue[battle.cursor];
+    const target=battle.participants.find(p=>p.side==='enemy'&&p.hp>0);
+    const result=actor==='player'?this.m2CombatAction({actorId:'player',type:'attack',targetId:target?.id}):this.m2EnemyTurn();
+    if(!result.accepted)return {ok:true,completed:i,stopReason:result.reason??'ACTION_REJECTED',events};
+    events.push(...result.events);
+    if(result.outcome==='failed')return {ok:true,completed:i+1,stopReason:'ACTION_FAILED',events};
+   }
+   return {ok:true,completed:maxActions,stopReason:'ACTION_LIMIT',events};
+  },
   m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
   /** Bounded synchronous automation. Calls exactly the same game actions as a
    * manual player, with safety evaluated before each attempt. */
@@ -907,6 +1137,10 @@ export function createMainV2Inventory(uiItems,options={}) {
   localPortal(){const [x,y]=state.world.runtime.pos;return localPortal(localRegistry,localPosition(state));},
   localRoute(goal,known){const [x,y]=state.world.runtime.pos;return safeLocalRoute(localRegistry,localPosition(state),{siteId:localSite(state),floor:state.world.runtime.localFloor??0,x:goal[0],y:goal[1]},new Set(known));},
   dispatch(type,payload={}){
+    // Active battle owns the turn. Reject all unrelated world and inventory actions
+    // before the common dispatcher so they consume zero turns and mutate nothing.
+    if(state.world.runtime.m2Combat?.phase==='active'&&type!=='m2.combat.act')
+     return {accepted:false,outcome:'rejected',reason:'M2_COMBAT_LOCKED',events:[]};
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
      // Stage integration changes before committing; consumers must receive the reconciled state.

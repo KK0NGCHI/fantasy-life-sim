@@ -291,6 +291,71 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
   if(!built.ok||validateWorldSnapshot03E(raw.state.world.runtime.world03E,built.registry).length)
    return {ok:false,reason:'INVALID_DATA'};
  }
+ // M2 combat state is optional; pre-M2 v3 slots remain valid.
+ // A malformed turn queue must never be applied to live gameplay.
+ if(Object.hasOwn(raw.state.world.runtime,'m2Combat')){
+  const x=raw.state.world.runtime.m2Combat;
+  const validNumber=(n:unknown)=>typeof n==='number'&&Number.isSafeInteger(n)&&n>=0;
+  if(!obj(x)||!keys(x,['schema','encounterId','phase','round','queue','cursor','participants','seed','log','outcome'])||
+   x.schema!==1||typeof x.encounterId!=='string'||x.encounterId.length<1||x.encounterId.length>160||
+   !['active','resolved'].includes(String(x.phase))||!validNumber(x.round)||Number(x.round)<1||
+   !validNumber(x.seed)||!validNumber(x.cursor)||!Array.isArray(x.queue)||!Array.isArray(x.participants)||
+   x.participants.length<2||x.participants.length>5||x.queue.length!==x.participants.length||
+   Number(x.cursor)>=x.queue.length||new Set(x.queue).size!==x.queue.length||
+   !x.queue.every((id:unknown)=>typeof id==='string'&&(x.participants as unknown[]).some((p:unknown)=>obj(p)&&p.id===id))||
+   !x.participants.every((p:unknown,i:number)=>obj(p)&&keys(p,['id','hp','maxHp','side','guard'])&&
+     p.id===(i?'enemy:'+(i-1):'player')&&p.side===(i?'enemy':'player')&&
+     validNumber(p.hp)&&validNumber(p.maxHp)&&Number(p.maxHp)>0&&Number(p.hp)<=Number(p.maxHp)&&
+     typeof p.guard==='boolean')||
+   !Array.isArray(x.log)||x.log.length>40||
+   !(x.outcome===null||['victory','defeat','retreat'].includes(String(x.outcome)))||
+   (x.phase==='active'&&x.outcome!==null)||(x.phase==='resolved'&&x.outcome===null))
+   return {ok:false,reason:'INVALID_DATA'};
+ }
+ // M2 death/reward ledgers are optional for old saves and bounded for corruption safety.
+ const m2rt=raw.state.world.runtime;
+ if(Object.hasOwn(m2rt,'m2StarterSalveClaimed')&&typeof m2rt.m2StarterSalveClaimed!=='boolean')
+  return {ok:false,reason:'INVALID_DATA'};
+ const m2id=(v:unknown)=>typeof v==='string'&&v.length>0&&v.length<=200;
+ const m2num=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0;
+ if(Object.hasOwn(m2rt,'m2Alert')&&!['idle','suspicious','alert'].includes(String(m2rt.m2Alert)))
+  return {ok:false,reason:'INVALID_DATA'};
+ for(const field of ['m2InspectedHazards','m2ClearedHazards']){
+  if(Object.hasOwn(m2rt,field)){
+   const list=m2rt[field];
+   if(!Array.isArray(list)||list.length>64||!list.every(m2id)||new Set(list).size!==list.length)
+    return {ok:false,reason:'INVALID_DATA'};
+  }
+ }
+ if(Object.hasOwn(m2rt,'m2RewardedEncounters')){
+  const list=m2rt.m2RewardedEncounters;
+  if(!Array.isArray(list)||list.length>10000||!list.every(m2id)||new Set(list).size!==list.length)
+   return {ok:false,reason:'INVALID_DATA'};
+ }
+ if(Object.hasOwn(m2rt,'m2EncounterTiles')){
+  const list=m2rt.m2EncounterTiles;
+  if(!Array.isArray(list)||list.length>64||!list.every(m2id)||new Set(list).size!==list.length)
+   return {ok:false,reason:'INVALID_DATA'};
+ }
+ if(Object.hasOwn(m2rt,'m2AvoidedEncounters')){
+  const list=m2rt.m2AvoidedEncounters;
+  if(!Array.isArray(list)||list.length>64||!list.every((v:unknown)=>obj(v)&&
+   keys(v,['key','mode'])&&m2id(v.key)&&['sneak','bypass'].includes(String(v.mode))))
+   return {ok:false,reason:'INVALID_DATA'};
+ }
+ if(Object.hasOwn(m2rt,'m2Corpses')){
+  const list=m2rt.m2Corpses;
+  if(!Array.isArray(list)||list.length>128||!list.every((v:unknown)=>obj(v)&&
+   keys(v,['id','ownerId','siteId','floor','pos','items','recovered'])&&
+   m2id(v.id)&&m2id(v.ownerId)&&m2id(v.siteId)&&
+   typeof v.floor==='number'&&Number.isSafeInteger(v.floor)&&
+   Array.isArray(v.pos)&&v.pos.length===2&&v.pos.every(m2num)&&
+   typeof v.recovered==='boolean'&&Array.isArray(v.items)&&v.items.length<=1000&&
+   v.items.every((item:unknown)=>obj(item)&&keys(item,['id','definitionId','quantity'])&&
+    m2id(item.id)&&m2id(item.definitionId)&&m2num(item.quantity)&&Number(item.quantity)>0))||
+   new Set(list.map((v:{id:string})=>v.id)).size!==list.length)
+   return {ok:false,reason:'INVALID_DATA'};
+ }
  // M1 opt-in runtime; legacy v3 saves without this extension stay intact.
  if(Object.hasOwn(raw.state.world.runtime,'m1Life')){
   const x=raw.state.world.runtime.m1Life;
