@@ -312,6 +312,39 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
    (x.phase==='active'&&x.outcome!==null)||(x.phase==='resolved'&&x.outcome===null))
    return {ok:false,reason:'INVALID_DATA'};
  }
+ // M2 death/reward ledgers are optional for old saves and bounded for corruption safety.
+ const m2rt=raw.state.world.runtime;
+ const m2id=(v:unknown)=>typeof v==='string'&&v.length>0&&v.length<=200;
+ const m2num=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0;
+ if(Object.hasOwn(m2rt,'m2RewardedEncounters')){
+  const list=m2rt.m2RewardedEncounters;
+  if(!Array.isArray(list)||list.length>10000||!list.every(m2id)||new Set(list).size!==list.length)
+   return {ok:false,reason:'INVALID_DATA'};
+ }
+ if(Object.hasOwn(m2rt,'m2EncounterTiles')){
+  const list=m2rt.m2EncounterTiles;
+  if(!Array.isArray(list)||list.length>64||!list.every(m2id)||new Set(list).size!==list.length)
+   return {ok:false,reason:'INVALID_DATA'};
+ }
+ if(Object.hasOwn(m2rt,'m2AvoidedEncounters')){
+  const list=m2rt.m2AvoidedEncounters;
+  if(!Array.isArray(list)||list.length>64||!list.every((v:unknown)=>obj(v)&&
+   keys(v,['key','mode'])&&m2id(v.key)&&['sneak','bypass'].includes(String(v.mode))))
+   return {ok:false,reason:'INVALID_DATA'};
+ }
+ if(Object.hasOwn(m2rt,'m2Corpses')){
+  const list=m2rt.m2Corpses;
+  if(!Array.isArray(list)||list.length>128||!list.every((v:unknown)=>obj(v)&&
+   keys(v,['id','ownerId','siteId','floor','pos','items','recovered'])&&
+   m2id(v.id)&&m2id(v.ownerId)&&m2id(v.siteId)&&
+   typeof v.floor==='number'&&Number.isSafeInteger(v.floor)&&
+   Array.isArray(v.pos)&&v.pos.length===2&&v.pos.every(m2num)&&
+   typeof v.recovered==='boolean'&&Array.isArray(v.items)&&v.items.length<=1000&&
+   v.items.every((item:unknown)=>obj(item)&&keys(item,['id','definitionId','quantity'])&&
+    m2id(item.id)&&m2id(item.definitionId)&&m2num(item.quantity)&&Number(item.quantity)>0))||
+   new Set(list.map((v:{id:string})=>v.id)).size!==list.length)
+   return {ok:false,reason:'INVALID_DATA'};
+ }
  // M1 opt-in runtime; legacy v3 saves without this extension stay intact.
  if(Object.hasOwn(raw.state.world.runtime,'m1Life')){
   const x=raw.state.world.runtime.m1Life;
