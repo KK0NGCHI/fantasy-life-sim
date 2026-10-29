@@ -257,3 +257,24 @@ test('M2 auto combat stops before unsafe action without consuming turns',()=>{
  assert.equal(stopped.completed,0);
  assert.deepEqual(g.current(),before);
 });
+
+test('M2 active combat locks exploration, travel, inventory and rest at zero turn cost',()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-combat-lock'});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ assert.equal(g.m2StartEncounter({encounterId:'m2:locked',enemyHps:[12],seed:1}).accepted,true);
+ const before=structuredClone(g.current());
+ for(const [type,payload] of [
+  ['dungeon.move',{direction:'east'}],['dungeon.portal',{}],['dungeon.leave',{}],
+  ['world.travel',{region:'거점 마을'}],['m2.rest',{}],['m2.encounter.explore',{}],
+  ['m2.corpse.recover',{corpseId:'nothing'}],['inventory.sort',{}]
+ ]){
+  const denied=g.dispatch(type,payload);
+  assert.equal(denied.accepted,false,type);
+  assert.equal(denied.reason,'M2_COMBAT_LOCKED',type);
+  assert.deepEqual(g.current(),before,type);
+ }
+ const attack=g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'});
+ assert.equal(attack.accepted,true,JSON.stringify(attack));
+ assert.equal(g.current().turn,before.turn+1);
+});
