@@ -114,6 +114,18 @@ function lifestyle(){
 const el=head(s.region,'');const hue={'거점 마을':'town','초원·농경지':'pasture','숲':'forest','강·호수':'river','습지':'marsh','산맥':'mountain','광산':'mine','설원':'snow','사막':'desert','해안·항구':'coast','바다':'ocean','화산지대':'volcano','고대 유적':'ruins','폐허·묘지':'grave','만신전':'temple','지하미궁':'dungeon'}[s.region]||'pasture';
 const hero=make('section',{class:'region-scene scene-'+hue},el);hero.innerHTML='<div class="scene-heading"><div><h2>'+esc(s.region)+'</h2></div>'+svgIcon(hue==='forest'?'trees':hue==='river'?'waves':hue==='mine'?'mountain':hue==='volcano'?'flame':hue==='snow'?'snowflake':hue==='desert'?'sun':hue==='ocean'||hue==='coast'?'waves':hue==='temple'?'sparkles':hue==='dungeon'?'footprints':'sun')+'</div>';
 if(s.region==='거점 마을'){
+ const missing=(mainV2.current().world.runtime.m2Corpses??[]).filter(c=>!c.recovered&&c.ownerId===mainV2.current().player.id&&
+  (!['core:site/labyrinth','core:site/forest'].includes(c.siteId)||![0,-1].includes(c.floor)||
+    c.pos.some(v=>!Number.isSafeInteger(v)||v<0||v>=24)));
+ if(missing.length){
+  const salvage=section(el,'접근 불가 전리품 복구');
+  for(const corpse of missing)btn('전리품 안전 복구',()=>{
+   const result=mainV2.m2RescueCorpse(corpse.id);
+   if(result.accepted){refreshV2Inventory();nextLog('탐험','접근 불가 전리품을 마을에서 복구했습니다.');}
+   else nextLog('위험','전리품 복구 거부: '+(result.reason??''));
+   render();
+  },'btn',salvage);
+ }
  const life=mainV2.m1Life();
  const panel=make('section',{class:'resource05a-panel','aria-label':'M1 실제 농업·교역'},el);
  make('h3',{text:'생활 생산 · 농지와 마을 상인 (시험 경제)'},panel);
