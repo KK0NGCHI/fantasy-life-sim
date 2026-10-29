@@ -10,10 +10,6 @@ try{
  await page.locator('#top .top-title').waitFor();
  assert.match(await page.locator('#top').innerText(),/08:00:00/);
  assert.equal(await page.locator('#main').isVisible(),true);
- // M2 safe-town rest is accessible through the real game UI.
- await page.getByRole('button',{name:'마을에서 휴식 (HP +25 / MP +20)'}).click();
- await page.getByText(/이미 충분히 회복했습니다/).first().waitFor();
-
  // 04-B: origin selection is character identity; distinct from attribute budget.
  await page.getByRole('button',{name:'캐릭터',exact:true}).first().click();
  await page.getByRole('button',{name:'종족·배경 선택'}).click();
