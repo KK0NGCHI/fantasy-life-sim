@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {M2_ACTIONS,startM2Encounter,actM2Combat,validateM2Combat} from '../src/m2-combat-core.js';
 test('M2 combat actions omit position movement and rotate through all actors',()=>{
- assert.deepEqual(M2_ACTIONS,['attack','defend','retreat']);
+ assert.deepEqual(M2_ACTIONS,['attack','defend','retreat','skill','item']);
  const begun=startM2Encounter({encounterId:'cave:1',playerHp:20,enemyHps:[8,8],seed:7});
  assert.equal(begun.ok,true);
  const initial=structuredClone(begun.state);
