@@ -309,6 +309,40 @@ export function createMainV2Inventory(uiItems,options={}) {
    m2AvoidedEncounters:[...(runtime.m2AvoidedEncounters??[]),{key,mode}].slice(-64)}}},
    events:[{type:'m2.encounter.avoided',payload:{key,mode,skill:skill?.name??null}}]};
  }],
+ ['m2.hazard.inspect',(snapshot)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_HAZARD_UNAVAILABLE');
+  const rt=snapshot.world.runtime,key=rt.localSiteId+':'+rt.localFloor+':'+rt.pos.join(',');
+  const inspected=rt.m2InspectedHazards??[];
+  if(inspected.includes(key))return {outcome:'failed',nextState:snapshot,
+   events:[{type:'m2.hazard.already_inspected',payload:{key}}]};
+  const kind=(rt.pos[0]+rt.pos[1]+Math.abs(rt.localFloor))%2===0?'trap':'environment';
+  const progression=snapshot.progression?.system04A;
+  const skill=SKILL_DEFINITIONS.find(d=>d.name==='탐색');
+  const nextProgress=progression&&skill?{...snapshot.progression,system04A:awardProgression(progression,{
+   actionId:'m2:hazard:inspect:'+key,skillId:skill.id,xp:2})}:snapshot.progression;
+  return {outcome:'success',nextState:{...snapshot,progression:nextProgress,world:{...snapshot.world,runtime:{
+   ...rt,m2InspectedHazards:[...inspected.slice(-63),key],m2Alert:'suspicious'}}},
+   events:[{type:'m2.hazard.discovered',payload:{key,kind,alert:'suspicious'}}]};
+ }],
+ ['m2.hazard.resolve',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_HAZARD_UNAVAILABLE');
+  const mode=command.payload?.mode;
+  if(!['disarm','bypass','force'].includes(mode))throw Error('M2_INVALID_HAZARD_ACTION');
+  const rt=snapshot.world.runtime,key=rt.localSiteId+':'+rt.localFloor+':'+rt.pos.join(',');
+  if(!(rt.m2InspectedHazards??[]).includes(key))throw Error('M2_HAZARD_UNDISCOVERED');
+  const cleared=rt.m2ClearedHazards??[];
+  if(cleared.includes(key))return {outcome:'failed',nextState:snapshot,events:[{type:'m2.hazard.already_cleared',payload:{key}}]};
+  const kind=(rt.pos[0]+rt.pos[1]+Math.abs(rt.localFloor))%2===0?'trap':'environment';
+  const roll=(Math.imul((snapshot.turn+1)>>>0,1664525)+1013904223)>>>0;
+  const success=mode==='bypass'||mode==='force'||roll%100<65;
+  const hp=Math.max(1,snapshot.player.currentHp-(!success||mode==='force'?(kind==='trap'?6:4):0));
+  return {outcome:success?'success':'failed',nextState:{...snapshot,
+   player:{...snapshot.player,currentHp:hp},world:{...snapshot.world,runtime:{...rt,
+    m2Alert:success?'idle':'alert',
+    ...(success?{m2ClearedHazards:[...cleared.slice(-63),key]}:{})}}},
+   events:[{type:success?'m2.hazard.cleared':'m2.hazard.triggered',
+    payload:{key,kind,mode,damage:snapshot.player.currentHp-hp}}]};
+ }],
  ['m2.encounter.explore',(snapshot)=>{
   if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_EXPLORATION_UNAVAILABLE');
   const runtime=snapshot.world.runtime;
@@ -888,7 +922,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.supply.salve'||action.type==='m2.rest'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.hazard.inspect'||action.type==='m2.hazard.resolve'||action.type==='m2.encounter.avoid'||action.type==='m2.supply.salve'||action.type==='m2.rest'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -1002,6 +1036,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   m2RescueCorpse(corpseId){return this.dispatch('m2.corpse.rescue',{corpseId});},
   m2RecoverCorpse(corpseId){return this.dispatch('m2.corpse.recover',{corpseId});},
   m2AvoidEncounter(mode){return this.dispatch('m2.encounter.avoid',{mode});},
+  m2InspectHazard(){return this.dispatch('m2.hazard.inspect',{});},
+  m2ResolveHazard(mode){return this.dispatch('m2.hazard.resolve',{mode});},
   m2ExploreEncounter(){return this.dispatch('m2.encounter.explore',{});},
   m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
   m2CombatAction(action){return this.dispatch('m2.combat.act',action);},
