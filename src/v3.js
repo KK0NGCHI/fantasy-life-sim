@@ -892,6 +892,14 @@ function m2CombatScreen(){
   btn('탐험으로 돌아가기',()=>render(),'btn primary',buttons);
   return;
  }
+ btn('안전 자동 전투 · 최대 12행동',()=>{
+  const result=mainV2.m2AutoCombat({hpMin:s.auto.hp.on?s.auto.hp.pct:0,
+   mpMin:s.auto.mp.on?s.auto.mp.pct:0,hungerMin:s.auto.hunger.on?s.auto.hunger.pct:0,maxActions:12});
+  if(result.ok){refreshV2Inventory();nextLog('전투','자동 전투 종료: '+result.stopReason+' · '+result.completed+'행동');}
+  else nextLog('위험','자동 전투 거부: '+result.reason);
+  if(mainV2.m2Combat()?.outcome==='defeat')s.page='생활';
+  render();
+ },'btn',buttons);
  const actor=battle.queue[battle.cursor];
  const act=(type,targetId)=>{
   const result=mainV2.m2CombatAction({actorId:actor,type,targetId});
