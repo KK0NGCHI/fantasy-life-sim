@@ -23,10 +23,11 @@ export function validateM2Combat(s){
   (s.outcome===null||['victory','defeat','retreat'].includes(s.outcome));
 }
 const roll=seed=>(Math.imul(seed,1664525)+1013904223)>>>0;
-export function actM2Combat(source,{actorId,type,targetId}={}){
+export function actM2Combat(source,{actorId,type,targetId,damageBonus=0}={}){
  if(!validateM2Combat(source))return {ok:false,reason:'INVALID_STATE'};
  if(source.phase!=='active')return {ok:false,reason:'RESOLVED'};
  if(!M2_ACTIONS.includes(type))return {ok:false,reason:'INVALID_ACTION'};
+ if(!Number.isSafeInteger(damageBonus)||damageBonus<0||damageBonus>3)return {ok:false,reason:'INVALID_DAMAGE_BONUS'};
  const s=clone(source),actor=s.participants.find(p=>p.id===actorId);
  if(!actor||actor.hp===0||s.queue[s.cursor]!==actorId)return {ok:false,reason:'NOT_ACTORS_TURN'};
  if(actor.side==='enemy'&&['retreat','skill','item'].includes(type))return {ok:false,reason:'INVALID_ACTION'};
@@ -44,7 +45,7 @@ export function actM2Combat(source,{actorId,type,targetId}={}){
   const target=s.participants.find(p=>p.id===targetId);
   if(!target||target.hp===0||target.side===actor.side)return {ok:false,reason:'INVALID_TARGET'};
   s.seed=roll(s.seed);
-  const raw=(type==='skill'?5:3)+s.seed%4,damage=Math.max(1,raw-(target.guard?2:0));
+  const raw=(type==='skill'?5:3)+s.seed%4+damageBonus,damage=Math.max(1,raw-(target.guard?2:0));
   target.guard=false;target.hp=Math.max(0,target.hp-damage);
   s.log.push({type,actorId,targetId,damage});
  }
