@@ -230,6 +230,21 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
    events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
  }],
+ ['m2.corpse.recover',(snapshot,command)=>{
+  if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')
+   throw Error('M2_RECOVERY_UNAVAILABLE');
+  const all=snapshot.world.runtime.m2Corpses??[];
+  const corpse=all.find(c=>c.id===command.payload?.corpseId&&!c.recovered);
+  if(!corpse||corpse.ownerId!==snapshot.player.id)throw Error('M2_CORPSE_NOT_FOUND');
+  if(corpse.siteId!==snapshot.world.runtime.localSiteId||corpse.floor!==snapshot.world.runtime.localFloor||
+   corpse.pos[0]!==snapshot.world.runtime.pos[0]||corpse.pos[1]!==snapshot.world.runtime.pos[1])
+   throw Error('M2_CORPSE_WRONG_LOCATION');
+  let itemWorld=snapshot.itemWorld;
+  for(const item of corpse.items)itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,item.id,item.definitionId,item.quantity);
+  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{
+   ...snapshot.world.runtime,m2Corpses:all.map(c=>c.id===corpse.id?{...c,recovered:true}:c)}}},
+   events:[{type:'m2.corpse.recovered',payload:{corpseId:corpse.id,count:corpse.items.length}}]};
+ }],
  ['m2.encounter.avoid',(snapshot,command)=>{
   if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')
    throw Error('M2_EXPLORATION_UNAVAILABLE');
@@ -276,10 +291,27 @@ export function createMainV2Inventory(uiItems,options={}) {
   const result=actM2Combat(current,command.payload);
   if(!result.ok)throw Error(result.reason);
   const hp=result.state.participants[0].hp;
+  const defeated=result.state.outcome==='defeat';
+  const difficulty=['easy','normal','hard'].includes(options.m2Difficulty)?options.m2Difficulty:'normal';
+  const deathPlace={siteId:snapshot.world.runtime.localSiteId,floor:snapshot.world.runtime.localFloor,pos:[...snapshot.world.runtime.pos]};
+  // Stash only player-owned stacks; never take another owner's item.
+  const lost=defeated&&difficulty!=='easy'?snapshot.itemWorld.items.filter(item=>
+   item.definitionId.startsWith('m2:loot:')&&snapshot.itemWorld.placements.some(p=>
+    p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id)):[];
+  const lostIds=new Set(lost.map(i=>i.id));
+  const corpse=defeated&&lost.length?{id:'m2:corpse:'+current.encounterId,ownerId:snapshot.player.id,
+   ...deathPlace,items:lost.map(i=>({...i})),recovered:false}:null;
+  const deathWorld=defeated?{...snapshot.world,activeRegionId:'거점 마을',runtime:{
+   ...snapshot.world.runtime,region:'거점 마을',dungeon:false,localFloor:0,pos:[2,2],
+   m2Corpses:corpse?[...(snapshot.world.runtime.m2Corpses??[]),corpse]:snapshot.world.runtime.m2Corpses??[]
+  }}:snapshot.world;
+  const deathItems=lostIds.size?{...snapshot.itemWorld,
+   items:snapshot.itemWorld.items.filter(i=>!lostIds.has(i.id)),
+   placements:snapshot.itemWorld.placements.filter(p=>!lostIds.has(p.itemId))}:snapshot.itemWorld;
   const victory=result.state.outcome==='victory'&&current.outcome!== 'victory';
   const ledger=snapshot.world.runtime.m2RewardedEncounters??[];
   if(victory&&ledger.includes(current.encounterId))throw Error('M2_REWARD_ALREADY_CLAIMED');
-  let itemWorld=snapshot.itemWorld,progression=snapshot.progression;
+  let itemWorld=deathItems,progression=snapshot.progression;
   if(victory){
    itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,
     'm2:reward:'+current.encounterId,'m2:loot:fang',1);
@@ -287,8 +319,9 @@ export function createMainV2Inventory(uiItems,options={}) {
    if(progression?.system04A&&skill)progression={...progression,system04A:awardProgression(progression.system04A,{
     actionId:'m2:victory:'+current.encounterId,skillId:skill.id,xp:3})};
   }
-  return {outcome:'success',nextState:{...snapshot,itemWorld,progression,player:{...snapshot.player,currentHp:hp},
-   world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:result.state,
+  return {outcome:'success',nextState:{...snapshot,itemWorld,progression,player:{...snapshot.player,currentHp:defeated?Math.max(1,Math.floor(result.state.participants[0].maxHp/2)):hp,
+    ...(defeated?{regionId:'거점 마을'}:{})},
+   world:{...deathWorld,runtime:{...deathWorld.runtime,m2Combat:result.state,
     ...(victory?{m2RewardedEncounters:[...ledger,current.encounterId]}:{})}}},
    events:[{type:'m2.combat.action',payload:{outcome:result.state.outcome,action:command.payload.type}},
     ...(victory?[{type:'m2.combat.reward',payload:{encounterId:current.encounterId,item:'m2:loot:fang',quantity:1}}]:[])]};
@@ -799,7 +832,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.corpse.recover'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -908,6 +941,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    return this.dispatch('m1.life',action);
   },
   m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
+  m2RecoverCorpse(corpseId){return this.dispatch('m2.corpse.recover',{corpseId});},
   m2AvoidEncounter(mode){return this.dispatch('m2.encounter.avoid',{mode});},
   m2ExploreEncounter(){return this.dispatch('m2.encounter.explore',{});},
   m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
