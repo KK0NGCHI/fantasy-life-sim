@@ -338,3 +338,27 @@ test('M2 player combat damage derives from existing strength allocation, not cal
  assert.ok(high.m2Combat().participants[1].hp<low.m2Combat().participants[1].hp);
  assert.equal(high.m2Combat().seed,low.m2Combat().seed);
 });
+
+test('M2 hazard inspect and bypass are deterministic, bounded and nonfarmable',()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-hazards',progression04A:true});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ const before=g.current();
+ assert.equal(g.m2ResolveHazard('bypass').accepted,false);
+ assert.deepEqual(g.current(),before);
+ const inspected=g.m2InspectHazard();
+ assert.equal(inspected.accepted,true,JSON.stringify(inspected));
+ assert.equal(g.current().world.runtime.m2Alert,'suspicious');
+ const once=g.current();
+ assert.equal(g.m2InspectHazard().outcome,'failed');
+ assert.deepEqual(g.current().progression,once.progression);
+ const done=g.m2ResolveHazard('bypass');
+ assert.equal(done.accepted,true);
+ assert.equal(done.outcome,'success');
+ assert.equal(g.current().world.runtime.m2Alert,'idle');
+ assert.equal(g.current().player.currentHp,before.player.currentHp);
+ const completed=g.current();
+ assert.equal(g.m2ResolveHazard('bypass').outcome,'failed');
+ assert.deepEqual(g.current().progression,completed.progression);
+ assert.equal(g.current().world.runtime.m2ClearedHazards.length,1);
+});
