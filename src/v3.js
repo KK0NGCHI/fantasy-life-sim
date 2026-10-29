@@ -969,6 +969,16 @@ btn('주변 위험 탐색 (M2)',()=>{
  render();
 },'btn',right);
 
+const hazardActions=make('div',{class:'dungeon-main-actions'},right);
+for(const [mode,label] of [[null,'위험 관찰 (M2)'],['disarm','함정 해제 시도 (M2)'],['bypass','위험 우회 처리 (M2)'],['force','위험 강행 (M2)']]){
+ btn(label,()=>{
+  stopAuto();
+  const result=mode?mainV2.m2ResolveHazard(mode):mainV2.m2InspectHazard();
+  if(result.accepted){refreshV2Inventory();nextLog('위험',result.events?.[0]?.type??'위험 처리');}
+  else nextLog('위험','위험 행동 거부: '+(result.reason??''));
+  render();
+ },'btn',hazardActions);
+}
 const avoidActions=make('div',{class:'dungeon-main-actions'},right);
 for(const [mode,label] of [['sneak','은신하여 통과 (M2)'],['bypass','위험 우회 (M2)']]){
  btn(label,()=>{
