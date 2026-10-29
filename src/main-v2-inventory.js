@@ -231,6 +231,17 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
    events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
  }],
+ ['m2.supply.salve',(snapshot)=>{
+  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
+   snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_SUPPLY_TOWN_REQUIRED');
+  if(snapshot.world.runtime.m2StarterSalveClaimed)
+   return {outcome:'failed',nextState:snapshot,events:[{type:'m2.supply.already_claimed',payload:{}}]};
+  const itemWorld=creditOwnedResource05A(snapshot.itemWorld,snapshot.player.id,
+   'm2:supply:'+snapshot.player.id,'m2:consumable:salve',1);
+  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{
+   ...snapshot.world.runtime,m2StarterSalveClaimed:true}}},
+   events:[{type:'m2.supply.granted',payload:{itemId:'m2:consumable:salve',quantity:1}}]};
+ }],
  ['m2.rest',(snapshot)=>{
   if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
    snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_REST_TOWN_REQUIRED');
@@ -325,7 +336,13 @@ export function createMainV2Inventory(uiItems,options={}) {
     snapshot.itemWorld.placements.some(p=>p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
    if(!consumable||command.payload.actorId!=='player')throw Error('M2_ITEM_NOT_OWNED');
   }
-  const result=actM2Combat(current,command.payload);
+  const skills=snapshot.progression?.system04A;
+  const attackSkill=SKILL_DEFINITIONS.find(d=>d.name==='검술');
+  const meleeLevel=skills&&attackSkill?skillLevel(skills.skills[attackSkill.id]):1;
+  const strength=skills?.attributes?.['근력']??10;
+  // Provisional, capped, deterministic damage contribution of the existing progression.
+  const damageBonus=Math.min(3,Math.max(0,Math.floor((strength-10)/4)+Math.floor((meleeLevel-1)/5)));
+  const result=actM2Combat(current,{...command.payload,damageBonus});
   if(!result.ok)throw Error(result.reason);
   const hp=result.state.participants[0].hp;
   const defeated=result.state.outcome==='defeat';
@@ -871,7 +888,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.rest'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.supply.salve'||action.type==='m2.rest'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -979,6 +996,7 @@ export function createMainV2Inventory(uiItems,options={}) {
     return {accepted:false,outcome:'rejected',reason:'DUPLICATE_REQUEST',events:[]};
    return this.dispatch('m1.life',action);
   },
+  m2ClaimStarterSalve(){return this.dispatch('m2.supply.salve',{});},
   m2Rest(){return this.dispatch('m2.rest',{});},
   m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
   m2RescueCorpse(corpseId){return this.dispatch('m2.corpse.rescue',{corpseId});},
