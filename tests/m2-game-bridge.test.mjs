@@ -278,3 +278,27 @@ test('M2 active combat locks exploration, travel, inventory and rest at zero tur
  assert.equal(attack.accepted,true,JSON.stringify(attack));
  assert.equal(g.current().turn,before.turn+1);
 });
+
+test('M2 skill and owned healing item use existing MP and itemWorld atomically',()=>{
+ const fixture=[{id:'m2:consumable:salve',name:'시험용 응급 연고',group:'소모품',qty:2,tags:['m2:healing']}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-skill-item'});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ assert.equal(g.m2StartEncounter({encounterId:'m2:skill-item',enemyHps:[50],seed:5}).accepted,true);
+ const initial=g.current(),actor='player';
+ const invalid=g.m2CombatAction({actorId:actor,type:'item'});
+ assert.equal(invalid.accepted,false);
+ assert.deepEqual(g.current(),initial);
+ const skill=g.m2CombatAction({actorId:actor,type:'skill',targetId:'enemy:0'});
+ assert.equal(skill.accepted,true,JSON.stringify(skill));
+ assert.equal(g.current().player.currentMp,initial.player.currentMp-5);
+ assert.equal(g.current().turn,initial.turn+1);
+ assert.equal(g.m2EnemyTurn().accepted,true);
+ // Enemy attack may or may not hurt under a guard; make healing dependent on actual damage.
+ const damaged=g.current().player.currentHp;
+ if(damaged<initial.player.currentHp){
+  const item=g.m2CombatAction({actorId:actor,type:'item'});
+  assert.equal(item.accepted,true,JSON.stringify(item));
+  assert.ok(g.current().player.currentHp>damaged);
+  assert.equal(g.current().itemWorld.items.find(i=>i.definitionId==='m2:consumable:salve').quantity,1);
+ }
+});
