@@ -910,6 +910,8 @@ function m2CombatScreen(){
  if(actor==='player'){
   const target=battle.participants.find(p=>p.side==='enemy'&&p.hp>0);
   btn('공격',()=>act('attack',target?.id),'btn primary',buttons);
+  btn('기술 · 강타 (MP 5)',()=>act('skill',target?.id),'btn',buttons);
+  btn('아이템 · 응급 연고',()=>act('item'),'btn',buttons);
   btn('방어',()=>act('defend'),'btn',buttons);
   btn('퇴각',()=>act('retreat'),'btn',buttons);
  }else{
