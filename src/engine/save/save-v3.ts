@@ -318,6 +318,15 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
   return {ok:false,reason:'INVALID_DATA'};
  const m2id=(v:unknown)=>typeof v==='string'&&v.length>0&&v.length<=200;
  const m2num=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0;
+ if(Object.hasOwn(m2rt,'m2Alert')&&!['idle','suspicious','alert'].includes(String(m2rt.m2Alert)))
+  return {ok:false,reason:'INVALID_DATA'};
+ for(const field of ['m2InspectedHazards','m2ClearedHazards']){
+  if(Object.hasOwn(m2rt,field)){
+   const list=m2rt[field];
+   if(!Array.isArray(list)||list.length>64||!list.every(m2id)||new Set(list).size!==list.length)
+    return {ok:false,reason:'INVALID_DATA'};
+  }
+ }
  if(Object.hasOwn(m2rt,'m2RewardedEncounters')){
   const list=m2rt.m2RewardedEncounters;
   if(!Array.isArray(list)||list.length>10000||!list.every(m2id)||new Set(list).size!==list.length)
