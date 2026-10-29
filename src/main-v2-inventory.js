@@ -296,7 +296,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const deathPlace={siteId:snapshot.world.runtime.localSiteId,floor:snapshot.world.runtime.localFloor,pos:[...snapshot.world.runtime.pos]};
   // Stash only player-owned stacks; never take another owner's item.
   const lost=defeated&&difficulty!=='easy'?snapshot.itemWorld.items.filter(item=>
-   item.definitionId.startsWith('m2:loot:')&&snapshot.itemWorld.placements.some(p=>
+   (item.definitionId.startsWith('m2:loot:')||(difficulty==='hard'&&item.definitionId.startsWith('m1:crop:')))&&snapshot.itemWorld.placements.some(p=>
     p.itemId===item.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id)):[];
   const lostIds=new Set(lost.map(i=>i.id));
   const corpse=defeated&&lost.length?{id:'m2:corpse:'+current.encounterId,ownerId:snapshot.player.id,
