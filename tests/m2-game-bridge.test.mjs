@@ -158,3 +158,29 @@ test('M2 normal defeat revives without permadeath and recovers only own trophy o
  assert.equal(g.m2RecoverCorpse(corpse.id).accepted,false);
  assert.deepEqual(g.current(),after);
 });
+
+test('M2 corpse v3 persistence validates owner, payload and duplicate ledger',async()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-corpse-persist'});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ assert.equal(g.m2StartEncounter({encounterId:'m2:corpse:test',enemyHps:[3],seed:42}).accepted,true);
+ assert.equal(g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'}).accepted,true);
+ const snapshot=g.current(),{schemaVersion,clock,...rest}=structuredClone(snapshot);
+ const {createSaveV3,decodeSaveV3}=await import('../dist/engine/v2.js');
+ const v3={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ v3.world.runtime.m2Corpses=[{id:'m2:corpse:fixture',ownerId:v3.player.id,siteId:'core:site/labyrinth',floor:0,pos:[2,2],items:[{id:'m2:fixture:fang',definitionId:'m2:loot:fang',quantity:1}],recovered:false}];
+ const slot={slotId:'m2-corpse',worldId:'m2-world',kind:'manual',label:'Corpse test',savedAt:'2026-10-29T00:00:00Z',revision:0};
+ const valid=createSaveV3(v3,slot,'m2-test',g.registry);
+ assert.equal(decodeSaveV3(valid,g.registry).ok,true);
+ const invalid=structuredClone(valid);
+ invalid.state.world.runtime.m2Corpses[0].items[0].quantity=-4;
+ assert.equal(decodeSaveV3(invalid,g.registry).ok,false);
+ const repeated=structuredClone(valid);
+ repeated.state.world.runtime.m2Corpses.push(structuredClone(repeated.state.world.runtime.m2Corpses[0]));
+ assert.equal(decodeSaveV3(repeated,g.registry).ok,false);
+ const badLedger=structuredClone(valid);
+ badLedger.state.world.runtime.m2RewardedEncounters.push('m2:corpse:test');
+ assert.equal(decodeSaveV3(badLedger,g.registry).ok,false);
+ assert.throws(()=>g.applyApprovedSave(invalid));
+ assert.deepEqual(g.current(),snapshot);
+});
