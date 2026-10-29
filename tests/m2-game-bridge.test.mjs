@@ -126,3 +126,35 @@ test('M2 stealth failure does not grant loot or mark unpassed tile',()=>{
  assert.equal(failure?.outcome==='failed'||g.current().world.runtime.m2AvoidedEncounters?.length===1,true);
  assert.equal(g.current().itemWorld.items.some(i=>i.definitionId==='m2:loot:fang'),false);
 });
+
+test('M2 normal defeat revives without permadeath and recovers only own trophy once',()=>{
+ const g=createMainV2Inventory([{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}],{worldSeed:'m2-revive',m2Difficulty:'normal'});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ const place={siteId:g.current().world.runtime.localSiteId,floor:g.current().world.runtime.localFloor,pos:[...g.current().world.runtime.pos]};
+ assert.equal(g.m2StartEncounter({encounterId:'m2:earn',enemyHps:[3],seed:42}).accepted,true);
+ assert.equal(g.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0'}).accepted,true);
+ assert.equal(g.current().itemWorld.items.some(i=>i.definitionId==='m2:loot:fang'),true);
+ assert.equal(g.m2StartEncounter({encounterId:'m2:defeat',enemyHps:[12],seed:5}).accepted,true);
+ let steps=0;
+ while(g.m2Combat().phase==='active'&&steps++<100){
+  const turn=g.m2Combat().queue[g.m2Combat().cursor];
+  const result=turn==='player'?g.m2CombatAction({actorId:'player',type:'defend'}):g.m2EnemyTurn();
+  assert.equal(result.accepted,true,JSON.stringify(result));
+ }
+ assert.equal(g.m2Combat().outcome,'defeat');
+ assert.equal(g.current().world.runtime.dungeon,false);
+ assert.equal(g.current().world.runtime.region,'거점 마을');
+ assert.ok(g.current().player.currentHp>0);
+ assert.equal(g.current().itemWorld.items.some(i=>i.definitionId==='m2:loot:fang'),false);
+ const corpse=g.current().world.runtime.m2Corpses[0];
+ assert.equal(corpse.ownerId,g.current().player.id);
+ assert.equal(corpse.items.length,1);
+ assert.equal(g.m2RecoverCorpse(corpse.id).accepted,false);
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ assert.deepEqual(g.current().world.runtime.pos,place.pos);
+ assert.equal(g.m2RecoverCorpse(corpse.id).accepted,true);
+ assert.equal(g.current().itemWorld.items.some(i=>i.definitionId==='m2:loot:fang'),true);
+ const after=g.current();
+ assert.equal(g.m2RecoverCorpse(corpse.id).accepted,false);
+ assert.deepEqual(g.current(),after);
+});
