@@ -230,6 +230,23 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
    events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
  }],
+ ['m2.corpse.rescue',(snapshot,command)=>{
+  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
+   snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_RESCUE_TOWN_REQUIRED');
+  const all=snapshot.world.runtime.m2Corpses??[];
+  const corpse=all.find(c=>c.id===command.payload?.corpseId&&!c.recovered);
+  if(!corpse||corpse.ownerId!==snapshot.player.id)throw Error('M2_CORPSE_NOT_FOUND');
+  // Explicit fallback is limited to removed/invalid map references, not a free substitute
+  // for visiting a reachable death location.
+  const reachable=['core:site/labyrinth','core:site/forest'].includes(corpse.siteId)&&
+   [0,-1].includes(corpse.floor)&&corpse.pos.every(v=>Number.isSafeInteger(v)&&v>=0&&v<24);
+  if(reachable)throw Error('M2_CORPSE_STILL_REACHABLE');
+  let itemWorld=snapshot.itemWorld;
+  for(const item of corpse.items)itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,item.id,item.definitionId,item.quantity);
+  return {outcome:'success',nextState:{...snapshot,itemWorld,world:{...snapshot.world,runtime:{
+   ...snapshot.world.runtime,m2Corpses:all.map(c=>c.id===corpse.id?{...c,recovered:true}:c)}}},
+   events:[{type:'m2.corpse.rescued',payload:{corpseId:corpse.id}}]};
+ }],
  ['m2.corpse.recover',(snapshot,command)=>{
   if(!snapshot.world.runtime.dungeon||snapshot.world.runtime.m2Combat?.phase==='active')
    throw Error('M2_RECOVERY_UNAVAILABLE');
@@ -832,7 +849,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.corpse.recover'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -941,6 +958,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    return this.dispatch('m1.life',action);
   },
   m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
+  m2RescueCorpse(corpseId){return this.dispatch('m2.corpse.rescue',{corpseId});},
   m2RecoverCorpse(corpseId){return this.dispatch('m2.corpse.recover',{corpseId});},
   m2AvoidEncounter(mode){return this.dispatch('m2.encounter.avoid',{mode});},
   m2ExploreEncounter(){return this.dispatch('m2.encounter.explore',{});},
