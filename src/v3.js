@@ -877,7 +877,7 @@ function m2CombatScreen(){
  const act=(type,targetId)=>{
   const result=mainV2.m2CombatAction({actorId:actor,type,targetId});
   if(!result.accepted)nextLog('위험','전투 행동 거부: '+(result.reason??''));
-  else{refreshV2Inventory();nextLog('전투',actor+' · '+type);}
+  else{refreshV2Inventory();nextLog('전투',actor+' · '+type);if(mainV2.m2Combat()?.outcome==='defeat')s.page='생활';}
   render();
  };
  if(actor==='player'){
@@ -886,7 +886,7 @@ function m2CombatScreen(){
   btn('방어',()=>act('defend'),'btn',buttons);
   btn('퇴각',()=>act('retreat'),'btn',buttons);
  }else{
-  btn('적의 행동 진행',()=>{const result=mainV2.m2EnemyTurn();if(!result.accepted)nextLog('위험','적 행동 거부: '+(result.reason??''));else{refreshV2Inventory();nextLog('전투','적 행동 처리');}render();},'btn primary',buttons);
+  btn('적의 행동 진행',()=>{const result=mainV2.m2EnemyTurn();if(!result.accepted)nextLog('위험','적 행동 거부: '+(result.reason??''));else{refreshV2Inventory();nextLog('전투','적 행동 처리');if(mainV2.m2Combat()?.outcome==='defeat')s.page='생활';}render();},'btn primary',buttons);
  }
 }
 function dungeon(){
@@ -911,6 +911,18 @@ for(let y=0;y<localTiles.length;y++)for(let x=0;x<localTiles[y].length;x++){
  tile.title=!known?'미탐색':player?'플레이어':stairCells.has(idx)?'계단':v==='#'?'벽':'바닥';
 }
 make('h2',{text:'탐색 제어'},right);
+const recovery=mainV2.current().world.runtime.m2Corpses??[];
+for(const corpse of recovery){
+ if(corpse.recovered||corpse.ownerId!==mainV2.current().player.id||
+  corpse.siteId!==mainV2.localSite()||corpse.floor!==mainV2.localFloor()||
+  corpse.pos[0]!==s.pos[0]||corpse.pos[1]!==s.pos[1])continue;
+ btn('사망 전리품 회수',()=>{
+  const result=mainV2.m2RecoverCorpse(corpse.id);
+  if(result.accepted){refreshV2Inventory();nextLog('탐험','사망 지점의 전리품을 회수했습니다.');}
+  else nextLog('위험','전리품 회수 거부: '+(result.reason??''));
+  render();
+ },'btn primary',right);
+}
 const activeM2=mainV2.m2Combat();
 if(activeM2?.phase==='resolved')make('p',{text:'최근 전투 결과: '+activeM2.outcome},right);
 btn('주변 위험 탐색 (M2)',()=>{
