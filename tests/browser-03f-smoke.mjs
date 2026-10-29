@@ -73,6 +73,17 @@ try{
  const battle=page.getByRole('region',{name:'M2 실제 전투'});
  await battle.waitFor();
  assert.match(await battle.innerText(),/라운드 1/);
+ // M2 battle F5 / fresh-document F9: active initiative survives browser reload.
+ await page.keyboard.press('F5');
+ await page.getByText(/IndexedDB에 저장했습니다/).first().waitFor({timeout:15000});
+ await page.reload({waitUntil:'domcontentloaded'});
+ await page.keyboard.press('F9');
+ const midBattleDialog=page.getByRole('dialog',{name:'저장 상태 불러오기 확인'});
+ await midBattleDialog.waitFor();
+ await midBattleDialog.getByRole('button',{name:'불러오기'}).click();
+ await page.getByRole('region',{name:'M2 실제 전투'}).waitFor();
+ assert.match(await page.getByRole('region',{name:'M2 실제 전투'}).innerText(),/라운드 1.*player/);
+
  assert.equal(await battle.getByRole('button',{name:'위치 변경'}).count(),0);
  await battle.getByRole('button',{name:'방어'}).click();
  await battle.getByRole('button',{name:'적의 행동 진행'}).click();
