@@ -184,3 +184,24 @@ test('M2 corpse v3 persistence validates owner, payload and duplicate ledger',as
  assert.throws(()=>g.applyApprovedSave(invalid));
  assert.deepEqual(g.current(),snapshot);
 });
+
+test('M2 town fallback refuses reachable corpses and atomically rescues invalid-site stash once',async()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-town-rescue'});
+ const {createSaveV3}=await import('../dist/engine/v2.js');
+ const initial=g.current(),{schemaVersion,clock,...rest}=structuredClone(initial);
+ const v3={...rest,schemaVersion:3,clock:{elapsedSeconds:clock.elapsedUnits,calendarId:'somnium-calendar-v1',startSecondOfDay:28800}};
+ const corpse={id:'m2:corpse:lost',ownerId:v3.player.id,siteId:'old:deleted-site',floor:0,pos:[2,2],
+  items:[{id:'m2:lost-item',definitionId:'m2:loot:fang',quantity:1}],recovered:false};
+ v3.world.runtime.m2Corpses=[corpse,{...structuredClone(corpse),id:'m2:corpse:reachable',siteId:'core:site/labyrinth'}];
+ const slot={slotId:'m2-rescue',worldId:'m2-world',kind:'manual',label:'Lost corpse',savedAt:'2026-10-29T00:00:00Z',revision:0};
+ g.applyApprovedSave(createSaveV3(v3,slot,'m2-test',g.registry));
+ const before=g.current();
+ assert.equal(g.m2RescueCorpse('m2:corpse:reachable').accepted,false);
+ assert.deepEqual(g.current(),before);
+ assert.equal(g.m2RescueCorpse('m2:corpse:lost').accepted,true);
+ assert.equal(g.current().itemWorld.items.find(i=>i.id==='m2:lost-item')?.quantity,1);
+ const after=g.current();
+ assert.equal(g.m2RescueCorpse('m2:corpse:lost').accepted,false);
+ assert.deepEqual(g.current(),after);
+});
