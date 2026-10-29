@@ -83,7 +83,8 @@ export function createMainV2Inventory(uiItems,options={}) {
   'm1:seed:blueberry':'블루베리 씨앗','m1:crop:wheat':'밀','m1:crop:potato':'감자',
   'm1:crop:strawberry':'딸기','m1:crop:blueberry':'블루베리','m1:food:bread':'밀빵',
   'm1:food:baked-potato':'구운 감자','m1:seed:apple':'사과나무 묘목','m1:crop:apple':'사과'};
- const m2Catalog=[{id:'m2:loot:fang',name:'시험용 야수 송곳니',group:'전리품',qty:0,tags:['m2:loot']}];
+ const m2Catalog=[{id:'m2:loot:fang',name:'시험용 야수 송곳니',group:'전리품',qty:0,tags:['m2:loot']},
+ {id:'m2:consumable:salve',name:'시험용 응급 연고',group:'소모품',qty:0,tags:['m2:healing']}];
  const m1Catalog=Object.keys(M1_PRICES).map(id=>({id,name:m1Names[id],group:id.includes(':seed:')?'씨앗':'식재료',qty:0,tags:['m1:life']}));
  const initialItems=options.resources05A===true?[...uiItems,...starterTools]:uiItems;
  const templates=new Map([...initialItems,...resourceItems,...materialTools05A,...m1Catalog,...m2Catalog].map(item=>[item.id,{...item}]));
@@ -316,6 +317,14 @@ export function createMainV2Inventory(uiItems,options={}) {
   const current=snapshot.world.runtime.m2Combat;
   if(!current||current.phase!=='active')throw Error('M2_NO_ACTIVE_COMBAT');
   if(command.payload.actorId!==current.queue[current.cursor])throw Error('M2_NOT_ACTORS_TURN');
+  if(command.payload.type==='skill'&&(command.payload.actorId!=='player'||snapshot.player.currentMp<5))
+   throw Error('M2_INSUFFICIENT_MP');
+  let consumable=null;
+  if(command.payload.type==='item'){
+   consumable=snapshot.itemWorld.items.find(i=>i.definitionId==='m2:consumable:salve'&&i.quantity>0&&
+    snapshot.itemWorld.placements.some(p=>p.itemId===i.id&&p.location.kind==='inventory'&&p.location.ownerId===snapshot.player.id));
+   if(!consumable||command.payload.actorId!=='player')throw Error('M2_ITEM_NOT_OWNED');
+  }
   const result=actM2Combat(current,command.payload);
   if(!result.ok)throw Error(result.reason);
   const hp=result.state.participants[0].hp;
@@ -340,6 +349,7 @@ export function createMainV2Inventory(uiItems,options={}) {
   const ledger=snapshot.world.runtime.m2RewardedEncounters??[];
   if(victory&&ledger.includes(current.encounterId))throw Error('M2_REWARD_ALREADY_CLAIMED');
   let itemWorld=deathItems,progression=snapshot.progression;
+  if(consumable){itemWorld={...itemWorld,items:itemWorld.items.map(i=>i.id===consumable.id?{...i,quantity:i.quantity-1}:i)};}
   if(victory){
    itemWorld=creditOwnedResource05A(itemWorld,snapshot.player.id,
     'm2:reward:'+current.encounterId,'m2:loot:fang',1);
@@ -348,6 +358,7 @@ export function createMainV2Inventory(uiItems,options={}) {
     actionId:'m2:victory:'+current.encounterId,skillId:skill.id,xp:3})};
   }
   return {outcome:'success',nextState:{...snapshot,itemWorld,progression,player:{...snapshot.player,currentHp:defeated?Math.max(1,Math.floor(result.state.participants[0].maxHp/2)):hp,
+    currentMp:snapshot.player.currentMp-(command.payload.type==='skill'?5:0),
     ...(defeated?{regionId:'거점 마을'}:{})},
    world:{...deathWorld,runtime:{...deathWorld.runtime,m2Combat:result.state,
     ...(victory?{m2RewardedEncounters:[...ledger,current.encounterId]}:{})}}},
