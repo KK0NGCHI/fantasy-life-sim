@@ -1,5 +1,5 @@
 /** M2-01 encounter foundation: pure, deterministic, no combat movement. */
-export const M2_ACTIONS=Object.freeze(['attack','defend','retreat']);
+export const M2_ACTIONS=Object.freeze(['attack','defend','retreat','skill','item']);
 const safe=n=>Number.isSafeInteger(n)&&n>=0;
 const clone=x=>structuredClone(x);
 export function startM2Encounter({encounterId,playerHp,enemyHps=[12],seed=1}={}){
@@ -29,20 +29,24 @@ export function actM2Combat(source,{actorId,type,targetId}={}){
  if(!M2_ACTIONS.includes(type))return {ok:false,reason:'INVALID_ACTION'};
  const s=clone(source),actor=s.participants.find(p=>p.id===actorId);
  if(!actor||actor.hp===0||s.queue[s.cursor]!==actorId)return {ok:false,reason:'NOT_ACTORS_TURN'};
- if(actor.side==='enemy'&&type==='retreat')return {ok:false,reason:'INVALID_ACTION'};
+ if(actor.side==='enemy'&&['retreat','skill','item'].includes(type))return {ok:false,reason:'INVALID_ACTION'};
  if(type==='retreat'&&actor.side==='player'){
   s.seed=roll(s.seed);
   if(s.seed%100<65){s.phase='resolved';s.outcome='retreat';}
   else s.log.push({type:'retreat.failed',actorId});
  }else if(type==='defend'){
   actor.guard=true;s.log.push({type:'defend',actorId});
+ }else if(type==='item'){
+  if(actor.side!=='player'||actor.hp===actor.maxHp)return {ok:false,reason:'HEAL_NOT_NEEDED'};
+  const restored=Math.min(12,actor.maxHp-actor.hp);actor.hp+=restored;
+  s.log.push({type:'item',actorId,restored});
  }else{
   const target=s.participants.find(p=>p.id===targetId);
   if(!target||target.hp===0||target.side===actor.side)return {ok:false,reason:'INVALID_TARGET'};
   s.seed=roll(s.seed);
-  const raw=3+s.seed%4,damage=Math.max(1,raw-(target.guard?2:0));
+  const raw=(type==='skill'?5:3)+s.seed%4,damage=Math.max(1,raw-(target.guard?2:0));
   target.guard=false;target.hp=Math.max(0,target.hp-damage);
-  s.log.push({type:'attack',actorId,targetId,damage});
+  s.log.push({type,actorId,targetId,damage});
  }
  if(s.phase==='active'){
   const enemies=s.participants.filter(p=>p.side==='enemy');
