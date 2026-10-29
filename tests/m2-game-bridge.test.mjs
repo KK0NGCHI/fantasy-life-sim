@@ -205,3 +205,31 @@ test('M2 town fallback refuses reachable corpses and atomically rescues invalid-
  assert.equal(g.m2RescueCorpse('m2:corpse:lost').accepted,false);
  assert.deepEqual(g.current(),after);
 });
+
+test('M2 rest is town-only, spends a turn and restores HP after defeat',()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-rest'});
+ const initial=g.current();
+ const full=g.m2Rest();
+ assert.equal(full.accepted,true);
+ assert.equal(full.outcome,'failed');
+ assert.equal(g.current().turn,initial.turn+1);
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ const before=g.current();
+ assert.equal(g.m2Rest().accepted,false);
+ assert.deepEqual(g.current(),before);
+ assert.equal(g.m2StartEncounter({encounterId:'m2:rest-defeat',enemyHps:[50],seed:5}).accepted,true);
+ for(let i=0;i<140&&g.m2Combat().phase==='active';i++){
+  const id=g.m2Combat().queue[g.m2Combat().cursor];
+  const result=id==='player'?g.m2CombatAction({actorId:'player',type:'defend'}):g.m2EnemyTurn();
+  assert.equal(result.accepted,true,JSON.stringify(result));
+ }
+ assert.equal(g.m2Combat().outcome,'defeat');
+ assert.equal(g.current().world.runtime.region,'거점 마을');
+ const hp=g.current().player.currentHp,mp=g.current().player.currentMp;
+ const turn=g.current().turn;
+ assert.equal(g.m2Rest().accepted,true);
+ assert.equal(g.current().player.currentHp,Math.min(100,hp+25));
+ assert.equal(g.current().player.currentMp,Math.min(80,mp+20));
+ assert.equal(g.current().turn,turn+1);
+});
