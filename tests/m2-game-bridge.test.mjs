@@ -302,3 +302,39 @@ test('M2 skill and owned healing item use existing MP and itemWorld atomically',
   assert.equal(g.current().itemWorld.items.find(i=>i.definitionId==='m2:consumable:salve').quantity,1);
  }
 });
+
+test('M2 town supply awards only one owned salve and persists its claim flag',()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-salve-town',progression04A:true});
+ const before=g.current();
+ const awarded=g.m2ClaimStarterSalve();
+ assert.equal(awarded.accepted,true,JSON.stringify(awarded));
+ assert.equal(awarded.outcome,'success');
+ const owned=g.current().itemWorld.items.find(i=>i.definitionId==='m2:consumable:salve');
+ assert.equal(owned?.quantity,1);
+ assert.equal(g.current().itemWorld.placements.some(p=>p.itemId===owned.id&&p.location.kind==='inventory'&&p.location.ownerId===g.current().player.id),true);
+ assert.equal(g.current().world.runtime.m2StarterSalveClaimed,true);
+ assert.equal(g.current().turn,before.turn+1);
+ const again=g.m2ClaimStarterSalve();
+ assert.equal(again.outcome,'failed');
+ assert.equal(g.current().itemWorld.items.find(i=>i.id===owned.id)?.quantity,1);
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ const during=g.current();
+ assert.equal(g.m2ClaimStarterSalve().accepted,false);
+ assert.deepEqual(g.current(),during);
+});
+test('M2 player combat damage derives from existing strength allocation, not caller bonus',()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const low=createMainV2Inventory(fixture,{worldSeed:'m2-strength',progression04A:true});
+ const high=createMainV2Inventory(fixture,{worldSeed:'m2-strength',progression04A:true,attributeAllocation:{'근력':8}});
+ for(const g of [low,high]){
+  assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+  assert.equal(g.m2StartEncounter({encounterId:'m2:strength',enemyHps:[30],seed:5}).accepted,true);
+ }
+ const a=low.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0',damageBonus:999});
+ const b=high.m2CombatAction({actorId:'player',type:'attack',targetId:'enemy:0',damageBonus:999});
+ assert.equal(a.accepted,true);
+ assert.equal(b.accepted,true);
+ assert.ok(high.m2Combat().participants[1].hp<low.m2Combat().participants[1].hp);
+ assert.equal(high.m2Combat().seed,low.m2Combat().seed);
+});
