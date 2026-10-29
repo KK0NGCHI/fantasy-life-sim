@@ -314,6 +314,8 @@ export function decodeSaveV3(raw:unknown,registry:ItemRegistry):V3Result{
  }
  // M2 death/reward ledgers are optional for old saves and bounded for corruption safety.
  const m2rt=raw.state.world.runtime;
+ if(Object.hasOwn(m2rt,'m2StarterSalveClaimed')&&typeof m2rt.m2StarterSalveClaimed!=='boolean')
+  return {ok:false,reason:'INVALID_DATA'};
  const m2id=(v:unknown)=>typeof v==='string'&&v.length>0&&v.length<=200;
  const m2num=(v:unknown)=>typeof v==='number'&&Number.isSafeInteger(v)&&v>=0;
  if(Object.hasOwn(m2rt,'m2RewardedEncounters')){
