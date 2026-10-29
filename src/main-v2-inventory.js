@@ -230,6 +230,17 @@ export function createMainV2Inventory(uiItems,options={}) {
   return {outcome:'success',nextState:{...snapshot,world:{...snapshot.world,runtime:{...snapshot.world.runtime,m2Combat:begun.state}}},
    events:[{type:'m2.encounter.started',payload:{encounterId:begun.state.encounterId}}]};
  }],
+ ['m2.rest',(snapshot)=>{
+  if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
+   snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_REST_TOWN_REQUIRED');
+  const hp=snapshot.player.currentHp,mp=snapshot.player.currentMp;
+  if(!Number.isSafeInteger(hp)||hp<1||hp>100||!Number.isSafeInteger(mp)||mp<0||mp>80)
+   throw Error('M2_INVALID_VITALS');
+  if(hp===100&&mp===80)return {outcome:'failed',nextState:snapshot,events:[{type:'m2.rest.unneeded',payload:{}}]};
+  const player={...snapshot.player,currentHp:Math.min(100,hp+25),currentMp:Math.min(80,mp+20)};
+  return {outcome:'success',nextState:{...snapshot,player},
+   events:[{type:'m2.rest.completed',payload:{hp:player.currentHp,mp:player.currentMp}}]};
+ }],
  ['m2.corpse.rescue',(snapshot,command)=>{
   if(snapshot.world.runtime.dungeon||snapshot.world.runtime.region!=='거점 마을'||
    snapshot.world.runtime.m2Combat?.phase==='active')throw Error('M2_RESCUE_TOWN_REQUIRED');
@@ -849,7 +860,7 @@ export function createMainV2Inventory(uiItems,options={}) {
    const result=simulateJourney(current);
    return {turns:result.turns,worldUnits:result.units};
   }
-    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
+    if(action.type==='m2.encounter.start'||action.type==='m2.encounter.explore'||action.type==='m2.encounter.avoid'||action.type==='m2.rest'||action.type==='m2.corpse.recover'||action.type==='m2.corpse.rescue'||action.type==='m2.combat.act')return {turns:1,worldUnits:60};
     if(action.type==='m1.home.wood-shed')return {turns:1,worldUnits:300};
     if(action.type==='m1.life'){
      const a=action.payload;
@@ -957,6 +968,7 @@ export function createMainV2Inventory(uiItems,options={}) {
     return {accepted:false,outcome:'rejected',reason:'DUPLICATE_REQUEST',events:[]};
    return this.dispatch('m1.life',action);
   },
+  m2Rest(){return this.dispatch('m2.rest',{});},
   m2Combat(){return state.world.runtime.m2Combat?structuredClone(state.world.runtime.m2Combat):null;},
   m2RescueCorpse(corpseId){return this.dispatch('m2.corpse.rescue',{corpseId});},
   m2RecoverCorpse(corpseId){return this.dispatch('m2.corpse.recover',{corpseId});},
