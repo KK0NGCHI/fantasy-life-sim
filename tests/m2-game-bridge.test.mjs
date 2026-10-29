@@ -233,3 +233,27 @@ test('M2 rest is town-only, spends a turn and restores HP after defeat',()=>{
  assert.equal(g.current().player.currentMp,Math.min(80,mp+20));
  assert.equal(g.current().turn,turn+1);
 });
+
+test('M2 auto combat stops before unsafe action without consuming turns',()=>{
+ const fixture=[{id:'fixture',name:'시험',group:'재료',qty:1,tags:[]}];
+ const g=createMainV2Inventory(fixture,{worldSeed:'m2-auto-safety'});
+ assert.equal(g.dispatch('dungeon.enter',{}).accepted,true);
+ assert.equal(g.m2StartEncounter({encounterId:'auto:safe',enemyHps:[30],seed:7}).accepted,true);
+ const initial=structuredClone(g.current());
+ const invalid=g.m2AutoCombat({hpMin:-1});
+ assert.equal(invalid.ok,false);
+ assert.deepEqual(g.current(),initial);
+ const safe=g.m2AutoCombat({hpMin:100,maxActions:6});
+ assert.equal(safe.stopReason,'SAFETY_THRESHOLD');
+ assert.equal(safe.completed,0);
+ assert.deepEqual(g.current(),initial);
+ const two=g.m2AutoCombat({hpMin:0,maxActions:2});
+ assert.equal(two.ok,true);
+ assert.equal(two.completed,2);
+ assert.equal(g.current().turn,initial.turn+2);
+ assert.equal(g.m2Combat().queue[g.m2Combat().cursor],'player');
+ const before=structuredClone(g.current());
+ const stopped=g.m2AutoCombat({hpMin:100,maxActions:4});
+ assert.equal(stopped.completed,0);
+ assert.deepEqual(g.current(),before);
+});
