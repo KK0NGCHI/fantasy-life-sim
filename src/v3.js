@@ -114,6 +114,13 @@ function lifestyle(){
 const el=head(s.region,'');const hue={'거점 마을':'town','초원·농경지':'pasture','숲':'forest','강·호수':'river','습지':'marsh','산맥':'mountain','광산':'mine','설원':'snow','사막':'desert','해안·항구':'coast','바다':'ocean','화산지대':'volcano','고대 유적':'ruins','폐허·묘지':'grave','만신전':'temple','지하미궁':'dungeon'}[s.region]||'pasture';
 const hero=make('section',{class:'region-scene scene-'+hue},el);hero.innerHTML='<div class="scene-heading"><div><h2>'+esc(s.region)+'</h2></div>'+svgIcon(hue==='forest'?'trees':hue==='river'?'waves':hue==='mine'?'mountain':hue==='volcano'?'flame':hue==='snow'?'snowflake':hue==='desert'?'sun':hue==='ocean'||hue==='coast'?'waves':hue==='temple'?'sparkles':hue==='dungeon'?'footprints':'sun')+'</div>';
 if(s.region==='거점 마을'){
+ const supplyPanel=section(el,'M2 모험 준비');
+ btn('응급 연고 1개 지급받기 (최초 1회)',()=>{
+  const result=mainV2.m2ClaimStarterSalve();
+  if(result.accepted){refreshV2Inventory();nextLog('준비',result.outcome==='success'?'응급 연고를 획득했습니다.':'이미 지급받은 물품입니다.');}
+  else nextLog('위험','보급 요청 거부: '+(result.reason??''));
+  render();
+ },'btn',supplyPanel);
  const recoveryPanel=section(el,'M2 회복');
  btn('마을에서 휴식 (HP +25 / MP +20)',()=>{
   const result=mainV2.m2Rest();
