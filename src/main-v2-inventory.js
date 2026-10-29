@@ -1072,6 +1072,10 @@ export function createMainV2Inventory(uiItems,options={}) {
   localPortal(){const [x,y]=state.world.runtime.pos;return localPortal(localRegistry,localPosition(state));},
   localRoute(goal,known){const [x,y]=state.world.runtime.pos;return safeLocalRoute(localRegistry,localPosition(state),{siteId:localSite(state),floor:state.world.runtime.localFloor??0,x:goal[0],y:goal[1]},new Set(known));},
   dispatch(type,payload={}){
+    // Active battle owns the turn. Reject all unrelated world and inventory actions
+    // before the common dispatcher so they consume zero turns and mutate nothing.
+    if(state.world.runtime.m2Combat?.phase==='active'&&type!=='m2.combat.act')
+     return {accepted:false,outcome:'rejected',reason:'M2_COMBAT_LOCKED',events:[]};
     const result=dispatcher.dispatch(state,{type,actorId:state.player.id,payload});
     if(result.accepted){
      // Stage integration changes before committing; consumers must receive the reconciled state.
