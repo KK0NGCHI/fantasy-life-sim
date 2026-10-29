@@ -977,6 +977,27 @@ export function createMainV2Inventory(uiItems,options={}) {
   m2StartEncounter(options){return this.dispatch('m2.encounter.start',options);},
   m2CombatAction(action){return this.dispatch('m2.combat.act',action);},
   m2EnemyTurn(){const choice=chooseM2EnemyAction(state.world.runtime.m2Combat);return choice.ok?this.dispatch('m2.combat.act',choice.action):{accepted:false,reason:choice.reason,events:[]};},
+  /** Bounded combat automation; each step uses the ordinary turn dispatcher. */
+  m2AutoCombat({hpMin=25,mpMin=0,hungerMin=0,maxActions=12}={}){
+   if(![hpMin,mpMin,hungerMin].every(v=>Number.isSafeInteger(v)&&v>=0&&v<=100)||
+    !Number.isSafeInteger(maxActions)||maxActions<1||maxActions>32)
+    return {ok:false,reason:'INVALID_AUTO_POLICY',completed:0};
+   const events=[];
+   for(let i=0;i<maxActions;i++){
+    const battle=state.world.runtime.m2Combat;
+    if(!battle||battle.phase!=='active')return {ok:true,completed:i,stopReason:'BATTLE_RESOLVED',events};
+    const player=state.player;
+    if(player.currentHp<=hpMin||player.currentMp<=mpMin&&mpMin>0||player.hunger<=hungerMin&&hungerMin>0)
+     return {ok:true,completed:i,stopReason:'SAFETY_THRESHOLD',events};
+    const actor=battle.queue[battle.cursor];
+    const target=battle.participants.find(p=>p.side==='enemy'&&p.hp>0);
+    const result=actor==='player'?this.m2CombatAction({actorId:'player',type:'attack',targetId:target?.id}):this.m2EnemyTurn();
+    if(!result.accepted)return {ok:true,completed:i,stopReason:result.reason??'ACTION_REJECTED',events};
+    events.push(...result.events);
+    if(result.outcome==='failed')return {ok:true,completed:i+1,stopReason:'ACTION_FAILED',events};
+   }
+   return {ok:true,completed:maxActions,stopReason:'ACTION_LIMIT',events};
+  },
   m1BuildWoodShed(){return this.dispatch('m1.home.wood-shed',{});},
   /** Bounded synchronous automation. Calls exactly the same game actions as a
    * manual player, with safety evaluated before each attempt. */
